@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
+import PlatformDeskScreen from "../pages/PlatformDeskScreen";
 
 // Protected Route Component
 function ProtectedRoute({ children, user, requiredRole }) {
@@ -19,6 +20,7 @@ export const ROUTES = {
   HOME: "/",
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
+  PLATFORM_DESK: "/platformdesk",
 };
 
 export default function AppRouter({ user, onLogin, onLogout }) {
@@ -47,6 +49,16 @@ export default function AppRouter({ user, onLogin, onLogout }) {
           element={
             <ProtectedRoute user={user} requiredRole="office">
               <FrontOfficeDeskScreen user={user} onLogout={onLogout} />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Platform Desk Route - Protected for platform admin */}
+        <Route 
+          path={ROUTES.PLATFORM_DESK} 
+          element={
+            <ProtectedRoute user={user} requiredRole="platform">
+              <PlatformDeskScreen user={user} onLogout={onLogout} />
             </ProtectedRoute>
           } 
         />
