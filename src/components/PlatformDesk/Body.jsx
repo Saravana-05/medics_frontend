@@ -2,10 +2,10 @@
 import Clinic from "./Clinic";
 import ClinicBranches from "./ClinicBranches";
 import Departments from "./Departments";
-// import Staff from "./Staff";
-// import Doctors from "./Doctors";
-// import Nurses from "./Nurses";
-// import Patients from "./Patients";
+import Staff from "./Staff";
+import Doctors from "./Doctors";
+import Nurses from "./Nurses";
+import Patients from "./Patients";
 import Reports from "./Reports";
 import Settings from "./Settings";
 
@@ -15,10 +15,10 @@ export default function Body({ activeMenu }) {
       {activeMenu === "clinic" && <Clinic />}
       {activeMenu === "clinicBranches" && <ClinicBranches />}
       {activeMenu === "departments" && <Departments />}
-      {/* {activeMenu === "staff" && <Staff />}
+      {activeMenu === "staff" && <Staff />}
       {activeMenu === "doctors" && <Doctors />}
       {activeMenu === "nurses" && <Nurses />}
-      {activeMenu === "patients" && <Patients />} */}
+      {activeMenu === "patients" && <Patients />}
       {activeMenu === "reports" && <Reports />}
       {activeMenu === "settings" && <Settings />}
     </div>

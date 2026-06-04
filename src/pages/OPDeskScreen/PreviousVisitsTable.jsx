@@ -167,7 +167,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
         
         {/* Header Section - Modern */}
         <div className="flex-shrink-0 px-4 py-[0.7rem] border-b flex justify-between items-center" style={{ 
-          background: "linear-gradient(135deg, var(--color-primary-muted) 0%, var(--color-surface) 100%)",
+          background: "linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-muted) 100%)",
           borderColor: "var(--color-border)"
         }}>
           <div className="flex items-center gap-2.5">

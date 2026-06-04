@@ -5,6 +5,7 @@ import TableUI from "../Table/TableUI";
 import ClinicBranchFormModal from "../../modal/ClinicBranchFormModal";
 import { getAllClinicBranches, createClinicBranch, updateClinicBranch, deleteClinicBranch } from "../../services/clinicBranchService";
 import { getAllClinics } from "../../services/clinicService";
+import ViewClinicBranchModal from "../../modal/ViewClinicBranchModal";
 
 export default function ClinicBranches() {
   const [branches, setBranches] = useState([]);
@@ -15,6 +16,8 @@ export default function ClinicBranches() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedClinicFilter, setSelectedClinicFilter] = useState("");
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewBranch, setViewBranch] = useState(null);
 
   // Fetch clinics for filter dropdown
   useEffect(() => {
@@ -70,9 +73,15 @@ export default function ClinicBranches() {
   };
 
   const handleView = (branch) => {
-    console.log("View branch:", branch);
-    alert(`View Branch: ${branch.branch_name}`);
+  // Enrich branch data with clinic name
+  const clinic = clinics.find(c => c.id === branch.clinic_id);
+  const enrichedBranch = {
+    ...branch,
+    clinic_name: clinic ? clinic.clinic_name : "Unknown"
   };
+  setViewBranch(enrichedBranch);
+  setShowViewModal(true);
+};
 
   const handleEdit = (branch) => {
     setSelectedBranch(branch);
@@ -217,6 +226,13 @@ export default function ClinicBranches() {
           onSave={handleSave}
         />
       )}
+
+      {showViewModal && (
+  <ViewClinicBranchModal
+    branch={viewBranch}
+    onClose={() => setShowViewModal(false)}
+  />
+)}
     </>
   );
 }

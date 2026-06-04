@@ -4,6 +4,7 @@ import { Plus, Building2, Edit2, Eye, Trash2 } from "lucide-react";
 import TableUI from "../Table/TableUI";
 import ClinicFormModal from "../../modal/ClinicFormModal";
 import { getAllClinics, createClinic, updateClinic, deleteClinic } from "../../services/clinicService";
+import ViewClinicModal from "../../modal/ViewClinicModal";
 
 export default function Clinic() {
   const [clinics, setClinics] = useState([]);
@@ -12,6 +13,8 @@ export default function Clinic() {
   const [showModal, setShowModal] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewClinic, setViewClinic] = useState(null);
 
   // Fetch clinics from API
   useEffect(() => {
@@ -38,11 +41,11 @@ export default function Clinic() {
     setShowModal(true);
   };
 
-  const handleView = (clinic) => {
-    console.log("View clinic:", clinic);
-    // Implement view logic (could show a view modal)
-    alert(`View Clinic: ${clinic.clinic_name}`);
-  };
+ const handleView = (clinic) => {
+  setViewClinic(clinic);
+  setShowViewModal(true);
+};
+
 
   const handleEdit = (clinic) => {
     setSelectedClinic(clinic);
@@ -159,6 +162,13 @@ export default function Clinic() {
           onSave={handleSave}
         />
       )}
+
+      {showViewModal && (
+  <ViewClinicModal
+    clinic={viewClinic}
+    onClose={() => setShowViewModal(false)}
+  />
+)}
     </>
   );
 }

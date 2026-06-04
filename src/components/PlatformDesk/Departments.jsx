@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Building, Plus, Filter } from "lucide-react";
 import TableUI from "../Table/TableUI";
 import DepartmentFormModal from "../../modal/DepartmentFormModal";
+import ViewDepartmentModal from "../../modal/ViewDepartmentModal";
 import { getAllDepartments, createDepartment, updateDepartment, deleteDepartment } from "../../services/departmentService";
 import { getAllClinics } from "../../services/clinicService";
 
@@ -12,7 +13,9 @@ export default function Departments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [viewDepartment, setViewDepartment] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedClinicFilter, setSelectedClinicFilter] = useState("");
 
@@ -49,7 +52,9 @@ export default function Departments() {
         const clinic = clinics.find(c => c.id === dept.clinic_id);
         return {
           ...dept,
-          clinic_name: clinic ? clinic.clinic_name : "Unknown"
+          clinic_name: clinic ? clinic.clinic_name : "Unknown",
+          clinic_city: clinic?.city,
+          clinic_address: clinic?.address_line1
         };
       }));
       
@@ -70,8 +75,16 @@ export default function Departments() {
   };
 
   const handleView = (department) => {
-    console.log("View department:", department);
-    alert(`View Department: ${department.department_name}`);
+    // Enrich department data with clinic details for view
+    const clinic = clinics.find(c => c.id === department.clinic_id);
+    const enrichedDepartment = {
+      ...department,
+      clinic_name: clinic ? clinic.clinic_name : "Unknown",
+      clinic_city: clinic?.city,
+      clinic_address: clinic?.address_line1
+    };
+    setViewDepartment(enrichedDepartment);
+    setShowViewModal(true);
   };
 
   const handleEdit = (department) => {
@@ -102,21 +115,10 @@ export default function Departments() {
     setShowModal(false);
   };
 
-  const getClinicName = (clinicId) => {
-    const clinic = clinics.find(c => c.id === clinicId);
-    return clinic ? clinic.clinic_name : "Unknown";
-  };
-
   const columns = [
     { key: "department_code", label: "Dept Code", align: "left", sortable: true },
     { key: "department_name", label: "Department Name", align: "left", sortable: true },
-    { 
-      key: "clinic_name", 
-      label: "Clinic", 
-      align: "left", 
-      sortable: true,
-      render: (row) => getClinicName(row.clinic_id)
-    },
+    { key: "clinic_name", label: "Clinic", align: "left", sortable: true },
     { key: "description", label: "Description", align: "left", sortable: false },
     { key: "status", label: "Status", align: "left", sortable: true },
   ];
@@ -213,6 +215,14 @@ export default function Departments() {
           isEdit={isEdit}
           onClose={() => setShowModal(false)}
           onSave={handleSave}
+        />
+      )}
+
+      {/* View Department Modal */}
+      {showViewModal && (
+        <ViewDepartmentModal
+          department={viewDepartment}
+          onClose={() => setShowViewModal(false)}
         />
       )}
     </>

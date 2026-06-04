@@ -58,17 +58,11 @@ export default function LoginPage({ onLogin }) {
           bearerToken: userData.bearer_token,
         };
         
-        // Store token in localStorage/sessionStorage for persistence
-        if (rememberMe) {
-          localStorage.setItem('authToken', userData.bearer_token);
-          localStorage.setItem('user', JSON.stringify(user));
-        } else {
-          sessionStorage.setItem('authToken', userData.bearer_token);
-          sessionStorage.setItem('user', JSON.stringify(user));
-        }
+       
+       
         
         // Call onLogin to set user in App state
-        onLogin(user);
+        onLogin(user, rememberMe);
         
         // Navigate based on user type
         if (userType === 'doctor') {

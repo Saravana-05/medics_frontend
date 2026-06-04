@@ -447,13 +447,13 @@ export default function FindingsTab({ findings, setFindings, patient }) {
   };
 
   return (
-    <div className="h-full flex flex-col rounded-lg overflow-hidden shadow-lg" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
+    <div className="h-full flex flex-col rounded-xs overflow-hidden shadow-lg" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
 
       {/* Header Section with Clear and Save buttons */}
       <div className="border-b" style={{ background: `linear-gradient(135deg, ${FINDINGS_COLOR.light} 0%, var(--color-surface) 100%)`, borderColor: "var(--color-border)" }}>
-        <div className="px-4 py-3 flex items-center justify-between">
+        <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FolderOpen size={18} style={{ color: FINDINGS_COLOR.accent }} />
+            <FolderOpen size={16} style={{ color: FINDINGS_COLOR.accent }} />
             <h2 className="text-base font-extrabold" style={{ color: FINDINGS_COLOR.accent }}>
               Clinical Findings & Documents
             </h2>

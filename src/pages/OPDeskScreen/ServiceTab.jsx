@@ -258,6 +258,7 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
 }
 
 /* ── Add Row Component ── */
+/* ── Add Row Component (wider service field, inline clear button) ── */
 function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }) {
   const inputRef    = useRef(null);
   const rowRef      = useRef(null);
@@ -265,14 +266,9 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
+  const [serviceSelected, setServiceSelected] = useState(false); // ← tracks if a service is confirmed
 
-  const commonServices = [
-    "Chest X-Ray (PA View)", "X-Ray Lumbar Spine (AP/Lat)", "USG Whole Abdomen",
-    "CT Brain Plain", "MRI Brain with Contrast", "ECG (12 Leads)",
-    "2D Echo with Doppler", "Pulmonary Function Test", "DEXA Scan",
-    "Mammography Both Breasts", "Upper GI Endoscopy", "Colonoscopy",
-    "Doppler Study - Carotid", "Doppler Study - Lower Limb", "ECG Treadmill Test"
-  ];
+  const commonServices = SERVICE_SUGGESTIONS; // ← use full SERVICE_SUGGESTIONS instead of hardcoded list
 
   const dropdownItems = query === "" ? commonServices : suggestions.slice(0, 8);
 
@@ -304,9 +300,19 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
   const handleSelectService = (service) => {
     setQuery(service);
     onDraftChange("name")(service);
+    setServiceSelected(true);
     setShowDropdown(false);
     setHighlightedIdx(-1);
     inputRef.current?.focus();
+  };
+
+  // Clear just the service name — keeps type and detail fields intact
+  const handleClearService = () => {
+    setQuery("");
+    onDraftChange("name")("");
+    setServiceSelected(false);
+    setShowDropdown(false);
+    setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const handleRowBlur = (e) => {
@@ -346,6 +352,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       style={{ background: "#e3f0fc", borderColor: "var(--color-services)" }}
       onBlur={handleRowBlur}
     >
+      {/* ── Dropdown Portal ── */}
       {showDropdown && dropdownItems.length > 0 && (
         <div className="rounded-lg shadow-xl overflow-hidden"
           style={{ ...dropdownStyle, background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
@@ -359,7 +366,9 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
                 className="px-4 py-2.5 cursor-pointer text-sm flex items-center gap-2"
                 style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "#e3f0fc" : "transparent" }}
                 onMouseEnter={() => setHighlightedIdx(i)} onMouseLeave={() => setHighlightedIdx(-1)}>
-                {query === "" ? <Briefcase size={14} style={{ color: "var(--color-services)" }} /> : <Search size={12} style={{ color: "var(--color-primary)" }} />}
+                {query === ""
+                  ? <Briefcase size={14} style={{ color: "var(--color-services)" }} />
+                  : <Search size={12} style={{ color: "var(--color-primary)" }} />}
                 <span style={{ color: "var(--color-text-base)" }}>{service}</span>
               </div>
             ))}
@@ -368,11 +377,17 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       )}
 
       <div className="flex items-center p-2 gap-2">
-        <div className="w-16 px-2 text-center">
+
+        {/* Serial / New label */}
+        <div className="w-16 flex-shrink-0 px-2 text-center">
           <span className="text-sm font-bold" style={{ color: "var(--color-services)" }}>New</span>
         </div>
-        <div className="w-28">
-          <select data-field="type" value={draft.type}
+
+        {/* Type dropdown — kept as-is */}
+        <div className="w-28 flex-shrink-0">
+          <select
+            data-field="type"
+            value={draft.type}
             onChange={e => onDraftChange("type")(e.target.value)}
             onKeyDown={e => handleFieldKeyDown(e, "type")}
             className="w-full px-2 py-1.5 rounded text-sm font-bold"
@@ -380,49 +395,109 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
             {TYPE_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
           </select>
         </div>
-        <div className="flex-1 relative" ref={wrapperRef}>
-          <Briefcase size={14} className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-services)" }} />
-          <input data-field="name" ref={inputRef} value={query}
-            onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowDropdown(true); setHighlightedIdx(-1); }}
-            onFocus={() => setShowDropdown(true)}
+
+        {/* ── Service Name Field (flex-1, inline clear ×) ── */}
+        <div className="flex-1 relative min-w-0" ref={wrapperRef}>
+          <Briefcase
+            size={14}
+            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: "var(--color-services)" }}
+          />
+          <input
+            data-field="name"
+            ref={inputRef}
+            value={query}
+            onChange={e => {
+              setQuery(e.target.value);
+              onDraftChange("name")(e.target.value);
+              setServiceSelected(false);
+              setShowDropdown(true);
+              setHighlightedIdx(-1);
+            }}
+            onFocus={() => { if (!serviceSelected) setShowDropdown(true); }}
             onKeyDown={e => handleFieldKeyDown(e, "name")}
             placeholder="Search or select service..."
-            className="w-full pl-7 pr-8 py-1.5 rounded text-sm font-medium"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-services)" }} />
-          <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+            className="w-full py-1.5 rounded text-sm font-medium"
+            style={{
+              border: serviceSelected
+                ? "1.5px solid var(--color-services)"
+                : "1px solid var(--color-border)",
+              background: serviceSelected ? "#e3f0fc" : "var(--color-surface)",
+              color: "var(--color-services)",
+              paddingLeft: "1.75rem",
+              paddingRight: serviceSelected ? "3.5rem" : "1.75rem",
+            }}
+          />
+
+          {/* ── Inline clear button — only shows when a service is selected ── */}
+          {serviceSelected && (
+            <button
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); handleClearService(); }}
+              title="Clear service and pick again"
+              className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full transition-all"
+              style={{
+                right: "1.5rem",
+                width: "16px",
+                height: "16px",
+                background: "var(--color-danger)",
+                color: "white",
+              }}
+            >
+              <X size={10} strokeWidth={3} />
+            </button>
+          )}
+
+          {/* Chevron toggle */}
+          <ChevronDown
+            size={14}
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
-            onMouseDown={(e) => { e.preventDefault(); setShowDropdown(v => !v); }} />
+            onMouseDown={(e) => {
+              e.preventDefault();
+              if (serviceSelected) {
+                handleClearService(); // chevron on selected = clear to re-pick
+              } else {
+                setShowDropdown(v => !v);
+              }
+            }}
+          />
         </div>
-       <div className="w-48">
-  <TypableDetailInput
-    value={draft.detail}
-    onChange={e => onDraftChange("detail")(e.target.value)}
-    onKeyDown={e => handleFieldKeyDown(e, "detail")}
-  />
-</div>
-        <div className="w-28 flex gap-1 justify-center">
-          <button data-field="commit" onClick={onCommit} onKeyDown={e => handleFieldKeyDown(e, "commit")}
+
+        {/* Detail / Body Part */}
+        <div className="w-40 flex-shrink-0">
+          <TypableDetailInput
+            value={draft.detail}
+            onChange={e => onDraftChange("detail")(e.target.value)}
+            onKeyDown={e => handleFieldKeyDown(e, "detail")}
+          />
+        </div>
+
+        {/* Commit / Cancel */}
+        <div className="w-28 flex-shrink-0 flex gap-1 justify-center">
+          <button
+            data-field="commit"
+            onClick={onCommit}
+            onKeyDown={e => handleFieldKeyDown(e, "commit")}
             className="p-1.5 rounded-md transition-all inline-flex items-center justify-center"
             style={{ background: "var(--color-services)", color: "white" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "#0d4b8f"}
             onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-services)"}
-            title="Add Service (Enter)"><Plus size={16} /></button>
-          <button onClick={onCancel}
+            title="Add Service (Enter)">
+            <Plus size={16} />
+          </button>
+          <button
+            onClick={onCancel}
             className="p-1.5 rounded-md transition-all inline-flex items-center justify-center"
             style={{ background: "#fee2e2", color: "var(--color-danger)" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
             onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}
-            title="Cancel (Esc)"><X size={16} /></button>
+            title="Cancel (Esc)">
+            <X size={16} />
+          </button>
         </div>
-      </div>
 
-      {/* <div className="px-3 pb-1.5 flex gap-4 flex-wrap" style={{ fontSize: "0.65rem", color: "var(--color-text-muted)" }}>
-        <span><kbd className="px-1 py-0.5 rounded text-[0.6rem]" style={{ background: "var(--color-border)" }}>Tab</kbd> next field</span>
-        <span><kbd className="px-1 py-0.5 rounded text-[0.6rem]" style={{ background: "var(--color-border)" }}>↑↓</kbd> browse list</span>
-        <span><kbd className="px-1 py-0.5 rounded text-[0.6rem]" style={{ background: "var(--color-border)" }}>Enter</kbd> select / save</span>
-        <span><kbd className="px-1 py-0.5 rounded text-[0.6rem]" style={{ background: "var(--color-border)" }}>Esc</kbd> cancel</span>
-        <span><kbd className="px-1 py-0.5 rounded text-[0.6rem]" style={{ background: "var(--color-border)" }}>Alt+→/←</kbd> jump columns</span>
-      </div> */}
+      </div>
     </div>
   );
 }
@@ -492,7 +567,7 @@ export default function ServiceTab({ services, setServices, patient }) {
   return (
     // ── OUTER WRAPPER: fixed height, flex column ──
     <div
-      className="flex flex-col rounded-lg overflow-hidden shadow-lg"
+      className="flex flex-col rounded-xs overflow-hidden shadow-lg"
       style={{
         background: "var(--color-surface)",
         border: "1px solid var(--color-border)",
@@ -506,9 +581,9 @@ export default function ServiceTab({ services, setServices, patient }) {
         className="flex-shrink-0 border-b"
         style={{ background: "linear-gradient(135deg, #e3f0fc 0%, var(--color-surface) 100%)", borderColor: "var(--color-border)" }}
       >
-        <div className="px-4 py-3 flex items-center justify-between">
+        <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Settings size={18} style={{ color: "var(--color-services)" }} />
+            <Settings size={16} style={{ color: "var(--color-services)" }} />
             <h2 className="text-base font-extrabold" style={{ color: "var(--color-services)" }}>Services & Procedures</h2>
           </div>
           <div className="flex items-center gap-2">

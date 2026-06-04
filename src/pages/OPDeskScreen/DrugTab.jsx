@@ -159,6 +159,8 @@ function DrugRow({ drug, index, isStruck, onDelete, onStrike, onEdit }) {
       <div className="w-48 px-2 py-2">
         <div className="font-semibold text-sm" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
           {drug.name}
+          {/* ── Form badge ── */}
+   
         </div>
         <div className="text-[0.6rem]" style={{ color: "var(--color-text-subtle)" }}>
           {intakeDisplay}
@@ -340,6 +342,7 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
 }
 
 /* ── Add Row Component (with typable detail field) ── */
+/* ── Add Row Component (wider drug field, no Form field, inline clear button) ── */
 function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }) {
   const inputRef    = useRef(null);
   const rowRef      = useRef(null);
@@ -347,12 +350,22 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
+  // Derive from query — if there's a value, it's "selected" unless user is actively typing
+  const [drugSelected, setDrugSelected] = useState(() => !!query);
 
-  const medicineTypes = [
-    "Paracetamol","Amoxicillin","Azithromycin","Ciprofloxacin",
-    "Doxycycline","Metformin","Omeprazole","Losartan",
-    "Amlodipine","Atorvastatin","Cetirizine","Ibuprofen"
-  ];
+  // Sync when parent sets query (e.g. startEdit pre-fills the drug name)
+  useEffect(() => {
+    if (query.trim()) setDrugSelected(true);
+    else setDrugSelected(false);
+  }, [query]);
+
+  // const medicineTypes = [
+  //   "Paracetamol","Amoxicillin","Azithromycin","Ciprofloxacin",
+  //   "Doxycycline","Metformin","Omeprazole","Losartan",
+  //   "Amlodipine","Atorvastatin","Cetirizine","Ibuprofen"
+  // ];
+
+  const medicineTypes = DRUG_SUGGESTIONS;
 
   const dropdownItems = query === ""
     ? medicineTypes
@@ -383,12 +396,40 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     };
   }, [showDropdown, recalcDropdown]);
 
+  // When a drug is selected from dropdown — also auto-parse form from name
+  // const handleSelectMedicine = (medicine) => {
+  //   // Try to extract form from drug name e.g. "Paracetamol 500mg Tab" → form = "Tab"
+  //   const formMatch = FORM_OPTIONS.find(f =>
+  //     medicine.toLowerCase().endsWith(f.toLowerCase()) ||
+  //     medicine.toLowerCase().includes(` ${f.toLowerCase()} `) ||
+  //     medicine.toLowerCase().includes(` ${f.toLowerCase()}`)
+  //   );
+  //   setQuery(medicine);
+  //   onDraftChange("name")(medicine);
+  //   if (formMatch) onDraftChange("form")(formMatch);
+  //   setDrugSelected(true);
+  //   setShowDropdown(false);
+  //   setHighlightedIdx(-1);
+  //   inputRef.current?.focus();
+  // };
+
   const handleSelectMedicine = (medicine) => {
-    setQuery(medicine);
-    onDraftChange("name")(medicine);
+  // Remove the formMatch auto-parse block — form is already in the name
+  setQuery(medicine);
+  onDraftChange("name")(medicine);   // stores full "Paracetamol 500mg Tab"
+  setDrugSelected(true);
+  setShowDropdown(false);
+  setHighlightedIdx(-1);
+  inputRef.current?.focus();
+};
+
+  // Clear just the drug name so user can pick again — keeps all other fields intact
+  const handleClearDrug = () => {
+    setQuery("");
+    onDraftChange("name")("");
+    setDrugSelected(false);
     setShowDropdown(false);
-    setHighlightedIdx(-1);
-    inputRef.current?.focus();
+    setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const handleRowBlur = (e) => {
@@ -404,8 +445,11 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     if (el) el.focus();
   }, []);
 
+  // FIELD_ORDER without "form" since we removed that column
+  const FIELD_ORDER_LOCAL = ["days", "name", "intake", "period", "when", "detail", "commit"];
+
   const handleFieldKeyDown = (e, currentField) => {
-    const idx = FIELD_ORDER.indexOf(currentField);
+    const idx = FIELD_ORDER_LOCAL.indexOf(currentField);
 
     if (e.key === "Escape") {
       onCancel();
@@ -432,34 +476,19 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
 
     if (e.key === "ArrowRight" && (currentField === "days" || currentField === "name")) {
       e.preventDefault();
-      const next = FIELD_ORDER[idx + 1];
+      const next = FIELD_ORDER_LOCAL[idx + 1];
       if (next) focusField(next);
       return;
     }
-    if (e.key === "ArrowRight" && e.altKey) {
-      e.preventDefault();
-      const next = FIELD_ORDER[idx + 1];
-      if (next) focusField(next);
-      return;
-    }
-
     if (e.key === "ArrowLeft" && (currentField === "days" || currentField === "name")) {
       e.preventDefault();
-      const prev = FIELD_ORDER[idx - 1];
+      const prev = FIELD_ORDER_LOCAL[idx - 1];
       if (prev) focusField(prev);
       return;
     }
-    if (e.key === "ArrowLeft" && e.altKey) {
-      e.preventDefault();
-      const prev = FIELD_ORDER[idx - 1];
-      if (prev) focusField(prev);
-      return;
-    }
-
     if (e.key === "Tab") {
       setShowDropdown(false);
     }
-
     if (e.key === "Enter" && currentField !== "name") {
       e.preventDefault();
       onCommit();
@@ -481,6 +510,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-drugs)" }}
       onBlur={handleRowBlur}
     >
+      {/* ── Dropdown Portal ── */}
       {showDropdown && dropdownItems.length > 0 && (
         <div
           className="rounded-lg shadow-xl overflow-hidden"
@@ -520,7 +550,9 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       )}
 
       <div className="flex items-center p-2 gap-2">
-        <div className="w-16 px-2">
+
+        {/* Days */}
+        <div className="w-16 flex-shrink-0">
           <input
             data-field="days"
             type="number" min="1" max="365"
@@ -533,8 +565,13 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           />
         </div>
 
-        <div className="flex-1 relative" ref={wrapperRef}>
-          <Pill size={14} className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-drugs)" }} />
+        {/* ── Drug Name Field (wider, inline clear ×, no separate Form dropdown) ── */}
+        <div className="flex-1 relative min-w-0" ref={wrapperRef}>
+          <Pill
+            size={14}
+            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: "var(--color-drugs)" }}
+          />
           <input
             data-field="name"
             ref={inputRef}
@@ -545,28 +582,69 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
               setShowDropdown(true);
               setHighlightedIdx(-1);
             }}
-            onFocus={() => setShowDropdown(true)}
+            onFocus={() => {
+              setShowDropdown(true);
+            }}
+            onBlur={() => {
+              setTimeout(() => {
+                setShowDropdown(false);
+                if (query.trim()) setDrugSelected(true);
+              }, 200);
+            }}
             onKeyDown={e => handleFieldKeyDown(e, "name")}
             placeholder="Search or select medicine..."
-            className="w-full pl-7 pr-8 py-1.5 rounded text-sm font-medium"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-drugs)" }}
+            className="w-full py-1.5 rounded text-sm font-medium"
+            style={{
+              border: drugSelected
+                ? "1.5px solid var(--color-drugs)"
+                : "1px solid var(--color-border)",
+              background: drugSelected
+                ? "var(--color-drugs-light)"
+                : "var(--color-surface)",
+              color: "var(--color-drugs)",
+              // Left pad for icon, right pad for clear btn + chevron
+              paddingLeft: "1.75rem",
+              paddingRight: drugSelected ? "3.5rem" : "1.75rem",
+            }}
           />
-          <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+
+          {/* ── Inline clear button — only shows when a drug is selected ── */}
+          {drugSelected && (
+            <button
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); handleClearDrug(); }}
+              title="Clear drug and pick again"
+              className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full transition-all"
+              style={{
+                right: "1.5rem",
+                width: "16px",
+                height: "16px",
+                background: "var(--color-danger)",
+                color: "white",
+              }}
+            >
+              <X size={10} strokeWidth={3} />
+            </button>
+          )}
+
+          {/* Chevron toggle */}
+          <ChevronDown
+            size={14}
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
-            onMouseDown={(e) => { e.preventDefault(); setShowDropdown(v => !v); }} />
+            onMouseDown={(e) => {
+              e.preventDefault();
+              if (drugSelected) {
+                handleClearDrug();   // chevron on selected drug = clear to re-pick
+              } else {
+                setShowDropdown(v => !v);
+              }
+            }}
+          />
         </div>
 
-        <div className="w-20">
-          <select data-field="form" value={draft.form}
-            onChange={e => onDraftChange("form")(e.target.value)}
-            onKeyDown={e => handleFieldKeyDown(e, "form")}
-            className="w-full px-2 py-1.5 rounded text-sm"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
-            {FORM_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
-          </select>
-        </div>
-
-        <div className="w-20">
+        {/* Intake */}
+        <div className="w-20 flex-shrink-0">
           <select data-field="intake" value={draft.intake}
             onChange={e => onDraftChange("intake")(e.target.value)}
             onKeyDown={e => handleFieldKeyDown(e, "intake")}
@@ -576,7 +654,8 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           </select>
         </div>
 
-        <div className="w-20">
+        {/* Period */}
+        <div className="w-20 flex-shrink-0">
           <select data-field="period" value={draft.period}
             onChange={e => onDraftChange("period")(e.target.value)}
             onKeyDown={e => handleFieldKeyDown(e, "period")}
@@ -586,7 +665,8 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           </select>
         </div>
 
-        <div className="w-28">
+        {/* When */}
+        <div className="w-28 flex-shrink-0">
           <select data-field="when" value={draft.when}
             onChange={e => onDraftChange("when")(e.target.value)}
             onKeyDown={e => handleFieldKeyDown(e, "when")}
@@ -596,7 +676,8 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           </select>
         </div>
 
-        <div className="w-48">
+        {/* Detail */}
+        <div className="w-48 flex-shrink-0">
           <TypableDetailInput
             value={draft.detail}
             onChange={handleDetailChange}
@@ -604,7 +685,8 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           />
         </div>
 
-        <div className="w-28 flex gap-1 justify-center">
+        {/* Commit / Cancel */}
+        <div className="w-16 flex-shrink-0 flex gap-1 justify-center">
           <button
             data-field="commit"
             onClick={onCommit}
@@ -697,7 +779,7 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
 
   return (
     <div
-      className="flex flex-col rounded-lg overflow-hidden shadow-lg"
+      className="flex flex-col rounded-xs overflow-hidden shadow-lg"
       style={{
         background: "var(--color-surface)",
         border: "1px solid var(--color-border)",
@@ -714,9 +796,9 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
           borderColor: "var(--color-border)",
         }}
       >
-        <div className="px-4 py-3 flex items-center justify-between">
+        <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Pill size={18} style={{ color: "var(--color-drugs)" }} />
+            <Pill size={16} style={{ color: "var(--color-drugs)" }} />
             <h2 className="text-base font-extrabold" style={{ color: "var(--color-drugs)" }}>
               Drug Prescription
             </h2>
