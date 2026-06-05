@@ -2,13 +2,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginUI from "../components/Login/LoginUI";
-import { loginUser, getAllUserRoles, mapRoleToUserType } from "../services/loginService";
 
 // Route paths
 const ROUTES = {
   DOCTOR: "/opdesk",
   OFFICE: "/frontdesk",
   PLATFORM: "/platformdesk",
+};
+
+// Hardcoded credentials for all users
+const HARDCODED_CREDENTIALS = {
+  "opdesk@gmail.com": {
+    password: "Password@123",
+    role: "doctor",
+    name: "Dr. Aravind Kumar",
+    roleName: "OP Desk"
+  },
+  "frontdesk@gmail.com": {
+    password: "Password@123",
+    role: "office",
+    name: "Priya Subramanian",
+    roleName: "Front Desk"
+  },
+  "platformdesk@gmail.com": {
+    password: "Password@123",
+    role: "platform",
+    name: "Platform Admin",
+    roleName: "Platform Desk"
+  }
 };
 
 export default function LoginPage({ onLogin }) {
@@ -28,61 +49,64 @@ export default function LoginPage({ onLogin }) {
     setError("");
     setLoading(true);
 
-    try {
-      // Call login API
-      const loginResponse = await loginUser(username, password);
+    // Simulate API delay
+    setTimeout(() => {
+      const userCred = HARDCODED_CREDENTIALS[username];
       
-      if (loginResponse?.data) {
-        const userData = loginResponse.data;
-        
-        // Fetch user role
-        const userRoles = await getAllUserRoles();
-        const userRole = userRoles.find(u => u.email === userData.email);
-        
-        if (!userRole) {
-          setError("User role not found");
-          setLoading(false);
-          return;
-        }
-        
-        // Map role_name to user type
-        const userType = mapRoleToUserType(userRole.role_name);
-        
-        // Create user object for app state
+      if (userCred && userCred.password === password) {
         const user = {
-          id: userData.id,
-          name: userData.full_name,
-          email: userData.email,
-          role: userType,
-          roleName: userRole.role_name,
-          bearerToken: userData.bearer_token,
+          id: `hardcoded-${Date.now()}`,
+          name: userCred.name,
+          email: username,
+          role: userCred.role,
+          roleName: userCred.roleName,
+          bearerToken: `hardcoded-token-${Date.now()}`,
         };
         
-       
-       
-        
-        // Call onLogin to set user in App state
         onLogin(user, rememberMe);
         
-        // Navigate based on user type
-        if (userType === 'doctor') {
+        // Navigate based on role
+        if (userCred.role === 'doctor') {
           navigate(ROUTES.DOCTOR);
-        } else if (userType === 'office') {
+        } else if (userCred.role === 'office') {
           navigate(ROUTES.OFFICE);
-        } else if (userType === 'platform') {
+        } else if (userCred.role === 'platform') {
+          navigate(ROUTES.PLATFORM);
+        }
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+      setLoading(false);
+    }, 700);
+  };
+
+  const handleRoleSelect = (email, roleType) => {
+    setUsername(email);
+    setPassword("Password@123");
+    
+    // Auto-login for quick access
+    setTimeout(() => {
+      const userCred = HARDCODED_CREDENTIALS[email];
+      if (userCred) {
+        const user = {
+          id: `hardcoded-${Date.now()}`,
+          name: userCred.name,
+          email: email,
+          role: userCred.role,
+          roleName: userCred.roleName,
+          bearerToken: `hardcoded-token-${Date.now()}`,
+        };
+        onLogin(user, false);
+        
+        if (userCred.role === 'doctor') {
+          navigate(ROUTES.DOCTOR);
+        } else if (userCred.role === 'office') {
+          navigate(ROUTES.OFFICE);
+        } else if (userCred.role === 'platform') {
           navigate(ROUTES.PLATFORM);
         }
       }
-    } catch (err) {
-      setError(err.message || "Invalid email or password. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRoleSelect = (email) => {
-    setUsername(email);
-    setPassword("Password@123");
+    }, 100);
   };
 
   return (

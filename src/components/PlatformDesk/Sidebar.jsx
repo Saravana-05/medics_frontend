@@ -4,7 +4,7 @@ import {
   Building2, MapPin, Users, Settings, Activity, 
   Calendar, FileText, HelpCircle, Briefcase, 
   Stethoscope, UserCircle, Heart, ActivitySquare,
-  Building
+  Building, Shield, UserCog
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -15,6 +15,8 @@ const MENU_ITEMS = [
   { key: "doctors", label: "Doctors", icon: Stethoscope, color: "var(--color-primary)" },
   { key: "nurses", label: "Nurses", icon: UserCircle, color: "var(--color-success)" },
   { key: "patients", label: "Patients", icon: Heart, color: "var(--color-danger)" },
+  { key: "users", label: "Users", icon: Users, color: "var(--color-info)" },
+  { key: "roles", label: "Roles", icon: Shield, color: "var(--color-warning)" },
   { key: "reports", label: "Reports", icon: FileText, color: "var(--color-info)" },
   { key: "settings", label: "Settings", icon: Settings, color: "var(--color-lab)" },
 ];

@@ -6,6 +6,8 @@ import Staff from "./Staff";
 import Doctors from "./Doctors";
 import Nurses from "./Nurses";
 import Patients from "./Patients";
+import UsersManagement from "./Users";
+import Roles from "./Roles";
 import Reports from "./Reports";
 import Settings from "./Settings";
 
@@ -19,6 +21,8 @@ export default function Body({ activeMenu }) {
       {activeMenu === "doctors" && <Doctors />}
       {activeMenu === "nurses" && <Nurses />}
       {activeMenu === "patients" && <Patients />}
+      {activeMenu === "users" && <UsersManagement  />}
+      {activeMenu === "roles" && <Roles />}
       {activeMenu === "reports" && <Reports />}
       {activeMenu === "settings" && <Settings />}
     </div>

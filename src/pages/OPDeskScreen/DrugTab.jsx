@@ -117,7 +117,7 @@ function ModernToolbar({ onProto }) {
 function TableHeader() {
   const columns = [
     { label: "S.No", width: "w-12", center: true },
-    { label: "Drug", width: "w-48" },
+    { label: "Drug", width: "flex-1" },
     { label: "Buy", width: "w-12", center: true },
     { label: "Mor", width: "w-12", center: true },
     { label: "Noon", width: "w-12", center: true },
@@ -156,8 +156,8 @@ function DrugRow({ drug, index, isStruck, onDelete, onStrike, onEdit }) {
       <div className="w-12 px-2 py-2 text-center">
         <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}</span>
       </div>
-      <div className="w-48 px-2 py-2">
-        <div className="font-semibold text-sm" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
+      <div className="flex-1 min-w-0 px-2 py-2">
+        <div className="font-semibold text-sm truncate" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
           {drug.name}
           {/* ── Form badge ── */}
    

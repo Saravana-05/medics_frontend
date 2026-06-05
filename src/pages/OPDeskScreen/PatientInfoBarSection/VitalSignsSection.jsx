@@ -1,4 +1,4 @@
-import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator } from "lucide-react";
+import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet } from "lucide-react";
 
 /* ── Vital Sign Card (Compact) ── */
 function VitalSignCard({ icon: Icon, value, label, color, unit, trend }) {
@@ -57,13 +57,30 @@ export default function VitalSignsSection({ patient }) {
   const bmiValue = calculateBMI();
   const bmiCategory = getBMICategory(bmiValue);
   
+  // Get blood group color based on type
+  const getBloodGroupColor = (bloodGroup) => {
+    if (!bloodGroup || bloodGroup === "—") return "var(--color-text-muted)";
+    const group = bloodGroup.toUpperCase();
+    if (group.includes("A+")) return "#dc2626";
+    if (group.includes("A-")) return "#b91c1c";
+    if (group.includes("B+")) return "#16a34a";
+    if (group.includes("B-")) return "#15803d";
+    if (group.includes("O+")) return "#2563eb";
+    if (group.includes("O-")) return "#1d4ed8";
+    if (group.includes("AB+")) return "#9333ea";
+    if (group.includes("AB-")) return "#7e22ce";
+    return "var(--color-text-muted)";
+  };
+  
+  const bloodGroupColor = getBloodGroupColor(p.bloodGroup);
+  
   return (
     <div className="px-3 py-2 border-b" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
       <div className="flex items-center gap-1.5 mb-1.5">
         <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
         <span className="text-[0.6rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Vital Signs</span>
       </div>
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-8 gap-1.5">
         <VitalSignCard
           icon={ActivitySquare}
           value={`${p.bpSystolic || 145}/${p.bpDiastolic || 90}`}
@@ -93,6 +110,12 @@ export default function VitalSignsSection({ patient }) {
           unit="%"
         />
         <VitalSignCard
+          icon={Droplet}
+          value={p.bloodGroup || "—"}
+          label="Blood"
+          color={bloodGroupColor}
+        />
+        <VitalSignCard
           icon={Ruler}
           value={p.height || "68"}
           label="Height"
@@ -110,7 +133,7 @@ export default function VitalSignsSection({ patient }) {
           icon={Calculator}
           value={bmiValue}
           label="BMI"
-          color="var(--color-danger)"
+          color={bmiCategory.color}
           unit={bmiCategory.label}
         />
       </div>

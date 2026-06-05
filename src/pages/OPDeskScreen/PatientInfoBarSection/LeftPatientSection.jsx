@@ -45,20 +45,24 @@ function CompactInfoCard({ icon: Icon, label, value, variant, onClick }) {
 }
 
 /* ── Compact Relation Card ── */
+/* ── Compact Relation Card ── */
 function CompactRelationCard({ value }) {
   return (
-    <div className="rounded-lg p-2" style={{ background: "var(--color-drugs-light)", border: "1px solid var(--color-drugs)20" }}>
+    <div
+      className="rounded-xl px-3 py-2.5"
+      style={{
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+      }}
+    >
       <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <div className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5" style={{ color: "var(--color-text-muted)" }}>
-            Relation
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="p-1 rounded-lg flex-shrink-0" style={{ background: "var(--color-primary-muted)" }}>
+            <Users size={14} style={{ color: "var(--color-primary)" }} />
           </div>
-          <div className="text-xs font-semibold" style={{ color: "var(--color-drugs)" }}>
-            {value || "W/o: Sri Krishnaswamy"}
-          </div>
-        </div>
-        <div className="p-1 rounded-md" style={{ background: "var(--color-drugs)15" }}>
-          <Users size={12} style={{ color: "var(--color-drugs)" }} />
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary-dark)" }}>
+            {value || "—"}
+          </span>
         </div>
       </div>
     </div>

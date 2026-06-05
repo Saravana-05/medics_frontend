@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { 
   Calendar, Clock, FileText, Activity, User, CalendarDays,
   ChevronDown, ChevronUp, History, Stethoscope, Syringe,
-  ArrowRight, Eye, Filter, Search
+  ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
 import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
 
@@ -23,6 +23,18 @@ export function getPrescriptionForVisit(visitSl) {
   return globalPrescriptionHistory[visitSl] || null;
 }
 
+// Column configuration with visibility toggle option
+const ALL_COLUMNS = [
+  { key: "sl", label: "SL", width: "w-12", align: "right", defaultVisible: true, sortable: true },
+  { key: "entryDt", label: "Entry", width: "w-28", align: "left", defaultVisible: true, sortable: true },
+  { key: "docModule", label: "Module", width: "w-32", align: "left", defaultVisible: true, sortable: true },
+  { key: "reportDt", label: "Report", width: "w-28", align: "left", defaultVisible: false, sortable: true },
+  { key: "complaint", label: "Complaint", width: "w-32", align: "left", defaultVisible: true, sortable: true },
+  { key: "vitals", label: "Vitals", width: "w-36", align: "left", defaultVisible: false, sortable: false },
+  { key: "by", label: "By", width: "w-24", align: "left", defaultVisible: true, sortable: true },
+  { key: "nextVisit", label: "Next", width: "w-28", align: "left", defaultVisible: false, sortable: true },
+];
+
 export default function PreviousVisitsTable({ visits = [] }) {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -30,6 +42,24 @@ export default function PreviousVisitsTable({ visits = [] }) {
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [currentVisitIndex, setCurrentVisitIndex] = useState(0);
   const [prescriptions, setPrescriptions] = useState({});
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    // Load saved column visibility from localStorage
+    const saved = localStorage.getItem("previousVisitsTableColumns");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return ALL_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {});
+      }
+    }
+    return ALL_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {});
+  });
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+
+  // Save column visibility to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("previousVisitsTableColumns", JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
 
   // Load prescriptions for visits when visits change
   useEffect(() => {
@@ -108,6 +138,13 @@ export default function PreviousVisitsTable({ visits = [] }) {
     setSelectedVisit(filteredVisits[newIndex]);
   };
 
+  const toggleColumn = (columnKey) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [columnKey]: !prev[columnKey]
+    }));
+  };
+
   const sortedVisits = [...visits].sort((a, b) => {
     if (!sortField) return 0;
     
@@ -140,17 +177,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
     visit.by?.toLowerCase().includes(filterText.toLowerCase())
   );
 
-  const columns = [
-    { key: "sl", label: "SL", width: "w-12", align: "right" },
-    { key: "entryDt", label: "Entry", width: "w-28", align: "left" },
-    { key: "docModule", label: "Module", width: "w-32", align: "left" },
-    { key: "reportDt", label: "Report", width: "w-28", align: "left" },
-    { key: "complaint", label: "Complaint", width: "w-32", align: "left" },
-    { key: "vitals", label: "Vitals", width: "w-36", align: "left" },
-    { key: "by", label: "By", width: "w-24", align: "left" },
-    { key: "nextVisit", label: "Next", width: "w-28", align: "left" },
-    { key: "actions", label: "", width: "w-8", align: "center" },
-  ];
+  // Get only visible columns
+  const visibleColumnsList = ALL_COLUMNS.filter(col => visibleColumns[col.key]);
 
   const SortIcon = ({ field }) => {
     if (sortField !== field) return <ChevronDown size={10} className="opacity-40" />;
@@ -161,11 +189,10 @@ export default function PreviousVisitsTable({ visits = [] }) {
     <>
       <div className="h-full flex flex-col rounded-sm overflow-hidden shadow-sm" style={{ 
         background: "var(--color-surface)", 
-        // border: "1px solid var(--color-border)",
         fontFamily: "var(--font-body)"
       }}>
         
-        {/* Header Section - Modern */}
+        {/* Header Section with Column Visibility Toggle */}
         <div className="flex-shrink-0 px-4 py-[0.7rem] border-b flex justify-between items-center" style={{ 
           background: "linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-muted) 100%)",
           borderColor: "var(--color-border)"
@@ -184,20 +211,61 @@ export default function PreviousVisitsTable({ visits = [] }) {
             </div>
           </div>
           
-          <div className="relative">
-            <Search size={12} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
-            <input
-              type="text"
-              placeholder="Search visits..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs rounded-lg w-36 focus:w-48 transition-all duration-200 outline-none"
-              style={{ 
-                border: "1px solid var(--color-border)", 
-                background: "var(--color-surface)",
-                color: "var(--color-text-base)"
-              }}
-            />
+          <div className="flex items-center gap-2">
+            {/* Column Visibility Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowColumnMenu(!showColumnMenu)}
+                className="p-1.5 rounded-lg transition-all"
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                title="Toggle Columns"
+              >
+                <ListFilter  size={14} style={{ color: "var(--color-text-muted)" }} />
+              </button>
+              
+              {showColumnMenu && (
+                <div 
+                  className="absolute right-0 top-full mt-1 w-40 rounded-lg shadow-xl z-50 animate-fade-in"
+                  style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                  onMouseLeave={() => setShowColumnMenu(false)}
+                >
+                  <div className="p-2 border-b" style={{ borderColor: "var(--color-border)" }}>
+                    <span className="text-xs font-semibold">Show/Hide Columns</span>
+                  </div>
+                  <div className="p-2 space-y-1">
+                    {ALL_COLUMNS.map(col => (
+                      <label key={col.key} className="flex items-center gap-2 cursor-pointer text-xs py-1 hover:bg-surface-alt px-1 rounded transition-all">
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns[col.key]}
+                          onChange={() => toggleColumn(col.key)}
+                          className="w-3.5 h-3.5 rounded"
+                          style={{ accentColor: "var(--color-primary)" }}
+                        />
+                        <span style={{ color: "var(--color-text-base)" }}>{col.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Search Input */}
+            <div className="relative">
+              <Search size={12} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+              <input
+                type="text"
+                placeholder="Search visits..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                className="pl-8 pr-3 py-1.5 text-xs rounded-lg w-36 focus:w-48 transition-all duration-200 outline-none"
+                style={{ 
+                  border: "1px solid var(--color-border)", 
+                  background: "var(--color-surface)",
+                  color: "var(--color-text-base)"
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -206,11 +274,11 @@ export default function PreviousVisitsTable({ visits = [] }) {
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
               <tr style={{ background: "var(--color-primary-muted)" }}>
-                {columns.map(col => (
+                {visibleColumnsList.map(col => (
                   <th 
                     key={col.key}
-                    onClick={() => handleSort(col.key)}
-                    className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'} cursor-pointer hover:bg-opacity-80 transition-all select-none`}
+                    onClick={() => col.sortable && handleSort(col.key)}
+                    className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
                     style={{ 
                       borderBottom: "1px solid var(--color-border)",
                       fontSize: "0.65rem",
@@ -222,17 +290,17 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   >
                     <div className={`flex items-center gap-1 ${col.align === 'right' ? 'justify-end' : 'justify-start'}`}>
                       {col.label}
-                      {col.key !== "actions" && <SortIcon field={col.key} />}
+                      {col.sortable && <SortIcon field={col.key} />}
                     </div>
                   </th>
                 ))}
-                </tr>
+              </tr>
             </thead>
             
             <tbody>
               {filteredVisits.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="py-12 text-center">
+                  <td colSpan={visibleColumnsList.length} className="py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <History size={32} style={{ color: "var(--color-text-subtle)" }} />
                       <p className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
@@ -265,103 +333,127 @@ export default function PreviousVisitsTable({ visits = [] }) {
                       }}
                       onClick={() => handleViewRow(visit, index)}
                     >
-                      <td className="w-12 px-3 py-2.5 text-right font-bold" style={{ color: "var(--color-primary)" }}>
-                        {visit.sl}
-                      </td>
-                      
-                      <td className="w-28 px-3 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={11} style={{ color: "var(--color-text-muted)" }} />
-                          <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-text-base)" }}>
-                            {visit.entryDt}
-                          </span>
-                        </div>
-                      </td>
-                      
-                      <td className="w-32 px-3 py-2.5">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[0.6rem] font-bold" style={{ background: module.bg, color: module.text }}>
-                          {visit.docModule}
-                        </span>
-                      </td>
-                      
-                      <td className="w-28 px-3 py-2.5">
-                        {visit.reportDt ? (
-                          <div className="flex items-center gap-1.5">
-                            <FileText size={11} style={{ color: "var(--color-success)" }} />
-                            <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-success)" }}>
-                              {visit.reportDt}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-[0.65rem]" style={{ color: "var(--color-text-subtle)" }}>—</span>
-                        )}
-                      </td>
-                      
-                      <td className="w-32 px-3 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <Activity size={11} style={{ color: "var(--color-danger)" }} />
-                          <span className="text-[0.7rem] font-medium line-clamp-2" style={{ color: "var(--color-text-base)" }}>
-                            {visit.complaint}
-                          </span>
-                        </div>
-                      </td>
-                      
-                      <td className="w-36 px-3 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>BP</span>
-                              <span className="text-[0.65rem] font-mono font-semibold" style={{ color: "var(--color-primary)" }}>{vitals.bp}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Pulse</span>
-                              <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-drugs)" }}>{vitals.pulse}</span>
-                            </div>
-                          </div>
-                          <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
-                          <div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Temp</span>
-                              <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-lab)" }}>{vitals.temp}°F</span>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="w-24 px-3 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <User size={11} style={{ color: "var(--color-primary)" }} />
-                          <span className="text-[0.7rem] font-medium truncate block max-w-[70px]" style={{ color: "var(--color-text-base)" }}>
-                            {visit.by}
-                          </span>
-                        </div>
-                      </td>
-                      
-                      <td className="w-28 px-3 py-2.5">
-                        {visit.nextVisit && visit.nextVisit !== "<None>" ? (
-                          <div className="flex items-center gap-1.5">
-                            <CalendarDays size={11} style={{ color: "var(--color-success)" }} />
-                            <span className="text-[0.65rem] font-semibold" style={{ color: "var(--color-success)" }}>
-                              {visit.nextVisit}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-[0.65rem] italic" style={{ color: "var(--color-text-subtle)" }}>No follow-up</span>
-                        )}
-                      </td>
-
-                      <td className="w-8 px-2 py-2.5 text-center">
-                        <button
-                          className="p-1.5 rounded-lg transition-all opacity-60 group-hover:opacity-100"
-                          style={{ 
-                            background: "var(--color-primary-muted)", 
-                            color: "var(--color-primary)"
-                          }}
-                          title="View Details & Prescription"
-                        >
-                          <Eye size={12} />
-                        </button>
-                      </td>
+                      {visibleColumnsList.map(col => {
+                        const value = visit[col.key];
+                        
+                        if (col.key === "docModule") {
+                          return (
+                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[0.6rem] font-bold" style={{ background: module.bg, color: module.text }}>
+                                {value}
+                              </span>
+                            </td>
+                          );
+                        }
+                        
+                        if (col.key === "reportDt") {
+                          return (
+                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                              {value ? (
+                                <div className="flex items-center gap-1.5">
+                                  <FileText size={11} style={{ color: "var(--color-success)" }} />
+                                  <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-success)" }}>
+                                    {value}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-[0.65rem]" style={{ color: "var(--color-text-subtle)" }}>—</span>
+                              )}
+                            </td>
+                          );
+                        }
+                        
+                        if (col.key === "vitals") {
+                          return (
+                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                              <div className="flex items-center gap-2">
+                                <div className="flex flex-col">
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>BP</span>
+                                    <span className="text-[0.65rem] font-mono font-semibold" style={{ color: "var(--color-primary)" }}>{vitals.bp}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Pulse</span>
+                                    <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-drugs)" }}>{vitals.pulse}</span>
+                                  </div>
+                                </div>
+                                <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
+                                <div>
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Temp</span>
+                                    <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-lab)" }}>{vitals.temp}°F</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          );
+                        }
+                        
+                        if (col.key === "nextVisit") {
+                          return (
+                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                              {value && value !== "<None>" ? (
+                                <div className="flex items-center gap-1.5">
+                                  <CalendarDays size={11} style={{ color: "var(--color-success)" }} />
+                                  <span className="text-[0.65rem] font-semibold" style={{ color: "var(--color-success)" }}>
+                                    {value}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-[0.65rem] italic" style={{ color: "var(--color-text-subtle)" }}>No follow-up</span>
+                              )}
+                            </td>
+                          );
+                        }
+                        
+                        if (col.key === "actions") {
+                          return (
+                            <td key={col.key} className="w-8 px-2 py-2.5 text-center">
+                              <button
+                                className="p-1.5 rounded-lg transition-all opacity-60 group-hover:opacity-100"
+                                style={{ 
+                                  background: "var(--color-primary-muted)", 
+                                  color: "var(--color-primary)"
+                                }}
+                                title="View Details & Prescription"
+                              >
+                                <Eye size={12} />
+                              </button>
+                            </td>
+                          );
+                        }
+                        
+                        return (
+                          <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            {col.key === "sl" ? (
+                              <span className="font-bold" style={{ color: "var(--color-primary)" }}>{value}</span>
+                            ) : col.key === "entryDt" ? (
+                              <div className="flex items-center gap-1.5">
+                                <Calendar size={11} style={{ color: "var(--color-text-muted)" }} />
+                                <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-text-base)" }}>
+                                  {value}
+                                </span>
+                              </div>
+                            ) : col.key === "complaint" ? (
+                              <div className="flex items-center gap-1.5">
+                                <Activity size={11} style={{ color: "var(--color-danger)" }} />
+                                <span className="text-[0.7rem] font-medium line-clamp-2" style={{ color: "var(--color-text-base)" }}>
+                                  {value}
+                                </span>
+                              </div>
+                            ) : col.key === "by" ? (
+                              <div className="flex items-center gap-1.5">
+                                <User size={11} style={{ color: "var(--color-primary)" }} />
+                                <span className="text-[0.7rem] font-medium truncate block max-w-[70px]" style={{ color: "var(--color-text-base)" }}>
+                                  {value}
+                                </span>
+                              </div>
+                            ) : (
+                              <span style={{ color: "var(--color-text-base)" }}>{value || "—"}</span>
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })

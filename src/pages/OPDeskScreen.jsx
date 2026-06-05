@@ -36,7 +36,6 @@ export default function OPDeskScreen({ user, onLogout }) {
   };
 
   const handleSave = () => { 
-    // Save current prescription to history (will be handled by PreviousVisitsTable)
     setSaved(true); 
     setTimeout(() => setSaved(false), 4000);
   };
@@ -86,7 +85,7 @@ export default function OPDeskScreen({ user, onLogout }) {
         </div>
       </div>
 
-      {/* ── Main workspace with split left and right sections - Equal width ── */}
+      {/* ── Main workspace with split left and right sections - 70% / 30% ── */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         
         {!selectedPatient ? (
@@ -101,8 +100,8 @@ export default function OPDeskScreen({ user, onLogout }) {
           </div>
         ) : (
           <>
-            {/* Left Section - Prescription Tabs + Active Tab Content */}
-            <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+            {/* Left Section - Prescription Tabs + Active Tab Content (70% width) */}
+            <div className="flex-[7] flex flex-col overflow-hidden min-w-0">
               <PrescriptionTabs 
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -119,8 +118,8 @@ export default function OPDeskScreen({ user, onLogout }) {
               </div>
             </div>
 
-            {/* Right Section - Previous Visits Table (self-contained) */}
-            <div className="flex-1 flex-shrink-0 border-l overflow-y-auto" style={{ borderColor: "var(--color-border)" }}>
+            {/* Right Section - Previous Visits Table (30% width) */}
+            <div className="flex-[3] flex-shrink-0 border-l overflow-y-auto" style={{ borderColor: "var(--color-border)" }}>
               <PreviousVisitsTable visits={visits} />
             </div>
           </>

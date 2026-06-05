@@ -2,7 +2,7 @@ export const MOCK_PATIENTS = [
   {
     id: "PID-1042", docNo: "OP: 3902",
     name: "Smt. Vijayalakshmi", relation: "W/o. Sri.Krishnaswamy",
-    age: 29, dob: "31/01/1995", gender: "F", weight: "86KG",
+    age: 29, dob: "31/01/1995", gender: "Female", weight: "86KG",
     height: '68"', bpSystolic: 145, bpDiastolic: 90, pulse: 95, temp: "101.2",
     bloodGroup: "O+", pregnancy: "Yes. 60 Days",
     chiefComplaint: "Allergy, Anxiety",
@@ -70,7 +70,7 @@ export const MOCK_PATIENTS = [
   {
     id: "PID-2187", docNo: "OP: 3903",
     name: "Mr. Karthik Selvam", relation: "S/o. Sri.Selvam",
-    age: 27, dob: "10/05/1997", gender: "M", weight: "72KG",
+    age: 27, dob: "10/05/1997", gender: "Male", weight: "72KG",
     height: '67"', bpSystolic: 120, bpDiastolic: 80, pulse: 78, temp: "98.6",
     bloodGroup: "B+", pregnancy: "N/A",
     chiefComplaint: "Fever, Headache",
@@ -120,7 +120,7 @@ export const MOCK_PATIENTS = [
   {
     id: "PID-3301", docNo: "OP: 3904",
     name: "Smt. Lakshmi Devi", relation: "W/o. Sri.Mohan",
-    age: 52, dob: "15/03/1972", gender: "F", weight: "68KG",
+    age: 52, dob: "15/03/1972", gender: "Female", weight: "68KG",
     height: '62"', bpSystolic: 150, bpDiastolic: 95, pulse: 88, temp: "99.1",
     bloodGroup: "A+", pregnancy: "No",
     chiefComplaint: "Knee Pain, Swelling",
