@@ -41,27 +41,9 @@ function ModernToolbar({ docNo, docDt, onProto }) {
   return (
     <div className="flex items-center justify-between p-1 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-6">
-        {/* <div className="flex gap-4">
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Hash size={10} className="inline mr-1" /> Doc #
-            </span>
-            <span className="text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{docNo || "—"}</span>
-          </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Calendar size={10} className="inline mr-1" /> Doc. Dt
-            </span>
-            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{docDt || "—"}</span>
-          </div>
-        </div> */}
         <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
-        {/* <span className="px-3 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1" style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}>
-          <Stethoscope size={12} /> OP-LP: 3903
-        </span> */}
       </div>
       <div className="flex gap-2">
-        {/* <ActionButton variant="ghost" icon={Copy} label="Copy" /> */}
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
@@ -139,7 +121,9 @@ function LabRow({ lab, index, isStruck, onDelete, onStrike, onEdit }) {
   );
 }
 
-function TypableDetailInput({ value, onChange, onKeyDown }) {
+/* ── Typable Detail Input Component ── */
+// FIX #2: ArrowUp/Down navigate dropdown options; ArrowLeft/Right delegated to parent for field navigation
+function TypableDetailInput({ value, onChange, onKeyDown: onParentKeyDown }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [hasTyped, setHasTyped] = useState(false);
@@ -181,21 +165,44 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
     inputRef.current?.focus();
   };
 
-  const handleKeyDown = (e) => {
-    if (showDropdown && filteredOptions.length > 0) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, filteredOptions.length - 1)); return; }
-      if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
-      if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelectOption(filteredOptions[highlightedIdx]); return; }
-      if (e.key === "Escape") { setShowDropdown(false); setHighlightedIdx(-1); return; }
-    }
-    onKeyDown?.(e);
-  };
-
   const filteredOptions = !hasTyped
     ? detailOptions
     : detailOptions.filter(opt =>
         opt.toLowerCase().includes((value === "—" ? "" : value).toLowerCase())
       );
+
+  const handleKeyDown = (e) => {
+    // FIX #2: Up/Down only navigate dropdown; Left/Right go to parent for field switch
+    if (showDropdown && filteredOptions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setHighlightedIdx(i => Math.min(i + 1, filteredOptions.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setHighlightedIdx(i => Math.max(i - 1, 0));
+        return;
+      }
+      if (e.key === "Enter" && highlightedIdx >= 0) {
+        e.preventDefault();
+        handleSelectOption(filteredOptions[highlightedIdx]);
+        return;
+      }
+      if (e.key === "Escape") {
+        setShowDropdown(false);
+        setHighlightedIdx(-1);
+        return;
+      }
+    }
+    // FIX #3: Left/Right delegate to parent (field navigation)
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      onParentKeyDown?.(e);
+      return;
+    }
+    onParentKeyDown?.(e);
+  };
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -207,6 +214,7 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
         onFocus={() => { recalcDropdown(); setShowDropdown(true); }}
         onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => { setShowDropdown(false); setHasTyped(false); }, 200)}
+        data-field="detail"
         placeholder="Type or select instructions..."
         className="w-full px-2 py-1.5 rounded text-sm outline-none"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
@@ -242,18 +250,22 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
 }
 
 /* ── Add Row Component ── */
-/* ── Add Row Component (wider lab field, inline clear button) ── */
 function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }) {
-  const inputRef    = useRef(null);
-  const rowRef      = useRef(null);
-  const wrapperRef  = useRef(null);
+  const inputRef   = useRef(null);
+  const rowRef     = useRef(null);
+  const wrapperRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
-  const [testSelected, setTestSelected] = useState(false); // ← tracks if a test is confirmed
+  const [testSelected, setTestSelected] = useState(false);
 
-  const labTests = LAB_SUGGESTIONS; // ← use full LAB_SUGGESTIONS instead of hardcoded short list
+  // Auto-focus the lab name field as soon as AddRow mounts
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, []);
 
+  const labTests = LAB_SUGGESTIONS;
   const dropdownItems = query === "" ? labTests : suggestions.slice(0, 8);
 
   const recalcDropdown = useCallback(() => {
@@ -290,7 +302,6 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     inputRef.current?.focus();
   };
 
-  // Clear just the test name — keeps detail field intact
   const handleClearTest = () => {
     setQuery("");
     onDraftChange("name")("");
@@ -306,26 +317,57 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     }
   };
 
+  // FIX #3: central field focus helper
   const focusField = useCallback((fieldKey) => {
     if (!rowRef.current) return;
     const el = rowRef.current.querySelector(`[data-field="${fieldKey}"]`);
     if (el) el.focus();
   }, []);
 
-  const handleFieldKeyDown = (e, currentField) => {
+  // FIX #3: navigate left/right between fields
+  const navigateField = useCallback((currentField, direction) => {
     const idx = FIELD_ORDER.indexOf(currentField);
+    if (direction === "right" && idx < FIELD_ORDER.length - 1) {
+      focusField(FIELD_ORDER[idx + 1]);
+    } else if (direction === "left" && idx > 0) {
+      focusField(FIELD_ORDER[idx - 1]);
+    }
+  }, [focusField]);
+
+  const handleFieldKeyDown = (e, currentField) => {
     if (e.key === "Escape") { onCancel(); return; }
 
+    // Name field: dropdown navigation with Up/Down
     if (currentField === "name" && showDropdown && dropdownItems.length > 0) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, dropdownItems.length - 1)); return; }
-      if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
-      if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelectTest(dropdownItems[highlightedIdx]); return; }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setHighlightedIdx(i => Math.min(i + 1, dropdownItems.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setHighlightedIdx(i => Math.max(i - 1, 0));
+        return;
+      }
+      if (e.key === "Enter" && highlightedIdx >= 0) {
+        e.preventDefault();
+        handleSelectTest(dropdownItems[highlightedIdx]);
+        return;
+      }
     }
 
-    if (e.key === "ArrowRight" && currentField === "name") { e.preventDefault(); const next = FIELD_ORDER[idx + 1]; if (next) focusField(next); return; }
-    if (e.key === "ArrowRight" && e.altKey) { e.preventDefault(); const next = FIELD_ORDER[idx + 1]; if (next) focusField(next); return; }
-    if (e.key === "ArrowLeft" && currentField === "name") { e.preventDefault(); const prev = FIELD_ORDER[idx - 1]; if (prev) focusField(prev); return; }
-    if (e.key === "ArrowLeft" && e.altKey) { e.preventDefault(); const prev = FIELD_ORDER[idx - 1]; if (prev) focusField(prev); return; }
+    // FIX #3: ArrowRight → next field, ArrowLeft → previous field
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      navigateField(currentField, "right");
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      navigateField(currentField, "left");
+      return;
+    }
+
     if (e.key === "Tab") { setShowDropdown(false); }
     if (e.key === "Enter" && currentField !== "name") { e.preventDefault(); onCommit(); }
     if (e.key === "Enter" && currentField === "name" && !showDropdown) { e.preventDefault(); onCommit(); }
@@ -338,7 +380,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       style={{ background: "var(--color-lab-light)", borderColor: "var(--color-lab)" }}
       onBlur={handleRowBlur}
     >
-      {/* ── Dropdown Portal ── */}
+      {/* Dropdown portal */}
       {showDropdown && dropdownItems.length > 0 && (
         <div className="rounded-lg shadow-xl overflow-hidden"
           style={{ ...dropdownStyle, background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
@@ -364,12 +406,12 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
 
       <div className="flex items-center p-2 gap-2">
 
-        {/* Serial / New label */}
+        {/* Serial label */}
         <div className="w-16 flex-shrink-0 px-2 text-center">
           <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>New</span>
         </div>
 
-        {/* ── Lab Test Field (flex-1, inline clear ×) ── */}
+        {/* Lab test search field */}
         <div className="flex-1 relative min-w-0" ref={wrapperRef}>
           <FlaskConical
             size={14}
@@ -392,54 +434,37 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
             placeholder="Search or select lab test..."
             className="w-full py-1.5 rounded text-sm font-medium"
             style={{
-              border: testSelected
-                ? "1.5px solid var(--color-lab)"
-                : "1px solid var(--color-border)",
-              background: testSelected
-                ? "var(--color-lab-light)"
-                : "var(--color-surface)",
+              border: testSelected ? "1.5px solid var(--color-lab)" : "1px solid var(--color-border)",
+              background: testSelected ? "var(--color-lab-light)" : "var(--color-surface)",
               color: "var(--color-lab)",
               paddingLeft: "1.75rem",
               paddingRight: testSelected ? "3.5rem" : "1.75rem",
             }}
           />
-
-          {/* ── Inline clear button — only shows when a test is selected ── */}
           {testSelected && (
             <button
               type="button"
               onMouseDown={(e) => { e.preventDefault(); handleClearTest(); }}
               title="Clear test and pick again"
               className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full transition-all"
-              style={{
-                right: "1.5rem",
-                width: "16px",
-                height: "16px",
-                background: "var(--color-danger)",
-                color: "white",
-              }}
+              style={{ right: "1.5rem", width: "16px", height: "16px", background: "var(--color-danger)", color: "white" }}
             >
               <X size={10} strokeWidth={3} />
             </button>
           )}
-
-          {/* Chevron toggle */}
           <ChevronDown
             size={14}
             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
             onMouseDown={(e) => {
               e.preventDefault();
-              if (testSelected) {
-                handleClearTest(); // chevron on selected = clear to re-pick
-              } else {
-                setShowDropdown(v => !v);
-              }
+              if (testSelected) handleClearTest();
+              else setShowDropdown(v => !v);
             }}
           />
         </div>
 
-        {/* Detail / Instructions */}
+        {/* Detail / Instructions — FIX #2 + #3 handled inside TypableDetailInput */}
         <div className="w-48 flex-shrink-0">
           <TypableDetailInput
             value={draft.detail}
@@ -484,7 +509,7 @@ export default function LabTab({ labs, setLabs, patient }) {
   const [editId, setEditId] = useState(null);
   const [query, setQuery] = useState("");
   const [struckIds, setStruckIds] = useState([]);
-  const [showAddRow, setShowAddRow] = useState(false);
+  const [showAddRow, setShowAddRow] = useState(true);
 
   const suggestions = query.length > 1
     ? LAB_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
@@ -502,7 +527,9 @@ export default function LabTab({ labs, setLabs, patient }) {
     }
     setDraft(EMPTY_DRAFT);
     setQuery("");
+    // FIX #1: keep AddRow visible and re-focus after adding, same as DrugTab
     setShowAddRow(false);
+    setTimeout(() => setShowAddRow(true), 50);
   };
 
   const cancelAdd = () => {
@@ -539,7 +566,6 @@ export default function LabTab({ labs, setLabs, patient }) {
   const addRowProps = { draft, onDraftChange: setD, onCommit: commitDraft, onCancel: cancelAdd, query, setQuery, suggestions };
 
   return (
-    // ── OUTER WRAPPER: fixed height, flex column ──
     <div
       className="flex flex-col rounded-xs overflow-hidden shadow-lg"
       style={{
@@ -549,8 +575,7 @@ export default function LabTab({ labs, setLabs, patient }) {
         minHeight: "300px",
       }}
     >
-
-      {/* ── HEADER: fixed, never scrolls ── */}
+      {/* HEADER */}
       <div
         className="flex-shrink-0 border-b"
         style={{ background: "linear-gradient(135deg, var(--color-lab-light) 0%, var(--color-surface) 100%)", borderColor: "var(--color-border)" }}
@@ -568,10 +593,10 @@ export default function LabTab({ labs, setLabs, patient }) {
         <ModernToolbar docNo={docNo} docDt={docDt} onProto={handleProto} />
       </div>
 
-      {/* ── BODY: flex-1, consistent height ── */}
+      {/* BODY */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* Empty state (no labs, no add row) */}
+        {/* Empty state — no labs, no add row */}
         {labs.length === 0 && !showAddRow && (
           <div className="flex-1 flex flex-col items-center justify-center py-5">
             <div className="text-center">
@@ -592,23 +617,21 @@ export default function LabTab({ labs, setLabs, patient }) {
           </div>
         )}
 
-        {/* Empty state + add row: spacer pushes AddRow to bottom */}
+        {/* Empty state + add row */}
         {labs.length === 0 && showAddRow && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1" />
+          <div className="flex-shrink-0">
             <AddRow {...addRowProps} />
           </div>
         )}
 
-        {/* Table view (has labs) */}
+        {/* TABLE VIEW — when labs exist */}
         {labs.length > 0 && (
+          // FIX #1: overflow-y-auto on the list only; AddRow sits flush below
           <div className="flex-1 flex flex-col overflow-hidden">
-
-            {/* Table header — pinned */}
             <TableHeader />
 
-            {/* Scrollable lab rows */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Scrollable lab rows — no flex-1 so AddRow stays close */}
+            <div className="overflow-y-auto">
               {labs.map((lab, index) => (
                 <LabRow
                   key={lab.id}
@@ -622,10 +645,10 @@ export default function LabTab({ labs, setLabs, patient }) {
               ))}
             </div>
 
-            {/* Add Row pinned below scroll area */}
+            {/* FIX #1: AddRow always visible directly below rows */}
             {showAddRow && <AddRow {...addRowProps} />}
 
-            {/* Add Test button pinned at bottom */}
+            {/* Add Test button when row is hidden */}
             {!showAddRow && (
               <div className="flex-shrink-0 flex justify-end px-4 py-3 border-t" style={{ borderColor: "var(--color-border)" }}>
                 <button
@@ -638,10 +661,8 @@ export default function LabTab({ labs, setLabs, patient }) {
                 </button>
               </div>
             )}
-
           </div>
         )}
-
       </div>
 
       {/* Footer bar */}
@@ -649,3 +670,4 @@ export default function LabTab({ labs, setLabs, patient }) {
     </div>
   );
 }
+//

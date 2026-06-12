@@ -12,6 +12,8 @@ const LEFT_TABS = [
     icon: User,
     color: "var(--color-primary)",
     lightColor: "var(--color-primary-muted)",
+    defaultBg: "var(--color-primary-muted)", // Default background
+    defaultIconColor: "var(--color-primary)" // Default icon color
   },
   { 
     key: "chronicAllergy", 
@@ -19,6 +21,8 @@ const LEFT_TABS = [
     icon: AlertCircle,
     color: "var(--color-danger)",
     lightColor: "#fee2e2",
+    defaultBg: "#fee2e2",
+    defaultIconColor: "#dc2626"
   },
   { 
     key: "patientFamily", 
@@ -26,6 +30,8 @@ const LEFT_TABS = [
     icon: Users,
     color: "var(--color-drugs)",
     lightColor: "var(--color-drugs-light)",
+    defaultBg: "var(--color-drugs-light)",
+    defaultIconColor: "var(--color-drugs)"
   },
   { 
     key: "period", 
@@ -33,6 +39,8 @@ const LEFT_TABS = [
     icon: Calendar,
     color: "var(--color-warning)",
     lightColor: "#fef3e2",
+    defaultBg: "#fef3e2",
+    defaultIconColor: "#d97706"
   },
 ];
 
@@ -376,7 +384,12 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient }) {
           const IconComponent = tab.icon;
           const isActive  = activePanel === tab.key;
           const isHovered = hoveredKey  === tab.key;
+          // Now highlight is true for both active AND hovered, but also we want default background
+          // So we always show the lightColor as background
           const highlight = isActive || isHovered;
+          
+          // Default background is always visible (tab.lightColor)
+          // On highlight, we use a slightly darker or same background
 
           return (
             <div
@@ -386,8 +399,8 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient }) {
               onMouseLeave={handleIconMouseLeave}
               className="relative cursor-pointer transition-all duration-200 group"
               style={{
-                background:  highlight ? tab.lightColor : "transparent",
-                borderLeft:  highlight ? `3px solid ${tab.color}` : "3px solid transparent",
+                background: tab.lightColor, // Always show the light color background
+                borderLeft: highlight ? `3px solid ${tab.color}` : "3px solid transparent",
               }}
             >
               <div className="flex items-center justify-center py-3">
@@ -395,12 +408,12 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient }) {
                   className="p-1.5 rounded-lg transition-all duration-200"
                   style={{
                     background: highlight ? tab.color : "transparent",
-                    transform:  isHovered ? "scale(1.1)" : "scale(1)",
+                    transform: isHovered ? "scale(1.1)" : "scale(1)",
                   }}
                 >
                   <IconComponent
                     size={18}
-                    style={{ color: highlight ? "white" : "var(--color-text-muted)" }}
+                    style={{ color: highlight ? "white" : tab.defaultIconColor || "var(--color-text-muted)" }}
                   />
                 </div>
               </div>

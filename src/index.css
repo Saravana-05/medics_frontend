@@ -21,6 +21,8 @@
   --color-lab-light:      #fef3e2;
   --color-services:       #1565c0;   /* blue  – Services    */
   --color-services-light: #e3f0fc;
+  --color-info:           #0ea5e9;   /* blue  – Info/Findings */
+  --color-info-light:     #c8eef4;   /* light teal – Findings tab background */
 
   /* Neutrals */
   --color-surface:        #ffffff;
@@ -38,7 +40,6 @@
   --color-success:        #17a765;
   --color-warning:        #f59e0b;
   --color-danger:         #dc2626;
-  --color-info:           #0ea5e9;
 
   /* Role badges */
   --color-role-op:        #0f6cbd;
@@ -84,6 +85,12 @@
   --transition-base:   220ms ease;
   --transition-slow:   350ms ease;
 }
+
+/* ─── Tab Colours with Findings Support ── */
+.tab-drugs    { --tab-color: var(--color-drugs);    --tab-bg: var(--color-drugs-light); }
+.tab-lab      { --tab-color: var(--color-lab);      --tab-bg: var(--color-lab-light); }
+.tab-services { --tab-color: var(--color-services); --tab-bg: var(--color-services-light); }
+.tab-findings { --tab-color: var(--color-info);     --tab-bg: var(--color-info-light); }
 
 /* ─── Global Base ─────────────────────────────────────────────────────────── */
 html { font-size: 15px; -webkit-font-smoothing: antialiased; }
@@ -153,11 +160,6 @@ body {
 }
 .input-base::placeholder { color: var(--color-text-subtle); }
 
-/* Tab colours */
-.tab-drugs    { --tab-color: var(--color-drugs);    --tab-bg: var(--color-drugs-light); }
-.tab-lab      { --tab-color: var(--color-lab);      --tab-bg: var(--color-lab-light); }
-.tab-services { --tab-color: var(--color-services); --tab-bg: var(--color-services-light); }
-
 /* Badge */
 .badge {
   display: inline-flex;
@@ -177,8 +179,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fadeUp var(--transition-slow) both; }
-
-
 
 @keyframes fade-in {
   from {

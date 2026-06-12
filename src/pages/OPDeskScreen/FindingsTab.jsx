@@ -9,7 +9,7 @@ import {
 
 const FINDINGS_COLOR = {
   accent: "var(--color-info)",
-  light: "var(--color-info-muted)",
+  light: "var(--color-info-light)", // Using the new CSS variable
 };
 
 // Ordered list of focusable field keys in the add row
@@ -45,27 +45,9 @@ function ModernToolbar({ docNo, docDt, onProto }) {
   return (
     <div className="flex items-center justify-between p-1 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-6">
-        {/* <div className="flex gap-4">
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Hash size={10} className="inline mr-1" /> Doc #
-            </span>
-            <span className="text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{docNo || "—"}</span>
-          </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Calendar size={10} className="inline mr-1" /> Doc. Dt
-            </span>
-            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{docDt || "—"}</span>
-          </div>
-        </div> */}
         <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
-        {/* <span className="px-3 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1" style={{ background: FINDINGS_COLOR.light, color: FINDINGS_COLOR.accent }}>
-          <Stethoscope size={12} /> OP-F: {docNo?.split(":")[0] || "3902"}
-        </span> */}
       </div>
       <div className="flex gap-2">
-        {/* <ActionButton variant="ghost" icon={Copy} label="Copy" /> */}
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
@@ -186,11 +168,9 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
 
   const handleSave = () => {
     if (selectedFile) {
-      // If a file is selected, upload it
       onFileUpload(selectedFile);
       setSelectedFile(null);
     } else if (content.trim()) {
-      // If content is written, save as note
       const now = new Date();
       const dt = `${now.getDate().toString().padStart(2, "0")}/${(now.getMonth() + 1).toString().padStart(2, "0")}/${now.getFullYear()} ${now.getHours().toString().padStart(2, "0")}.${now.getMinutes().toString().padStart(2, "0")}`;
       onSave({
@@ -211,7 +191,6 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
     const f = e.target.files[0];
     if (f) {
       setSelectedFile(f);
-      // Auto-fill title with filename if title is empty
       if (!title) {
         setTitle(f.name.replace(/\.[^/.]+$/, ""));
       }
@@ -242,7 +221,6 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Title Field */}
           <div>
             <label className="text-[0.65rem] font-bold uppercase tracking-wide block mb-1" style={{ color: "var(--color-text-muted)" }}>
               Document Title
@@ -258,7 +236,6 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
             />
           </div>
 
-          {/* Content Field */}
           <div>
             <label className="text-[0.65rem] font-bold uppercase tracking-wide block mb-1" style={{ color: "var(--color-text-muted)" }}>
               Content / Notes
@@ -279,7 +256,6 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
             )}
           </div>
 
-          {/* File Upload Field */}
           <div>
             <label className="text-[0.65rem] font-bold uppercase tracking-wide block mb-1" style={{ color: "var(--color-text-muted)" }}>
               Upload File (Optional)
@@ -322,7 +298,6 @@ function AddNoteModal({ onSave, onCancel, onFileUpload }) {
             </p>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-end gap-2 pt-2">
             <button onClick={onCancel} className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
               style={{ border: "1px solid var(--color-border)", color: "var(--color-text-muted)" }}
@@ -449,7 +424,7 @@ export default function FindingsTab({ findings, setFindings, patient }) {
   return (
     <div className="h-full flex flex-col rounded-xs overflow-hidden shadow-lg" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
 
-      {/* Header Section with Clear and Save buttons */}
+      {/* Header Section with Gradient using --color-info-light */}
       <div className="border-b" style={{ background: `linear-gradient(135deg, ${FINDINGS_COLOR.light} 0%, var(--color-surface) 100%)`, borderColor: "var(--color-border)" }}>
         <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">

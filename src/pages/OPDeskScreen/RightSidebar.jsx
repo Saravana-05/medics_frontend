@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import { 
   ParkingCircle, AlertTriangle, FileText, CalendarClock,
-  Plus, X, Calendar, Clock, User, Check, Briefcase, Coffee, Video, Users as UsersIcon
+  Plus, X, Calendar, Clock, User, Check, Briefcase, Coffee, Video, Users as UsersIcon,
+  MapPin
 } from "lucide-react";
 
 const RIGHT_TABS = [
@@ -11,6 +12,8 @@ const RIGHT_TABS = [
     icon: ParkingCircle,
     color: "var(--color-warning)",
     lightColor: "#fef3e2",
+    defaultBg: "#fef3e2",
+    defaultIconColor: "#d97706",
     badge: "3"
   },
   { 
@@ -19,6 +22,8 @@ const RIGHT_TABS = [
     icon: AlertTriangle,
     color: "var(--color-danger)",
     lightColor: "#fee2e2",
+    defaultBg: "#fee2e2",
+    defaultIconColor: "#dc2626",
     badge: "2"
   },
   { 
@@ -27,6 +32,8 @@ const RIGHT_TABS = [
     icon: FileText,
     color: "var(--color-primary)",
     lightColor: "var(--color-primary-muted)",
+    defaultBg: "var(--color-primary-muted)",
+    defaultIconColor: "var(--color-primary)",
     badge: "5"
   },
   { 
@@ -35,6 +42,8 @@ const RIGHT_TABS = [
     icon: CalendarClock,
     color: "var(--color-drugs)",
     lightColor: "var(--color-drugs-light)",
+    defaultBg: "var(--color-drugs-light)",
+    defaultIconColor: "var(--color-drugs)",
     badge: "8"
   },
 ];
@@ -415,9 +424,6 @@ function SchedulePanel({ panelHeight }) {
   );
 }
 
-// Add missing import for MapPin
-import { MapPin } from "lucide-react";
-
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function RightSidebar({ activePanel, onPanelChange }) {
@@ -515,7 +521,7 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
               onMouseLeave={handleIconMouseLeave}
               className="relative cursor-pointer transition-all duration-200 group"
               style={{
-                background:  highlight ? tab.lightColor : "transparent",
+                background: tab.defaultBg, // Always show default background color
                 borderRight: highlight ? `3px solid ${tab.color}` : "3px solid transparent",
               }}
             >
@@ -524,12 +530,12 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
                   className="p-1.5 rounded-lg transition-all duration-200"
                   style={{
                     background: highlight ? tab.color : "transparent",
-                    transform:  isHovered ? "scale(1.1)" : "scale(1)",
+                    transform: isHovered ? "scale(1.1)" : "scale(1)",
                   }}
                 >
                   <IconComponent
                     size={18}
-                    style={{ color: highlight ? "white" : "var(--color-text-muted)" }}
+                    style={{ color: highlight ? "white" : tab.defaultIconColor }}
                   />
                 </div>
               </div>

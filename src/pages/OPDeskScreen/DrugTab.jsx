@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { 
   Plus, Clipboard, FileText, Printer, Save, X,
@@ -14,7 +15,7 @@ const PERIOD_OPTIONS = ["OD","BD","TDS","QID","HS","SOS","Stat","Weekly","Monthl
 const WHEN_OPTIONS   = ["AF","BF","BF&AF","Any Time","Empty Stomach","With Milk","Before Sleep"];
 const DETAIL_OPTIONS = ["—","On Time","Only If Required","Discontinue Any Time","Continue","Reduce Dose","Increase Dose","Take with Water"];
 
-const FIELD_ORDER = ["days", "name", "form", "intake", "period", "when", "detail", "commit"];
+const FIELD_ORDER = ["days", "name", "intake", "period", "when", "detail", "commit"];
 
 // Function to calculate dosage schedule based on period
 function getDosageSchedule(period, intake) {
@@ -35,17 +36,9 @@ function getDosageSchedule(period, intake) {
 // Function to calculate total quantity (Buy)
 function calculateBuy(days, intake, period) {
   const dosageCount = {
-    "OD": 1,
-    "BD": 2,
-    "TDS": 3,
-    "QID": 4,
-    "HS": 1,
-    "SOS": 1,
-    "Stat": 1,
-    "Weekly": 1,
-    "Monthly": 1
+    "OD": 1, "BD": 2, "TDS": 3, "QID": 4,
+    "HS": 1, "SOS": 1, "Stat": 1, "Weekly": 1, "Monthly": 1
   };
-  
   let intakeNum = 1;
   if (intake.includes("½")) intakeNum = 0.5;
   else if (intake.includes("¼")) intakeNum = 0.25;
@@ -55,10 +48,8 @@ function calculateBuy(days, intake, period) {
   else if (intake.includes("3")) intakeNum = 3;
   else if (intake.includes("4")) intakeNum = 4;
   else if (!isNaN(parseFloat(intake))) intakeNum = parseFloat(intake);
-  
   const dailyDosage = (dosageCount[period] || 1) * intakeNum;
-  const total = Math.ceil(days * dailyDosage);
-  return total;
+  return Math.ceil(days * dailyDosage);
 }
 
 // Helper to format intake display
@@ -97,7 +88,7 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
   );
 }
 
-/* ── Modern Toolbar Component (without Doc info and Copy) ── */
+/* ── Modern Toolbar Component ── */
 function ModernToolbar({ onProto }) {
   return (
     <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
@@ -113,7 +104,7 @@ function ModernToolbar({ onProto }) {
   );
 }
 
-/* ── Table Header Component (New Structure) ── */
+/* ── Table Header Component ── */
 function TableHeader() {
   const columns = [
     { label: "S.No", width: "w-12", center: true },
@@ -139,7 +130,8 @@ function TableHeader() {
   );
 }
 
-/* ── Drug Row Component (New Structure) ── */
+/* ── Drug Row Component ── */
+// FIX #4: Display selected days below the drug name
 function DrugRow({ drug, index, isStruck, onDelete, onStrike, onEdit }) {
   const schedule = getDosageSchedule(drug.period, drug.intake);
   const buy = calculateBuy(parseInt(drug.days) || 1, drug.intake, drug.period);
@@ -159,11 +151,18 @@ function DrugRow({ drug, index, isStruck, onDelete, onStrike, onEdit }) {
       <div className="flex-1 min-w-0 px-2 py-2">
         <div className="font-semibold text-sm truncate" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
           {drug.name}
-          {/* ── Form badge ── */}
-   
         </div>
-        <div className="text-[0.6rem]" style={{ color: "var(--color-text-subtle)" }}>
-          {intakeDisplay}
+        {/* FIX #4: Show days + intake display below drug name */}
+        <div className="flex items-center gap-2 mt-0.5">
+          <span
+            className="text-[0.6rem] font-bold px-1 rounded"
+            style={{ background: "var(--color-drugs-light)", color: "var(--color-drugs)" }}
+          >
+            {drug.days}d
+          </span>
+          <span className="text-[0.6rem]" style={{ color: "var(--color-text-subtle)" }}>
+            {intakeDisplay}
+          </span>
         </div>
       </div>
       <div className="w-12 px-2 py-2 text-center">
@@ -211,8 +210,7 @@ function DrugRow({ drug, index, isStruck, onDelete, onStrike, onEdit }) {
   );
 }
 
-/* ── Typable Detail Input Component with Dropdown Above ── */
-/* ── Typable Detail Input Component with Dropdown Above ── */
+/* ── Typable Detail Input Component ── */
 function TypableDetailInput({ value, onChange, onKeyDown }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
@@ -220,7 +218,6 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
   const wrapperRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
-  // Filter out the "--" option
   const detailOptions = DETAIL_OPTIONS.filter(opt => opt !== "—");
 
   const recalcDropdown = useCallback(() => {
@@ -249,7 +246,6 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
 
   const handleSelectOption = (option) => {
     onChange({ target: { value: option } });
-    setHasTyped(false);
     setShowDropdown(false);
     setHighlightedIdx(-1);
     inputRef.current?.focus();
@@ -281,13 +277,9 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
     onKeyDown?.(e);
   };
 
-  const [hasTyped, setHasTyped] = useState(false);
-
-  const filteredOptions = !hasTyped
-  ? detailOptions
-  : detailOptions.filter(opt =>
-      opt.toLowerCase().includes((value === "—" ? "" : value).toLowerCase())
-    );
+  const filteredOptions = detailOptions.filter(opt => 
+    opt.toLowerCase().includes((value === "—" ? "" : value).toLowerCase())
+  );
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -295,16 +287,10 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
         ref={inputRef}
         type="text"
         value={value === "—" ? "" : value}
-        onChange={e => {
-  setHasTyped(true);   // ← add this line
-  onChange(e);
-}}
-       onFocus={() => {
-  recalcDropdown();        // ← calculate position BEFORE showing
-  setShowDropdown(true);
-}}
+        onChange={onChange}
+        onFocus={() => setShowDropdown(true)}
         onKeyDown={handleKeyDown}
-        onBlur={() => setTimeout(() => { setShowDropdown(false); setHasTyped(false); }, 200)}
+        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
         placeholder="Type or select detail..."
         className="w-full px-2 py-1.5 rounded text-sm outline-none"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
@@ -341,35 +327,84 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
   );
 }
 
-/* ── Add Row Component (with typable detail field) ── */
-/* ── Add Row Component (wider drug field, no Form field, inline clear button) ── */
-function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }) {
+/* ── FIX #2: Arrow-key-only Select Component ── */
+// Replaces native <select> for intake, period, when fields so that
+// only ArrowUp / ArrowDown cycle through options — Left/Right are
+// free to navigate between fields (FIX #3).
+function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {}, className = "" }) {
+  const currentIdx = options.indexOf(value);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = options[Math.min(currentIdx + 1, options.length - 1)];
+      onChange(next);
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = options[Math.max(currentIdx - 1, 0)];
+      onChange(next);
+      return;
+    }
+    // FIX #3: delegate left/right to parent for field navigation
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      onNavigate?.(e);
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onNavigate?.(e);
+      return;
+    }
+    if (e.key === "Escape") {
+      onNavigate?.(e);
+      return;
+    }
+    if (e.key === "Tab") {
+      onNavigate?.(e);
+    }
+  };
+
+  return (
+    <select
+      data-field={dataField}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      onKeyDown={handleKeyDown}
+      className={`w-full px-2 py-1.5 rounded text-sm ${className}`}
+      style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", ...extraStyle }}
+    >
+      {options.map(opt => <option key={opt}>{opt}</option>)}
+    </select>
+  );
+}
+
+/* ── Add Row Component with focus tracking ── */
+const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }, ref) => {
   const inputRef    = useRef(null);
   const rowRef      = useRef(null);
   const wrapperRef  = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
-  // Derive from query — if there's a value, it's "selected" unless user is actively typing
   const [drugSelected, setDrugSelected] = useState(() => !!query);
 
-  // Sync when parent sets query (e.g. startEdit pre-fills the drug name)
+  React.useImperativeHandle(ref, () => ({
+    focusDays: () => {
+      const daysInput = rowRef.current?.querySelector('[data-field="days"]');
+      if (daysInput) daysInput.focus();
+    }
+  }));
+
   useEffect(() => {
     if (query.trim()) setDrugSelected(true);
     else setDrugSelected(false);
   }, [query]);
 
-  // const medicineTypes = [
-  //   "Paracetamol","Amoxicillin","Azithromycin","Ciprofloxacin",
-  //   "Doxycycline","Metformin","Omeprazole","Losartan",
-  //   "Amlodipine","Atorvastatin","Cetirizine","Ibuprofen"
-  // ];
-
   const medicineTypes = DRUG_SUGGESTIONS;
-
-  const dropdownItems = query === ""
-    ? medicineTypes
-    : suggestions.slice(0, 8);
+  const dropdownItems = query === "" ? medicineTypes : suggestions.slice(0, 8);
 
   const recalcDropdown = useCallback(() => {
     if (!wrapperRef.current) return;
@@ -396,34 +431,15 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     };
   }, [showDropdown, recalcDropdown]);
 
-  // When a drug is selected from dropdown — also auto-parse form from name
-  // const handleSelectMedicine = (medicine) => {
-  //   // Try to extract form from drug name e.g. "Paracetamol 500mg Tab" → form = "Tab"
-  //   const formMatch = FORM_OPTIONS.find(f =>
-  //     medicine.toLowerCase().endsWith(f.toLowerCase()) ||
-  //     medicine.toLowerCase().includes(` ${f.toLowerCase()} `) ||
-  //     medicine.toLowerCase().includes(` ${f.toLowerCase()}`)
-  //   );
-  //   setQuery(medicine);
-  //   onDraftChange("name")(medicine);
-  //   if (formMatch) onDraftChange("form")(formMatch);
-  //   setDrugSelected(true);
-  //   setShowDropdown(false);
-  //   setHighlightedIdx(-1);
-  //   inputRef.current?.focus();
-  // };
-
   const handleSelectMedicine = (medicine) => {
-  // Remove the formMatch auto-parse block — form is already in the name
-  setQuery(medicine);
-  onDraftChange("name")(medicine);   // stores full "Paracetamol 500mg Tab"
-  setDrugSelected(true);
-  setShowDropdown(false);
-  setHighlightedIdx(-1);
-  inputRef.current?.focus();
-};
+    setQuery(medicine);
+    onDraftChange("name")(medicine);
+    setDrugSelected(true);
+    setShowDropdown(false);
+    setHighlightedIdx(-1);
+    inputRef.current?.focus();
+  };
 
-  // Clear just the drug name so user can pick again — keeps all other fields intact
   const handleClearDrug = () => {
     setQuery("");
     onDraftChange("name")("");
@@ -439,23 +455,32 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     }
   };
 
+  const FIELD_ORDER_LOCAL = ["days", "name", "intake", "period", "when", "detail", "commit"];
+
+  // FIX #3: Central field focus helper used by all fields
   const focusField = useCallback((fieldKey) => {
     if (!rowRef.current) return;
     const el = rowRef.current.querySelector(`[data-field="${fieldKey}"]`);
     if (el) el.focus();
   }, []);
 
-  // FIELD_ORDER without "form" since we removed that column
-  const FIELD_ORDER_LOCAL = ["days", "name", "intake", "period", "when", "detail", "commit"];
+  // FIX #3: Navigate left/right between fields
+  const navigateField = useCallback((currentField, direction) => {
+    const idx = FIELD_ORDER_LOCAL.indexOf(currentField);
+    if (direction === "right" && idx < FIELD_ORDER_LOCAL.length - 1) {
+      focusField(FIELD_ORDER_LOCAL[idx + 1]);
+    } else if (direction === "left" && idx > 0) {
+      focusField(FIELD_ORDER_LOCAL[idx - 1]);
+    }
+  }, [focusField]);
 
   const handleFieldKeyDown = (e, currentField) => {
-    const idx = FIELD_ORDER_LOCAL.indexOf(currentField);
-
     if (e.key === "Escape") {
       onCancel();
       return;
     }
 
+    // Drug name dropdown navigation
     if (currentField === "name" && showDropdown && dropdownItems.length > 0) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -474,18 +499,18 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       }
     }
 
-    if (e.key === "ArrowRight" && (currentField === "days" || currentField === "name")) {
+    // FIX #3: ArrowRight moves to next field, ArrowLeft to previous
+    if (e.key === "ArrowRight") {
       e.preventDefault();
-      const next = FIELD_ORDER_LOCAL[idx + 1];
-      if (next) focusField(next);
+      navigateField(currentField, "right");
       return;
     }
-    if (e.key === "ArrowLeft" && (currentField === "days" || currentField === "name")) {
+    if (e.key === "ArrowLeft") {
       e.preventDefault();
-      const prev = FIELD_ORDER_LOCAL[idx - 1];
-      if (prev) focusField(prev);
+      navigateField(currentField, "left");
       return;
     }
+
     if (e.key === "Tab") {
       setShowDropdown(false);
     }
@@ -510,7 +535,6 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-drugs)" }}
       onBlur={handleRowBlur}
     >
-      {/* ── Dropdown Portal ── */}
       {showDropdown && dropdownItems.length > 0 && (
         <div
           className="rounded-lg shadow-xl overflow-hidden"
@@ -550,7 +574,6 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       )}
 
       <div className="flex items-center p-2 gap-2">
-
         {/* Days */}
         <div className="w-16 flex-shrink-0">
           <input
@@ -565,13 +588,9 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
           />
         </div>
 
-        {/* ── Drug Name Field (wider, inline clear ×, no separate Form dropdown) ── */}
+        {/* Drug name search */}
         <div className="flex-1 relative min-w-0" ref={wrapperRef}>
-          <Pill
-            size={14}
-            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ color: "var(--color-drugs)" }}
-          />
+          <Pill size={14} className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-drugs)" }} />
           <input
             data-field="name"
             ref={inputRef}
@@ -582,9 +601,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
               setShowDropdown(true);
               setHighlightedIdx(-1);
             }}
-            onFocus={() => {
-              setShowDropdown(true);
-            }}
+            onFocus={() => setShowDropdown(true)}
             onBlur={() => {
               setTimeout(() => {
                 setShowDropdown(false);
@@ -595,85 +612,68 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
             placeholder="Search or select medicine..."
             className="w-full py-1.5 rounded text-sm font-medium"
             style={{
-              border: drugSelected
-                ? "1.5px solid var(--color-drugs)"
-                : "1px solid var(--color-border)",
-              background: drugSelected
-                ? "var(--color-drugs-light)"
-                : "var(--color-surface)",
+              border: drugSelected ? "1.5px solid var(--color-drugs)" : "1px solid var(--color-border)",
+              background: drugSelected ? "var(--color-drugs-light)" : "var(--color-surface)",
               color: "var(--color-drugs)",
-              // Left pad for icon, right pad for clear btn + chevron
               paddingLeft: "1.75rem",
               paddingRight: drugSelected ? "3.5rem" : "1.75rem",
             }}
           />
-
-          {/* ── Inline clear button — only shows when a drug is selected ── */}
           {drugSelected && (
             <button
               type="button"
               onMouseDown={(e) => { e.preventDefault(); handleClearDrug(); }}
               title="Clear drug and pick again"
               className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full transition-all"
-              style={{
-                right: "1.5rem",
-                width: "16px",
-                height: "16px",
-                background: "var(--color-danger)",
-                color: "white",
-              }}
+              style={{ right: "1.5rem", width: "16px", height: "16px", background: "var(--color-danger)", color: "white" }}
             >
               <X size={10} strokeWidth={3} />
             </button>
           )}
-
-          {/* Chevron toggle */}
           <ChevronDown
             size={14}
             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
             onMouseDown={(e) => {
               e.preventDefault();
-              if (drugSelected) {
-                handleClearDrug();   // chevron on selected drug = clear to re-pick
-              } else {
-                setShowDropdown(v => !v);
-              }
+              if (drugSelected) handleClearDrug();
+              else setShowDropdown(v => !v);
             }}
           />
         </div>
 
-        {/* Intake */}
+        {/* FIX #2: intake — ArrowUp/Down only, ArrowLeft/Right navigates fields */}
         <div className="w-20 flex-shrink-0">
-          <select data-field="intake" value={draft.intake}
-            onChange={e => onDraftChange("intake")(e.target.value)}
-            onKeyDown={e => handleFieldKeyDown(e, "intake")}
-            className="w-full px-2 py-1.5 rounded text-sm"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
-            {INTAKE_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
-          </select>
+          <ArrowSelect
+            dataField="intake"
+            value={draft.intake}
+            options={INTAKE_OPTIONS}
+            onChange={v => onDraftChange("intake")(v)}
+            onNavigate={e => handleFieldKeyDown(e, "intake")}
+          />
         </div>
 
-        {/* Period */}
+        {/* FIX #2: period — ArrowUp/Down only */}
         <div className="w-20 flex-shrink-0">
-          <select data-field="period" value={draft.period}
-            onChange={e => onDraftChange("period")(e.target.value)}
-            onKeyDown={e => handleFieldKeyDown(e, "period")}
-            className="w-full px-2 py-1.5 rounded text-sm font-bold"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-primary)" }}>
-            {PERIOD_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
-          </select>
+          <ArrowSelect
+            dataField="period"
+            value={draft.period}
+            options={PERIOD_OPTIONS}
+            onChange={v => onDraftChange("period")(v)}
+            onNavigate={e => handleFieldKeyDown(e, "period")}
+            style={{ color: "var(--color-primary)", fontWeight: "700" }}
+          />
         </div>
 
-        {/* When */}
+        {/* FIX #2: when — ArrowUp/Down only */}
         <div className="w-28 flex-shrink-0">
-          <select data-field="when" value={draft.when}
-            onChange={e => onDraftChange("when")(e.target.value)}
-            onKeyDown={e => handleFieldKeyDown(e, "when")}
-            className="w-full px-2 py-1.5 rounded text-sm"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
-            {WHEN_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
-          </select>
+          <ArrowSelect
+            dataField="when"
+            value={draft.when}
+            options={WHEN_OPTIONS}
+            onChange={v => onDraftChange("when")(v)}
+            onNavigate={e => handleFieldKeyDown(e, "when")}
+          />
         </div>
 
         {/* Detail */}
@@ -711,7 +711,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       </div>
     </div>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════ MAIN DRUG TAB COMPONENT ═══════════════════ */
 const EMPTY_DRAFT = { name: "", form: "Tab", intake: "1", period: "OD", when: "AF", detail: "—", days: "1" };
@@ -721,7 +721,8 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
   const [editId, setEditId] = useState(null);
   const [query, setQuery] = useState("");
   const [struckIds, setStruckIds] = useState([]);
-  const [showAddRow, setShowAddRow] = useState(false);
+  const [showAddRow, setShowAddRow] = useState(true);
+  const addRowRef = useRef(null);
 
   const suggestions = query.length > 1
     ? DRUG_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
@@ -740,6 +741,13 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
     setDraft(EMPTY_DRAFT);
     setQuery("");
     setShowAddRow(false);
+
+    setTimeout(() => {
+      setShowAddRow(true);
+      setTimeout(() => {
+        if (addRowRef.current) addRowRef.current.focusDays();
+      }, 100);
+    }, 50);
   };
 
   const cancelAdd = () => {
@@ -764,15 +772,18 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
     if (window.confirm("Are you sure you want to clear all medicines?")) {
       setDrugs([]);
       setStruckIds([]);
+      setShowAddRow(false);
     }
   };
 
-  const handleSave = () => {
-    alert("Prescription saved successfully!");
-  };
+  const handleSave = () => alert("Prescription saved successfully!");
+  const handleProto = () => alert("Proto feature coming soon!");
 
-  const handleProto = () => {
-    alert("Proto feature coming soon!");
+  const handleAddNewMedicine = () => {
+    setShowAddRow(true);
+    setTimeout(() => {
+      if (addRowRef.current) addRowRef.current.focusDays();
+    }, 100);
   };
 
   const addRowProps = { draft, onDraftChange: setD, onCommit: commitDraft, onCancel: cancelAdd, query, setQuery, suggestions };
@@ -787,7 +798,6 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
         minHeight: "300px",
       }}
     >
-
       {/* HEADER */}
       <div
         className="flex-shrink-0 border-b"
@@ -824,7 +834,7 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
               <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Medicines Added Yet</h3>
               <p className="text-sm mb-3" style={{ color: "var(--color-text-muted)" }}>Click the button below to start prescribing</p>
               <button
-                onClick={() => setShowAddRow(true)}
+                onClick={handleAddNewMedicine}
                 className="px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm mx-auto"
                 style={{ background: "var(--color-drugs)", color: "white" }}
                 onMouseEnter={(e) => e.currentTarget.style.background = "#146b4c"}
@@ -836,19 +846,20 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
           </div>
         )}
 
-        {/* EMPTY STATE + ADD ROW */}
+        {/* Add Row for empty state */}
         {drugs.length === 0 && showAddRow && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1" />
-            <AddRow {...addRowProps} />
+          <div className="flex-shrink-0">
+            <AddRow ref={addRowRef} {...addRowProps} />
           </div>
         )}
 
-        {/* TABLE VIEW */}
+        {/* TABLE VIEW - When drugs exist */}
         {drugs.length > 0 && (
+          // FIX #1: flex-col so AddRow sits flush right below the last drug row
           <div className="flex-1 flex flex-col overflow-hidden">
             <TableHeader />
-            <div className="flex-1 overflow-y-auto">
+            {/* Scrollable drug list — does NOT grow to fill remaining space so AddRow stays close */}
+            <div className="overflow-y-auto">
               {drugs.map((drug, index) => (
                 <DrugRow
                   key={drug.id}
@@ -861,23 +872,9 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
                 />
               ))}
             </div>
-            {showAddRow && <AddRow {...addRowProps} />}
-            {!showAddRow && (
-              <div
-                className="flex-shrink-0 flex justify-end px-4 py-3 border-t"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <button
-                  onClick={() => setShowAddRow(true)}
-                  className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm"
-                  style={{ background: "var(--color-drugs)", color: "white" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#146b4c"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-drugs)"}
-                >
-                  <Plus size={15} /> Add Medicine
-                </button>
-              </div>
-            )}
+
+            {/* FIX #1: AddRow is placed directly after the drug list, no gap */}
+            <AddRow ref={addRowRef} {...addRowProps} />
           </div>
         )}
       </div>

@@ -18,6 +18,16 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
     return colorMap[tabKey] || "var(--color-primary)";
   };
 
+  const getActiveBgColor = (tabKey) => {
+    const bgColorMap = {
+      drugs: "var(--color-drugs-light)",
+      lab: "var(--color-lab-light)",
+      services: "var(--color-services-light)",
+      findings: "var(--color-info-light)" // Make sure this CSS variable is defined with a visible color
+    };
+    return bgColorMap[tabKey] || "var(--color-primary-muted)";
+  };
+
   return (
     <div className="flex-shrink-0" style={{ background: "var(--color-surface)", borderBottom: "1px solid var(--color-border)" }}>
       <div className="flex items-center justify-between px-2">
@@ -26,6 +36,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
           {PRESCRIPTION_TABS.map(tab => {
             const isActive = activeTab === tab.key;
             const activeColor = getActiveTabColor(tab.key);
+            const activeBgColor = getActiveBgColor(tab.key);
             const Icon = tab.icon;
             const count = tabCount[tab.key];
             
@@ -35,8 +46,9 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
                 onClick={() => setActiveTab(tab.key)}
                 className="relative px-4 py-3 transition-all duration-200 group"
                 style={{
-                  background: isActive ? `linear-gradient(180deg, ${activeColor}10 0%, transparent 100%)` : "transparent",
+                  background: isActive ? activeBgColor : "transparent",
                   borderBottom: isActive ? `2px solid ${activeColor}` : "2px solid transparent",
+                  borderRadius: "8px 8px 0 0",
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -70,25 +82,6 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
             );
           })}
         </div>
-
-        {/* Right Side Actions - Follow-up Date Field */}
-        {/* <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <label className="text-[0.65rem] font-semibold" style={{ color: "var(--color-text-muted)" }}>
-              Follow-up Date:
-            </label>
-            <input
-              type="date"
-              className="px-2 py-1.5 rounded-lg text-xs border outline-none"
-              style={{
-                background: "var(--color-surface)",
-                borderColor: "var(--color-border)",
-                color: "var(--color-text-base)"
-              }}
-              defaultValue={new Date().toISOString().split('T')[0]}
-            />
-          </div>
-        </div> */}
       </div>
     </div>
   );

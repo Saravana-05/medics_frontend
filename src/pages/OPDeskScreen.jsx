@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users } from "lucide-react";
+import { Users, ChevronLeft, ChevronRight } from "lucide-react";
 
 import AppBar from "./OPDeskScreen/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
@@ -18,6 +18,8 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState("drugs");
   const [leftPanel, setLeftPanel] = useState(null);
   const [rightPanel, setRightPanel] = useState(null);
+  const [isRightPanelExpanded, setIsRightPanelExpanded] = useState(false);
+  const [isTabletView, setIsTabletView] = useState(window.innerWidth < 1024);
 
   const [drugs, setDrugs] = useState([]);
   const [labs, setLabs] = useState([]);
@@ -27,6 +29,15 @@ export default function OPDeskScreen({ user, onLogout }) {
     nextVisit: "", referTo: "", followupNote: "",
   });
   const [saved, setSaved] = useState(false);
+
+  // Check window resize for tablet view
+  useState(() => {
+    const handleResize = () => {
+      setIsTabletView(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const selectPatient = (p) => {
     setSelectedPatient(p);
@@ -47,6 +58,10 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
   const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, findings: 0 };
+
+  const toggleRightPanel = () => {
+    setIsRightPanelExpanded(!isRightPanelExpanded);
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--color-surface-alt)", fontFamily: "var(--font-body)" }}>
@@ -85,7 +100,7 @@ export default function OPDeskScreen({ user, onLogout }) {
         </div>
       </div>
 
-      {/* ── Main workspace with split left and right sections - 70% / 30% ── */}
+      {/* ── Main workspace with responsive split ── */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         
         {!selectedPatient ? (
@@ -100,8 +115,14 @@ export default function OPDeskScreen({ user, onLogout }) {
           </div>
         ) : (
           <>
-            {/* Left Section - Prescription Tabs + Active Tab Content (70% width) */}
-            <div className="flex-[7] flex flex-col overflow-hidden min-w-0">
+            {/* Left Section - Prescription Tabs + Active Tab Content */}
+            <div 
+              className={`flex flex-col overflow-hidden min-w-0 transition-all duration-300 ${
+                isTabletView 
+                  ? isRightPanelExpanded ? 'flex-[5]' : 'flex-1'
+                  : 'flex-[7]'
+              }`}
+            >
               <PrescriptionTabs 
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -118,8 +139,35 @@ export default function OPDeskScreen({ user, onLogout }) {
               </div>
             </div>
 
-            {/* Right Section - Previous Visits Table (30% width) */}
-            <div className="flex-[3] flex-shrink-0 border-l overflow-y-auto" style={{ borderColor: "var(--color-border)" }}>
+            {/* Toggle Button for Tablet View */}
+            {isTabletView && (
+              <button
+                onClick={toggleRightPanel}
+                className="absolute z-20 flex items-center justify-center w-6 h-12 rounded-r-lg shadow-md transition-all duration-300 hover:scale-105"
+                style={{
+                  background: "var(--color-primary)",
+                  color: "white",
+                  right: isRightPanelExpanded ? 'calc(50% - 3px)' : '0',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                }}
+                title={isRightPanelExpanded ? "Collapse History" : "View History"}
+              >
+                {isRightPanelExpanded ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+              </button>
+            )}
+
+            {/* Right Section - Previous Visits Table */}
+            <div 
+              className={`flex-shrink-0 border-l overflow-y-auto transition-all duration-300 ${
+                isTabletView 
+                  ? isRightPanelExpanded 
+                    ? 'flex-[5] w-auto' 
+                    : 'w-0 overflow-hidden border-l-0'
+                  : 'flex-[3] w-auto'
+              }`} 
+              style={{ borderColor: "var(--color-border)" }}
+            >
               <PreviousVisitsTable visits={visits} />
             </div>
           </>

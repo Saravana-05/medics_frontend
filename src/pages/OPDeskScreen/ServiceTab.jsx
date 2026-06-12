@@ -42,27 +42,9 @@ function ModernToolbar({ docNo, docDt, onProto }) {
   return (
     <div className="flex items-center justify-between p-1 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-6">
-        {/* <div className="flex gap-4">
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Hash size={10} className="inline mr-1" /> Doc #
-            </span>
-            <span className="text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{docNo || "—"}</span>
-          </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider block" style={{ color: "var(--color-text-muted)" }}>
-              <Calendar size={10} className="inline mr-1" /> Doc. Dt
-            </span>
-            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{docDt || "—"}</span>
-          </div>
-        </div> */}
         <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
-        {/* <span className="px-3 py-1 rounded-md text-xs font-semibold inline-flex items-center gap-1" style={{ background: "#e3f0fc", color: "var(--color-services)" }}>
-          <Stethoscope size={12} /> OP-SP: 3903
-        </span> */}
       </div>
       <div className="flex gap-2">
-        {/* <ActionButton variant="ghost" icon={Copy} label="Copy" /> */}
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
@@ -155,7 +137,12 @@ function ServiceRow({ service, index, isStruck, onDelete, onStrike, onEdit }) {
   );
 }
 
-function TypableDetailInput({ value, onChange, onKeyDown }) {
+/* ── Typable Detail Input Component ──
+   • Up/Down   → navigate dropdown options only
+   • Left/Right → delegate to parent for field navigation (Fix #2 + #3)
+   • data-field="detail" → required for focusField() to find this input (Fix #3)
+*/
+function TypableDetailInput({ value, onChange, onKeyDown: onParentKeyDown }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [hasTyped, setHasTyped] = useState(false);
@@ -210,13 +197,20 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
       if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelectOption(filteredOptions[highlightedIdx]); return; }
       if (e.key === "Escape") { setShowDropdown(false); setHighlightedIdx(-1); return; }
     }
-    onKeyDown?.(e);
+    // Left/Right always delegate to parent for field navigation
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      onParentKeyDown?.(e);
+      return;
+    }
+    onParentKeyDown?.(e);
   };
 
   return (
     <div ref={wrapperRef} className="relative w-full">
       <input
         ref={inputRef}
+        data-field="detail"
         type="text"
         value={value === "—" ? "" : value}
         onChange={e => { setHasTyped(true); onChange(e); }}
@@ -257,8 +251,47 @@ function TypableDetailInput({ value, onChange, onKeyDown }) {
   );
 }
 
+/* ── ArrowSelect: native <select> that only responds to Up/Down ──
+   Left/Right are forwarded to onNavigate so field navigation works (Fix #2 + #3).
+   Used for the Type dropdown.
+*/
+function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {}, className = "" }) {
+  const currentIdx = options.indexOf(value);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      onChange(options[Math.min(currentIdx + 1, options.length - 1)]);
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      onChange(options[Math.max(currentIdx - 1, 0)]);
+      return;
+    }
+    // Left/Right/Enter/Escape/Tab → delegate to parent field navigator
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Tab") {
+      e.preventDefault();
+      onNavigate?.(e);
+      return;
+    }
+  };
+
+  return (
+    <select
+      data-field={dataField}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      onKeyDown={handleKeyDown}
+      className={`w-full px-2 py-1.5 rounded text-sm ${className}`}
+      style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", ...extraStyle }}
+    >
+      {options.map(opt => <option key={opt}>{opt}</option>)}
+    </select>
+  );
+}
+
 /* ── Add Row Component ── */
-/* ── Add Row Component (wider service field, inline clear button) ── */
 function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel }) {
   const inputRef    = useRef(null);
   const rowRef      = useRef(null);
@@ -266,10 +299,15 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
-  const [serviceSelected, setServiceSelected] = useState(false); // ← tracks if a service is confirmed
+  const [serviceSelected, setServiceSelected] = useState(false);
 
-  const commonServices = SERVICE_SUGGESTIONS; // ← use full SERVICE_SUGGESTIONS instead of hardcoded list
+  // Auto-focus service name field on mount (Fix: auto-active without mouse click)
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, []);
 
+  const commonServices = SERVICE_SUGGESTIONS;
   const dropdownItems = query === "" ? commonServices : suggestions.slice(0, 8);
 
   const recalcDropdown = useCallback(() => {
@@ -306,7 +344,6 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     inputRef.current?.focus();
   };
 
-  // Clear just the service name — keeps type and detail fields intact
   const handleClearService = () => {
     setQuery("");
     onDraftChange("name")("");
@@ -322,24 +359,34 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
     }
   };
 
+  // Fix #3: focus any field by its data-field attribute
   const focusField = useCallback((fieldKey) => {
     if (!rowRef.current) return;
     const el = rowRef.current.querySelector(`[data-field="${fieldKey}"]`);
     if (el) el.focus();
   }, []);
 
-  const handleFieldKeyDown = (e, currentField) => {
+  // Fix #3: Left/Right navigate across fields using FIELD_ORDER
+  const navigateField = useCallback((currentField, direction) => {
     const idx = FIELD_ORDER.indexOf(currentField);
+    if (direction === "right" && idx < FIELD_ORDER.length - 1) focusField(FIELD_ORDER[idx + 1]);
+    else if (direction === "left" && idx > 0) focusField(FIELD_ORDER[idx - 1]);
+  }, [focusField]);
+
+  const handleFieldKeyDown = (e, currentField) => {
     if (e.key === "Escape") { onCancel(); return; }
 
+    // Name dropdown navigation: Up/Down only
     if (currentField === "name" && showDropdown && dropdownItems.length > 0) {
       if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, dropdownItems.length - 1)); return; }
       if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
       if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelectService(dropdownItems[highlightedIdx]); return; }
     }
 
-    if ((e.key === "ArrowRight" && currentField === "type") || (e.key === "ArrowRight" && e.altKey)) { e.preventDefault(); const next = FIELD_ORDER[idx + 1]; if (next) focusField(next); return; }
-    if ((e.key === "ArrowLeft" && currentField === "name") || (e.key === "ArrowLeft" && e.altKey)) { e.preventDefault(); const prev = FIELD_ORDER[idx - 1]; if (prev) focusField(prev); return; }
+    // Fix #3: ArrowRight → next field, ArrowLeft → previous field
+    if (e.key === "ArrowRight") { e.preventDefault(); navigateField(currentField, "right"); return; }
+    if (e.key === "ArrowLeft") { e.preventDefault(); navigateField(currentField, "left"); return; }
+
     if (e.key === "Tab") { setShowDropdown(false); }
     if (e.key === "Enter" && currentField !== "name") { e.preventDefault(); onCommit(); }
     if (e.key === "Enter" && currentField === "name" && !showDropdown) { e.preventDefault(); onCommit(); }
@@ -352,7 +399,7 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
       style={{ background: "#e3f0fc", borderColor: "var(--color-services)" }}
       onBlur={handleRowBlur}
     >
-      {/* ── Dropdown Portal ── */}
+      {/* Dropdown portal */}
       {showDropdown && dropdownItems.length > 0 && (
         <div className="rounded-lg shadow-xl overflow-hidden"
           style={{ ...dropdownStyle, background: "var(--color-surface)", border: "1px solid var(--color-border)", boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
@@ -378,25 +425,24 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
 
       <div className="flex items-center p-2 gap-2">
 
-        {/* Serial / New label */}
+        {/* Serial label */}
         <div className="w-16 flex-shrink-0 px-2 text-center">
           <span className="text-sm font-bold" style={{ color: "var(--color-services)" }}>New</span>
         </div>
 
-        {/* Type dropdown — kept as-is */}
+        {/* Fix #2: Type — ArrowUp/Down only, Left/Right navigates fields */}
         <div className="w-28 flex-shrink-0">
-          <select
-            data-field="type"
+          <ArrowSelect
+            dataField="type"
             value={draft.type}
-            onChange={e => onDraftChange("type")(e.target.value)}
-            onKeyDown={e => handleFieldKeyDown(e, "type")}
-            className="w-full px-2 py-1.5 rounded text-sm font-bold"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-services)" }}>
-            {TYPE_OPTIONS.map(opt => <option key={opt}>{opt}</option>)}
-          </select>
+            options={TYPE_OPTIONS}
+            onChange={v => onDraftChange("type")(v)}
+            onNavigate={e => handleFieldKeyDown(e, "type")}
+            style={{ color: "var(--color-services)", fontWeight: "700" }}
+          />
         </div>
 
-        {/* ── Service Name Field (flex-1, inline clear ×) ── */}
+        {/* Service name search field */}
         <div className="flex-1 relative min-w-0" ref={wrapperRef}>
           <Briefcase
             size={14}
@@ -419,52 +465,37 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
             placeholder="Search or select service..."
             className="w-full py-1.5 rounded text-sm font-medium"
             style={{
-              border: serviceSelected
-                ? "1.5px solid var(--color-services)"
-                : "1px solid var(--color-border)",
+              border: serviceSelected ? "1.5px solid var(--color-services)" : "1px solid var(--color-border)",
               background: serviceSelected ? "#e3f0fc" : "var(--color-surface)",
               color: "var(--color-services)",
               paddingLeft: "1.75rem",
               paddingRight: serviceSelected ? "3.5rem" : "1.75rem",
             }}
           />
-
-          {/* ── Inline clear button — only shows when a service is selected ── */}
           {serviceSelected && (
             <button
               type="button"
               onMouseDown={(e) => { e.preventDefault(); handleClearService(); }}
               title="Clear service and pick again"
               className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full transition-all"
-              style={{
-                right: "1.5rem",
-                width: "16px",
-                height: "16px",
-                background: "var(--color-danger)",
-                color: "white",
-              }}
+              style={{ right: "1.5rem", width: "16px", height: "16px", background: "var(--color-danger)", color: "white" }}
             >
               <X size={10} strokeWidth={3} />
             </button>
           )}
-
-          {/* Chevron toggle */}
           <ChevronDown
             size={14}
             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
             onMouseDown={(e) => {
               e.preventDefault();
-              if (serviceSelected) {
-                handleClearService(); // chevron on selected = clear to re-pick
-              } else {
-                setShowDropdown(v => !v);
-              }
+              if (serviceSelected) handleClearService();
+              else setShowDropdown(v => !v);
             }}
           />
         </div>
 
-        {/* Detail / Body Part */}
+        {/* Body Part / Detail — Fix #2 + #3 handled inside TypableDetailInput */}
         <div className="w-40 flex-shrink-0">
           <TypableDetailInput
             value={draft.detail}
@@ -496,7 +527,6 @@ function AddRow({ draft, onDraftChange, onCommit, query, setQuery, suggestions, 
             <X size={16} />
           </button>
         </div>
-
       </div>
     </div>
   );
@@ -510,7 +540,7 @@ export default function ServiceTab({ services, setServices, patient }) {
   const [editId, setEditId] = useState(null);
   const [query, setQuery] = useState("");
   const [struckIds, setStruckIds] = useState([]);
-  const [showAddRow, setShowAddRow] = useState(false);
+  const [showAddRow, setShowAddRow] = useState(true);
 
   const suggestions = query.length > 1
     ? SERVICE_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
@@ -528,7 +558,9 @@ export default function ServiceTab({ services, setServices, patient }) {
     }
     setDraft(EMPTY_DRAFT);
     setQuery("");
+    // Fix #1: keep AddRow visible right after adding, re-mounts to re-trigger auto-focus
     setShowAddRow(false);
+    setTimeout(() => setShowAddRow(true), 50);
   };
 
   const cancelAdd = () => {
@@ -565,7 +597,6 @@ export default function ServiceTab({ services, setServices, patient }) {
   const addRowProps = { draft, onDraftChange: setD, onCommit: commitDraft, onCancel: cancelAdd, query, setQuery, suggestions };
 
   return (
-    // ── OUTER WRAPPER: fixed height, flex column ──
     <div
       className="flex flex-col rounded-xs overflow-hidden shadow-lg"
       style={{
@@ -575,8 +606,7 @@ export default function ServiceTab({ services, setServices, patient }) {
         minHeight: "300px",
       }}
     >
-
-      {/* ── HEADER: fixed, never scrolls ── */}
+      {/* HEADER */}
       <div
         className="flex-shrink-0 border-b"
         style={{ background: "linear-gradient(135deg, #e3f0fc 0%, var(--color-surface) 100%)", borderColor: "var(--color-border)" }}
@@ -594,10 +624,10 @@ export default function ServiceTab({ services, setServices, patient }) {
         <ModernToolbar docNo={docNo} docDt={docDt} onProto={handleProto} />
       </div>
 
-      {/* ── BODY: flex-1, consistent height ── */}
+      {/* BODY */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* Empty state (no services, no add row) */}
+        {/* Empty state — no services, no add row */}
         {services.length === 0 && !showAddRow && (
           <div className="flex-1 flex flex-col items-center justify-center py-5">
             <div className="text-center">
@@ -618,23 +648,21 @@ export default function ServiceTab({ services, setServices, patient }) {
           </div>
         )}
 
-        {/* Empty state + add row: spacer pushes AddRow to bottom */}
+        {/* Empty state + add row */}
         {services.length === 0 && showAddRow && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1" />
+          <div className="flex-shrink-0">
             <AddRow {...addRowProps} />
           </div>
         )}
 
-        {/* Table view (has services) */}
+        {/* TABLE VIEW — when services exist */}
         {services.length > 0 && (
+          // Fix #1: list does not flex-1; AddRow sits flush directly below rows
           <div className="flex-1 flex flex-col overflow-hidden">
-
-            {/* Table header — pinned */}
             <TableHeader />
 
-            {/* Scrollable service rows */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Scrollable service rows — no flex-1 so AddRow stays close */}
+            <div className="overflow-y-auto">
               {services.map((service, index) => (
                 <ServiceRow
                   key={service.id}
@@ -648,10 +676,10 @@ export default function ServiceTab({ services, setServices, patient }) {
               ))}
             </div>
 
-            {/* Add Row pinned below scroll area */}
+            {/* Fix #1: AddRow always flush directly below the last service row */}
             {showAddRow && <AddRow {...addRowProps} />}
 
-            {/* Add Service button pinned at bottom */}
+            {/* Add Service button when row is hidden */}
             {!showAddRow && (
               <div className="flex-shrink-0 flex justify-end px-4 py-3 border-t" style={{ borderColor: "var(--color-border)" }}>
                 <button
@@ -664,10 +692,8 @@ export default function ServiceTab({ services, setServices, patient }) {
                 </button>
               </div>
             )}
-
           </div>
         )}
-
       </div>
 
       {/* Footer bar */}

@@ -25,7 +25,7 @@ export const ROUTES = {
 
 export default function AppRouter({ user, onLogin, onLogout }) {
   return (
-    <BrowserRouter basename="/medics/">
+    <BrowserRouter basename="/medics-v2/">
       <Routes>
         {/* Login Route - Home */}
         <Route 
