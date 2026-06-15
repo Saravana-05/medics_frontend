@@ -809,7 +809,7 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
         <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Pill size={16} style={{ color: "var(--color-drugs)" }} />
-            <h2 className="text-base font-extrabold" style={{ color: "var(--color-drugs)" }}>
+            <h2 className="lg:text-base md:text-xs font-light" style={{ color: "var(--color-drugs)" }}>
               Drug Prescription
             </h2>
           </div>

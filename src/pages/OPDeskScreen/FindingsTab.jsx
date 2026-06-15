@@ -429,7 +429,7 @@ export default function FindingsTab({ findings, setFindings, patient }) {
         <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FolderOpen size={16} style={{ color: FINDINGS_COLOR.accent }} />
-            <h2 className="text-base font-extrabold" style={{ color: FINDINGS_COLOR.accent }}>
+            <h2 className="lg:text-base md:text-xs font-light" style={{ color: FINDINGS_COLOR.accent }}>
               Clinical Findings & Documents
             </h2>
           </div>

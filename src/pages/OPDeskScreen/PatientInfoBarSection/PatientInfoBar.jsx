@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  BedDouble, User, Calendar, Users, ClipboardList,
-  ActivitySquare, Stethoscope, Eye, Baby, ArrowRightLeft,
-  Activity, Edit2
-} from "lucide-react";
+import { User } from "lucide-react";
 import OPListModal from "../../../modal/Oplistmodal";
 import LeftPatientSection from "./LeftPatientSection";
 import VitalSignsSection from "./VitalSignsSection";
@@ -27,7 +23,8 @@ export default function PatientInfoBar({
       <div className="select-none" style={{ background: "var(--color-surface)", fontFamily: "var(--font-body)" }}>
         
         {/* ── Main Content Area ── */}
-        <div className="flex">
+        {/* Stacks vertically on tablet/mobile, side-by-side from lg up */}
+        <div className="flex flex-col lg:flex-row">
           
           {/* ── Left Patient Section Component ── */}
           <LeftPatientSection
@@ -39,7 +36,7 @@ export default function PatientInfoBar({
           />
 
           {/* ── Right Panel ── */}
-          <div className="flex-1 flex min-w-0">
+          <div className="flex-1 flex flex-col lg:flex-row min-w-0">
             
             {/* Left side - Vital Signs + Clinical Information (stacked vertically) */}
             <div className="flex-1 flex flex-col min-w-0">
@@ -50,9 +47,12 @@ export default function PatientInfoBar({
               {p && <ClinicalInformationSection patient={p} isInline={true} />}
             </div>
             
-            {/* Right side - TopBar Section (vertical on the right) */}
+            {/* Right side - TopBar Section (full width on tablet, vertical sidebar on desktop) */}
             {p && (
-              <div className="w-80 flex-shrink-0 border-l" style={{ borderColor: "var(--color-border)" }}>
+              <div
+                className="w-full lg:w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l"
+                style={{ borderColor: "var(--color-border)" }}
+              >
                 <TopBarSection patient={p} onPark={onPark} onFinalize={onFinalize} />
               </div>
             )}

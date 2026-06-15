@@ -78,7 +78,9 @@ export default function OPDeskScreen({ user, onLogout }) {
       </div>
 
       {/* ── Second Row: LeftSidebar + PatientInfoBar + RightSidebar ── */}
-      <div className="flex-shrink-0 flex">
+      {/* On tablet/mobile this row is capped at 50% of viewport height and scrolls
+          internally, so the main workspace below always keeps usable space. */}
+      <div className="flex-shrink-0 flex max-h-[50vh] overflow-y-auto lg:max-h-none lg:overflow-visible">
         <div className="flex-shrink-0">
           <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} />
         </div>
@@ -101,7 +103,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       </div>
 
       {/* ── Main workspace with responsive split ── */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative">
         
         {!selectedPatient ? (
           <div className="flex-1 overflow-y-auto flex items-center justify-center">

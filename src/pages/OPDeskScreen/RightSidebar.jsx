@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { 
   ParkingCircle, AlertTriangle, FileText, CalendarClock,
-  Plus, X, Calendar, Clock, User, Check, Briefcase, Coffee, Video, Users as UsersIcon,
+  Plus, X, Calendar, Clock, Check, Briefcase, Coffee, Video, Users as UsersIcon,
   MapPin
 } from "lucide-react";
 
@@ -81,7 +81,7 @@ function ParkedPatientsPanel({ panelHeight }) {
   const headerH = 36;
   return (
     <div className="overflow-hidden rounded-lg shadow-xl"
-      style={{ background: "var(--color-surface)", width: PANEL_WIDTH, height: panelHeight }}>
+      style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b flex items-center gap-2"
         style={{ background: "#fef3e2", borderColor: "#fde68a", height: headerH }}>
         <ParkingCircle size={16} style={{ color: "#d97706" }} />
@@ -103,7 +103,7 @@ function EmergencyPatientsPanel({ panelHeight }) {
   const headerH = 36;
   return (
     <div className="overflow-hidden rounded-lg shadow-xl"
-      style={{ background: "var(--color-surface)", width: PANEL_WIDTH, height: panelHeight }}>
+      style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b flex items-center gap-2"
         style={{ background: "#fee2e2", borderColor: "#fecaca", height: headerH }}>
         <AlertTriangle size={16} style={{ color: "#dc2626" }} />
@@ -148,7 +148,7 @@ function ReportsPanel({ panelHeight }) {
 
   return (
     <div className="overflow-hidden rounded-lg shadow-xl"
-      style={{ background: "var(--color-surface)", width: PANEL_WIDTH, height: panelHeight }}>
+      style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b flex items-center justify-between"
         style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: headerH }}>
         <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ function SchedulePanel({ panelHeight }) {
 
   return (
     <div className="overflow-hidden rounded-lg shadow-xl"
-      style={{ background: "var(--color-surface)", width: PANEL_WIDTH, height: panelHeight }}>
+      style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b"
         style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center justify-between mb-2">
@@ -430,9 +430,43 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
   const [hoveredKey,  setHoveredKey]  = useState(null);
   const [panelTop,    setPanelTop]    = useState(0);
   const [panelHeight, setPanelHeight] = useState(480);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
 
   const sidebarRef = useRef(null);
+  const popupRef   = useRef(null);
   const hideTimer  = useRef(null);
+
+  const isTabletView = viewportWidth < 1024;
+  const effectivePanelWidth = Math.min(PANEL_WIDTH, viewportWidth - SIDEBAR_WIDTH - GAP * 2);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const visibleKey = isTabletView ? activePanel : hoveredKey;
+
+  // Tap outside to close on tablet
+  useEffect(() => {
+    if (!isTabletView || !activePanel) return;
+    const handleOutside = (e) => {
+      if (
+        popupRef.current && !popupRef.current.contains(e.target) &&
+        sidebarRef.current && !sidebarRef.current.contains(e.target)
+      ) {
+        onPanelChange(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [isTabletView, activePanel, onPanelChange]);
 
   const clearHideTimer = () => {
     if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; }
@@ -459,25 +493,38 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
   const handlePanelMouseEnter = () => clearHideTimer();
   const handlePanelMouseLeave = () => scheduleHide();
 
+  // Tap handler: computes panel geometry AND toggles activePanel (used on tablet)
+  const handleTabActivate = (e, tab) => {
+    const sidebarRect = sidebarRef.current?.getBoundingClientRect();
+    const anchorTop   = sidebarRect ? sidebarRect.top : e.currentTarget.getBoundingClientRect().top;
+    const viewportH   = window.innerHeight || 800;
+    const available   = viewportH - anchorTop - BOTTOM_MARGIN;
+
+    setPanelTop(anchorTop);
+    setPanelHeight(Math.max(200, available));
+    onPanelChange(tab.key === activePanel ? null : tab.key);
+  };
+
   const renderPopup = () => {
-    if (!hoveredKey) return null;
+    if (!visibleKey) return null;
 
     const sidebarRect = sidebarRef.current?.getBoundingClientRect();
-    const panelLeft   = sidebarRect
-      ? sidebarRect.left - PANEL_WIDTH - GAP
-      : window.innerWidth - SIDEBAR_WIDTH - PANEL_WIDTH - GAP;
+    const rawLeft = sidebarRect
+      ? sidebarRect.left - effectivePanelWidth - GAP
+      : viewportWidth - SIDEBAR_WIDTH - effectivePanelWidth - GAP;
+    const panelLeft = Math.max(GAP, rawLeft);
 
     const wrapperStyle = {
       position: "fixed",
       zIndex:   50,
       top:      panelTop,
       left:     panelLeft,
-      width:    PANEL_WIDTH,
+      width:    effectivePanelWidth,
       height:   panelHeight,
     };
 
     let content = null;
-    switch (hoveredKey) {
+    switch (visibleKey) {
       case "parked":    content = <ParkedPatientsPanel    panelHeight={panelHeight} />; break;
       case "emergency": content = <EmergencyPatientsPanel panelHeight={panelHeight} />; break;
       case "reports":   content = <ReportsPanel           panelHeight={panelHeight} />; break;
@@ -487,6 +534,7 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
 
     return (
       <div
+        ref={popupRef}
         style={wrapperStyle}
         onMouseEnter={handlePanelMouseEnter}
         onMouseLeave={handlePanelMouseLeave}
@@ -516,12 +564,12 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
           return (
             <div
               key={tab.key}
-              onClick={() => onPanelChange(tab.key === activePanel ? null : tab.key)}
+              onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={(e) => handleIconMouseEnter(e, tab.key)}
               onMouseLeave={handleIconMouseLeave}
               className="relative cursor-pointer transition-all duration-200 group"
               style={{
-                background: tab.defaultBg, // Always show default background color
+                background: tab.defaultBg,
                 borderRight: highlight ? `3px solid ${tab.color}` : "3px solid transparent",
               }}
             >

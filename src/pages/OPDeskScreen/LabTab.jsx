@@ -583,7 +583,7 @@ export default function LabTab({ labs, setLabs, patient }) {
         <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FlaskConical size={16} style={{ color: "var(--color-lab)" }} />
-            <h2 className="text-base font-extrabold" style={{ color: "var(--color-lab)" }}>Lab Investigations</h2>
+            <h2 className="lg:text-base md:text-xs font-light" style={{ color: "var(--color-lab)" }}>Lab Investigations</h2>
           </div>
           <div className="flex items-center gap-2">
             <ActionButton variant="warning" icon={Trash} label="Clear" onClick={handleClearAll} />

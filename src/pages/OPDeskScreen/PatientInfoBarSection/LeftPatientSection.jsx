@@ -1,66 +1,24 @@
 import { useState } from "react";
 import {
-  ClipboardList, User, Calendar, Users, ChevronDown, Search, Edit2
+  ClipboardList, User, Users, ChevronDown, Search
 } from "lucide-react";
 
-/* ── Compact Info Card Component (Reduced Height) ── */
-function CompactInfoCard({ icon: Icon, label, value, variant, onClick }) {
-  const variants = {
-    blue: { bg: "var(--color-primary-muted)", color: "var(--color-primary)", border: "var(--color-primary)" },
-    green: { bg: "var(--color-drugs-light)", color: "var(--color-drugs)", border: "var(--color-drugs)" },
-    amber: { bg: "var(--color-lab-light)", color: "var(--color-lab)", border: "var(--color-lab)" },
-    purple: { bg: "#f3e8ff", color: "#9333ea", border: "#9333ea" },
-    red: { bg: "#fee2e2", color: "#dc2626", border: "#dc2626" },
-    teal: { bg: "#ccfbf1", color: "#0d9488", border: "#0d9488" },
-  };
-
-  const style = variant
-    ? variants[variant]
-    : { bg: "var(--color-surface-alt)", color: "var(--color-text-base)", border: "var(--color-border)" };
-
-  return (
-    <div
-      onClick={onClick}
-      className="group relative overflow-hidden rounded-lg transition-all duration-200 cursor-pointer hover:shadow-sm"
-      style={{ background: style.bg, border: `1px solid ${style.border}20` }}
-    >
-      <div className="p-2">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <div className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5" style={{ color: "var(--color-text-muted)" }}>
-              {label}
-            </div>
-            <div className="text-xs font-semibold" style={{ color: style.color }}>
-              {value || "—"}
-            </div>
-          </div>
-          <div className="p-1 rounded-md transition-all group-hover:scale-110 flex-shrink-0" style={{ background: `${style.color}15` }}>
-            <Icon size={12} style={{ color: style.color }} />
-          </div>
-        </div>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 transition-all group-hover:h-1" style={{ background: style.color }} />
-    </div>
-  );
-}
-
-/* ── Compact Relation Card ── */
-/* ── Compact Relation Card ── */
+/* ── Compact Relation Card (Extra short for tablet) ── */
 function CompactRelationCard({ value }) {
   return (
     <div
-      className="rounded-xl px-3 py-2.5"
+      className="rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full"
       style={{
         background: "var(--color-surface)",
         border: "1px solid var(--color-border)",
       }}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="p-1 rounded-lg flex-shrink-0" style={{ background: "var(--color-primary-muted)" }}>
-            <Users size={14} style={{ color: "var(--color-primary)" }} />
+      <div className="flex items-center justify-between h-full">
+        <div className="flex items-center gap-2 md:gap-1 flex-1 min-w-0">
+          <div className="p-1 rounded-lg flex-shrink-0 md:p-0.5" style={{ background: "var(--color-primary-muted)" }}>
+            <Users size={14} className="md:w-3 md:h-3" style={{ color: "var(--color-primary)" }} />
           </div>
-          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary-dark)" }}>
+          <span className="text-sm md:text-xs font-semibold truncate" style={{ color: "var(--color-primary-dark)" }}>
             {value || "—"}
           </span>
         </div>
@@ -82,7 +40,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all"
+        className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
         style={{
           background: "var(--color-surface)",
           border: `1px solid ${open ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -195,99 +153,130 @@ export default function LeftPatientSection({
     return { years, months, days };
   };
 
+  // Short label for Sex: "Female" -> "F", "Male" -> "M", anything else -> first letter
+  const getGenderShort = (gender) => {
+    if (!gender) return "—";
+    const g = gender.trim().toLowerCase();
+    if (g.startsWith("f")) return "F";
+    if (g.startsWith("m")) return "M";
+    return gender.charAt(0).toUpperCase();
+  };
+
   const age = calculateAge(p?.dob);
 
   return (
-    <div className="w-72 shrink-0 border-r" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
+    <div
+      className="w-full lg:w-72 lg:shrink-0 border-b lg:border-b-0 lg:border-r"
+      style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}
+    >
+      {/*
+        Layout behaviour:
+        - Mobile (<md):     everything stacked, full "Female"/"Male", normal padding
+        - Tablet (md-lg):   single row, "F"/"M", reduced padding/gaps for a shorter row
+        - Desktop (lg+):    original stacked sidebar layout, full "Female"/"Male"
+      */}
+      <div className="flex flex-col md:flex-row lg:flex-col gap-2 md:gap-1 lg:gap-0 p-3 md:p-1 lg:p-0">
 
-      {/* Patient Selection */}
-      <div className="p-3 border-b" style={{ borderColor: "var(--color-border)" }}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-[0.65rem] font-bold uppercase tracking-wide flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-            <User size={12} /> Patient Info
-          </div>
-          {/* OP Number */}
-          {p && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "var(--color-primary-muted)" }}>
-              <ClipboardList size={10} style={{ color: "var(--color-primary)" }} />
-              <span className="text-[0.6rem] font-bold" style={{ color: "var(--color-primary)" }}>
-                OP: {p.appt || "—"}
-              </span>
+        {/* Patient Selection — narrower on tablet */}
+        <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-3 lg:border-b" style={{ borderColor: "var(--color-border)" }}>
+          {/* Patient Info header: visible on mobile and desktop, hidden on tablet */}
+          <div className="flex items-center justify-between mb-1 md:hidden lg:flex lg:mb-2">
+            <div className="text-[0.65rem] font-bold uppercase tracking-wide flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
+              <User size={12} /> Patient Info
             </div>
-          )}
+            {/* OP Number */}
+            {p && (
+              <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "var(--color-primary-muted)" }}>
+                <ClipboardList size={10} style={{ color: "var(--color-primary)" }} />
+                <span className="text-[0.6rem] font-bold" style={{ color: "var(--color-primary)" }}>
+                  OP: {p.appt || "—"}
+                </span>
+              </div>
+            )}
+          </div>
+          <PatientDropdown
+            patients={patients}
+            selectedPatient={selectedPatient}
+            onSelectPatient={onSelectPatient}
+            open={open}
+            setOpen={setOpen}
+          />
         </div>
-        <PatientDropdown
-          patients={patients}
-          selectedPatient={selectedPatient}
-          onSelectPatient={onSelectPatient}
-          open={open}
-          setOpen={setOpen}
-        />
+
+        {/* Patient Details */}
+        {p && (
+          <div className="flex flex-col sm:flex-row md:flex-1 lg:flex-none lg:flex-col gap-2 md:gap-1 lg:p-3 lg:pt-2">
+
+            {/* Sex / Age / DOB — extra compact on tablet */}
+            <div
+              className="md:w-[58%] flex-1 lg:w-auto rounded-lg p-2 md:px-4 md:py-0.5 lg:p-2"
+              style={{
+                background: "var(--color-surface-alt)",
+                border: "1px solid var(--color-border)",
+              }}
+            >
+              <div className="grid grid-cols-3 gap-2 md:gap-1">
+
+                {/* Sex */}
+                <div>
+                  <div
+                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    Sex
+                  </div>
+                  {/* Full word on mobile + desktop */}
+                  <div className="hidden md:hidden lg:block text-xs font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                    {p.gender || "—"}
+                  </div>
+                  <div className="block md:hidden text-xs font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                    {p.gender || "—"}
+                  </div>
+                  {/* Abbreviation on tablet only - smaller text */}
+                  <div className="hidden md:block lg:hidden text-[0.7rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                    {getGenderShort(p.gender)}
+                  </div>
+                </div>
+
+                {/* Age */}
+                <div>
+                  <div
+                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    Age
+                  </div>
+                  <div className="text-xs md:text-[0.65rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                    {age.years !== null
+                      ? `${age.years}y ${age.months}m ${age.days}d`
+                      : "—"}
+                  </div>
+                </div>
+
+                {/* DOB */}
+                <div>
+                  <div
+                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    DOB
+                  </div>
+                  <div className="text-xs md:text-[0.65rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                    {p.dob || "—"}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Relation — narrower on tablet with reduced height */}
+            <div className="md:w-[28%] flex-1 lg:w-auto">
+              <CompactRelationCard value={p.relation} />
+            </div>
+
+          </div>
+        )}
       </div>
-
-      {/* Patient Details */}
-      {p && (
-        <div className="p-3 space-y-2">
-
-          {/* Sex / Age / DOB — three aligned columns */}
-          <div
-            className="rounded-lg p-2"
-            style={{
-              background: "var(--color-surface-alt)",
-              border: "1px solid var(--color-border)",
-            }}
-          >
-            <div className="grid grid-cols-3 gap-2">
-
-              {/* Sex */}
-              <div>
-                <div
-                  className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  Sex
-                </div>
-                <div className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>
-                  {p.gender || "—"}
-                </div>
-              </div>
-
-              {/* Age */}
-              <div>
-                <div
-                  className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  Age
-                </div>
-                <div className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>
-                  {age.years !== null
-                    ? `${age.years}y ${age.months}m ${age.days}d`
-                    : "—"}
-                </div>
-              </div>
-
-              {/* DOB */}
-              <div>
-                <div
-                  className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  DOB
-                </div>
-                <div className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>
-                  {p.dob || "—"}
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Relation */}
-          <CompactRelationCard value={p.relation} />
-
-        </div>
-      )}
     </div>
   );
 }
