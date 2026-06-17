@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Users, ChevronLeft, ChevronRight } from "lucide-react";
 
-import AppBar from "./OPDeskScreen/AppBar";
+import AppBar from "../components/AppBar/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
 import LeftSidebar from "./OPDeskScreen/LeftSidebar";
 import RightSidebar from "./OPDeskScreen/RightSidebar";
@@ -74,6 +74,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           saved={saved} 
           onOPListClick={selectPatient}
           patients={MOCK_PATIENTS} 
+          screenType="opdesk"
         />
       </div>
 

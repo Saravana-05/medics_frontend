@@ -1,7 +1,7 @@
 // src/pages/PlatformDeskScreen.jsx
 import { useState } from "react";
 import Navbar from "../components/PlatformDesk/Navbar";
-import Sidebar from "../components/PlatformDesk/Sidebar";
+import Sidebar from "../components/Sidebar/Sidebar";
 import Footer from "../components/PlatformDesk/Footer";
 import Body from "../components/PlatformDesk/Body";
 

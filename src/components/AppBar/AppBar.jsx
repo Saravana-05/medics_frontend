@@ -4,8 +4,8 @@ import {
   ClipboardList, BedDouble, Stethoscope
 } from "lucide-react";
 import OPListModal            from "../../modal/Oplistmodal";
-import UserMenuDropdown       from "../../components/AppBar/UserMenuDropdown";
-import NotificationDropdown   from "../../components/AppBar/NotificationDropdown";
+import UserMenuDropdown       from "./UserMenuDropdown";
+import NotificationDropdown   from "./NotificationDropdown";
 
 export default function AppBar({ user, onLogout, saved, onOPListClick, patients }) {
   const [isFullscreen,      setIsFullscreen]      = useState(false);
