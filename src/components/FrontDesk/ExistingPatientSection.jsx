@@ -4,7 +4,8 @@ import {
   User, Phone, UserCheck, Heart, Activity, 
   Stethoscope, UserPlus, Calendar, Clock, 
   ChevronDown, FileText, ChevronRight, HeartPulse,
-  XCircle, CheckCircle, Thermometer, Weight, Ruler, Droplet
+  XCircle, CheckCircle, Thermometer, Weight, Ruler, Droplet,
+  X
 } from 'lucide-react';
 import PatientInfoPanel from '../../pages/OPDeskScreen/PatientInfoPanel';
 import { MOCK_PATIENTS } from '../../pages/OPDeskScreen/mockData';
@@ -16,6 +17,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
   const [showPatientInfo, setShowPatientInfo] = useState(false);
   const [selectedPatientForInfo, setSelectedPatientForInfo] = useState(null);
   const [isEditingGynac, setIsEditingGynac] = useState(false);
+  const [showSearchField, setShowSearchField] = useState(true);
   
   const [formData, setFormData] = useState({
     patientId: '',
@@ -88,6 +90,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     });
     setSearchTerm(patient.name);
     setShowDropdown(false);
+    setShowSearchField(false); // Hide search field after selection
     
     // Check if patient has gynecology info
     if (patient.gynacInfo && patient.gender === 'Female') {
@@ -149,6 +152,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     setSelectedPatient(null);
     setSearchTerm('');
     setShowDropdown(false);
+    setShowSearchField(true);
     setFormData({
       patientId: '',
       patientName: '',
@@ -214,6 +218,13 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     }
   };
 
+  // Handle show search field
+  const handleShowSearch = () => {
+    setShowSearchField(true);
+    setSelectedPatient(null);
+    setSearchTerm('');
+  };
+
   // Render dropdown item with patient details
   const renderDropdownItem = (patient) => {
     return (
@@ -248,117 +259,117 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     );
   };
 
-  // Render vitals section
+  // Render vitals section - all fields in one row
   const renderVitals = () => (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
-          BP Systolic
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          BP Sys
         </label>
         <div className="relative">
-          <Heart size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="number"
             name="vitals.bpSystolic"
             value={formData.vitals.bpSystolic}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Systolic"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="Sys"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
-          BP Diastolic
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          BP Dias
         </label>
         <div className="relative">
-          <Heart size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="number"
             name="vitals.bpDiastolic"
             value={formData.vitals.bpDiastolic}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Diastolic"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="Dias"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
           Pulse
         </label>
         <div className="relative">
-          <Activity size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Activity size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="number"
             name="vitals.pulse"
             value={formData.vitals.pulse}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             placeholder="BPM"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
-          Temperature
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          Temp
         </label>
         <div className="relative">
-          <Thermometer size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Thermometer size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             name="vitals.temperature"
             value={formData.vitals.temperature}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="°F/°C"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            placeholder="°F"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
           Weight
         </label>
         <div className="relative">
-          <Weight size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Weight size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             name="vitals.weight"
             value={formData.vitals.weight}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             placeholder="kg"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
           Height
         </label>
         <div className="relative">
-          <Ruler size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Ruler size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             name="vitals.height"
             value={formData.vitals.height}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             placeholder="cm"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
           SpO2
         </label>
         <div className="relative">
-          <Droplet size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Droplet size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             name="vitals.spo2"
             value={formData.vitals.spo2}
             onChange={handleInputChange}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             placeholder="%"
           />
         </div>
@@ -371,7 +382,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     if (!selectedPatient || selectedPatient.gender !== 'Female') return null;
     
     return (
-      <div className="mt-4 p-4 bg-pink-50 rounded-lg border border-pink-200">
+      <div className="mt-4 p-4 bg-gradient-to-r from-pink-100 to-white rounded-lg border border-pink-200">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <HeartPulse size={16} className="text-pink-600" />
@@ -493,55 +504,67 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
 
   return (
     <div>
-      {/* Patient Search */}
-      <div className="mb-4 relative">
-        <label className="block text-xs font-medium text-gray-700 mb-1">
-          Select Patient Name
-        </label>
-        <div className="relative">
-          <User size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search patient by name, ID, or phone..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setShowDropdown(true);
-            }}
-            onFocus={() => setShowDropdown(true)}
-            className="w-full pl-9 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <ChevronDown 
-            size={16} 
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 transition-transform ${
-              showDropdown ? 'rotate-180' : ''
-            }`}
-            onClick={() => setShowDropdown(!showDropdown)}
-          />
-        </div>
-
-        {/* Dropdown */}
-        {showDropdown && searchTerm && (
-          <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto">
-            {filteredPatients.length > 0 ? (
-              filteredPatients.map(renderDropdownItem)
-            ) : (
-              <div className="px-3 py-4 text-sm text-gray-500 text-center">
-                No patients found
-              </div>
-            )}
+      {/* Patient Search - Hidden after selection */}
+      {showSearchField && (
+        <div className="mb-4 relative">
+          <label className="block text-xs font-medium text-gray-700 mb-1">
+            Select Patient Name
+          </label>
+          <div className="relative">
+            <User size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search patient by name, ID, or phone..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowDropdown(true);
+              }}
+              onFocus={() => setShowDropdown(true)}
+              className="w-full pl-9 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <ChevronDown 
+              size={16} 
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 transition-transform ${
+                showDropdown ? 'rotate-180' : ''
+              }`}
+              onClick={() => setShowDropdown(!showDropdown)}
+            />
           </div>
-        )}
-      </div>
+
+          {/* Dropdown */}
+          {showDropdown && searchTerm && (
+            <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto">
+              {filteredPatients.length > 0 ? (
+                filteredPatients.map(renderDropdownItem)
+              ) : (
+                <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                  No patients found
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Patient Details Fields */}
       {selectedPatient && (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Patient Info Section - Extended to include Chief Complaint, Attender & Referral */}
-          <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <User size={16} className="text-blue-600" />
-              <h4 className="text-sm font-semibold text-blue-800">Patient Information</h4>
+          {/* Patient Info Section with X icon - Gradient Background from Blue to White */}
+          <div className="bg-gradient-to-r from-blue-100 to-white rounded-lg border border-blue-200 p-4 relative">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <User size={16} className="text-blue-600" />
+                <h4 className="text-sm font-semibold text-blue-800">Patient Information</h4>
+              </div>
+              <button
+                type="button"
+                onClick={handleShowSearch}
+                className="p-1 hover:bg-blue-200 rounded-lg transition-colors"
+                title="Change patient"
+              >
+                <X size={16} className="text-blue-600" />
+              </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -631,61 +654,61 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Chief Complaint, Attender & Referral - inside Patient Information section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-blue-200">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Chief Complaint
-                </label>
-                <textarea
-                  name="chiefComplaint"
-                  value={formData.chiefComplaint}
+          {/* Chief Complaint, Attender & Referral - Separate section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Chief Complaint
+              </label>
+              <textarea
+                name="chiefComplaint"
+                value={formData.chiefComplaint}
+                onChange={handleInputChange}
+                rows="1"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="Enter chief complaint..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Attender
+              </label>
+              <div className="relative">
+                <UserPlus size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  name="attender"
+                  value={formData.attender}
                   onChange={handleInputChange}
-                  rows="2"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter chief complaint..."
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Attender name"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Attender
-                </label>
-                <div className="relative">
-                  <UserPlus size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    name="attender"
-                    value={formData.attender}
-                    onChange={handleInputChange}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Attender name"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Referral
-                </label>
-                <div className="relative">
-                  <Stethoscope size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    name="referral"
-                    value={formData.referral}
-                    onChange={handleInputChange}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Referral source"
-                  />
-                </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Referral
+              </label>
+              <div className="relative">
+                <Stethoscope size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  name="referral"
+                  value={formData.referral}
+                  onChange={handleInputChange}
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Referral source"
+                />
               </div>
             </div>
           </div>
 
-          {/* Vitals and First Observation Section - Yellow background */}
-          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          {/* Vitals Section - All fields in one row - Gradient Background from Yellow to White */}
+          <div className="p-4 bg-gradient-to-r from-yellow-100 to-white rounded-lg border border-yellow-200">
             <div className="flex items-center gap-2 mb-3">
               <Activity size={16} className="text-yellow-600" />
               <h4 className="text-sm font-semibold text-yellow-800">Vitals</h4>
@@ -701,31 +724,15 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
                 name="firstObservation"
                 value={formData.firstObservation}
                 onChange={handleInputChange}
-                rows="2"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                rows="1"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
                 placeholder="Enter first observation..."
               />
             </div>
           </div>
 
-          {/* Gynecology Section for Female Patients */}
-          {renderGynecologySection()}
-
-          {/* View Patient Info Button - Right corner above appointment */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={handleViewPatientInfo}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              <FileText size={16} />
-              View Full Patient Details
-              <ChevronRight size={14} />
-            </button>
-          </div>
-
-          {/* Appointment Section */}
-          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+          {/* Appointment Section - Gradient Background from Purple to White */}
+          <div className="p-4 bg-gradient-to-r from-purple-100 to-white rounded-lg border border-purple-200">
             <div className="flex items-center gap-2 mb-3">
               <Calendar size={16} className="text-purple-600" />
               <h4 className="text-sm font-semibold text-purple-800">Appointment Details</h4>
@@ -790,8 +797,8 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
+          {/* Submit Buttons */}
+          <div className="flex gap-3 pt-4">
             <button
               type="submit"
               className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -802,10 +809,26 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
             <button
               type="button"
               onClick={resetForm}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <XCircle size={16} className="inline mr-1" />
+              <XCircle size={16} />
               Reset
+            </button>
+          </div>
+
+          {/* Gynecology Section for Female Patients - Gradient Background from Pink to White */}
+          {renderGynecologySection()}
+
+          {/* View Patient Info Button - Right corner */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleViewPatientInfo}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <FileText size={16} />
+              View Full Patient Details
+              <ChevronRight size={14} />
             </button>
           </div>
         </form>

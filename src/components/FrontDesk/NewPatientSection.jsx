@@ -4,7 +4,7 @@ import {
   User, Phone, UserCheck, Calendar, Clock, 
   Stethoscope, Activity, CheckCircle, XCircle,
   Heart, Droplet, Thermometer, Ruler, Weight,
-  AlertCircle
+  AlertCircle, X
 } from 'lucide-react';
 
 const NewPatientSection = ({ onFormSubmit }) => {
@@ -34,6 +34,8 @@ const NewPatientSection = ({ onFormSubmit }) => {
     visitType: 'OP',
   });
 
+  const [showClearButton, setShowClearButton] = useState(false);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name.startsWith('vitals.')) {
@@ -51,6 +53,10 @@ const NewPatientSection = ({ onFormSubmit }) => {
         [name]: value,
       });
     }
+    // Show clear button if any field has value
+    const hasValue = Object.values(formData).some(val => val !== '') ||
+                     Object.values(formData.vitals).some(val => val !== '');
+    setShowClearButton(hasValue);
   };
 
   const handleSubmit = (e) => {
@@ -95,15 +101,151 @@ const NewPatientSection = ({ onFormSubmit }) => {
       doctor: '',
       visitType: 'OP',
     });
+    setShowClearButton(false);
   };
+
+  // Handle clear all fields
+  const handleClearAll = () => {
+    handleReset();
+  };
+
+  // Render vitals section - all fields in one row
+  const renderVitals = () => (
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          BP Sys
+        </label>
+        <div className="relative">
+          <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.bpSystolic"
+            value={formData.vitals.bpSystolic}
+            onChange={handleInputChange}
+            placeholder="Sys"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          BP Dias
+        </label>
+        <div className="relative">
+          <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.bpDiastolic"
+            value={formData.vitals.bpDiastolic}
+            onChange={handleInputChange}
+            placeholder="Dias"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          Pulse
+        </label>
+        <div className="relative">
+          <Activity size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.pulse"
+            value={formData.vitals.pulse}
+            onChange={handleInputChange}
+            placeholder="BPM"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          Temp
+        </label>
+        <div className="relative">
+          <Thermometer size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.temperature"
+            value={formData.vitals.temperature}
+            onChange={handleInputChange}
+            placeholder="°F"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          Weight
+        </label>
+        <div className="relative">
+          <Weight size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.weight"
+            value={formData.vitals.weight}
+            onChange={handleInputChange}
+            placeholder="kg"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          Height
+        </label>
+        <div className="relative">
+          <Ruler size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.height"
+            value={formData.vitals.height}
+            onChange={handleInputChange}
+            placeholder="cm"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+          SpO2
+        </label>
+        <div className="relative">
+          <Droplet size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            name="vitals.spo2"
+            value={formData.vitals.spo2}
+            onChange={handleInputChange}
+            placeholder="%"
+            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
+          />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Patient Information Section - Blue background */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <User size={16} className="text-blue-600" />
-          <h4 className="text-sm font-semibold text-blue-800">Patient Information</h4>
+      {/* Patient Information Section - Gradient Background from Blue to White */}
+      <div className="bg-gradient-to-r from-blue-100 to-white rounded-lg border border-blue-200 p-4 relative">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <User size={16} className="text-blue-600" />
+            <h4 className="text-sm font-semibold text-blue-800">Patient Information</h4>
+          </div>
+          {showClearButton && (
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="p-1 hover:bg-blue-200 rounded-lg transition-colors"
+              title="Clear all fields"
+            >
+              <X size={16} className="text-blue-600" />
+            </button>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -194,157 +336,19 @@ const NewPatientSection = ({ onFormSubmit }) => {
             </div>
           </div>
         </div>
-
-        {/* Address and Blood Group - inside Patient Information section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-blue-200">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Blood Group
-            </label>
-            <select
-              name="bloodGroup"
-              value={formData.bloodGroup}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Blood Group</option>
-              <option value="A+">A+</option>
-              <option value="A-">A-</option>
-              <option value="B+">B+</option>
-              <option value="B-">B-</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB-</option>
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Address
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              rows="1"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter address"
-            />
-          </div>
-        </div>
       </div>
 
-      {/* Vitals and Allergies Section - Yellow background */}
-      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+      {/* Vitals and Allergies Section - Gradient Background from Yellow to White */}
+      <div className="p-4 bg-gradient-to-r from-yellow-100 to-white rounded-lg border border-yellow-200">
         <div className="flex items-center gap-2 mb-3">
           <Activity size={16} className="text-yellow-600" />
           <h4 className="text-sm font-semibold text-yellow-800">Vitals & Allergies</h4>
         </div>
 
-        {/* Vitals fields */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">BP Systolic</label>
-            <div className="relative">
-              <Heart size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.bpSystolic"
-                value={formData.vitals.bpSystolic}
-                onChange={handleInputChange}
-                placeholder="Systolic"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">BP Diastolic</label>
-            <div className="relative">
-              <Heart size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.bpDiastolic"
-                value={formData.vitals.bpDiastolic}
-                onChange={handleInputChange}
-                placeholder="Diastolic"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">Pulse</label>
-            <div className="relative">
-              <Activity size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.pulse"
-                value={formData.vitals.pulse}
-                onChange={handleInputChange}
-                placeholder="BPM"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">Temperature</label>
-            <div className="relative">
-              <Thermometer size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.temperature"
-                value={formData.vitals.temperature}
-                onChange={handleInputChange}
-                placeholder="°F/°C"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">Weight (kg)</label>
-            <div className="relative">
-              <Weight size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.weight"
-                value={formData.vitals.weight}
-                onChange={handleInputChange}
-                placeholder="kg"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">Height (cm)</label>
-            <div className="relative">
-              <Ruler size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.height"
-                value={formData.vitals.height}
-                onChange={handleInputChange}
-                placeholder="cm"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[0.6rem] font-medium text-gray-600 mb-1">SpO2 (%)</label>
-            <div className="relative">
-              <Droplet size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                name="vitals.spo2"
-                value={formData.vitals.spo2}
-                onChange={handleInputChange}
-                placeholder="%"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Vitals fields - all in one row */}
+        {renderVitals()}
 
-        {/* Allergies / Medical History - inside Vitals section */}
+        {/* Allergies / Medical History - as text input instead of textarea */}
         <div className="mt-4 pt-4 border-t border-yellow-200">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle size={14} className="text-yellow-600" />
@@ -352,19 +356,19 @@ const NewPatientSection = ({ onFormSubmit }) => {
               Allergies / Medical History
             </label>
           </div>
-          <textarea
+          <input
+            type="text"
             name="allergies"
             value={formData.allergies}
             onChange={handleInputChange}
-            rows="2"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             placeholder="Enter any allergies or medical history..."
           />
         </div>
       </div>
 
-      {/* Appointment Section - Purple background */}
-      <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+      {/* Appointment Section - Gradient Background from Purple to White */}
+      <div className="p-4 bg-gradient-to-r from-purple-100 to-white rounded-lg border border-purple-200">
         <div className="flex items-center gap-2 mb-3">
           <Calendar size={16} className="text-purple-600" />
           <h4 className="text-sm font-semibold text-purple-800">Appointment Details</h4>
@@ -430,7 +434,7 @@ const NewPatientSection = ({ onFormSubmit }) => {
       </div>
 
       {/* Submit Buttons */}
-      <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
+      <div className="flex gap-3 pt-4">
         <button
           type="submit"
           className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
@@ -441,9 +445,9 @@ const NewPatientSection = ({ onFormSubmit }) => {
         <button
           type="button"
           onClick={handleReset}
-          className="px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          className="flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
         >
-          <XCircle size={16} className="inline mr-1" />
+          <XCircle size={16} />
           Reset
         </button>
       </div>
