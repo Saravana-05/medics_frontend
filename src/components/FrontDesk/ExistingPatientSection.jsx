@@ -31,8 +31,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     attender: '',
     referral: '',
     vitals: {
-      bpSystolic: '',
-      bpDiastolic: '',
+      bp: '',
       pulse: '',
       temperature: '',
       weight: '',
@@ -78,8 +77,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
       attender: patient.attender?.name || '',
       referral: patient.referral || '',
       vitals: {
-        bpSystolic: patient.bpSystolic || '',
-        bpDiastolic: patient.bpDiastolic || '',
+        bp: patient.bp ? `${patient.bpSystolic}/${patient.bpDiastolic}` : '',
         pulse: patient.pulse || '',
         temperature: patient.temp || '',
         weight: patient.weight || '',
@@ -165,8 +163,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
       attender: '',
       referral: '',
       vitals: {
-        bpSystolic: '',
-        bpDiastolic: '',
+        bp: '',
         pulse: '',
         temperature: '',
         weight: '',
@@ -259,43 +256,27 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
     );
   };
 
-  // Render vitals section - all fields in one row
+  // Render vitals section - all fields in one row with combined BP
   const renderVitals = () => (
-    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
-          BP Sys
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
+          BP (Sys/Dias)
         </label>
         <div className="relative">
           <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
-            type="number"
-            name="vitals.bpSystolic"
-            value={formData.vitals.bpSystolic}
+            type="text"
+            name="vitals.bp"
+            value={formData.vitals.bp}
             onChange={handleInputChange}
             className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Sys"
+            placeholder="120/80"
           />
         </div>
       </div>
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
-          BP Dias
-        </label>
-        <div className="relative">
-          <Heart size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="number"
-            name="vitals.bpDiastolic"
-            value={formData.vitals.bpDiastolic}
-            onChange={handleInputChange}
-            className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            placeholder="Dias"
-          />
-        </div>
-      </div>
-      <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
           Pulse
         </label>
         <div className="relative">
@@ -311,8 +292,8 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
         </div>
       </div>
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
-          Temp
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
+          Temperature
         </label>
         <div className="relative">
           <Thermometer size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -327,7 +308,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
         </div>
       </div>
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
           Weight
         </label>
         <div className="relative">
@@ -343,7 +324,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
         </div>
       </div>
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
           Height
         </label>
         <div className="relative">
@@ -359,7 +340,7 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
         </div>
       </div>
       <div>
-        <label className="block text-[0.55rem] font-medium text-gray-600 mb-0.5">
+        <label className="block text-[0.65rem] font-semibold text-gray-600 mb-0.5">
           SpO2
         </label>
         <div className="relative">

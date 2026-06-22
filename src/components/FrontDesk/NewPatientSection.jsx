@@ -4,8 +4,9 @@ import {
   User, Phone, UserCheck, Calendar, Clock, 
   Stethoscope, Activity, CheckCircle, XCircle,
   Heart, Droplet, Thermometer, Ruler, Weight,
-  AlertCircle, X
+  AlertCircle, X, UserPlus, ChevronRight
 } from 'lucide-react';
+import PatientInfoForm from './PatientInfoForm';
 
 const NewPatientSection = ({ onFormSubmit }) => {
   const [formData, setFormData] = useState({
@@ -35,6 +36,33 @@ const NewPatientSection = ({ onFormSubmit }) => {
   });
 
   const [showClearButton, setShowClearButton] = useState(false);
+  const [showPatientInfoForm, setShowPatientInfoForm] = useState(false);
+  const [patientInfoData, setPatientInfoData] = useState({
+    name: '',
+    phone: '',
+    age: '',
+    gender: '',
+    bloodGroup: '',
+    dob: '',
+    address: {
+      line1: '',
+      line2: '',
+      line3: '',
+      line4: '',
+    },
+    attendant: {
+      name: '',
+      relationship: '',
+      phone: '',
+    },
+    chiefComplaint: '',
+    firstObservation: '',
+    referral: '',
+    insurer: {
+      name: '',
+      plan: '',
+    },
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -107,6 +135,59 @@ const NewPatientSection = ({ onFormSubmit }) => {
   // Handle clear all fields
   const handleClearAll = () => {
     handleReset();
+  };
+
+  // Handle open patient info form
+  const handleOpenPatientInfo = () => {
+    // Populate patient info data from form
+    const updatedPatientInfo = {
+      name: formData.patientName || '',
+      phone: formData.phone || '',
+      age: formData.age || '',
+      gender: formData.sex || '',
+      bloodGroup: formData.bloodGroup || '',
+      dob: formData.dob || '',
+      address: {
+        line1: formData.address || '',
+        line2: '',
+        line3: '',
+        line4: '',
+      },
+      attendant: {
+        name: formData.relationName || '',
+        relationship: '',
+        phone: formData.phone || '',
+      },
+      chiefComplaint: formData.allergies || '',
+      firstObservation: '',
+      referral: '',
+      insurer: {
+        name: '',
+        plan: '',
+      },
+    };
+    setPatientInfoData(updatedPatientInfo);
+    setShowPatientInfoForm(true);
+  };
+
+  // Handle save patient info
+  const handleSavePatientInfo = (data) => {
+    console.log('Patient info saved:', data);
+    // Update form data with saved patient info
+    setFormData(prev => ({
+      ...prev,
+      patientName: data.name || prev.patientName,
+      phone: data.phone || prev.phone,
+      age: data.age || prev.age,
+      sex: data.gender || prev.sex,
+      bloodGroup: data.bloodGroup || prev.bloodGroup,
+      dob: data.dob || prev.dob,
+      address: data.address?.line1 || prev.address,
+      relationName: data.attendant?.name || prev.relationName,
+      allergies: data.chiefComplaint || prev.allergies,
+    }));
+    setShowPatientInfoForm(false);
+    alert('Patient details saved successfully!');
   };
 
   // Render vitals section - all fields in one row
@@ -433,6 +514,19 @@ const NewPatientSection = ({ onFormSubmit }) => {
         </div>
       </div>
 
+      {/* Create Patient Button */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={handleOpenPatientInfo}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+        >
+          <UserPlus size={16} />
+          Create Patient Profile
+          <ChevronRight size={14} />
+        </button>
+      </div>
+
       {/* Submit Buttons */}
       <div className="flex gap-3 pt-4">
         <button
@@ -445,12 +539,23 @@ const NewPatientSection = ({ onFormSubmit }) => {
         <button
           type="button"
           onClick={handleReset}
-          className="flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          className="flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors"
         >
           <XCircle size={16} />
           Reset
         </button>
       </div>
+
+      {/* Patient Info Form Modal - Editable */}
+      {showPatientInfoForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <PatientInfoForm 
+            patient={patientInfoData}
+            onSave={handleSavePatientInfo}
+            onClose={() => setShowPatientInfoForm(false)}
+          />
+        </div>
+      )}
     </form>
   );
 };

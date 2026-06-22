@@ -16,7 +16,7 @@ const ParkedList = () => {
       doctor: 'Dr. Aravind Kumar',
       reason: 'Waiting for insurance verification',
       parkedSince: '2024-01-15 10:30 AM',
-      status: 'Pending',
+      status: 'lab',
       priority: 'High',
       token: 'P001'
     },
@@ -28,7 +28,7 @@ const ParkedList = () => {
       doctor: 'Dr. Priya Sharma',
       reason: 'Need to upload documents',
       parkedSince: '2024-01-15 11:00 AM',
-      status: 'Pending',
+      status: 'lab',
       priority: 'Medium',
       token: 'P002'
     },
@@ -40,7 +40,7 @@ const ParkedList = () => {
       doctor: 'Dr. Rajesh Patel',
       reason: 'Awaiting lab results',
       parkedSince: '2024-01-14 4:00 PM',
-      status: 'In Progress',
+      status: 'service',
       priority: 'Low',
       token: 'P003'
     },
@@ -52,7 +52,7 @@ const ParkedList = () => {
       doctor: 'Dr. Sneha Reddy',
       reason: 'Payment pending',
       parkedSince: '2024-01-16 9:30 AM',
-      status: 'Pending',
+      status: 'lab',
       priority: 'High',
       token: 'P004'
     },
@@ -64,7 +64,7 @@ const ParkedList = () => {
       doctor: 'Dr. Aravind Kumar',
       reason: 'Awaiting specialist consultation',
       parkedSince: '2024-01-16 10:00 AM',
-      status: 'In Progress',
+      status: 'service',
       priority: 'Medium',
       token: 'P005'
     },
@@ -101,8 +101,8 @@ const ParkedList = () => {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Pending': return 'bg-yellow-100 text-yellow-700';
-      case 'In Progress': return 'bg-blue-100 text-blue-700';
+      case 'lab': return 'bg-yellow-100 text-yellow-700';
+      case 'service': return 'bg-blue-100 text-blue-700';
       case 'Completed': return 'bg-green-100 text-green-700';
       default: return 'bg-gray-100 text-gray-700';
     }
