@@ -170,7 +170,7 @@ const PatientInfoForm = ({ patient, onSave, onClose }) => {
     <div
       className="flex flex-col overflow-hidden rounded-lg shadow-2xl"
       style={{
-        width: 560,
+        width: 700,
         height: 700,
         background: "linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-alt) 100%)",
         border: "1px solid var(--color-border)",

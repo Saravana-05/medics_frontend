@@ -828,8 +828,8 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
             <PatientInfoPanel 
               patient={selectedPatientForInfo}
               isPopup={true}
-              popupWidth={480}
-              popupHeight={600}
+              popupWidth={700}
+              popupHeight={700}
             />
           </div>
         </div>
