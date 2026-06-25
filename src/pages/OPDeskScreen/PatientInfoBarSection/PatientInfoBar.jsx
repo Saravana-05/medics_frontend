@@ -53,7 +53,7 @@ export default function PatientInfoBar({
                 className="w-full lg:w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l"
                 style={{ borderColor: "var(--color-border)" }}
               >
-                <TopBarSection patient={p} onPark={onPark} onFinalize={onFinalize} />
+                <TopBarSection patient={p} onPark={onPark} onFinalize={onFinalize}  onOPList={() => {}}  onIPList={onIPList}/>
               </div>
             )}
             

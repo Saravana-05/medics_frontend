@@ -192,9 +192,9 @@ export default function PreviousVisitsTable({ visits = [] }) {
         fontFamily: "var(--font-body)"
       }}>
         
-        {/* Header Section with Column Visibility Toggle */}
+        {/* Header Section with FULL background color */}
         <div className="flex-shrink-0 px-4 py-[0.7rem] border-b flex justify-between items-center" style={{ 
-          background: "linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-muted) 100%)",
+          background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
           <div className="flex items-center gap-2.5">

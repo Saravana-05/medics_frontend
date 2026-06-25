@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { 
   Pill, FlaskConical, Settings, FileSearch, 
-  ChevronUp, ChevronDown, Copy, Check, BookOpen, Printer, Eye, Ban, ParkingCircle
+  ChevronUp, ChevronDown, Copy, Check, BookOpen, Printer, Eye, Ban, ParkingCircle,
+  ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet,
+  Stethoscope, Baby, ArrowRightLeft, Clipboard
 } from "lucide-react";
 
 const PRESCRIPTION_TABS = [
@@ -114,7 +116,7 @@ function formatPrescriptionForCopy(visit, prescriptions) {
   return text;
 }
 
-// Render Drugs Tab Content (New Table Format)
+// Render Drugs Tab Content
 function DrugsTabContent({ prescriptions }) {
   const drugs = prescriptions?.drugs || [];
   if (drugs.length === 0) {
@@ -139,7 +141,7 @@ function DrugsTabContent({ prescriptions }) {
             <th className="px-2 py-2 text-center w-12">Night</th>
             <th className="px-2 py-2 text-center w-20">When</th>
             <th className="px-2 py-2 text-left w-28">Detail</th>
-           </tr>
+          </tr>
         </thead>
         <tbody>
           {drugs.map((drug, idx) => {
@@ -151,16 +153,16 @@ function DrugsTabContent({ prescriptions }) {
               <tr key={idx} className="border-b" style={{ borderColor: "var(--color-border)" }}>
                 <td className="px-2 py-2 text-center font-semibold" style={{ color: "var(--color-primary)" }}>
                   {idx + 1}
-                 </td>
+                </td>
                 <td className="px-2 py-2">
                   <div className="font-semibold text-sm">{drug.name}</div>
                   <div className="text-[0.6rem]" style={{ color: "var(--color-text-subtle)" }}>
                     {intakeDisplay}
                   </div>
-                 </td>
+                </td>
                 <td className="px-2 py-2 text-center font-bold" style={{ color: "var(--color-drugs)" }}>
                   {buy}
-                 </td>
+                </td>
                 <td className="px-2 py-2 text-center">{schedule.mor}</td>
                 <td className="px-2 py-2 text-center">{schedule.noon}</td>
                 <td className="px-2 py-2 text-center">{schedule.eve}</td>
@@ -168,12 +170,12 @@ function DrugsTabContent({ prescriptions }) {
                 <td className="px-2 py-2 text-center text-xs">{drug.when}</td>
                 <td className="px-2 py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
                   {drug.detail === "—" ? "" : drug.detail}
-                 </td>
-               </tr>
+                </td>
+              </tr>
             );
           })}
         </tbody>
-       </table>
+      </table>
     </div>
   );
 }
@@ -196,17 +198,17 @@ function LabsTabContent({ prescriptions }) {
           <tr style={{ background: "var(--color-lab-light)" }}>
             <th className="px-3 py-2 text-left">Test Name</th>
             <th className="px-3 py-2 text-left">Instructions</th>
-           </tr>
+          </tr>
         </thead>
         <tbody>
           {labs.map((lab, idx) => (
             <tr key={idx} className="border-b" style={{ borderColor: "var(--color-border)" }}>
               <td className="px-3 py-2 font-semibold">{lab.name}</td>
               <td className="px-3 py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>{lab.detail === "—" ? "" : lab.detail}</td>
-             </tr>
+            </tr>
           ))}
         </tbody>
-       </table>
+      </table>
     </div>
   );
 }
@@ -230,7 +232,7 @@ function ServicesTabContent({ prescriptions }) {
             <th className="px-3 py-2 text-left">Type</th>
             <th className="px-3 py-2 text-left">Service Name</th>
             <th className="px-3 py-2 text-left">Body Part / Details</th>
-           </tr>
+          </tr>
         </thead>
         <tbody>
           {services.map((service, idx) => (
@@ -239,13 +241,13 @@ function ServicesTabContent({ prescriptions }) {
                 <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold" style={{ background: "#e3f0fc", color: "var(--color-services)" }}>
                   {service.type}
                 </span>
-               </td>
+              </td>
               <td className="px-3 py-2 font-semibold">{service.name}</td>
               <td className="px-3 py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>{service.detail === "—" ? "" : service.detail}</td>
-             </tr>
+            </tr>
           ))}
         </tbody>
-       </table>
+      </table>
     </div>
   );
 }
@@ -307,7 +309,7 @@ export default function PrescriptionViewModal({
   visit, 
   prescriptions, 
   onClose,
-  onClear,  // New prop for clearing prescription data
+  onClear,
   onNavigate,
   currentIndex,
   totalVisits
@@ -347,9 +349,7 @@ export default function PrescriptionViewModal({
     onClose();
   };
 
-  // Check if this visit is parked (you can customize this logic)
   const isParked = () => {
-    // For demo purposes - mark visits with SL No 44, 42, 40 as parked
     const parkedSlNos = [44, 42, 40];
     return parkedSlNos.includes(visit.sl);
   };
@@ -366,6 +366,23 @@ export default function PrescriptionViewModal({
     }
   };
 
+  // Extract vitals and clinical data from visit
+  const vitalsData = {
+    bp: visit.vitals ? visit.vitals.split('/')[3] + '/' + visit.vitals.split('/')[4] : "—",
+    temp: visit.vitals ? visit.vitals.split('/')[1] : "—",
+    pulse: visit.vitals ? visit.vitals.split('/')[5] : "—",
+    spo2: visit.vitals ? visit.vitals.split('/')[6] : "—",
+    height: visit.height || "—",
+    weight: visit.weight || "—",
+  };
+
+  const clinicalData = {
+    chiefComplaint: visit.complaint || "—",
+    firstObservation: visit.observation || "—",
+    pregnancy: visit.pregnancy || "—",
+    referral: visit.referral || "—",
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
       <div className="rounded-xl overflow-hidden shadow-2xl" style={{ background: "var(--color-surface)", width: "950px", height: "80vh", display: "flex", flexDirection: "column" }}>
@@ -377,7 +394,6 @@ export default function PrescriptionViewModal({
               <span className="text-sm font-bold">Visit Details - SL No: {visit.sl}</span>
               <span className="text-xs ml-1 opacity-80">{visit.entryDt}</span>
               
-              {/* Parked Badge - only for specific visits */}
               {isParked() && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6rem] font-semibold ml-2"
                   style={{ background: "#fef3c7", color: "#d97706" }}>
@@ -387,7 +403,6 @@ export default function PrescriptionViewModal({
               )}
             </div>
             
-            {/* Navigation Buttons */}
             <div className="flex items-center gap-1 ml-4">
               <button
                 onClick={handlePrevious}
@@ -412,70 +427,32 @@ export default function PrescriptionViewModal({
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Proto Button */}
-            <button
-              onClick={handleProto}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Proto"
-            >
+            <button onClick={handleProto} className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1">
               <BookOpen size={14} />
               <span className="text-xs">Proto</span>
             </button>
-            
-            {/* Print Button */}
-            <button
-              onClick={handlePrint}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Print"
-            >
+            <button onClick={handlePrint} className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1">
               <Printer size={14} />
               <span className="text-xs">Print</span>
             </button>
-            
-            {/* Preview Button */}
-            <button
-              onClick={handlePreview}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Preview"
-            >
+            <button onClick={handlePreview} className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1">
               <Eye size={14} />
               <span className="text-xs">Preview</span>
             </button>
-            
-            {/* Copy Button */}
-            <button
-              onClick={handleCopy}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Copy Prescription"
-            >
+            <button onClick={handleCopy} className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1">
               {copied ? <Check size={14} /> : <Copy size={14} />}
               <span className="text-xs">{copied ? "Copied!" : "Copy"}</span>
             </button>
-            
-            {/* Cancel Button */}
-            <button
-              onClick={handleCancel}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Cancel & Clear"
-            >
+            <button onClick={handleCancel} className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1">
               <Ban size={14} />
               <span className="text-xs">Cancel</span>
             </button>
-            
-            {/* X Button - Close Modal */}
-            {/* <button
-              onClick={onClose}
-              className="p-1 rounded transition-all hover:bg-white/20 flex items-center gap-1"
-              title="Close"
-            >
-              <X size={14} />
-              <span className="text-xs">Close</span>
-            </button> */}
           </div>
         </div>
         
-        {/* Visit Info Summary - Updates with navigation */}
+        {/* Visit Info Summary with Vital Signs (Left) and Clinical Information (Right) */}
         <div className="px-4 py-3 border-b flex-shrink-0" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
+          {/* Top Row: Doctor, Module, Report Date, Next Visit */}
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
               <span className="font-bold" style={{ color: "var(--color-text-muted)" }}>Doctor:</span>
@@ -494,9 +471,72 @@ export default function PrescriptionViewModal({
               <span className="ml-1" style={{ color: visit.nextVisit ? "var(--color-success)" : "inherit" }}>{visit.nextVisit || "—"}</span>
             </div>
           </div>
+          
+          {/* Chief Complaint */}
           <div className="mt-2">
             <span className="font-bold text-xs" style={{ color: "var(--color-text-muted)" }}>Chief Complaint:</span>
             <span className="text-xs ml-1">{visit.complaint}</span>
+          </div>
+          
+          {/* Bottom Row: Vital Signs (Left) | Clinical Information (Right) */}
+          <div className="mt-2 pt-2 border-t grid grid-cols-2 gap-4" style={{ borderColor: "var(--color-border)" }}>
+            {/* Left: Vital Signs */}
+            <div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
+                <span className="text-[0.55rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Vital Signs</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#ef444418", border: "1px solid #ef444435" }}>
+                  <ActivitySquare size={10} style={{ color: "#ef4444" }} />
+                  <span className="text-xs font-bold" style={{ color: "#ef4444" }}>{vitalsData.bp}</span>
+                  <span className="text-[0.5rem]" style={{ color: "#ef4444" }}>BP</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#f9731618", border: "1px solid #f9731635" }}>
+                  <Thermometer size={10} style={{ color: "#f97316" }} />
+                  <span className="text-xs font-bold" style={{ color: "#f97316" }}>{vitalsData.temp}</span>
+                  <span className="text-[0.5rem]" style={{ color: "#f97316" }}>Temp</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#6366f118", border: "1px solid #6366f135" }}>
+                  <Heart size={10} style={{ color: "#6366f1" }} />
+                  <span className="text-xs font-bold" style={{ color: "#6366f1" }}>{vitalsData.pulse}</span>
+                  <span className="text-[0.5rem]" style={{ color: "#6366f1" }}>Pulse</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#06b6d418", border: "1px solid #06b6d435" }}>
+                  <Wind size={10} style={{ color: "#06b6d4" }} />
+                  <span className="text-xs font-bold" style={{ color: "#06b6d4" }}>{vitalsData.spo2}</span>
+                  <span className="text-[0.5rem]" style={{ color: "#06b6d4" }}>SpO₂</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right: Clinical Information */}
+            <div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Clipboard size={12} style={{ color: "var(--color-primary)" }} />
+                <span className="text-[0.55rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {clinicalData.chiefComplaint && clinicalData.chiefComplaint !== "—" && (
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#dc262618", border: "1px solid #dc262635" }}>
+                    <Stethoscope size={10} style={{ color: "#dc2626" }} />
+                    <span className="text-xs font-bold" style={{ color: "#dc2626" }}>{clinicalData.chiefComplaint}</span>
+                  </div>
+                )}
+                {clinicalData.firstObservation && clinicalData.firstObservation !== "—" && (
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#0284c718", border: "1px solid #0284c735" }}>
+                    <Eye size={10} style={{ color: "#0284c7" }} />
+                    <span className="text-xs font-bold" style={{ color: "#0284c7" }}>{clinicalData.firstObservation}</span>
+                  </div>
+                )}
+                {clinicalData.referral && clinicalData.referral !== "—" && (
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#d9770618", border: "1px solid #d9770635" }}>
+                    <ArrowRightLeft size={10} style={{ color: "#d97706" }} />
+                    <span className="text-xs font-bold" style={{ color: "#d97706" }}>{clinicalData.referral}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
         
@@ -523,7 +563,7 @@ export default function PrescriptionViewModal({
           })}
         </div>
         
-        {/* Tab Content - Scrollable - Updates with navigation */}
+        {/* Tab Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === "drugs" && <DrugsTabContent prescriptions={prescriptions} />}
           {activeTab === "lab" && <LabsTabContent prescriptions={prescriptions} />}

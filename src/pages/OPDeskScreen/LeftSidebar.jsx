@@ -12,8 +12,8 @@ const LEFT_TABS = [
     icon: User,
     color: "var(--color-primary)",
     lightColor: "var(--color-primary-muted)",
-    defaultBg: "var(--color-primary-muted)",
-    defaultIconColor: "var(--color-primary)"
+    defaultBg: "var(--color-primary)",  // Changed to dark color
+    defaultIconColor: "white"  // Changed to white for better contrast
   },
   { 
     key: "chronicAllergy", 
@@ -21,8 +21,8 @@ const LEFT_TABS = [
     icon: AlertCircle,
     color: "var(--color-danger)",
     lightColor: "#fee2e2",
-    defaultBg: "#fee2e2",
-    defaultIconColor: "#dc2626"
+    defaultBg: "#dc2626",  // Changed to dark red
+    defaultIconColor: "white"
   },
   { 
     key: "patientFamily", 
@@ -30,8 +30,8 @@ const LEFT_TABS = [
     icon: Users,
     color: "var(--color-drugs)",
     lightColor: "var(--color-drugs-light)",
-    defaultBg: "var(--color-drugs-light)",
-    defaultIconColor: "var(--color-drugs)"
+    defaultBg: "var(--color-drugs)",  // Changed to dark color
+    defaultIconColor: "white"
   },
   { 
     key: "period", 
@@ -39,8 +39,8 @@ const LEFT_TABS = [
     icon: Calendar,
     color: "var(--color-warning)",
     lightColor: "#fef3e2",
-    defaultBg: "#fef3e2",
-    defaultIconColor: "#d97706"
+    defaultBg: "#d97706",  // Changed to dark orange
+    defaultIconColor: "white"
   },
 ];
 
@@ -433,7 +433,6 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient }) {
           const IconComponent = tab.icon;
           const isActive  = activePanel === tab.key;
           const isHovered = hoveredKey  === tab.key;
-          const highlight = isActive || isHovered;
 
           return (
             <div
@@ -443,25 +442,27 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient }) {
               onMouseLeave={handleIconMouseLeave}
               className="relative cursor-pointer transition-all duration-200 group"
               style={{
-                background: tab.lightColor,
-                borderLeft: highlight ? `3px solid ${tab.color}` : "3px solid transparent",
+                background: "transparent",
+                borderLeft: isActive || isHovered ? `3px solid ${tab.color}` : "3px solid transparent",
+                opacity: 1,
               }}
             >
               <div className="flex items-center justify-center py-3">
                 <div
                   className="p-1.5 rounded-lg transition-all duration-200"
                   style={{
-                    background: highlight ? tab.color : "transparent",
-                    transform: isHovered ? "scale(1.1)" : "scale(1)",
+                    background: tab.defaultBg || "transparent",
+                    transform: isHovered && !isActive ? "scale(1.1)" : "scale(1)",
                   }}
                 >
                   <IconComponent
                     size={18}
-                    style={{ color: highlight ? "white" : tab.defaultIconColor || "var(--color-text-muted)" }}
+                    style={{ color: tab.defaultIconColor || "var(--color-text-muted)" }}
                   />
                 </div>
               </div>
 
+              {/* Tooltip on hover */}
               {!isHovered && (
                 <div
                   className="absolute left-full ml-2 top-1/2 transform -translate-y-1/2 px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-40"

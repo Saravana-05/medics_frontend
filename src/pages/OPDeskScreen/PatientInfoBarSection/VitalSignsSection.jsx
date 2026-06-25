@@ -12,7 +12,7 @@ function VitalBadge({ icon: Icon, value, color, unit }) {
         {value || "—"}
       </span>
       {unit && (
-        <span className="text-[0.52rem] whitespace-nowrap" style={{ color }}>
+        <span className="text-[0.6rem] whitespace-nowrap" style={{ color: "#000000" }}>
           {unit}
         </span>
       )}
@@ -39,7 +39,7 @@ function VitalSignCard({ icon: Icon, value, label, color, unit, trend }) {
             {value || "—"}
           </div>
           {unit && (
-            <div className="text-[0.5rem] mt-0.5" style={{ color: "var(--color-text-subtle)" }}>
+            <div className="text-[0.65rem] mt-0.5" style={{ color: "#000000" }}>
               {unit}
             </div>
           )}
