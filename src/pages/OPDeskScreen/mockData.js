@@ -10,9 +10,8 @@ export const MOCK_PATIENTS = [
     nextVisitDue: "05/02/2024", referral: "Dr.Sheela (From)",
     slot: "09:30", dept: "General Medicine", appt: "APT-001",
     docDate: "03/02/2024 14:02",
-    photo: "https://randomuser.me/api/portraits/women/68.jpg", // Female patient photo
+    photo: "https://randomuser.me/api/portraits/women/68.jpg",
 
-    /* ── Patient Information panel data ── */
     address: {
       line1: "Ram Krishna Apartments",
       line2: "12/24, Srinivasapuram 3rd St.",
@@ -54,17 +53,16 @@ export const MOCK_PATIENTS = [
     ipInfo: {
       ward: "—", bed: "—", admitDate: "—", consultant: "—",
     },
-
     chronicAllergy: [
-      { type: "Allergy", name: "Penicillin",       since: "2018", severity: "High"   },
-      { type: "Chronic", name: "Hypertension",      since: "2020", severity: "Medium" },
-      { type: "Allergy", name: "Dust Mites",        since: "2015", severity: "Low"    },
-      { type: "Chronic", name: "Anxiety Disorder",  since: "2021", severity: "Medium" },
+      { type: "Allergy", name: "Penicillin", since: "2018", severity: "High" },
+      { type: "Chronic", name: "Hypertension", since: "2020", severity: "Medium" },
+      { type: "Allergy", name: "Dust Mites", since: "2015", severity: "Low" },
+      { type: "Chronic", name: "Anxiety Disorder", since: "2021", severity: "Medium" },
     ],
     family: [
-      { relation: "Father",  name: "Sri.Krishnaswamy", age: 58, condition: "Diabetes"     },
-      { relation: "Mother",  name: "Smt.Kamala",        age: 54, condition: "Hypertension" },
-      { relation: "Husband", name: "Sri.Ramesh",         age: 34, condition: "Nil"          },
+      { relation: "Father", name: "Sri.Krishnaswamy", age: 58, condition: "Diabetes" },
+      { relation: "Mother", name: "Smt.Kamala", age: 54, condition: "Hypertension" },
+      { relation: "Husband", name: "Sri.Ramesh", age: 34, condition: "Nil" },
     ],
   },
   {
@@ -78,7 +76,7 @@ export const MOCK_PATIENTS = [
     nextVisitDue: "10/02/2024", referral: "Self",
     slot: "10:00", dept: "General Medicine", appt: "APT-002",
     docDate: "03/02/2024 10:12",
-    photo: "https://randomuser.me/api/portraits/men/32.jpg", // Male patient photo
+    photo: "https://randomuser.me/api/portraits/men/32.jpg",
 
     address: {
       line1: "45, Anna Nagar 2nd Cross",
@@ -111,7 +109,6 @@ export const MOCK_PATIENTS = [
     },
     gynacInfo: null,
     ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
-
     chronicAllergy: [
       { type: "Allergy", name: "Sulfa drugs", since: "2019", severity: "High" },
     ],
@@ -128,7 +125,7 @@ export const MOCK_PATIENTS = [
     nextVisitDue: "17/02/2024", referral: "Dr.Arun (From)",
     slot: "10:30", dept: "General Medicine", appt: "APT-003",
     docDate: "03/02/2024 10:35",
-    photo: "https://randomuser.me/api/portraits/women/45.jpg", // Female patient photo
+    photo: "https://randomuser.me/api/portraits/women/45.jpg",
 
     address: {
       line1: "7/B, Meenakshi Nagar",
@@ -164,59 +161,585 @@ export const MOCK_PATIENTS = [
       pregnancies: 2, deliveries: 2, abortions: 0, livingChildren: 2,
     },
     ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
-
     chronicAllergy: [
-      { type: "Chronic", name: "Osteoarthritis",  since: "2019", severity: "High" },
+      { type: "Chronic", name: "Osteoarthritis", since: "2019", severity: "High" },
       { type: "Chronic", name: "Diabetes Type 2", since: "2018", severity: "High" },
     ],
     family: [],
+  },
+  {
+    id: "PID-4456", docNo: "OP: 3905",
+    name: "Mr. Rajesh Kumar", relation: "S/o. Sri.Ramesh",
+    age: 45, dob: "12/08/1979", gender: "Male", weight: "78KG",
+    height: '172"', bpSystolic: 135, bpDiastolic: 85, pulse: 72, temp: "98.4",
+    bloodGroup: "AB+", pregnancy: "N/A",
+    chiefComplaint: "Chest Pain, Shortness of breath",
+    firstObservation: "Sharp chest pain radiating to left arm",
+    nextVisitDue: "10/02/2024", referral: "Dr.Priya (From)",
+    slot: "11:00", dept: "Cardiology", appt: "APT-004",
+    docDate: "03/02/2024 11:05",
+    photo: "https://randomuser.me/api/portraits/men/45.jpg",
+
+    address: {
+      line1: "23, Gandhi Nagar 1st Street",
+      line2: "Villapuram",
+      line3: "Madurai - 625 012",
+      line4: "Madurai Dt",
+      phone: "9789456123",
+    },
+    attendant: {
+      name: "Smt. Kavitha",
+      relationship: "Wife",
+      phone: "9789456124",
+    },
+    appointment: {
+      datetime: "03/02/2024 11:00",
+      priority: "Emergency",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "15/01/2024",
+      visitCount: 3,
+      corporate: "Yes",
+      fee: "Insurance",
+    },
+    insurer: {
+      name: "ICICI Lombard",
+      plan: "Health Insurance Plus",
+      period: "Till 31/12/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: null,
+    ipInfo: { ward: "CCU", bed: "A-12", admitDate: "03/02/2024", consultant: "Dr.Suresh" },
+    chronicAllergy: [
+      { type: "Chronic", name: "CAD", since: "2020", severity: "High" },
+      { type: "Chronic", name: "Hyperlipidemia", since: "2019", severity: "Medium" },
+    ],
+    family: [
+      { relation: "Father", name: "Sri.Ramesh", age: 70, condition: "Heart Disease" },
+      { relation: "Mother", name: "Smt.Saroja", age: 65, condition: "Diabetes" },
+    ],
+  },
+  {
+    id: "PID-5567", docNo: "OP: 3906",
+    name: "Ms. Priya Sharma", relation: "D/o. Sri.Sharma",
+    age: 24, dob: "22/03/2000", gender: "Female", weight: "55KG",
+    height: '160"', bpSystolic: 110, bpDiastolic: 70, pulse: 82, temp: "98.8",
+    bloodGroup: "O-", pregnancy: "No",
+    chiefComplaint: "Severe Abdominal Pain",
+    firstObservation: "Right lower quadrant pain, nausea",
+    nextVisitDue: "05/02/2024", referral: "Self",
+    slot: "11:30", dept: "General Surgery", appt: "APT-005",
+    docDate: "03/02/2024 11:25",
+    photo: "https://randomuser.me/api/portraits/women/22.jpg",
+
+    address: {
+      line1: "8, Sivagami Nagar",
+      line2: "Near Railway Station",
+      line3: "Dindigul - 624 001",
+      line4: "Dindigul Dt",
+      phone: "9876543322",
+    },
+    attendant: {
+      name: "Sri.Sharma",
+      relationship: "Father",
+      phone: "9876543323",
+    },
+    appointment: {
+      datetime: "03/02/2024 11:30",
+      priority: "Urgent",
+    },
+    todaysVisit: {
+      type: "First Visit",
+      firstVisit: "03/02/2024",
+      visitCount: 1,
+      corporate: "No",
+      fee: "Cash",
+    },
+    insurer: {
+      name: "None",
+      plan: "—",
+      period: "—",
+      claim: "—",
+    },
+    gynacInfo: {
+      lmp: "15/01/2024",
+      doc: "N/A",
+      edd: "N/A",
+      pregnancies: 0,
+      deliveries: 0,
+      abortions: 0,
+      livingChildren: 0,
+    },
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Allergy", name: "Latex", since: "2015", severity: "Medium" },
+      { type: "Allergy", name: "Morphine", since: "2018", severity: "High" },
+    ],
+    family: [],
+  },
+  {
+    id: "PID-6678", docNo: "OP: 3907",
+    name: "Sri. Senthil Murugan", relation: "S/o. Sri.Murugan",
+    age: 38, dob: "05/07/1986", gender: "Male", weight: "85KG",
+    height: '175"', bpSystolic: 160, bpDiastolic: 100, pulse: 95, temp: "99.5",
+    bloodGroup: "B-", pregnancy: "N/A",
+    chiefComplaint: "Dizziness, Blurred Vision",
+    firstObservation: "Sudden onset of dizziness, unable to stand",
+    nextVisitDue: "10/02/2024", referral: "Dr.Karthik (From)",
+    slot: "12:00", dept: "Neurology", appt: "APT-006",
+    docDate: "03/02/2024 12:10",
+    photo: "https://randomuser.me/api/portraits/men/52.jpg",
+
+    address: {
+      line1: "56, South Street",
+      line2: "Thirumangalam",
+      line3: "Madurai - 625 706",
+      line4: "Madurai Dt",
+      phone: "9944455566",
+    },
+    attendant: {
+      name: "Smt. Meena",
+      relationship: "Wife",
+      phone: "9944455567",
+    },
+    appointment: {
+      datetime: "03/02/2024 12:00",
+      priority: "Emergency",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "25/01/2024",
+      visitCount: 2,
+      corporate: "No",
+      fee: "Cash",
+    },
+    insurer: {
+      name: "Bajaj Allianz",
+      plan: "Health Guard",
+      period: "Till 30/11/2024",
+      claim: "OP-Yes|Day-No|IP-Yes",
+    },
+    gynacInfo: null,
+    ipInfo: { ward: "ICU", bed: "B-08", admitDate: "03/02/2024", consultant: "Dr.Prabhu" },
+    chronicAllergy: [
+      { type: "Chronic", name: "Migraine", since: "2015", severity: "High" },
+      { type: "Chronic", name: "Hypertension", since: "2018", severity: "High" },
+    ],
+    family: [
+      { relation: "Father", name: "Sri.Murugan", age: 65, condition: "Stroke" },
+      { relation: "Mother", name: "Smt.Valli", age: 60, condition: "Diabetes" },
+    ],
+  },
+  {
+    id: "PID-7789", docNo: "OP: 3908",
+    name: "Smt. Anitha Raman", relation: "W/o. Sri.Raman",
+    age: 35, dob: "18/11/1989", gender: "Female", weight: "62KG",
+    height: '164"', bpSystolic: 130, bpDiastolic: 82, pulse: 76, temp: "98.6",
+    bloodGroup: "AB-", pregnancy: "Yes. 30 Weeks",
+    chiefComplaint: "Swelling in feet, Headache",
+    firstObservation: "Pitting edema in both feet, elevated BP",
+    nextVisitDue: "15/02/2024", referral: "Dr.Meera (From)",
+    slot: "12:30", dept: "Obstetrics", appt: "APT-007",
+    docDate: "03/02/2024 12:35",
+    photo: "https://randomuser.me/api/portraits/women/33.jpg",
+
+    address: {
+      line1: "12, North Masi Street",
+      line2: "K.K. Nagar",
+      line3: "Madurai - 625 020",
+      line4: "Madurai Dt",
+      phone: "9988776655",
+    },
+    attendant: {
+      name: "Sri.Raman",
+      relationship: "Husband",
+      phone: "9988776656",
+    },
+    appointment: {
+      datetime: "03/02/2024 12:30",
+      priority: "Urgent",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "10/07/2023",
+      visitCount: 12,
+      corporate: "Yes",
+      fee: "Insurance",
+    },
+    insurer: {
+      name: "HDFC Ergo",
+      plan: "Maternity Cover",
+      period: "Till 31/03/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: {
+      lmp: "15/07/2023",
+      doc: "20/08/2023",
+      edd: "22/04/2024",
+      pregnancies: 2,
+      deliveries: 1,
+      abortions: 0,
+      livingChildren: 1,
+    },
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Allergy", name: "Shellfish", since: "2010", severity: "High" },
+      { type: "Chronic", name: "Anemia", since: "2023", severity: "Low" },
+    ],
+    family: [],
+  },
+  {
+    id: "PID-8890", docNo: "OP: 3909",
+    name: "Mr. Arun Prakash", relation: "S/o. Sri.Prakash",
+    age: 60, dob: "03/01/1964", gender: "Male", weight: "70KG",
+    height: '168"', bpSystolic: 140, bpDiastolic: 88, pulse: 82, temp: "98.2",
+    bloodGroup: "A-", pregnancy: "N/A",
+    chiefComplaint: "Frequent Urination, Fatigue",
+    firstObservation: "Polyuria, polydipsia, weight loss",
+    nextVisitDue: "17/02/2024", referral: "Dr.Raj (From)",
+    slot: "01:00", dept: "Endocrinology", appt: "APT-008",
+    docDate: "03/02/2024 13:05",
+    photo: "https://randomuser.me/api/portraits/men/65.jpg",
+
+    address: {
+      line1: "3, Temple View",
+      line2: "Avaniyapuram",
+      line3: "Madurai - 625 012",
+      line4: "Madurai Dt",
+      phone: "9876543322",
+    },
+    attendant: {
+      name: "Smt. Latha",
+      relationship: "Wife",
+      phone: "9876543323",
+    },
+    appointment: {
+      datetime: "03/02/2024 01:00",
+      priority: "Normal",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "05/12/2023",
+      visitCount: 6,
+      corporate: "No",
+      fee: "Cash",
+    },
+    insurer: {
+      name: "United India",
+      plan: "Senior Citizen",
+      period: "Till 30/06/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: null,
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Chronic", name: "Diabetes Type 2", since: "2015", severity: "High" },
+      { type: "Chronic", name: "Neuropathy", since: "2018", severity: "Medium" },
+    ],
+    family: [
+      { relation: "Brother", name: "Sri.Ravi", age: 55, condition: "Diabetes" },
+    ],
+  },
+  {
+    id: "PID-9901", docNo: "OP: 3910",
+    name: "Smt. Parvathy Devi", relation: "W/o. Sri.Devarajan",
+    age: 68, dob: "12/09/1956", gender: "Female", weight: "58KG",
+    height: '155"', bpSystolic: 155, bpDiastolic: 92, pulse: 90, temp: "98.8",
+    bloodGroup: "B+", pregnancy: "No",
+    chiefComplaint: "Joint Pain, Morning Stiffness",
+    firstObservation: "Symmetrical joint pain in hands and feet",
+    nextVisitDue: "20/02/2024", referral: "Dr.Anjali (From)",
+    slot: "01:30", dept: "Rheumatology", appt: "APT-009",
+    docDate: "03/02/2024 13:35",
+    photo: "https://randomuser.me/api/portraits/women/75.jpg",
+
+    address: {
+      line1: "45, Old Natham Road",
+      line2: "T.V.S. Nagar",
+      line3: "Madurai - 625 003",
+      line4: "Madurai Dt",
+      phone: "9944556677",
+    },
+    attendant: {
+      name: "Sri.Devarajan",
+      relationship: "Husband",
+      phone: "9944556678",
+    },
+    appointment: {
+      datetime: "03/02/2024 01:30",
+      priority: "Normal",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "10/10/2023",
+      visitCount: 9,
+      corporate: "No",
+      fee: "Insurance",
+    },
+    insurer: {
+      name: "New India",
+      plan: "Senior Citizen Health",
+      period: "Till 31/12/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: {
+      lmp: "N/A", doc: "N/A", edd: "N/A",
+      pregnancies: 3,
+      deliveries: 3,
+      abortions: 0,
+      livingChildren: 3,
+    },
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Chronic", name: "Rheumatoid Arthritis", since: "2018", severity: "High" },
+      { type: "Chronic", name: "Osteoporosis", since: "2019", severity: "Medium" },
+    ],
+    family: [
+      { relation: "Sister", name: "Smt.Vijaya", age: 62, condition: "Osteoarthritis" },
+    ],
+  },
+  {
+    id: "PID-1012", docNo: "OP: 3911",
+    name: "Mr. Dinesh Kumar", relation: "S/o. Sri.Kumar",
+    age: 22, dob: "08/04/2002", gender: "Male", weight: "65KG",
+    height: '170"', bpSystolic: 115, bpDiastolic: 75, pulse: 72, temp: "98.6",
+    bloodGroup: "O+", pregnancy: "N/A",
+    chiefComplaint: "Sore Throat, Cough",
+    firstObservation: "Pharyngeal erythema, tonsillar enlargement",
+    nextVisitDue: "10/02/2024", referral: "Self",
+    slot: "02:00", dept: "ENT", appt: "APT-010",
+    docDate: "03/02/2024 14:05",
+    photo: "https://randomuser.me/api/portraits/men/22.jpg",
+
+    address: {
+      line1: "7, Rajaji Nagar",
+      line2: "K.Pudur",
+      line3: "Madurai - 625 007",
+      line4: "Madurai Dt",
+      phone: "9865432190",
+    },
+    attendant: {
+      name: "Sri.Kumar",
+      relationship: "Father",
+      phone: "9865432191",
+    },
+    appointment: {
+      datetime: "03/02/2024 02:00",
+      priority: "Normal",
+    },
+    todaysVisit: {
+      type: "First Visit",
+      firstVisit: "03/02/2024",
+      visitCount: 1,
+      corporate: "No",
+      fee: "Cash",
+    },
+    insurer: {
+      name: "None",
+      plan: "—",
+      period: "—",
+      claim: "—",
+    },
+    gynacInfo: null,
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Allergy", name: "Pollen", since: "2010", severity: "Medium" },
+    ],
+    family: [],
+  },
+  {
+    id: "PID-1123", docNo: "OP: 3912",
+    name: "Smt. Vasanthi Ravi", relation: "W/o. Sri.Ravi",
+    age: 42, dob: "19/06/1982", gender: "Female", weight: "75KG",
+    height: '163"', bpSystolic: 145, bpDiastolic: 90, pulse: 88, temp: "99.2",
+    bloodGroup: "A+", pregnancy: "No",
+    chiefComplaint: "Palpitations, Sweating",
+    firstObservation: "Irregular heartbeat, excessive sweating",
+    nextVisitDue: "15/02/2024", referral: "Dr.Geetha (From)",
+    slot: "02:30", dept: "Cardiology", appt: "APT-011",
+    docDate: "03/02/2024 14:35",
+    photo: "https://randomuser.me/api/portraits/women/55.jpg",
+
+    address: {
+      line1: "19, Ram Nagar",
+      line2: "Sundararajapuram",
+      line3: "Madurai - 625 002",
+      line4: "Madurai Dt",
+      phone: "9988774411",
+    },
+    attendant: {
+      name: "Sri.Ravi",
+      relationship: "Husband",
+      phone: "9988774412",
+    },
+    appointment: {
+      datetime: "03/02/2024 02:30",
+      priority: "Urgent",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "20/12/2023",
+      visitCount: 5,
+      corporate: "Yes",
+      fee: "Insurance",
+    },
+    insurer: {
+      name: "Royal Sundaram",
+      plan: "Health Shield",
+      period: "Till 30/09/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: {
+      lmp: "05/01/2024",
+      doc: "N/A",
+      edd: "N/A",
+      pregnancies: 2,
+      deliveries: 2,
+      abortions: 0,
+      livingChildren: 2,
+    },
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Chronic", name: "Hyperthyroidism", since: "2020", severity: "High" },
+      { type: "Chronic", name: "Hypertension", since: "2019", severity: "Medium" },
+    ],
+    family: [
+      { relation: "Mother", name: "Smt.Saraswathi", age: 65, condition: "Thyroid" },
+    ],
+  },
+  {
+    id: "PID-1234", docNo: "OP: 3913",
+    name: "Mr. Ganesh Babu", relation: "S/o. Sri.Babu",
+    age: 55, dob: "25/12/1969", gender: "Male", weight: "82KG",
+    height: '174"', bpSystolic: 130, bpDiastolic: 84, pulse: 76, temp: "98.4",
+    bloodGroup: "AB+", pregnancy: "N/A",
+    chiefComplaint: "Back Pain, Sciatica",
+    firstObservation: "Lower back pain radiating to left leg",
+    nextVisitDue: "18/02/2024", referral: "Dr.Shankar (From)",
+    slot: "03:00", dept: "Orthopedics", appt: "APT-012",
+    docDate: "03/02/2024 15:05",
+    photo: "https://randomuser.me/api/portraits/men/58.jpg",
+
+    address: {
+      line1: "32, Lake View Road",
+      line2: "Kochadai",
+      line3: "Madurai - 625 016",
+      line4: "Madurai Dt",
+      phone: "9944332211",
+    },
+    attendant: {
+      name: "Smt. Lalitha",
+      relationship: "Wife",
+      phone: "9944332212",
+    },
+    appointment: {
+      datetime: "03/02/2024 03:00",
+      priority: "Normal",
+    },
+    todaysVisit: {
+      type: "Follow-up",
+      firstVisit: "10/01/2024",
+      visitCount: 4,
+      corporate: "No",
+      fee: "Cash",
+    },
+    insurer: {
+      name: "Tata AIG",
+      plan: "Individual Health",
+      period: "Till 31/12/2024",
+      claim: "OP-Yes|Day-Yes|IP-Yes",
+    },
+    gynacInfo: null,
+    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    chronicAllergy: [
+      { type: "Chronic", name: "Lumbar Spondylosis", since: "2018", severity: "Medium" },
+      { type: "Chronic", name: "Sciatica", since: "2020", severity: "High" },
+    ],
+    family: [
+      { relation: "Father", name: "Sri.Babu", age: 78, condition: "Osteoporosis" },
+    ],
   },
 ];
 
 export const PREVIOUS_VISITS = {
   "PID-1042": [
-    { sl: 45, entryDt: "02/02/2024 16:02", docModule: "3902: OP-DP",  reportDt: "",              complaint: "Allergy, Anxiety",  vitals: "86/25.7/140:90:96/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
-    { sl: 44, entryDt: "02/02/2024 12:30", docModule: "3902: OP-LP-R",reportDt: "02/02/2024 16.00", complaint: "Allergy, Anxiety",  vitals: "86/25.7/145:90:95/101.", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
-    { sl: 43, entryDt: "21/01/2024 12:15", docModule: "2911: IP-F",   reportDt: "",              complaint: "Bowel Irritation",  vitals: "85/25/120:80:96/98.6",  by: "Dr.Sheela",       nextVisit: "" },
-    { sl: 42, entryDt: "21/01/2024 12:10", docModule: "2911: IP-DP",  reportDt: "",              complaint: "Bowel Irritation",  vitals: "85/25/120:80:96/98.6",  by: "Dr.Sheela",       nextVisit: "" },
-    { sl: 41, entryDt: "21/01/2024 10:22", docModule: "2911: IP-SP-R",reportDt: "21/01/2024 12.07", complaint: "Bowel Irritation",  vitals: "85/25/130:80:96/98.6",  by: "Dr.Sheela",       nextVisit: "" },
-    { sl: 40, entryDt: "21/01/2024 10:20", docModule: "2911: IP-LP-R",reportDt: "21/01/2024 12.05", complaint: "Bowel Irritation",  vitals: "85/25/120:80:96/98.6",  by: "Dr.Sheela",       nextVisit: "" },
-    { sl: 39, entryDt: "13/06/2023 10:30", docModule: "1211: OP-DP",  reportDt: "",              complaint: "Stomach Pain",      vitals: "86/25.7/130:85:95/98.6",by: "Nr.Sridevi",      nextVisit: "" },
-    { sl: 38, entryDt: "12/06/2023 09:10", docModule: "1211: OP-SP-R",reportDt: "13/06/2023 10.30", complaint: "Stomach Pain",      vitals: "86/25.7/130:85:95/98.6",by: "Dr.Arun",         nextVisit: "13/06/2023" },
+    { sl: 45, entryDt: "02/02/2024 16:02", docModule: "3902: OP-DP", reportDt: "", complaint: "Allergy, Anxiety", vitals: "86/25.7/140:90:96/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
+    { sl: 44, entryDt: "02/02/2024 12:30", docModule: "3902: OP-LP-R", reportDt: "02/02/2024 16.00", complaint: "Allergy, Anxiety", vitals: "86/25.7/145:90:95/101.", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
+    { sl: 43, entryDt: "21/01/2024 12:15", docModule: "2911: IP-F", reportDt: "", complaint: "Bowel Irritation", vitals: "85/25/120:80:96/98.6", by: "Dr.Sheela", nextVisit: "" },
+    { sl: 42, entryDt: "21/01/2024 12:10", docModule: "2911: IP-DP", reportDt: "", complaint: "Bowel Irritation", vitals: "85/25/120:80:96/98.6", by: "Dr.Sheela", nextVisit: "" },
+    { sl: 41, entryDt: "21/01/2024 10:22", docModule: "2911: IP-SP-R", reportDt: "21/01/2024 12.07", complaint: "Bowel Irritation", vitals: "85/25/130:80:96/98.6", by: "Dr.Sheela", nextVisit: "" },
+    { sl: 40, entryDt: "21/01/2024 10:20", docModule: "2911: IP-LP-R", reportDt: "21/01/2024 12.05", complaint: "Bowel Irritation", vitals: "85/25/120:80:96/98.6", by: "Dr.Sheela", nextVisit: "" },
+    { sl: 39, entryDt: "13/06/2023 10:30", docModule: "1211: OP-DP", reportDt: "", complaint: "Stomach Pain", vitals: "86/25.7/130:85:95/98.6", by: "Nr.Sridevi", nextVisit: "" },
+    { sl: 38, entryDt: "12/06/2023 09:10", docModule: "1211: OP-SP-R", reportDt: "13/06/2023 10.30", complaint: "Stomach Pain", vitals: "86/25.7/130:85:95/98.6", by: "Dr.Arun", nextVisit: "13/06/2023" },
   ],
   "PID-2187": [
-    { sl: 12, entryDt: "28/01/2024 09:00", docModule: "3850: OP-DP",  reportDt: "",              complaint: "Fever, Headache",   vitals: "72/--/120:80:78/98.6",  by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
+    { sl: 12, entryDt: "28/01/2024 09:00", docModule: "3850: OP-DP", reportDt: "", complaint: "Fever, Headache", vitals: "72/--/120:80:78/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
   ],
   "PID-3301": [
-    { sl: 8,  entryDt: "20/01/2024 11:00", docModule: "3810: OP-DP",  reportDt: "",              complaint: "Knee Pain",         vitals: "68/--/150:95:88/99.1",  by: "Dr.Arun",         nextVisit: "03/02/2024" },
+    { sl: 8, entryDt: "20/01/2024 11:00", docModule: "3810: OP-DP", reportDt: "", complaint: "Knee Pain", vitals: "68/--/150:95:88/99.1", by: "Dr.Arun", nextVisit: "03/02/2024" },
+  ],
+  "PID-4456": [
+    { sl: 3, entryDt: "02/02/2024 09:30", docModule: "3905: OP-DP", reportDt: "", complaint: "Chest Pain", vitals: "78/--/135:85:72/98.4", by: "Dr.Priya", nextVisit: "10/02/2024" },
+    { sl: 2, entryDt: "28/01/2024 10:00", docModule: "3905: OP-SP-R", reportDt: "28/01/2024 14.00", complaint: "Shortness of breath", vitals: "78/--/140:88:76/98.6", by: "Dr.Priya", nextVisit: "03/02/2024" },
+  ],
+  "PID-5567": [
+    { sl: 1, entryDt: "03/02/2024 11:30", docModule: "3906: OP-DP", reportDt: "", complaint: "Abdominal Pain", vitals: "55/--/110:70:82/98.8", by: "Dr.Sharma", nextVisit: "05/02/2024" },
+  ],
+  "PID-6678": [
+    { sl: 2, entryDt: "02/02/2024 14:00", docModule: "3907: OP-DP", reportDt: "", complaint: "Dizziness", vitals: "85/--/160:100:95/99.5", by: "Dr.Karthik", nextVisit: "10/02/2024" },
+  ],
+  "PID-7789": [
+    { sl: 12, entryDt: "02/02/2024 09:00", docModule: "3908: OP-DP", reportDt: "", complaint: "Swelling, Headache", vitals: "62/--/130:82:76/98.6", by: "Dr.Meera", nextVisit: "15/02/2024" },
+    { sl: 11, entryDt: "25/01/2024 10:00", docModule: "3908: OP-SP-R", reportDt: "25/01/2024 15.00", complaint: "Pregnancy Check", vitals: "60/--/125:80:72/98.4", by: "Dr.Meera", nextVisit: "03/02/2024" },
+  ],
+  "PID-8890": [
+    { sl: 6, entryDt: "01/02/2024 11:00", docModule: "3909: OP-DP", reportDt: "", complaint: "Frequent Urination", vitals: "70/--/140:88:82/98.2", by: "Dr.Raj", nextVisit: "17/02/2024" },
+  ],
+  "PID-9901": [
+    { sl: 9, entryDt: "02/02/2024 13:30", docModule: "3910: OP-DP", reportDt: "", complaint: "Joint Pain", vitals: "58/--/155:92:90/98.8", by: "Dr.Anjali", nextVisit: "20/02/2024" },
+  ],
+  "PID-1012": [
+    { sl: 1, entryDt: "03/02/2024 14:00", docModule: "3911: OP-DP", reportDt: "", complaint: "Sore Throat", vitals: "65/--/115:75:72/98.6", by: "Dr.Suresh", nextVisit: "10/02/2024" },
+  ],
+  "PID-1123": [
+    { sl: 5, entryDt: "02/02/2024 15:00", docModule: "3912: OP-DP", reportDt: "", complaint: "Palpitations", vitals: "75/--/145:90:88/99.2", by: "Dr.Geetha", nextVisit: "15/02/2024" },
+  ],
+  "PID-1234": [
+    { sl: 4, entryDt: "02/02/2024 15:30", docModule: "3913: OP-DP", reportDt: "", complaint: "Back Pain", vitals: "82/--/130:84:76/98.4", by: "Dr.Shankar", nextVisit: "18/02/2024" },
   ],
 };
 
 export const DRUG_SUGGESTIONS = [
-  "Paracetamol 500mg Tab","Amoxicillin 250mg Cap","Ibuprofen 400mg Tab",
-  "Metformin 500mg Tab","Atorvastatin 10mg Tab","Omeprazole 20mg Cap",
-  "Azithromycin 500mg Tab","Cetirizine 10mg Tab","Pantoprazole 40mg Tab",
-  "Ranitidine 150mg Tab","Dolo 650mg Tab","Crocin 500mg Tab",
-  "Combiflam Tab","Allegra 120mg Tab","Montair LC Tab",
+  "Paracetamol 500mg Tab", "Amoxicillin 250mg Cap", "Ibuprofen 400mg Tab",
+  "Metformin 500mg Tab", "Atorvastatin 10mg Tab", "Omeprazole 20mg Cap",
+  "Azithromycin 500mg Tab", "Cetirizine 10mg Tab", "Pantoprazole 40mg Tab",
+  "Ranitidine 150mg Tab", "Dolo 650mg Tab", "Crocin 500mg Tab",
+  "Combiflam Tab", "Allegra 120mg Tab", "Montair LC Tab",
+  "Losartan 50mg Tab", "Amlodipine 5mg Tab", "Hydrochlorothiazide 25mg Tab",
+  "Levothyroxine 50mcg Tab", "Insulin Glargine 100IU/mL", "Salbutamol Inhaler 100mcg",
+  "Diclofenac 50mg Tab", "Gabapentin 300mg Cap", "Pregabalin 75mg Cap",
 ];
 
 export const LAB_SUGGESTIONS = [
-  "Complete Blood Count (CBC)","Blood Sugar Fasting","Blood Sugar PP",
-  "HbA1c","Lipid Profile","Thyroid Profile (T3,T4,TSH)",
-  "Liver Function Test (LFT)","Kidney Function Test (KFT)","Urine Routine",
-  "ESR","CRP","Dengue NS1 Antigen","Malaria Antigen Test",
-  "Widal Test","HIV Screening",
+  "Complete Blood Count (CBC)", "Blood Sugar Fasting", "Blood Sugar PP",
+  "HbA1c", "Lipid Profile", "Thyroid Profile (T3,T4,TSH)",
+  "Liver Function Test (LFT)", "Kidney Function Test (KFT)", "Urine Routine",
+  "ESR", "CRP", "Dengue NS1 Antigen", "Malaria Antigen Test",
+  "Widal Test", "HIV Screening", "Vitamin D Total", "Vitamin B12",
+  "Ferritin", "Iron Studies", "Blood Culture",
 ];
 
 export const SERVICE_SUGGESTIONS = [
-  "X-Ray Chest PA","X-Ray Right Knee AP/Lat","X-Ray Left Knee AP/Lat",
-  "USG Abdomen","USG Pelvis","USG Whole Abdomen",
-  "CT Brain Plain","CT Chest","MRI Lumbar Spine","MRI Brain",
-  "ECG 12 Lead","2D Echo","Pulmonary Function Test (PFT)",
-  "Bone Density Scan (DEXA)","Mammography",
+  "X-Ray Chest PA", "X-Ray Right Knee AP/Lat", "X-Ray Left Knee AP/Lat",
+  "USG Abdomen", "USG Pelvis", "USG Whole Abdomen",
+  "CT Brain Plain", "CT Chest", "MRI Lumbar Spine", "MRI Brain",
+  "ECG 12 Lead", "2D Echo", "Pulmonary Function Test (PFT)",
+  "Bone Density Scan (DEXA)", "Mammography", "Ultrasound Thyroid",
+  "Doppler Study", "Coronary Angiography",
 ];
 
-export const FREQUENCY_OPTIONS = ["Once daily (OD)","Twice daily (BD)","Three times (TID)","Four times (QID)","Every 6 hrs","Every 8 hrs","As needed (SOS)","At bedtime (HS)","Before food","After food"];
-export const DURATION_OPTIONS   = ["1 day","3 days","5 days","7 days","10 days","14 days","1 month","2 months","3 months","Continuous"];
-export const ROUTE_OPTIONS      = ["Oral","IV Injection","IM Injection","Topical","Inhaler","Sublingual","Ear drops","Eye drops","Nasal drops"];
-export const TIMING_OPTIONS     = ["Before food","After food","With food","Empty stomach","Bedtime only"];
+export const FREQUENCY_OPTIONS = ["Once daily (OD)", "Twice daily (BD)", "Three times (TID)", "Four times (QID)", "Every 6 hrs", "Every 8 hrs", "As needed (SOS)", "At bedtime (HS)", "Before food", "After food"];
+export const DURATION_OPTIONS = ["1 day", "3 days", "5 days", "7 days", "10 days", "14 days", "1 month", "2 months", "3 months", "Continuous"];
+export const ROUTE_OPTIONS = ["Oral", "IV Injection", "IM Injection", "Topical", "Inhaler", "Sublingual", "Ear drops", "Eye drops", "Nasal drops"];
+export const TIMING_OPTIONS = ["Before food", "After food", "With food", "Empty stomach", "Bedtime only"];

@@ -65,7 +65,11 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
       {open && (
         <div
           className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl overflow-hidden shadow-xl animate-fade-in"
-          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+          style={{ 
+            background: "var(--color-surface)", 
+            border: "1px solid var(--color-border)",
+            maxHeight: "480px",
+          }}
         >
           <div className="p-2 border-b" style={{ borderColor: "var(--color-border)", background: "var(--color-primary-muted)" }}>
             <div className="flex items-center gap-2 px-2">
@@ -81,12 +85,12 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
               />
             </div>
           </div>
-          <div className="max-h-64 overflow-y-auto">
+          <div className="max-h-120 overflow-y-auto">
             {filteredPatients.map((pt, i) => (
               <div
                 key={pt.id}
                 onClick={() => { onSelectPatient(pt); setOpen(false); setSearchTerm(""); }}
-                className="px-3 py-2 cursor-pointer transition-all hover:pl-4"
+                className="px-3 py-2.5 cursor-pointer transition-all hover:pl-4"
                 style={{
                   background: selectedPatient?.id === pt.id ? "var(--color-primary-muted)" : i % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
                   borderLeft: selectedPatient?.id === pt.id ? `3px solid var(--color-primary)` : "3px solid transparent",
