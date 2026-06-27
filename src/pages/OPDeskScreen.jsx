@@ -12,6 +12,7 @@ import ServiceTab from "./OPDeskScreen/ServiceTab";
 import FindingsTab from "./OPDeskScreen/FindingsTab";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
 import { MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
+import IPTimeSheetTab from "./OPDeskScreen/IPTimeSheetTab";
 
 export default function OPDeskScreen({ user, onLogout }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -28,6 +29,7 @@ export default function OPDeskScreen({ user, onLogout }) {
     diagnosis: "", clinicalNotes: "", advice: "",
     nextVisit: "", referTo: "", followupNote: "",
   });
+  const [ipEntries, setIpEntries] = useState([]);
   const [saved, setSaved] = useState(false);
 
   // Check window resize for tablet view
@@ -57,7 +59,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   };
 
   const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
-  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, findings: 0 };
+  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, findings: 0, iptime: ipEntries.length };
 
   const toggleRightPanel = () => {
     setIsRightPanelExpanded(!isRightPanelExpanded);
@@ -139,6 +141,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 {activeTab === "lab" && <LabTab labs={labs} setLabs={setLabs} patient={selectedPatient} />}
                 {activeTab === "services" && <ServiceTab services={services} setServices={setServices} patient={selectedPatient} />}
                 {activeTab === "findings" && <FindingsTab findings={findings} setFindings={setFindings} patient={selectedPatient} />}
+                {activeTab === "iptime" && <IPTimeSheetTab entries={ipEntries} setEntries={setIpEntries} patient={selectedPatient} />}
               </div>
             </div>
 

@@ -1,10 +1,14 @@
-import { Pill, FlaskConical, Settings as ServicesIcon, FileSearch } from "lucide-react";
+import { Pill, FlaskConical, Settings as ServicesIcon, FileSearch, Clock } from "lucide-react";
+
+const BURGUNDY = "#8e2a4c";
+const BURGUNDY_LIGHT = "#fbe7ee";
 
 const PRESCRIPTION_TABS = [
   { key: "drugs",    label: "Drug",     icon: Pill,          colorVar: "--color-drugs",    description: "Medication prescription" },
   { key: "lab",      label: "Lab",      icon: FlaskConical,  colorVar: "--color-lab",      description: "Lab investigations" },
   { key: "services", label: "Service",  icon: ServicesIcon,  colorVar: "--color-services", description: "Medical services" },
   { key: "findings", label: "Findings", icon: FileSearch,    colorVar: "--color-info",     description: "Clinical findings" },
+  { key: "iptime",   label: "IP Time",  icon: Clock,         colorVar: "--color-iptime",   description: "IP Time sheet" },
 ];
 
 export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, onClear, onSave }) {
@@ -13,7 +17,8 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
       drugs:    "var(--color-drugs)",
       lab:      "var(--color-lab)",
       services: "var(--color-services)",
-      findings: "var(--color-info)"
+      findings: "var(--color-info)",
+      iptime:   BURGUNDY
     };
     return colorMap[tabKey] || "var(--color-primary)";
   };
@@ -23,7 +28,8 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
       drugs:    "var(--color-drugs-light)",
       lab:      "var(--color-lab-light)",
       services: "var(--color-services-light)",
-      findings: "var(--color-info-light)"
+      findings: "var(--color-info-light)",
+      iptime:   BURGUNDY_LIGHT
     };
     return bgColorMap[tabKey] || "var(--color-primary-muted)";
   };
@@ -76,9 +82,6 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
                         </span>
                       )}
                     </div>
-                    {/* <div className="text-[0.6rem] hidden lg:block" style={{ color: "var(--color-text-muted)" }}>
-                      {tab.description}
-                    </div> */}
                   </div>
                 </div>
 

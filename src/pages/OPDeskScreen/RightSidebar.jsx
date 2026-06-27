@@ -211,7 +211,7 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
                 borderRight: isActive || isHovered ? `3px solid ${tab.color}` : "3px solid transparent",
               }}
             >
-              <div className="flex flex-col items-center justify-center py-2 px-1 gap-0.5">
+              <div className="flex flex-col items-center justify-center py-1.5 px-1 gap-0.5">
                 <div
                   className="p-1.5 rounded-lg transition-all duration-200"
                   style={{

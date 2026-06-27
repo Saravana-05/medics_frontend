@@ -193,7 +193,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
       }}>
         
         {/* Header Section with FULL background color */}
-        <div className="flex-shrink-0 px-4 py-[0.7rem] border-b flex justify-between items-center" style={{ 
+        <div className="flex-shrink-0 px-4 py-[0.44rem] border-b flex justify-between items-center" style={{ 
           background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
