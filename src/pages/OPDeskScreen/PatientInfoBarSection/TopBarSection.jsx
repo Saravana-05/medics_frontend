@@ -31,20 +31,20 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <ClipboardList size={14} />
                 OP List
               </button>
-              <button
-                onClick={onPark}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-semibold transition-all hover:shadow-sm"
-                style={{
-                  borderRadius: 0,
-                  background: "var(--color-lab-light)",
-                  color: "var(--color-lab)"
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "#fde68a"}
-                onMouseLeave={e => e.currentTarget.style.background = "var(--color-lab-light)"}
-              >
-                <ParkingCircle size={14} />
-                Park
-              </button>
+             <button
+  onClick={onPark}
+  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-semibold transition-all hover:shadow-sm"
+  style={{
+    borderRadius: 0,
+    background: "#fbbf24",
+    color: "#78350f"
+  }}
+  onMouseEnter={e => e.currentTarget.style.background = "#f59e0b"}
+  onMouseLeave={e => e.currentTarget.style.background = "#fbbf24"}
+>
+  <ParkingCircle size={14} />
+  Park
+</button>
             </div>
 
             {/* Pair 2: IP List + Finalize */}
@@ -63,20 +63,20 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <BedDouble size={14} />
                 IP List
               </button>
-              <button
-                onClick={onFinalize}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-bold transition-all shadow-sm"
-                style={{
-                  borderRadius: 0,
-                  background: "var(--color-primary)",
-                  color: "white"
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--color-primary-light)"}
-                onMouseLeave={e => e.currentTarget.style.background = "var(--color-primary)"}
-              >
-                <Save size={14} />
-                Finalize
-              </button>
+             <button
+  onClick={onFinalize}
+  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-bold transition-all shadow-sm"
+  style={{
+    borderRadius: 0,
+    background: "#16a34a",
+    color: "white"
+  }}
+  onMouseEnter={e => e.currentTarget.style.background = "#15803d"}
+  onMouseLeave={e => e.currentTarget.style.background = "#16a34a"}
+>
+  <Save size={14} />
+  Finalize
+</button>
             </div>
 
           </div>
