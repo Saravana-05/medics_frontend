@@ -6,6 +6,14 @@ import VitalSignsSection from "./VitalSignsSection";
 import TopBarSection from "./TopBarSection";
 import ClinicalInformationSection from "./ClinicalInformationSection";
 
+// Keys must match LeftSidebar's LEFT_TABS keys, in the same top-to-bottom order.
+const LEFT_ACCENT_SEGMENTS = [
+  { key: "patientInfo",    color: "#eb6367" },
+  { key: "chronicAllergy", color: "#73bfb8" },
+  { key: "patientFamily",  color: "#679cbc" },
+  { key: "period",         color: "#0c324a" },
+];
+
 export default function PatientInfoBar({
   patients,
   selectedPatient,
@@ -13,6 +21,8 @@ export default function PatientInfoBar({
   onIPList,
   onPark,
   onFinalize,
+  highlightedTab, // comes from OPDeskScreen (via RightSidebar's onHoverChange)
+  leftHighlightedTab, // comes from OPDeskScreen (via LeftSidebar's onHoverChange)
 }) {
   const [open, setOpen] = useState(false);
   const [opList, setOpList] = useState(false);
@@ -25,7 +35,25 @@ export default function PatientInfoBar({
         {/* ── Main Content Area ── */}
         {/* Stacks vertically on tablet/mobile, side-by-side from lg up */}
         <div className="flex flex-col lg:flex-row">
-          
+
+          {/* Left accent bar — mirrors the right one; a segment shows only while
+              its matching LeftSidebar tab is hovered. Desktop only. */}
+          <div className="hidden lg:flex flex-col flex-shrink-0" style={{ width: "5px" }}>
+            {LEFT_ACCENT_SEGMENTS.map((seg, i) => (
+              <div
+                key={seg.key}
+                style={{
+                  height: "52px",
+                  flexShrink: 0,
+                  background: seg.color,
+                  borderBottom: i < LEFT_ACCENT_SEGMENTS.length - 1 ? "2px solid var(--color-surface)" : "none",
+                  opacity: leftHighlightedTab === seg.key ? 1 : 0,
+                  transition: "opacity 150ms ease",
+                }}
+              />
+            ))}
+          </div>
+
           {/* ── Left Patient Section Component ── */}
           <LeftPatientSection
             patients={patients}
@@ -53,7 +81,15 @@ export default function PatientInfoBar({
                 className="w-full lg:w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l"
                 style={{ borderColor: "var(--color-border)" }}
               >
-                <TopBarSection patient={p} onPark={onPark} onFinalize={onFinalize}  onOPList={() => {}}  onIPList={onIPList}/>
+                <TopBarSection
+                  patient={p}
+                  onPark={onPark}
+                  onFinalize={onFinalize}
+                  onOPList={() => {}}
+                  onIPList={onIPList}
+                  onSelectPatient={onSelectPatient}
+                  highlightedTab={highlightedTab}
+                />
               </div>
             )}
             

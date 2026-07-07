@@ -19,9 +19,10 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState("drugs");
   const [leftPanel, setLeftPanel] = useState(null);
   const [rightPanel, setRightPanel] = useState(null);
+  const [highlightedTab, setHighlightedTab] = useState(null);
+  const [leftHighlightedTab, setLeftHighlightedTab] = useState(null);
   const [isRightPanelExpanded, setIsRightPanelExpanded] = useState(false);
   const [isTabletView, setIsTabletView] = useState(window.innerWidth < 1024);
-
   const [drugs, setDrugs] = useState([]);
   const [labs, setLabs] = useState([]);
   const [services, setServices] = useState([]);
@@ -85,7 +86,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           internally, so the main workspace below always keeps usable space. */}
       <div className="flex-shrink-0 flex max-h-[50vh] overflow-y-auto lg:max-h-none lg:overflow-visible">
         <div className="flex-shrink-0">
-          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} />
+          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} />
         </div>
 
         <div className="flex-1">
@@ -97,11 +98,13 @@ export default function OPDeskScreen({ user, onLogout }) {
             onIPList={() => {}}
             onPark={() => {}}
             onFinalize={handleSave}
+            highlightedTab={highlightedTab}
+            leftHighlightedTab={leftHighlightedTab}
           />
         </div>
 
         <div className="flex-shrink-0">
-          <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} />
+          <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 import { Pill, FlaskConical, Settings as ServicesIcon, FileSearch, Clock } from "lucide-react";
 
 const BURGUNDY = "#8e2a4c";
-const BURGUNDY_LIGHT = "#fbe7ee";
 
 const PRESCRIPTION_TABS = [
   { key: "drugs",    label: "Drug",     icon: Pill,          colorVar: "--color-drugs",    description: "Medication prescription" },
@@ -23,26 +22,17 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
     return colorMap[tabKey] || "var(--color-primary)";
   };
 
-  const getDefaultBgColor = (tabKey) => {
-    const bgColorMap = {
-      drugs:    "var(--color-drugs-light)",
-      lab:      "var(--color-lab-light)",
-      services: "var(--color-services-light)",
-      findings: "var(--color-info-light)",
-      iptime:   BURGUNDY_LIGHT
-    };
-    return bgColorMap[tabKey] || "var(--color-primary-muted)";
-  };
+  // Translucent tint of a color token (works with both var(--…) and hex).
+  const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
 
   return (
     <div className="flex-shrink-0" style={{ background: "var(--color-surface)", borderBottom: "1px solid var(--color-border)" }}>
       <div className="flex items-center justify-between px-2">
         {/* Tab Buttons */}
-        <div className="flex gap-1">
+        <div className="flex items-center gap-0.5 py-1.5">
           {PRESCRIPTION_TABS.map(tab => {
             const isActive = activeTab === tab.key;
             const activeColor = getActiveTabColor(tab.key);
-            const defaultBgColor = getDefaultBgColor(tab.key);
             const Icon = tab.icon;
             const count = tabCount?.[tab.key];
 
@@ -50,44 +40,26 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className="relative px-4 py-3 transition-all duration-200 group"
+                className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200"
                 style={{
-                  background: defaultBgColor,
-                  opacity: 1,
-                  borderBottom: isActive ? `2px solid ${activeColor}` : "2px solid transparent",
-                  borderRadius: "8px 8px 0 0",
+                  background: isActive ? tint(activeColor, "12%") : "transparent",
+                  color: isActive ? activeColor : "var(--color-text-muted)",
                 }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--color-surface-alt)"; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
               >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="p-1 rounded-lg transition-all group-hover:scale-110"
-                    style={{ background: `${activeColor}20` }}
+                <Icon
+                  size={14}
+                  style={{ color: isActive ? activeColor : "var(--color-text-subtle)" }}
+                />
+                <span className="whitespace-nowrap">{tab.label}</span>
+                {count > 0 && (
+                  <span
+                    className="flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[0.55rem] font-bold leading-none text-white"
+                    style={{ background: isActive ? activeColor : "var(--color-text-subtle)" }}
                   >
-                    <Icon size={16} style={{ color: activeColor }} />
-                  </div>
-                  <div className="text-left">
-                    <div className="flex items-center gap-1">
-                      <span
-                        className="text-sm font-semibold"
-                        style={{ color: isActive ? activeColor : "var(--color-text-base)" }}
-                      >
-                        {tab.label}
-                      </span>
-                      {count > 0 && (
-                        <span
-                          className="px-1.5 py-0.5 rounded-full text-[0.6rem] font-bold text-white"
-                          style={{ background: activeColor }}
-                        >
-                          {count}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Active bottom indicator - only visible when active */}
-                {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: activeColor }} />
+                    {count}
+                  </span>
                 )}
               </button>
             );

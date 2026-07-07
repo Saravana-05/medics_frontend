@@ -17,7 +17,7 @@ export default function ViewNurseModal({ nurse, onClose }) {
       case "Evening": return "#c2410c";
       case "Night": return "#4338ca";
       case "Rotational": return "#059669";
-      case "On Call": return "#dc2626";
+      case "On Call": return "var(--color-danger)";
       default: return "#6b7280";
     }
   };

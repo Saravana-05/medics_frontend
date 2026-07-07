@@ -8,7 +8,7 @@ function PeriodPanel({ patient, panelHeight }) {
   const [toDate, setToDate] = useState("");
   const [showCustomRange, setShowCustomRange] = useState(false);
 
-  const headerH = 36;
+  const headerH = 50;
 
   // Generate years from 2022 to current year
   const years = [];
@@ -70,29 +70,31 @@ function PeriodPanel({ patient, panelHeight }) {
 
   return (
     <div
-      className="overflow-hidden rounded-lg shadow-xl"
+      className="overflow-hidden rounded-lg shadow-xl flex flex-col"
       style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}
     >
-      <div className="px-3 py-2 border-b flex items-center justify-between" 
-        style={{ background: "#f0d8b0", borderColor: "#d8c080", height: headerH, flexShrink: 0 }}>
+      <div className="px-3 py-2 border-b flex items-center justify-between"
+        style={{ background: "#0c324a", borderColor: "var(--color-border)", height: headerH, flexShrink: 0 }}>
         <div className="flex items-center gap-2">
-          <Calendar size={16} style={{ color: "#5a3a00" }} />
-          <span className="text-xs font-bold" style={{ color: "#5a3a00" }}>Visit Period</span>
+          {/* <Calendar size={16} style={{ color: "#ffffff" }} /> */}
+          <span className="text-md font-bold text-white" style={{ color: "#ffffff" }}>Visit Period</span>
         </div>
+        
+      </div>
+      
+      {/* Second row — period selector controls (light-grey divider + drop shadow) */}
+      <div className="p-3 flex-shrink-0" style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}>
         <button
           onClick={() => setShowCustomRange(!showCustomRange)}
-          className="text-[0.6rem] font-semibold px-2 py-1 rounded transition-all hover:bg-white/50"
-          style={{ 
-            background: showCustomRange ? "#5a3a00" : "var(--color-surface)",
-            color: showCustomRange ? "white" : "#5a3a00",
-            border: "1px solid #d8c080"
+          className="text-[0.6rem] font-semibold px-2 py-1 rounded transition-all"
+          style={{
+            background: showCustomRange ? "rgba(255,255,255,0.2)" : "var(--color-surface)",
+            color: showCustomRange ? "#ffffff" : "#0c324a",
+            border: "1px solid rgba(255,255,255,0.4)"
           }}
         >
           {showCustomRange ? "Year View" : "Custom Range"}
         </button>
-      </div>
-      
-      <div className="overflow-y-auto p-3" style={{ height: panelHeight - headerH }}>
         {/* Year Selector or Custom Range */}
         {!showCustomRange ? (
           // Year Selector - Display years from 2022 to current
@@ -172,7 +174,7 @@ function PeriodPanel({ patient, panelHeight }) {
                 <button
                   onClick={handleClearCustomRange}
                   className="px-3 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca" }}
+                  style={{ background: "#fee2e2", color: "var(--color-danger)", border: "1px solid #fecaca" }}
                 >
                   <X size={12} /> Clear
                 </button>
@@ -185,9 +187,11 @@ function PeriodPanel({ patient, panelHeight }) {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Results */}
-        <div className="mt-4 pt-3 border-t" style={{ borderColor: "var(--color-border)" }}>
+      {/* Body — visit results only */}
+      <div className="overflow-y-auto p-3 flex-1">
+        <div>
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs font-semibold" style={{ color: "var(--color-text-base)" }}>
               {currentVisits.length} Visit{currentVisits.length !== 1 ? 's' : ''} Found

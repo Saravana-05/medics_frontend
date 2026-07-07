@@ -10,7 +10,7 @@ const MOCK_REPORTS = [
 ];
 
 function ReportsPanel({ panelHeight }) {
-  const headerH = 48;
+  const headerH = 50;
   const [selectedDate, setSelectedDate] = useState("");
   const [filteredReports, setFilteredReports] = useState(MOCK_REPORTS);
 
@@ -27,26 +27,32 @@ function ReportsPanel({ panelHeight }) {
     if (type === "Lab") {
       return { bg: "var(--color-lab-light)", color: "var(--color-lab)" };
     }
-    return { bg: "#e3f0fc", color: "var(--color-services)" };
+    return { bg: "var(--color-services-light)", color: "var(--color-services)" };
   };
 
   return (
     <div className="overflow-hidden rounded-lg shadow-xl"
       style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b flex items-center justify-between"
-        style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: headerH }}>
+        style={{ background: "#679cbc", borderColor: "var(--color-border)", height: headerH }}>
         <div className="flex items-center gap-2">
-          <FileText size={16} style={{ color: "var(--color-primary)" }} />
-          <span className="text-xs font-bold" style={{ color: "var(--color-primary-dark)" }}>Patient Reports</span>
+          {/* <FileText size={16} style={{ color: "var(--color-primary)" }} /> */}
+          <span className="text-md font-bold text-white" >Patient Reports</span>
         </div>
+
+      </div>
+      <div
+        className="px-3 py-2 flex justify-end"
+        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}
+      >
         <div className="relative">
-          <Calendar size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+          <Calendar size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => handleDateFilter(e.target.value)}
-            className="pl-7 pr-2 py-1 text-xs rounded border"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="pl-9 pr-3 text-sm rounded-lg border"
+            style={{ height: 40, borderColor: "var(--color-border)", background: "var(--color-surface)" }}
             placeholder="Filter by date"
           />
         </div>
@@ -71,7 +77,7 @@ function ReportsPanel({ panelHeight }) {
                   <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.report}</div>
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ background: item.status === "Pending" ? "#fef3e2" : "#e6f5f0", color: item.status === "Pending" ? "#b45309" : "#1a7f5a" }}>
+                  style={{ background: item.status === "Pending" ? "var(--color-lab-light)" : "var(--color-drugs-light)", color: item.status === "Pending" ? "var(--color-lab)" : "var(--color-drugs)" }}>
                   {item.status}
                 </span>
               </div>

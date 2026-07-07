@@ -15,7 +15,7 @@ const Dashboard = ({ patients }) => {
       title: "Today's Appointments", 
       value: 12, 
       icon: Calendar, 
-      color: "#8b5cf6",
+      color: "var(--color-vital-height)",
       bg: "bg-purple-50"
     },
     { 
@@ -29,7 +29,7 @@ const Dashboard = ({ patients }) => {
       title: "Pending Registrations", 
       value: 3, 
       icon: Clock, 
-      color: "#f59e0b",
+      color: "var(--color-warning)",
       bg: "bg-yellow-50"
     },
   ];

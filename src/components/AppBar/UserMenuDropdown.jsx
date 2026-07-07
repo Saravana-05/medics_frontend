@@ -9,7 +9,7 @@ import HelpPopup     from "./HelpPopup";
 
 const MENU_ITEMS = [
   { key: "profile",  icon: User,        label: "My Profile",     color: "var(--color-primary)"  },
-  { key: "settings", icon: Settings,    label: "Settings",        color: "#8b5cf6"               },
+  { key: "settings", icon: Settings,    label: "Settings",        color: "var(--color-vital-height)"               },
   { key: "help",     icon: HelpCircle,  label: "Help & Support",  color: "var(--color-success)"  },
 ];
 

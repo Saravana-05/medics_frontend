@@ -1,18 +1,45 @@
+
 import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet } from "lucide-react";
 
-/* ── Compact Badge (tablet / mobile) — now with colored bg for ALL vitals ── */
-function VitalBadge({ icon: Icon, value, color, unit }) {
+/* Fonts (Inter) are loaded globally in index.html + registered in the Tailwind
+   theme (index.css). Colors below come from the shared design tokens. */
+
+/* ── Value text stays blue for all vitals ── */
+const VALUE_COLOR = "var(--color-value)";
+
+/* ── Per-vital accent colors (registered as tokens in index.css @theme) ── */
+const VITAL_ACCENTS = {
+  bp: "var(--color-vital-bp)",
+  temp: "var(--color-vital-temp)",
+  pulse: "var(--color-vital-pulse)",
+  spo2: "var(--color-vital-spo2)",
+  blood: "var(--color-vital-blood)",
+  height: "var(--color-vital-height)",
+  weight: "var(--color-vital-weight)",
+};
+
+/* Translucent tint of a token color (works with CSS variables). pct like "15%". */
+const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
+
+/* ── Compact Badge (tablet / mobile) — solid vital-colored bg for ALL vitals ── */
+function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
   return (
     <div
       className="flex items-center gap-1 px-2 py-0.5 rounded-full flex-shrink-0"
-      style={{ background: `${color}18`, border: `1px solid ${color}35` }}
+      style={{ background: accent }}
     >
-      <Icon size={11} style={{ color }} />
-      <span className="text-xs font-bold whitespace-nowrap" style={{ color }}>
+      <Icon size={11} style={{ color: "#ffffff" }} />
+      <span
+        className="text-xs font-bold whitespace-nowrap"
+        style={{ color: "#ffffff", fontFamily: "var(--font-inter)" }}
+      >
         {value || "—"}
       </span>
       {unit && (
-        <span className="text-[0.6rem] whitespace-nowrap" style={{ color: "#000000" }}>
+        <span
+          className="text-[0.6rem] whitespace-nowrap"
+          style={{ color: "rgba(255,255,255,0.85)", fontFamily: "var(--font-inter)" }}
+        >
           {unit}
         </span>
       )}
@@ -21,31 +48,46 @@ function VitalBadge({ icon: Icon, value, color, unit }) {
 }
 
 /* ── Vital Sign Card (Compact, desktop) ── */
-function VitalSignCard({ icon: Icon, value, label, color, unit, trend }) {
+function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, trend }) {
   return (
     <div
-      className="relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105"
-      style={{ background: "var(--color-surface)", border: `1px solid ${color}20` }}
+      className="group relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105"
+      style={{ background: "var(--color-surface)", border: `1px solid ${tint(accent, "20%")}` }}
     >
       <div className="flex items-center justify-between">
         <div>
           <div
-            className="text-[0.48rem] font-bold uppercase tracking-wide mb-0.5"
-            style={{ color: "var(--color-text-muted)" }}
+            className="text-[0.58rem] uppercase tracking-wide mb-0.5"
+            style={{ color: "darkslategray",fontWeight: "600", letterSpacing: "0.1em", fontFamily: "var(--font-inter)" }}
           >
             {label}
           </div>
-          <div className="text-sm font-black leading-tight" style={{ color }}>
+          <div 
+            className="text-sm font-black leading-tight" 
+            style={{ color: valueColor,letterSpacing: "0.05em", fontWeight: "600", fontFamily: "var(--font-inter)" }}
+          >
             {value || "—"}
           </div>
           {unit && (
-            <div className="text-[0.65rem] mt-0.5" style={{ color: "#000000" }}>
+            <div 
+              className="text-[0.80rem] font-regular mt-0.5" 
+              style={{ color: "#000000", fontFamily: "var(--font-inter)" }}
+            >
               {unit}
             </div>
           )}
         </div>
-        <div className="p-1 rounded-lg" style={{ background: `${color}15` }}>
-          <Icon size={14} style={{ color }} />
+        <div
+          className="flex items-center justify-center rounded-full flex-shrink-0 transition-transform group-hover:scale-110"
+          style={{
+            width: 26,
+            height: 26,
+            background: tint(accent, "15%"),
+            border: `1px solid ${tint(accent, "30%")}`,
+            boxShadow: `0 1px 3px ${tint(accent, "25%")}`,
+          }}
+        >
+          <Icon size={16} style={{ color: accent, opacity: 2.8 }} />
         </div>
       </div>
       {trend && (
@@ -57,8 +99,8 @@ function VitalSignCard({ icon: Icon, value, label, color, unit, trend }) {
         </div>
       )}
       <div
-        className="absolute top-0 right-0 w-16 h-16 -mr-6 -mt-6 rounded-full opacity-10"
-        style={{ background: color }}
+        className="absolute top-0 right-0 w-16 h-16 -mr-6 -mt-6 rounded-full opacity-20"
+        style={{ background: accent }}
       />
     </div>
   );
@@ -90,80 +132,72 @@ export default function VitalSignsSection({ patient }) {
   const bmiValue    = calculateBMI();
   const bmiCategory = getBMICategory(bmiValue);
 
-  /* ── Blood group colour ── */
-  const getBloodGroupColor = (bg) => {
-    if (!bg || bg === "—") return "var(--color-text-muted)";
-    const g = bg.toUpperCase();
-    if (g.includes("AB+")) return "#9333ea";
-    if (g.includes("AB-")) return "#7e22ce";
-    if (g.includes("A+"))  return "#dc2626";
-    if (g.includes("A-"))  return "#b91c1c";
-    if (g.includes("B+"))  return "#16a34a";
-    if (g.includes("B-"))  return "#15803d";
-    if (g.includes("O+"))  return "#2563eb";
-    if (g.includes("O-"))  return "#1d4ed8";
-    return "var(--color-text-muted)";
-  };
-
-  const bloodGroupColor = getBloodGroupColor(p.bloodGroup);
-
   /* ── Shared vital definitions so both views stay in sync ──
-     All colors are plain hex so template-literal bg opacity (e.g. `${color}18`)
-     works correctly for every badge and card.                              */
+     accent = per-vital color for icon + badge/card background & border
+     valueColor = shared blue used for every value's text                */
   const vitals = [
     {
       icon: ActivitySquare,
       value: `${p.bpSystolic || 145}/${p.bpDiastolic || 90}`,
       label: "BP",
-      color: "#ef4444",   // red   — maps to --color-danger
+      accent: VITAL_ACCENTS.bp,
+      valueColor: VALUE_COLOR,
       unit: "mmHg",
     },
     {
       icon: Thermometer,
       value: p.temp || "101.2",
       label: "Temp",
-      color: "#f97316",   // amber-orange
+      accent: VITAL_ACCENTS.temp,
+      valueColor: VALUE_COLOR,
       unit: "°F",
     },
     {
       icon: Heart,
       value: p.pulse || "95",
       label: "Pulse",
-      color: "#6366f1",   // indigo — maps to --color-primary (adjust if yours differs)
+      accent: VITAL_ACCENTS.pulse,
+      valueColor: VALUE_COLOR,
       unit: "bpm",
     },
     {
       icon: Wind,
       value: p.oxygenLevel || "98",
       label: "SpO₂",
-      color: "#06b6d4",   // cyan
+      accent: VITAL_ACCENTS.spo2,
+      valueColor: VALUE_COLOR,
       unit: "%",
     },
     {
       icon: Droplet,
       value: p.bloodGroup || "—",
       label: "Blood",
-      color: bloodGroupColor.startsWith("var(") ? "#6b7280" : bloodGroupColor,
+      accent: VITAL_ACCENTS.blood,
+      valueColor: VALUE_COLOR,
+      unit: "blood ",
     },
     {
       icon: Ruler,
       value: p.height || "68",
       label: "Height",
-      color: "#8b5cf6",   // violet — maps to --color-drugs
+      accent: VITAL_ACCENTS.height,
+      valueColor: VALUE_COLOR,
       unit: "cm",
     },
     {
       icon: Weight,
       value: p.weight || "86",
       label: "Weight",
-      color: "#0ea5e9",   // sky blue — maps to --color-role-office
+      accent: VITAL_ACCENTS.weight,
+      valueColor: VALUE_COLOR,
       unit: "kg",
     },
     {
       icon: Calculator,
       value: bmiValue,
       label: "BMI",
-      color: bmiCategory.color.startsWith("var(") ? "#6b7280" : bmiCategory.color,
+      accent: bmiCategory.color.startsWith("var(") ? "#6b7280" : bmiCategory.color,
+      valueColor: VALUE_COLOR,
       unit: bmiCategory.label,
     },
   ];
@@ -172,7 +206,7 @@ export default function VitalSignsSection({ patient }) {
     <div
       className="px-3 border-b"
       /* Tablet/mobile: tighter vertical padding. Desktop: normal. */
-      style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}
+      style={{ borderColor: "var(--color-border)", background: "#AAB2BD" }}
     >
       {/* ── Tablet / Mobile ──
           • Header is HIDDEN (no ActivitySquare title row)
@@ -184,7 +218,8 @@ export default function VitalSignsSection({ patient }) {
             key={v.label}
             icon={v.icon}
             value={v.value}
-            color={v.color}
+            accent={v.accent}
+            valueColor={v.valueColor}
             unit={v.unit}
           />
         ))}
@@ -198,7 +233,7 @@ export default function VitalSignsSection({ patient }) {
           <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
           <span
             className="text-[0.6rem] font-bold uppercase tracking-wide"
-            style={{ color: "var(--color-text-muted)" }}
+            style={{ color: "var(--color-text-base)", fontFamily: "var(--font-archivo)" }}
           >
             Vital Signs
           </span>
@@ -211,7 +246,8 @@ export default function VitalSignsSection({ patient }) {
               icon={v.icon}
               value={v.value}
               label={v.label}
-              color={v.color}
+              accent={v.accent}
+              valueColor={v.valueColor}
               unit={v.unit}
             />
           ))}

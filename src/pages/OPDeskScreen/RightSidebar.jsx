@@ -1,62 +1,43 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { 
-  ParkingCircle, AlertTriangle, FileText, CalendarClock
-} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { X } from "lucide-react";
 import ParkedPatientsPanel from "./ParkedPatientsPanel";
 import EmergencyPatientsPanel from "./EmergencyPatientsPanel";
 import ReportsPanel from "./ReportsPanel";
 import SchedulePanel from "./SchedulePanel";
 
 const RIGHT_TABS = [
-  { 
-    key: "parked", 
-    label: "Parked", 
-    icon: ParkingCircle,
-    color: "var(--color-warning)",
-    lightColor: "#fef3e2",
-    defaultBg: "#d97706",
-    defaultIconColor: "white",
-    badge: "3"
+  {
+    key: "parked",
+    label: "Parked",
+    color: "#eb6367",
   },
-  { 
-    key: "emergency", 
-    label: "Emergency", 
-    icon: AlertTriangle,
-    color: "var(--color-danger)",
-    lightColor: "#fee2e2",
-    defaultBg: "#dc2626",
-    defaultIconColor: "white",
-    badge: "2"
+  {
+    key: "emergency",
+    label: "Emergency",
+    color: "#73bfb8",
   },
-  { 
-    key: "reports", 
-    label: "Reports", 
-    icon: FileText,
-    color: "var(--color-primary)",
-    lightColor: "var(--color-primary-muted)",
-    defaultBg: "var(--color-primary)",
-    defaultIconColor: "white",
-    badge: "5"
+  {
+    key: "reports",
+    label: "Reports",
+    color: "#679cbc",
   },
-  { 
-    key: "schedule", 
-    label: "Schedule", 
-    icon: CalendarClock,
-    color: "var(--color-drugs)",
-    lightColor: "var(--color-drugs-light)",
-    defaultBg: "var(--color-drugs)",
-    defaultIconColor: "white",
-    badge: "8"
+  {
+    key: "schedule",
+    label: "Schedule",
+    color: "#0c324a",
   },
 ];
 
 // ── Shared dimensions ───────────────────────────────────────────────
 const PANEL_WIDTH   = 360;
-const SIDEBAR_WIDTH = 48;
+const SIDEBAR_WIDTH = 78;
 const GAP           = 8;
 const BOTTOM_MARGIN = 16;
 
-export default function RightSidebar({ activePanel, onPanelChange }) {
+// Translucent tint of a token color (works with CSS variables). pct like "14%".
+const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
+
+export default function RightSidebar({ activePanel, onPanelChange, onHoverChange }) {
   const [hoveredKey,  setHoveredKey]  = useState(null);
   const [panelTop,    setPanelTop]    = useState(0);
   const [panelHeight, setPanelHeight] = useState(480);
@@ -66,7 +47,6 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
 
   const sidebarRef = useRef(null);
   const popupRef   = useRef(null);
-  const hideTimer  = useRef(null);
 
   const isTabletView = viewportWidth < 1024;
   const effectivePanelWidth = Math.min(PANEL_WIDTH, viewportWidth - SIDEBAR_WIDTH - GAP * 2);
@@ -77,11 +57,17 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const visibleKey = isTabletView ? activePanel : hoveredKey;
+  const visibleKey = activePanel;
 
-  // Tap outside to close on tablet
+  // Notify parent of the HOVERED tab only, so TopBarSection's accent bar
+  // shows solely on hover (panels themselves still open on click).
   useEffect(() => {
-    if (!isTabletView || !activePanel) return;
+    onHoverChange && onHoverChange(hoveredKey);
+  }, [hoveredKey, onHoverChange]);
+
+  // Click outside to close (panels are click-to-open now)
+  useEffect(() => {
+    if (!activePanel) return;
     const handleOutside = (e) => {
       if (
         popupRef.current && !popupRef.current.contains(e.target) &&
@@ -96,34 +82,9 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
       document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("touchstart", handleOutside);
     };
-  }, [isTabletView, activePanel, onPanelChange]);
+  }, [activePanel, onPanelChange]);
 
-  const clearHideTimer = () => {
-    if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; }
-  };
-
-  const scheduleHide = useCallback(() => {
-    clearHideTimer();
-    hideTimer.current = setTimeout(() => setHoveredKey(null), 150);
-  }, []);
-
-  const handleIconMouseEnter = (e, key) => {
-    clearHideTimer();
-    const sidebarRect = sidebarRef.current?.getBoundingClientRect();
-    const anchorTop   = sidebarRect ? sidebarRect.top : e.currentTarget.getBoundingClientRect().top;
-    const viewportH   = window.innerHeight || 800;
-    const available   = viewportH - anchorTop - BOTTOM_MARGIN;
-
-    setPanelTop(anchorTop);
-    setPanelHeight(Math.max(200, available));
-    setHoveredKey(key);
-  };
-
-  const handleIconMouseLeave  = () => scheduleHide();
-  const handlePanelMouseEnter = () => clearHideTimer();
-  const handlePanelMouseLeave = () => scheduleHide();
-
-  // Tap handler: computes panel geometry AND toggles activePanel (used on tablet)
+  // Click handler: computes panel geometry AND toggles activePanel
   const handleTabActivate = (e, tab) => {
     const sidebarRect = sidebarRef.current?.getBoundingClientRect();
     const anchorTop   = sidebarRect ? sidebarRect.top : e.currentTarget.getBoundingClientRect().top;
@@ -146,7 +107,7 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
 
     const wrapperStyle = {
       position: "fixed",
-      zIndex:   50,
+      zIndex:   80,
       top:      panelTop,
       left:     panelLeft,
       width:    effectivePanelWidth,
@@ -155,30 +116,41 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
 
     let content = null;
     switch (visibleKey) {
-      case "parked":    
-        content = <ParkedPatientsPanel panelHeight={panelHeight} />; 
+      case "parked":
+        content = <ParkedPatientsPanel panelHeight={panelHeight} />;
         break;
-      case "emergency": 
-        content = <EmergencyPatientsPanel panelHeight={panelHeight} />; 
+      case "emergency":
+        content = <EmergencyPatientsPanel panelHeight={panelHeight} />;
         break;
-      case "reports":   
-        content = <ReportsPanel panelHeight={panelHeight} />; 
+      case "reports":
+        content = <ReportsPanel panelHeight={panelHeight} />;
         break;
-      case "schedule":  
-        content = <SchedulePanel panelHeight={panelHeight} />; 
+      case "schedule":
+        content = <SchedulePanel panelHeight={panelHeight} />;
         break;
-      default: 
+      default:
         return null;
     }
 
     return (
-      <div
-        ref={popupRef}
-        style={wrapperStyle}
-        onMouseEnter={handlePanelMouseEnter}
-        onMouseLeave={handlePanelMouseLeave}
-      >
+      <div ref={popupRef} style={wrapperStyle}>
         {content}
+        <button
+          onClick={() => onPanelChange(null)}
+          aria-label="Close panel"
+          className="absolute flex items-center justify-center rounded-full active:scale-90 transition-transform"
+          style={{
+            top: 10,
+            right: 10,
+            width: 30,
+            height: 30,
+            background: "rgba(255,255,255,0.92)",
+            color: "var(--color-text-base)",
+            boxShadow: "0 1px 5px rgba(0,0,0,0.25)",
+          }}
+        >
+          <X size={17} />
+        </button>
       </div>
     );
   };
@@ -187,60 +159,62 @@ export default function RightSidebar({ activePanel, onPanelChange }) {
     <>
       <div
         ref={sidebarRef}
-        className="flex flex-col flex-shrink-0"
+        className="flex flex-col flex-shrink-0 items-center"
         style={{
           width: `${SIDEBAR_WIDTH}px`,
-          background: "linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-alt) 100%)",
+          background: "var(--color-surface)",
           borderLeft: "1px solid var(--color-border)",
         }}
       >
-        {RIGHT_TABS.map(tab => {
-          const IconComponent = tab.icon;
+        {RIGHT_TABS.map((tab) => {
           const isActive  = activePanel === tab.key;
-          const isHovered = hoveredKey  === tab.key;
+          const isLit     = isActive;
 
           return (
             <div
               key={tab.key}
               onClick={(e) => handleTabActivate(e, tab)}
-              onMouseEnter={(e) => handleIconMouseEnter(e, tab.key)}
-              onMouseLeave={handleIconMouseLeave}
-              className="relative cursor-pointer transition-all duration-200 group"
+              onMouseEnter={() => setHoveredKey(tab.key)}
+              onMouseLeave={() => setHoveredKey(null)}
+              className="relative cursor-pointer flex items-center justify-center w-full active:scale-95 transition-transform"
               style={{
-                background: "transparent",
-                borderRight: isActive || isHovered ? `3px solid ${tab.color}` : "3px solid transparent",
+                minHeight: "52px",
+                background: tab.color,
+                opacity: isLit ? 1 : 0.92,
+                borderBottom: "2px solid var(--color-surface)",
+                boxShadow: isActive ? "inset 0 0 0 2px rgba(255,255,255,0.85)" : "none",
               }}
             >
-              <div className="flex flex-col items-center justify-center py-1.5 px-1 gap-0.5">
-                <div
-                  className="p-1.5 rounded-lg transition-all duration-200"
-                  style={{
-                    background: tab.defaultBg || "transparent",
-                    transform: isHovered && !isActive ? "scale(1.1)" : "scale(1)",
-                  }}
-                >
-                  <IconComponent
-                    size={18}
-                    style={{ color: tab.defaultIconColor || "var(--color-text-muted)" }}
-                  />
-                </div>
-                <span 
-                  className="text-[0.55rem] font-semibold text-center leading-tight"
-                  style={{ 
-                    color: isActive || isHovered ? tab.color : "var(--color-text-muted)",
-                  }}
-                >
-                  {tab.label}
-                </span>
-              </div>
-
-              {tab.badge && (
-                <div className="absolute top-1 right-1 w-2 h-2 rounded-full"
-                  style={{ background: tab.color }} />
-              )}
+              <span
+  className="text-center leading-tight px-1"
+  style={{
+    fontSize: "0.78rem",
+    fontWeight: isLit ? 700 : 600,
+    color: "#ffffff",
+    letterSpacing: "0.05em",
+    textShadow: isLit
+      ? "0 3px 3px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.3)"
+      : "0 3px 2px rgba(0, 0, 0, 0.35)",
+  }}
+>
+  {tab.label}
+</span>
             </div>
           );
         })}
+
+        <div className="flex-1" />
+
+        {/* <div
+          className="flex items-center justify-center rounded-lg cursor-pointer transition-all duration-150"
+          style={{ width: "36px", height: "36px" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-surface-alt)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+        >
+          <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--color-text-muted)", lineHeight: 1 }}>
+            +
+          </span>
+        </div> */}
       </div>
 
       {renderPopup()}

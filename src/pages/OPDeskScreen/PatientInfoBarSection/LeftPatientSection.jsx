@@ -170,9 +170,15 @@ export default function LeftPatientSection({
 
   return (
     <div
-      className="w-full lg:w-72 lg:shrink-0 border-b lg:border-b-0 lg:border-r"
-      style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}
-    >
+  className="w-full lg:shrink-0 border-b lg:border-b-0 lg:border-r"
+  style={{ 
+    borderColor: "var(--color-border)", 
+    background: "var(--color-surface-alt)",
+    width: "calc(20% - 40px)",
+    marginLeft: "10px",
+    marginRight: "10px",
+  }}
+>
       {/*
         Layout behaviour:
         - Mobile (<md):     everything stacked, full "Female"/"Male", normal padding

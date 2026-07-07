@@ -52,7 +52,7 @@ export default function AppBar({ user, onLogout, saved }) {
 
           {/* ── Left: Brand / Logo ────────────────────────────────────── */}
           <div className="flex items-center gap-2">
-            <span className="font-display text-lg font-extrabold text-white tracking-tighter">Skylimit Digital - Medix</span>
+            <span style={{  letterSpacing: "0.5px" }} className="text-xl font-medium text-white">Trident Skiode - Medix</span>
           </div>
 
           {/* ── Right: Actions ──────────────────────────────────────────── */}

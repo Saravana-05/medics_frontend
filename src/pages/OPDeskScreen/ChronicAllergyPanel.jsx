@@ -14,7 +14,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
     reaction: ""
   });
 
-  const headerH = 36;
+  const headerH = 50;
 
   const handleAdd = () => {
     if (newItem.name && newItem.since) {
@@ -63,24 +63,23 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
     >
       {/* Header with Add Button */}
       <div className="px-3 py-2 border-b flex items-center justify-between"
-        style={{ background: "#fee2e2", borderColor: "#fecaca", height: headerH, flexShrink: 0 }}>
+        style={{ background: "#73bfb8", borderColor: "#73bfb8", height: headerH, flexShrink: 0 }}>
         <div className="flex items-center gap-2">
-          <AlertCircle size={16} style={{ color: "#dc2626" }} />
-          <span className="text-xs font-bold" style={{ color: "#7a0000" }}>Chronic &amp; Allergy</span>
-          <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full"
-            style={{ background: "#dc2626", color: "white" }}>{items.length}</span>
+          {/* <AlertCircle size={16} style={{ color: "var(--color-danger)" }} /> */}
+          <span className="text-md font-bold text-white">Chronic &amp; Allergy</span>
+          <span className="text-[0.6rem] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "#eb6367", color: "white", border: "1px solid #73bfb8" }}>{items.length}</span>
         </div>
+      </div>
+
+      {/* Content */}
+      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="p-1 rounded transition-all hover:bg-white/50"
           style={{ background: "var(--color-surface)" }}
         >
-          <Plus size={14} style={{ color: "#dc2626" }} />
+          <Plus size={14} style={{ color: "var(--color-danger)" }} />
         </button>
-      </div>
-
-      {/* Content */}
-      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
         {/* Add/Edit Form */}
         {showAddForm && (
           <div className="p-3 border-b" style={{ borderColor: "#fecaca", background: "#fff5f5" }}>
@@ -135,14 +134,14 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                 <button
                   onClick={editingIndex !== null ? handleUpdate : handleAdd}
                   className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#dc2626", color: "white" }}
+                  style={{ background: "var(--color-danger)", color: "white" }}
                 >
                   <Check size={12} /> {editingIndex !== null ? "Update" : "Add"}
                 </button>
                 <button
                   onClick={handleCancel}
                   className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#fee2e2", color: "#dc2626" }}
+                  style={{ background: "#fee2e2", color: "var(--color-danger)" }}
                 >
                   <X size={12} /> Cancel
                 </button>
@@ -162,12 +161,12 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
             style={{ borderColor: "#f8d8d8", background: i % 2 === 0 ? "white" : "#fff5f5" }}>
             <div className="flex justify-between items-start mb-1">
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                background: item.type === "Allergy" ? "#fee2e2" : "#fef3e2",
-                color: item.type === "Allergy" ? "#dc2626" : "#b45309",
+                background: item.type === "Allergy" ? "#fee2e2" : "var(--color-lab-light)",
+                color: item.type === "Allergy" ? "var(--color-danger)" : "var(--color-lab)",
               }}>{item.type}</span>
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                background: item.severity === "High" ? "#fee2e2" : item.severity === "Medium" ? "#fef3e2" : "#e6f5f0",
-                color: item.severity === "High" ? "#dc2626" : item.severity === "Medium" ? "#b45309" : "#1a7f5a",
+                background: item.severity === "High" ? "#fee2e2" : item.severity === "Medium" ? "var(--color-lab-light)" : "var(--color-drugs-light)",
+                color: item.severity === "High" ? "var(--color-danger)" : item.severity === "Medium" ? "var(--color-lab)" : "var(--color-drugs)",
               }}>{item.severity}</span>
             </div>
             <div className="font-bold text-sm mt-1" style={{ color: "#5a0000" }}>{item.name}</div>
@@ -186,7 +185,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                 style={{ background: "var(--color-surface)" }}
                 title="Edit"
               >
-                <Pencil size={13} style={{ color: "#dc2626" }} />
+                <Pencil size={13} style={{ color: "var(--color-danger)" }} />
               </button>
               <button
                 onClick={() => handleDelete(i)}
@@ -194,7 +193,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                 style={{ background: "var(--color-surface)" }}
                 title="Delete"
               >
-                <X size={13} style={{ color: "#dc2626" }} />
+                <X size={13} style={{ color: "var(--color-danger)" }} />
               </button>
             </div>
           </div>

@@ -13,7 +13,7 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
     chronicAllergy: []
   });
 
-  const headerH = 36;
+  const headerH = 50;
 
   const handleAdd = () => {
     if (newMember.name && newMember.age) {
@@ -62,13 +62,18 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
     >
       {/* Header with Add Button */}
       <div className="px-3 py-2 border-b flex items-center justify-between"
-        style={{ background: "#c8e8c8", borderColor: "#b0d8b0", height: headerH, flexShrink: 0 }}>
+        style={{ background: "#679cbc", borderColor: "#679cbc", height: headerH, flexShrink: 0 }}>
         <div className="flex items-center gap-2">
-          <Users size={16} style={{ color: "#004d00" }} />
-          <span className="text-xs font-bold" style={{ color: "#004d00" }}>Patient Family History</span>
+          {/* <Users size={16} style={{ color: "#004d00" }} /> */}
+          <span className="text-md font-bold text-white" >Patient Family History</span>
           <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full"
             style={{ background: "#004d00", color: "white" }}>{items.length}</span>
         </div>
+        
+      </div>
+
+      {/* Content */}
+      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="p-1 rounded transition-all hover:bg-white/50"
@@ -76,10 +81,6 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
         >
           <Plus size={14} style={{ color: "#004d00" }} />
         </button>
-      </div>
-
-      {/* Content */}
-      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
         {/* Add/Edit Form */}
         {showAddForm && (
           <div className="p-3 border-b" style={{ borderColor: "#b0d8b0", background: "#f5fff5" }}>
@@ -166,8 +167,8 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{
-                  background: member.condition === "Nil" ? "#e6f5f0" : "#fef3e2",
-                  color: member.condition === "Nil" ? "#1a7f5a" : "#b45309",
+                  background: member.condition === "Nil" ? "var(--color-drugs-light)" : "var(--color-lab-light)",
+                  color: member.condition === "Nil" ? "var(--color-drugs)" : "var(--color-lab)",
                 }}>
                   {member.condition || "Nil"}
                 </span>
@@ -180,8 +181,8 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
                 {member.chronicAllergy.map((allergy, idx) => (
                   <span key={idx} className="text-[0.55rem] font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5"
                     style={{
-                      background: allergy.type === "Allergy" ? "#fee2e2" : "#fef3e2",
-                      color: allergy.type === "Allergy" ? "#dc2626" : "#b45309",
+                      background: allergy.type === "Allergy" ? "#fee2e2" : "var(--color-lab-light)",
+                      color: allergy.type === "Allergy" ? "var(--color-danger)" : "var(--color-lab)",
                     }}>
                     <AlertCircle size={10} />
                     {allergy.name}
@@ -206,7 +207,7 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
                 style={{ background: "var(--color-surface)", border: "1px solid #f8d8d8" }}
                 title="Delete"
               >
-                <X size={13} style={{ color: "#dc2626" }} />
+                <X size={13} style={{ color: "var(--color-danger)" }} />
               </button>
             </div>
           </div>

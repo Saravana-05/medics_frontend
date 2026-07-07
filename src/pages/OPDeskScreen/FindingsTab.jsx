@@ -159,11 +159,11 @@ function RichTextEditor({ value, onChange, onOpenDrawing }) {
 function DrawingCanvas({ onSave, onCancel, imageToAnnotate }) {
   const canvasRef = useRef(null);
   const fabricRef = useRef(null);
-  const [selectedColor, setSelectedColor] = useState('#dc2626');
+  const [selectedColor, setSelectedColor] = useState('var(--color-danger)');
   const [brushSize, setBrushSize] = useState(4);
   const [isDrawing, setIsDrawing] = useState(true);
 
-  const colors = ['#dc2626', '#2563eb', '#16a34a', '#eab308', '#000000', '#8b5cf6', '#ec4899'];
+  const colors = ['var(--color-danger)', 'var(--color-value)', '#16a34a', '#eab308', '#000000', 'var(--color-vital-height)', '#ec4899'];
 
   useEffect(() => {
     // Initialize Fabric.js canvas
@@ -348,7 +348,7 @@ function DrawingCanvas({ onSave, onCancel, imageToAnnotate }) {
         <button
           onClick={onCancel}
           className="px-3 py-1.5 rounded text-sm font-semibold"
-          style={{ background: '#fee2e2', color: '#dc2626' }}
+          style={{ background: '#fee2e2', color: 'var(--color-danger)' }}
         >
           Cancel
         </button>
@@ -539,19 +539,22 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
 }
 
 // ── Modern Toolbar Component ──
-function ModernToolbar({ docNo, docDt, onProto }) {
+function ModernToolbar({ docNo, docDt, onProto, onClear, onSave }) {
   return (
     <div className="flex items-center justify-between p-1 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-6">
         <div className="h-8 w-px" style={{ background: "var(--color-border)" }} />
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
         <ActionButton variant="ghost" icon={FileText} label="Preview" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
+        <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
+        <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
+        <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
     </div>
   );
@@ -585,8 +588,8 @@ function FindingsRow({ file, index, isStruck, onDelete, onStrike, onView }) {
     const types = {
       JPG: { icon: Image, bg: "#e8f4fb", color: "#0a5a9a" },
       PNG: { icon: Image, bg: "#e8f4fb", color: "#0a5a9a" },
-      PDF: { icon: FileText, bg: "#fee2e2", color: "#dc2626" },
-      TXT: { icon: FileSignature, bg: "#f0f9f0", color: "#1a7f5a" },
+      PDF: { icon: FileText, bg: "#fee2e2", color: "var(--color-danger)" },
+      TXT: { icon: FileSignature, bg: "#f0f9f0", color: "var(--color-drugs)" },
       DOC: { icon: File, bg: "#e8e8fb", color: "#3a3a9a" },
       DOCX: { icon: File, bg: "#e8e8fb", color: "#3a3a9a" },
       HTML: { icon: File, bg: "#f0e8fb", color: "#6a3a9a" },
@@ -759,24 +762,14 @@ export default function FindingsTab({ findings, setFindings, patient }) {
 
   return (
     <div className="h-full flex flex-col rounded-xs overflow-hidden shadow-lg" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
-      {/* Header Section */}
-      <div className="border-b" style={{ background: `linear-gradient(135deg, ${FINDINGS_COLOR.light} 0%, var(--color-surface) 100%)`, borderColor: "var(--color-border)" }}>
-        <div className="px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FolderOpen size={16} style={{ color: FINDINGS_COLOR.accent }} />
-            <h2 className="lg:text-base md:text-xs font-light" style={{ color: FINDINGS_COLOR.accent }}>
-              Clinical Findings & Documents
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <ActionButton variant="warning" icon={Trash} label="Clear" onClick={handleClearAll} />
-            <ActionButton variant="success" icon={Save} label="Save" onClick={handleSave} />
-          </div>
-        </div>
-        <ModernToolbar 
-          docNo={docNo} 
-          docDt={docDt} 
+      {/* HEADER / TOOLBAR — Clear & Save live here alongside Paste/Proto/etc. */}
+      <div className="flex-shrink-0">
+        <ModernToolbar
+          docNo={docNo}
+          docDt={docDt}
           onProto={handleProto}
+          onClear={handleClearAll}
+          onSave={handleSave}
         />
       </div>
 

@@ -5,7 +5,7 @@ import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
   FlaskConical, Search, ChevronDown, TestTube, Microscope,
-  BookOpen, Trash, FolderOpen, List
+  BookOpen, Trash, FolderOpen, List, Info
 } from "lucide-react";
 import { LAB_SUGGESTIONS } from "./mockData";
 
@@ -149,8 +149,39 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
   );
 }
 
+/* ── Keyboard-shortcut hint — icon that reveals shortcuts on hover ── */
+function ShortcutHint() {
+  const shortcuts = [
+    { keys: "Alt + T", desc: "Switch tables" },
+    { keys: "Alt + E", desc: "Edit row" },
+    { keys: "Alt + Del", desc: "Delete row" },
+  ];
+  return (
+    <div className="relative group flex items-center">
+      <Info size={16} className="cursor-help" style={{ color: "var(--color-text-subtle)" }} />
+      <div
+        className="absolute right-0 top-full mt-1.5 z-50 hidden group-hover:block rounded-lg p-2 shadow-lg"
+        style={{ background: "var(--color-text-base)", minWidth: "180px" }}
+      >
+        <div className="text-[0.6rem] font-bold uppercase tracking-wider mb-1.5 px-1" style={{ color: "var(--color-text-subtle)" }}>
+          Keyboard shortcuts
+        </div>
+        {shortcuts.map(s => (
+          <div key={s.keys} className="flex items-center justify-between gap-3 px-1 py-0.5">
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>{s.desc}</span>
+            <kbd className="text-[0.6rem] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
+              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
+              {s.keys}
+            </kbd>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Modern Toolbar Component ── */
-function ModernToolbar({ onProto, searchMode, onSearchModeChange }) {
+function ModernToolbar({ onProto, searchMode, onSearchModeChange, onClear, onSave }) {
   return (
     <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-3">
@@ -174,13 +205,17 @@ function ModernToolbar({ onProto, searchMode, onSearchModeChange }) {
           );
         })}
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
         <ActionButton variant="ghost" icon={FileText} label="Preview" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
+        <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
+        <ShortcutHint />
+        <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
+        <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
     </div>
   );
@@ -696,7 +731,7 @@ const AddRow = React.forwardRef(({
                       </span>
                       {item.isPartialMatch && (
                         <span className="text-[0.55rem] px-1 py-0.5 rounded" 
-                          style={{ background: "#fef3e2", color: "#b45309" }}>
+                          style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}>
                           Partial match
                         </span>
                       )}
@@ -898,25 +933,15 @@ export default function LabTab({ labs, setLabs, patient }) {
         minHeight: "300px",
       }}
     >
-      {/* HEADER */}
-      <div
-        className="flex-shrink-0 border-b"
-        style={{ background: "linear-gradient(135deg, var(--color-lab-light) 0%, var(--color-surface) 100%)", borderColor: "var(--color-border)" }}
-      >
-        <div className="px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FlaskConical size={16} style={{ color: "var(--color-lab)" }} />
-            <h2 className="lg:text-base md:text-xs font-light" style={{ color: "var(--color-lab)" }}>Lab Investigations</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[0.65rem] hidden lg:inline mr-2" style={{ color: "var(--color-text-subtle)" }}>
-              Alt+T: switch tables · Alt+E: edit row · Alt+Del: delete row
-            </span>
-            <ActionButton variant="warning" icon={Trash} label="Clear" onClick={handleClearAll} />
-            <ActionButton variant="success" icon={Save} label="Save" onClick={handleSave} />
-          </div>
-        </div>
-        <ModernToolbar onProto={handleProto} searchMode={searchMode} onSearchModeChange={setSearchMode} />
+      {/* HEADER / TOOLBAR — Clear, Save & the shortcut info icon live here alongside Paste/Proto/etc. */}
+      <div className="flex-shrink-0">
+        <ModernToolbar
+          onProto={handleProto}
+          searchMode={searchMode}
+          onSearchModeChange={setSearchMode}
+          onClear={handleClearAll}
+          onSave={handleSave}
+        />
       </div>
 
       {/* BODY */}

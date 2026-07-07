@@ -81,15 +81,15 @@ function StatusBadge({ status, type }) {
   );
 }
 
-// Tab configuration
+// Tab configuration — each tab renders as a vertical colored bar + icon button
 const TABS = [
-  { key: "address", label: "Address", icon: MapPin, color: "var(--color-primary)" },
-  { key: "attendant", label: "Attendant", icon: UserPlus, color: "var(--color-info)" },
-  { key: "appointment", label: "Appointment", icon: CalendarIcon, color: "var(--color-warning)" },
-  { key: "visit", label: "Today's Visit", icon: StethoscopeIcon, color: "var(--color-success)" },
-  { key: "insurance", label: "Insurance", icon: Shield, color: "var(--color-primary)" },
-  { key: "gynac", label: "Gynecology", icon: BabyIcon2, color: "#d946ef" },
-  { key: "ipinfo", label: "IP Info", icon: HospitalIcon2, color: "var(--color-info)" },
+  { key: "address",     label: "Address",       icon: MapPin,       color: "#4a90d9" },
+  { key: "attendant",   label: "Attendant",     icon: Users,        color: "#a78bdb" },
+  { key: "appointment", label: "Appointment",   icon: CalendarIcon, color: "#f5b301" },
+  { key: "visit",       label: "Today's Visit", icon: Clock,        color: "#4caf82" },
+  { key: "insurance",   label: "Insurance",     icon: Shield,       color: "#ef5a6f" },
+  { key: "gynac",       label: "Gynecology",    icon: BabyIcon2,    color: "#d946ef" },
+  { key: "ipinfo",      label: "IP Info",       icon: Hospital,     color: "#6dc4c4" },
 ];
 
 // Header height for scroll calculation - Increased to accommodate larger photo + details
@@ -276,12 +276,12 @@ export default function PatientInfoPanel({
         }}
       >
         {/* Avatar with Photo Support - Passport Size */}
-        <div className="relative flex-shrink-0 rounded-lg overflow-hidden group shadow-lg"
-          style={{ 
-            width: 96, 
-            height: 120,
+        <div className="relative flex-shrink-0 rounded-full overflow-hidden group shadow-lg"
+          style={{
+            width: 104,
+            height: 104,
             background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%)",
-            border: "2px solid white",
+            border: "3px solid white",
           }}>
           
           {patient.photo && !imageError ? (
@@ -305,7 +305,7 @@ export default function PatientInfoPanel({
 
         {/* Patient details below photo */}
         <div className="text-center mt-2.5">
-          <h3 className="text-sm font-bold truncate" style={{ color: "var(--color-text-base)" }}>
+          <h3 className="text-lg font-bold truncate" style={{ color: "var(--color-text-base)" }}>
             {patient.name || "Smt. Vijayalakshmi"}
           </h3>
           <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
@@ -328,15 +328,40 @@ export default function PatientInfoPanel({
         </div>
       </div>
 
-      {/* ── TABS ────────────────────────────────────────────────────────── */}
-      <div
-        className="flex-shrink-0 px-2 border-b flex items-center gap-1 overflow-x-auto"
-        style={{ 
-          borderColor: "var(--color-border)", 
-          height: TABS_H,
-          background: "var(--color-surface-alt)"
-        }}
-      >
+      {/* ── TAB BARS: vertical colored "lollipop" bars with rotated labels ── */}
+      <div className="flex-shrink-0 flex gap-1.5 px-2" style={{ background: "var(--color-surface)" }}>
+        {TABS.map(tab => {
+          const isActive = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="flex-1 flex items-end justify-center rounded-b-[22px] transition-all duration-200"
+              style={{
+                height: isActive ? 172 : 158,
+                background: isActive ? "var(--color-success)" : "var(--color-danger)",
+                opacity: isActive ? 1 : 0.88,
+                boxShadow: isActive ? "0 8px 16px rgba(0,0,0,0.20)" : "none",
+              }}
+            >
+              <span
+                className="font-bold text-white pb-4 whitespace-nowrap"
+                style={{
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── ICON ROW: circular icon button per tab ── */}
+      <div className="flex-shrink-0 flex items-center justify-between px-3 py-3">
         {TABS.map(tab => {
           const isActive = activeTab === tab.key;
           const Icon = tab.icon;
@@ -344,29 +369,27 @@ export default function PatientInfoPanel({
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className="px-3 py-1.5 rounded-lg text-[0.6rem] font-semibold transition-all whitespace-nowrap flex items-center gap-1"
+              className="flex items-center justify-center rounded-full transition-all"
               style={{
-                background: isActive ? tab.color : "transparent",
-                color: isActive ? "white" : "var(--color-text-muted)",
-                border: isActive ? "none" : "1px solid transparent",
+                width: 40,
+                height: 40,
+                background: "var(--color-surface)",
+                boxShadow: isActive
+                  ? "0 0 0 2px var(--color-success), 0 4px 10px rgba(0,0,0,0.14)"
+                  : "0 2px 6px rgba(0,0,0,0.10)",
               }}
             >
-              <Icon size={12} />
-              {tab.label}
+              <Icon size={18} style={{ color: isActive ? "var(--color-success)" : "var(--color-danger)" }} />
             </button>
           );
         })}
       </div>
 
-      {/* ── SCROLLABLE CONTENT ── */}
-      <div
-        className="overflow-y-auto p-4"
-        style={{
-          height: scrollAreaH,
-          flexShrink: 0,
-        }}
-      >
-        {renderContent()}
+      {/* ── CONTENT ── */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
+        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+          {renderContent()}
+        </div>
       </div>
 
       {/* ── FOOTER (popup only) ── */}

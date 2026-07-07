@@ -16,7 +16,7 @@ const MOCK_SCHEDULES = [
 ];
 
 function SchedulePanel({ panelHeight }) {
-  const headerH = 80;
+  const headerH = 50;
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [schedules, setSchedules] = useState(MOCK_SCHEDULES);
@@ -81,34 +81,44 @@ function SchedulePanel({ panelHeight }) {
     <div className="overflow-hidden rounded-lg shadow-xl"
       style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
       <div className="px-3 py-2 border-b"
-        style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-border)" }}>
+        style={{ background: "#0c324a", borderColor: "var(--color-border)" }}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <CalendarClock size={16} style={{ color: "var(--color-drugs)" }} />
-            <span className="text-xs font-bold" style={{ color: "var(--color-drugs)" }}>
+            {/* <CalendarClock size={16} style={{ color: "var(--color-drugs)" }} /> */}
+            <span className="text-md font-bold text-white" >
               Doctor's Schedule
             </span>
           </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="p-1 rounded transition-all hover:bg-white/50"
-            style={{ background: "var(--color-surface)" }}
-          >
-            <Plus size={14} style={{ color: "var(--color-drugs)" }} />
-          </button>
+
         </div>
+
+      </div>
+
+      {/* Date filter row — right-aligned with light-grey divider + drop shadow (matches ReportsPanel) */}
+      <div
+        className="px-3 py-2 flex items-center justify-end gap-2"
+        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}
+      >
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="flex items-center justify-center rounded-lg transition-all hover:bg-black/5 flex-shrink-0"
+          style={{ width: 40, height: 40, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+          title="Add schedule"
+        >
+          <Plus size={24} style={{ color: "var(--color-drugs)", fontWeight: "bold" }} />
+        </button>
         <div className="relative">
-          <Calendar size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+          <Calendar size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full pl-7 pr-2 py-1 text-xs rounded border"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="pl-9 pr-3 text-sm rounded-lg border"
+            style={{ height: 40, borderColor: "var(--color-border)", background: "var(--color-surface)" }}
           />
         </div>
       </div>
-      
+
       <div className="p-3 space-y-2 overflow-y-auto" style={{ height: panelHeight - headerH }}>
         {/* Add Form */}
         {showAddForm && (

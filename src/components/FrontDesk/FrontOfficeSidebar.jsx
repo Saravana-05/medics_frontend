@@ -18,7 +18,7 @@ const MENU_ITEMS = [
     key: "appointments", 
     label: "Appointment & Registration", 
     icon: CalendarPlus, 
-    color: "#8b5cf6",
+    color: "var(--color-vital-height)",
     description: "Book & manage appointments"
   },
   { 
@@ -32,7 +32,7 @@ const MENU_ITEMS = [
     key: "doctorschedule", 
     label: "Doctor's Schedule", 
     icon: Clock, 
-    color: "#f59e0b",
+    color: "var(--color-warning)",
     description: "View doctor availability"
   },
   { 

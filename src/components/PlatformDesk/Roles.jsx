@@ -74,7 +74,7 @@ export default function Roles() {
     if (isActive) {
       return { bg: "#d1fae5", color: "#065f46", text: "Active" };
     }
-    return { bg: "#fee2e2", color: "#dc2626", text: "Inactive" };
+    return { bg: "#fee2e2", color: "var(--color-danger)", text: "Inactive" };
   };
 
   const columns = [

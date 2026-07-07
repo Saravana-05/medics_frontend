@@ -19,13 +19,13 @@ export default function SidePanel({ panelKey, patient }) {
             <div key={i} style={{ padding: "6px 8px", borderBottom: "1px solid #f8d8d8", background: i % 2 === 0 ? "white" : "#fff5f5" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{
-                  background: item.type === "Allergy" ? "#fee2e2" : "#fef3e2",
-                  color: item.type === "Allergy" ? "#dc2626" : "#b45309",
+                  background: item.type === "Allergy" ? "#fee2e2" : "var(--color-lab-light)",
+                  color: item.type === "Allergy" ? "var(--color-danger)" : "var(--color-lab)",
                   borderRadius: "2px", padding: "1px 5px", fontSize: ".62rem", fontWeight: "700",
                 }}>{item.type}</span>
                 <span style={{
-                  background: item.severity === "High" ? "#fee2e2" : item.severity === "Medium" ? "#fef3e2" : "#f0f9f0",
-                  color: item.severity === "High" ? "#dc2626" : item.severity === "Medium" ? "#b45309" : "#1a7f5a",
+                  background: item.severity === "High" ? "#fee2e2" : item.severity === "Medium" ? "var(--color-lab-light)" : "#f0f9f0",
+                  color: item.severity === "High" ? "var(--color-danger)" : item.severity === "Medium" ? "var(--color-lab)" : "var(--color-drugs)",
                   borderRadius: "2px", padding: "1px 5px", fontSize: ".62rem", fontWeight: "700",
                 }}>{item.severity}</span>
               </div>
@@ -53,7 +53,7 @@ export default function SidePanel({ panelKey, patient }) {
               <div style={{ display: "flex", gap: "8px", fontSize: ".68rem", color: "#3a6a3a", marginTop: "2px" }}>
                 <span style={{ background: "#d8f0d8", padding: "1px 5px", borderRadius: "2px", fontWeight: "700" }}>{f.relation}</span>
                 <span>Age {f.age}</span>
-                <span style={{ color: f.condition === "Nil" ? "#1a7f5a" : "#b45309" }}>● {f.condition}</span>
+                <span style={{ color: f.condition === "Nil" ? "var(--color-drugs)" : "var(--color-lab)" }}>● {f.condition}</span>
               </div>
             </div>
           ))}

@@ -30,7 +30,7 @@ const FAQS = [
 
 const QUICK_LINKS = [
   { icon: BookOpen,   label: "User Manual",       color: "var(--color-primary)" },
-  { icon: Video,      label: "Video Tutorials",    color: "#8b5cf6"              },
+  { icon: Video,      label: "Video Tutorials",    color: "var(--color-vital-height)"              },
   { icon: FileText,   label: "Release Notes",      color: "var(--color-success)" },
   { icon: Zap,        label: "Keyboard Shortcuts", color: "var(--color-warning)" },
 ];
@@ -157,7 +157,7 @@ export default function HelpPopup({ onClose }) {
               {[
                 { icon: Headphones, label: "Live Chat Support",   sub: "Available Mon–Sat 9AM–6PM",   badge: "Online",   color: "var(--color-success)" },
                 { icon: Phone,      label: "Phone Support",        sub: "+91 044 4567 8900",           badge: null,       color: "var(--color-primary)" },
-                { icon: Mail,       label: "Email Support",        sub: "support@medix.com",           badge: "24h reply", color: "#8b5cf6"             },
+                { icon: Mail,       label: "Email Support",        sub: "support@medix.com",           badge: "24h reply", color: "var(--color-vital-height)"             },
                 { icon: MessageCircle, label: "Submit a Ticket",   sub: "Track your issue online",     badge: null,       color: "var(--color-warning)" },
               ].map(({ icon: Icon, label, sub, badge, color }) => (
                 <div
@@ -187,7 +187,7 @@ export default function HelpPopup({ onClose }) {
                 <div className="flex justify-center gap-2">
                   {[1,2,3,4,5].map(n => (
                     <button key={n}>
-                      <Star size={20} style={{ color: n <= 4 ? "#f59e0b" : "var(--color-border)" }} fill={n <= 4 ? "#f59e0b" : "none"} />
+                      <Star size={20} style={{ color: n <= 4 ? "var(--color-warning)" : "var(--color-border)" }} fill={n <= 4 ? "var(--color-warning)" : "none"} />
                     </button>
                   ))}
                 </div>

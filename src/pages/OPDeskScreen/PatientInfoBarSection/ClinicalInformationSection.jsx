@@ -1,5 +1,8 @@
 import { Clipboard, Stethoscope, Eye, Baby, ArrowRightLeft } from "lucide-react";
 
+/* Fonts (Inter) are loaded globally in index.html + registered in the Tailwind
+   theme (index.css). Use var(--font-inter) / the `font-sans` utility anywhere. */
+
 /* ── Clinical Card Component (compact, single-row friendly) ── */
 function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
   const variants = {
@@ -25,11 +28,17 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
     >
       <div className="flex items-center gap-1.5 mb-1 md:mb-0">
         <Icon size={12} className="md:w-2.5 md:h-2.5" style={{ color: iconColor }} />
-        <span className="text-[0.55rem] font-bold uppercase tracking-wide truncate md:text-[0.5rem]" style={{ color: "var(--color-text-muted)" }}>
+        <span 
+          className="text-[0.55rem] font-bold uppercase tracking-wide truncate md:text-[0.5rem]" 
+          style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
+        >
           {label}
         </span>
       </div>
-      <div className="lg:text-[0.8rem] font-semibold truncate md:text-[0.6rem]" style={{ color: textStyle.color }}>
+      <div 
+        className="lg:text-[0.8rem] font-semibold truncate md:text-[0.6rem]" 
+        style={{ color: textStyle.color, fontFamily: "var(--font-inter)" }}
+      >
         {value || "—"}
       </div>
     </div>
@@ -45,7 +54,7 @@ export default function ClinicalInformationSection({ patient, isInline = false }
       icon: Stethoscope, 
       label: "Chief Complaint", 
       value: p.chiefComplaint || "Allergy, Anxiety", 
-      variant: "danger" 
+      variant: "info" 
     },
     { 
       icon: Eye, 
@@ -61,7 +70,7 @@ export default function ClinicalInformationSection({ patient, isInline = false }
     icon: Baby, 
     label: "Pregnancy Status", 
     value: isMale ? "N/A" : (p.pregnancy || "Yes. 60 Days"), 
-    variant: "purple",  // Always use purple for the icon
+    variant: "info",  // Always use purple for the icon
     disabled: isMale
   });
   
@@ -69,7 +78,7 @@ export default function ClinicalInformationSection({ patient, isInline = false }
     icon: ArrowRightLeft, 
     label: "Referral", 
     value: p.referral || "Dr. Sheela (From)", 
-    variant: "warning" 
+    variant: "info" 
   });
   
   return (
@@ -77,7 +86,12 @@ export default function ClinicalInformationSection({ patient, isInline = false }
       {/* Clinical Information header - hidden on tablet, visible on mobile and desktop */}
       <div className="flex items-center gap-2 mb-2 md:hidden lg:flex lg:mb-2">
         <Clipboard size={14} style={{ color: "var(--color-primary)" }} />
-        <span className="text-[0.65rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
+        <span 
+          className="text-[0.65rem] font-bold uppercase tracking-wide" 
+          style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
+        >
+          Clinical Information
+        </span>
       </div>
       
       {/* Single Row Cards — scrolls horizontally if it can't all fit */}

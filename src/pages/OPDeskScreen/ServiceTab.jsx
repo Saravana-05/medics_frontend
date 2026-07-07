@@ -5,7 +5,7 @@ import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
   Settings, Search, ChevronDown, Briefcase, Activity, Heart, Mic, Zap,
-  BookOpen, Trash, List, ListChecks
+  BookOpen, Trash, List, ListChecks, Info
 } from "lucide-react";
 import { SERVICE_SUGGESTIONS } from "./mockData";
 
@@ -40,8 +40,39 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
   );
 }
 
+/* ── Keyboard-shortcut hint — icon that reveals shortcuts on hover ── */
+function ShortcutHint() {
+  const shortcuts = [
+    { keys: "Alt + T", desc: "Switch tables" },
+    { keys: "Alt + E", desc: "Edit row" },
+    { keys: "Alt + Del", desc: "Delete row" },
+  ];
+  return (
+    <div className="relative group flex items-center">
+      <Info size={16} className="cursor-help" style={{ color: "var(--color-text-subtle)" }} />
+      <div
+        className="absolute right-0 top-full mt-1.5 z-50 hidden group-hover:block rounded-lg p-2 shadow-lg"
+        style={{ background: "var(--color-text-base)", minWidth: "180px" }}
+      >
+        <div className="text-[0.6rem] font-bold uppercase tracking-wider mb-1.5 px-1" style={{ color: "var(--color-text-subtle)" }}>
+          Keyboard shortcuts
+        </div>
+        {shortcuts.map(s => (
+          <div key={s.keys} className="flex items-center justify-between gap-3 px-1 py-0.5">
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>{s.desc}</span>
+            <kbd className="text-[0.6rem] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
+              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
+              {s.keys}
+            </kbd>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Modern Toolbar Component ── */
-function ModernToolbar({ onProto, searchMode, onSearchModeChange, prescriptionMode, onPrescriptionModeChange }) {
+function ModernToolbar({ onProto, searchMode, onSearchModeChange, prescriptionMode, onPrescriptionModeChange, onClear, onSave }) {
   return (
     <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-4">
@@ -109,13 +140,17 @@ function ModernToolbar({ onProto, searchMode, onSearchModeChange, prescriptionMo
       </div>
 
       {/* Right-side action buttons */}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={BookOpen} label="Proto" onClick={onProto} />
         <ActionButton variant="ghost" icon={FileText} label="Preview" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
+        <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
+        <ShortcutHint />
+        <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
+        <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
     </div>
   );
@@ -189,7 +224,7 @@ function TableHeader() {
     { label: "Actions", width: "w-28", center: true },
   ];
   return (
-    <div className="flex border-b flex-shrink-0" style={{ background: "#e3f0fc", borderColor: "var(--color-border)" }}>
+    <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-services-light)", borderColor: "var(--color-border)" }}>
       {columns.map(col => (
         <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
           style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-services)" }}>
@@ -218,7 +253,7 @@ function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, 
       style={{
         borderColor: "var(--color-border)",
         background: isSelected
-          ? "#e3f0fc"
+          ? "var(--color-services-light)"
           : isStruck
             ? "var(--color-surface-alt)"
             : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
@@ -246,9 +281,9 @@ function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, 
           <Edit2 size={14} />
         </button>
         <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
-          style={{ background: "#e3f0fc", color: "var(--color-services)" }}
+          style={{ background: "var(--color-services-light)", color: "var(--color-services)" }}
           onMouseEnter={(e) => e.currentTarget.style.background = "#d0e4f5"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#e3f0fc"}>
+          onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-services-light)"}>
           {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
         </button>
         <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
@@ -313,7 +348,7 @@ function TypableDetailInput({ value, onChange, onKeyDown, dataField }) {
               key={opt}
               onMouseDown={() => handleSelectOption(opt)}
               className="px-3 py-2 cursor-pointer text-sm transition-colors"
-              style={{ background: highlightedIdx === i ? "#e3f0fc" : "transparent" }}
+              style={{ background: highlightedIdx === i ? "var(--color-services-light)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}
               onMouseLeave={() => setHighlightedIdx(-1)}
             >
@@ -407,7 +442,7 @@ const AddRow = React.forwardRef(({
       ref={rowRef}
       data-add-row="true"
       className="flex items-stretch border-b relative"
-      style={{ background: "#e3f0fc", borderColor: "var(--color-services)" }}
+      style={{ background: "var(--color-services-light)", borderColor: "var(--color-services)" }}
       onBlur={handleRowBlur}
     >
       {/* S.No */}
@@ -435,7 +470,7 @@ const AddRow = React.forwardRef(({
           className="w-full py-1.5 rounded text-sm font-medium"
           style={{
             border: serviceSelected ? "1.5px solid var(--color-services)" : "1px solid var(--color-border)",
-            background: serviceSelected ? "#e3f0fc" : "var(--color-surface)",
+            background: serviceSelected ? "var(--color-services-light)" : "var(--color-surface)",
             color: "var(--color-services)",
             paddingLeft: "1.75rem",
             paddingRight: serviceSelected ? "3.5rem" : "1.75rem",
@@ -472,7 +507,7 @@ const AddRow = React.forwardRef(({
                 className="px-4 py-2.5 cursor-pointer text-sm flex items-center gap-2"
                 style={{
                   borderBottom: "1px solid var(--color-border)",
-                  background: highlightedIdx === i ? "#e3f0fc" : "transparent"
+                  background: highlightedIdx === i ? "var(--color-services-light)" : "transparent"
                 }}
                 onMouseEnter={() => setHighlightedIdx(i)}
                 onMouseLeave={() => setHighlightedIdx(-1)}
@@ -677,30 +712,16 @@ export default function ServiceTab({ services, setServices, patient }) {
         minHeight: "300px",
       }}
     >
-      {/* HEADER */}
-      <div
-        className="flex-shrink-0 border-b"
-        style={{ background: "linear-gradient(135deg, #e3f0fc 0%, var(--color-surface) 100%)", borderColor: "var(--color-border)" }}
-      >
-        <div className="px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Settings size={16} style={{ color: "var(--color-services)" }} />
-            <h2 className="lg:text-base md:text-xs font-light" style={{ color: "var(--color-services)" }}>Services & Procedures</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[0.65rem] hidden lg:inline mr-2" style={{ color: "var(--color-text-subtle)" }}>
-              Alt+T: switch tables · Alt+E: edit row · Alt+Del: delete row
-            </span>
-            <ActionButton variant="warning" icon={Trash} label="Clear" onClick={handleClearAll} />
-            <ActionButton variant="success" icon={Save} label="Save" onClick={handleSave} />
-          </div>
-        </div>
-        <ModernToolbar 
-          onProto={handleProto} 
-          searchMode={searchMode} 
+      {/* HEADER / TOOLBAR — Clear, Save & the shortcut info icon live here alongside Paste/Proto/etc. */}
+      <div className="flex-shrink-0">
+        <ModernToolbar
+          onProto={handleProto}
+          searchMode={searchMode}
           onSearchModeChange={setSearchMode}
           prescriptionMode={prescriptionMode}
           onPrescriptionModeChange={setPrescriptionMode}
+          onClear={handleClearAll}
+          onSave={handleSave}
         />
       </div>
 
@@ -714,7 +735,7 @@ export default function ServiceTab({ services, setServices, patient }) {
             <AddRow ref={addRowRef} {...addRowProps} />
           ) : (
             <div className="flex items-center justify-center py-3 border-b cursor-pointer transition-all"
-              style={{ background: "#e3f0fc", borderColor: "var(--color-services)" }}
+              style={{ background: "var(--color-services-light)", borderColor: "var(--color-services)" }}
               onClick={handleAddNewService}>
               <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
                 style={{ background: "var(--color-services)", color: "white" }}>
@@ -729,7 +750,7 @@ export default function ServiceTab({ services, setServices, patient }) {
           {services.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
               <div className="text-center">
-                <div className="mb-2 p-4 rounded-full inline-flex" style={{ background: "#e3f0fc" }}>
+                <div className="mb-2 p-4 rounded-full inline-flex" style={{ background: "var(--color-services-light)" }}>
                   <Settings size={20} style={{ color: "var(--color-services)" }} />
                 </div>
                 <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Services Ordered Yet</h3>

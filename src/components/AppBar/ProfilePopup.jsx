@@ -8,7 +8,7 @@ import {
 const STAT_CARDS = [
   { label: "Patients Today", value: "24", icon: Users,      color: "var(--color-primary)"  },
   { label: "Years Exp.",     value: "12", icon: Award,       color: "var(--color-warning)"  },
-  { label: "Avg. Rating",    value: "4.9", icon: Star,       color: "#f59e0b"               },
+  { label: "Avg. Rating",    value: "4.9", icon: Star,       color: "var(--color-warning)"               },
   { label: "Consultations",  value: "3.2k", icon: Activity,  color: "var(--color-success)"  },
 ];
 

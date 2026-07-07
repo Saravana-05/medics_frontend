@@ -11,7 +11,7 @@ const SECTIONS = [
     key: "appearance",
     title: "Appearance",
     icon: Palette,
-    color: "#8b5cf6",
+    color: "var(--color-vital-height)",
   },
   {
     key: "notifications",
@@ -97,12 +97,12 @@ export default function SettingsPopup({ onClose }) {
                     onClick={() => setTheme(key)}
                     className="flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all"
                     style={{
-                      borderColor: theme === key ? "#8b5cf6" : "var(--color-border)",
-                      background:  theme === key ? "#8b5cf610" : "var(--color-surface-alt)",
+                      borderColor: theme === key ? "var(--color-vital-height)" : "var(--color-border)",
+                      background:  theme === key ? "var(--color-vital-height)10" : "var(--color-surface-alt)",
                     }}
                   >
-                    <Icon size={18} style={{ color: theme === key ? "#8b5cf6" : "var(--color-text-muted)" }} />
-                    <span className="text-[0.65rem] font-semibold" style={{ color: theme === key ? "#8b5cf6" : "var(--color-text-muted)" }}>{label}</span>
+                    <Icon size={18} style={{ color: theme === key ? "var(--color-vital-height)" : "var(--color-text-muted)" }} />
+                    <span className="text-[0.65rem] font-semibold" style={{ color: theme === key ? "var(--color-vital-height)" : "var(--color-text-muted)" }}>{label}</span>
                   </button>
                 ))}
               </div>
@@ -117,9 +117,9 @@ export default function SettingsPopup({ onClose }) {
                     onClick={() => setDensity(d)}
                     className="py-2 rounded-lg border-2 text-[0.65rem] font-semibold capitalize transition-all"
                     style={{
-                      borderColor: density === d ? "#8b5cf6" : "var(--color-border)",
-                      background:  density === d ? "#8b5cf610" : "var(--color-surface-alt)",
-                      color:       density === d ? "#8b5cf6"   : "var(--color-text-muted)",
+                      borderColor: density === d ? "var(--color-vital-height)" : "var(--color-border)",
+                      background:  density === d ? "var(--color-vital-height)10" : "var(--color-surface-alt)",
+                      color:       density === d ? "var(--color-vital-height)"   : "var(--color-text-muted)",
                     }}
                   >
                     {d}
@@ -128,10 +128,10 @@ export default function SettingsPopup({ onClose }) {
               </div>
             </div>
             <SettingRow label="Animations" subtitle="Smooth transitions and micro-interactions">
-              <Toggle value={true} onChange={() => {}} color="#8b5cf6" />
+              <Toggle value={true} onChange={() => {}} color="var(--color-vital-height)" />
             </SettingRow>
             <SettingRow label="Compact sidebar" subtitle="Reduce sidebar icon spacing">
-              <Toggle value={false} onChange={() => {}} color="#8b5cf6" />
+              <Toggle value={false} onChange={() => {}} color="var(--color-vital-height)" />
             </SettingRow>
           </div>
         );

@@ -228,7 +228,7 @@ function ServicesTabContent({ prescriptions }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr style={{ background: "#e3f0fc" }}>
+          <tr style={{ background: "var(--color-services-light)" }}>
             <th className="px-3 py-2 text-left">Type</th>
             <th className="px-3 py-2 text-left">Service Name</th>
             <th className="px-3 py-2 text-left">Body Part / Details</th>
@@ -238,7 +238,7 @@ function ServicesTabContent({ prescriptions }) {
           {services.map((service, idx) => (
             <tr key={idx} className="border-b" style={{ borderColor: "var(--color-border)" }}>
               <td className="px-3 py-2">
-                <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold" style={{ background: "#e3f0fc", color: "var(--color-services)" }}>
+                <span className="inline-flex px-2 py-0.5 rounded text-xs font-semibold" style={{ background: "var(--color-services-light)", color: "var(--color-services)" }}>
                   {service.type}
                 </span>
               </td>
@@ -518,9 +518,9 @@ export default function PrescriptionViewModal({
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {clinicalData.chiefComplaint && clinicalData.chiefComplaint !== "—" && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#dc262618", border: "1px solid #dc262635" }}>
-                    <Stethoscope size={10} style={{ color: "#dc2626" }} />
-                    <span className="text-xs font-bold" style={{ color: "#dc2626" }}>{clinicalData.chiefComplaint}</span>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "var(--color-danger)18", border: "1px solid var(--color-danger)35" }}>
+                    <Stethoscope size={10} style={{ color: "var(--color-danger)" }} />
+                    <span className="text-xs font-bold" style={{ color: "var(--color-danger)" }}>{clinicalData.chiefComplaint}</span>
                   </div>
                 )}
                 {clinicalData.firstObservation && clinicalData.firstObservation !== "—" && (

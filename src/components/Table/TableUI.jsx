@@ -62,7 +62,7 @@ export default function TableUI({
     if (status === "ACTIVE") {
       return { bg: "#d1fae5", color: "#065f46", text: "Active" };
     } else if (status === "INACTIVE") {
-      return { bg: "#fee2e2", color: "#dc2626", text: "Inactive" };
+      return { bg: "#fee2e2", color: "var(--color-danger)", text: "Inactive" };
     }
     return { bg: "#fef3c7", color: "#d97706", text: status || "Unknown" };
   };

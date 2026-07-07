@@ -39,7 +39,7 @@ const MOCK_OP_LIST = {
 function PriorityBadge({ priority }) {
   const getStyle = () => {
     const p = priority?.toLowerCase() || "";
-    if (p.includes("emergency")) return { bg: "#fee2e2", color: "#dc2626", icon: AlertCircle };
+    if (p.includes("emergency")) return { bg: "#fee2e2", color: "var(--color-danger)", icon: AlertCircle };
     if (p.includes("urgent")) return { bg: "#fff7ed", color: "#ea580c", icon: AlertCircle };
     if (p.includes("important")) return { bg: "#fefce8", color: "#ca8a04", icon: Star };
     return { bg: "#f0fdf4", color: "#16a34a", icon: CheckCircle };
@@ -58,7 +58,7 @@ function PriorityBadge({ priority }) {
 function NeedBadge({ need }) {
   const getStyle = () => {
     if (need === "Referral") return { bg: "#f3e8ff", color: "#9333ea" };
-    if (need === "Follow-up") return { bg: "#eff6ff", color: "#2563eb" };
+    if (need === "Follow-up") return { bg: "#eff6ff", color: "var(--color-value)" };
     if (need === "New Patient") return { bg: "#ecfdf5", color: "#059669" };
     return { bg: "#f9fafb", color: "#6b7280" };
   };
@@ -73,7 +73,7 @@ function NeedBadge({ need }) {
 
 function StatusBadge({ status }) {
   const getStyle = () => {
-    if (status.includes("Waiting")) return { bg: "#dbeafe", color: "#2563eb", icon: Clock };
+    if (status.includes("Waiting")) return { bg: "#dbeafe", color: "var(--color-value)", icon: Clock };
     if (status.includes("Parked")) return { bg: "#fef3c7", color: "#d97706", icon: ParkingCircle };
     if (status.includes("Treated")) return { bg: "#d1fae5", color: "#059669", icon: CheckCircle };
     return { bg: "#f3f4f6", color: "#6b7280", icon: FileText };
@@ -110,7 +110,7 @@ function PatientRow({ row, index, onSelect, section }) {
         <span className="text-sm font-bold" style={{ color: row.token.startsWith("@") ? "#9333ea" : "var(--color-primary)" }}>
           {row.token}
         </span>
-        {row.token.includes("*") && <Star size={10} style={{ color: "#f59e0b" }} title="Insurance" />}
+        {row.token.includes("*") && <Star size={10} style={{ color: "var(--color-warning)" }} title="Insurance" />}
         {row.token.includes("#") && <DollarSign size={10} style={{ color: "#10b981" }} title="Corporate" />}
         {row.token.includes("@") && <Tag size={10} style={{ color: "#9333ea" }} title="Referral" />}
       </div>
@@ -431,9 +431,9 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         <div className="flex-shrink-0 px-5 py-3 border-t flex items-center justify-between" style={{ background: "var(--color-surface-alt)", borderColor: "var(--color-border)" }}>
           <div className="flex gap-4 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#2563eb" }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-value)" }} />
               <span style={{ color: "var(--color-text-muted)" }}>Appointments:</span>
-              <span className="font-bold" style={{ color: "#2563eb" }}>{MOCK_OP_LIST.appointment.length}</span>
+              <span className="font-bold" style={{ color: "var(--color-value)" }}>{MOCK_OP_LIST.appointment.length}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full" style={{ background: "#d97706" }} />
