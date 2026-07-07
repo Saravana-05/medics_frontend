@@ -16,7 +16,7 @@ function ProtectedRoute({ children, user, requiredRole }) {
   return children;
 }
 
-export const ROUTES = {
+const ROUTES = {
   HOME: "/",
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
