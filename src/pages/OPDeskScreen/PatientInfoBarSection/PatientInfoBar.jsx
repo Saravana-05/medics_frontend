@@ -34,11 +34,13 @@ export default function PatientInfoBar({
         
         {/* ── Main Content Area ── */}
         {/* Stacks vertically on tablet/mobile, side-by-side from lg up */}
-        <div className="flex flex-col lg:flex-row">
+        <div className="flex flex-col lg:flex-row lg:relative ">
 
           {/* Left accent bar — mirrors the right one; a segment shows only while
-              its matching LeftSidebar tab is hovered. Desktop only. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0" style={{ width: "5px" }}>
+              its matching LeftSidebar tab is hovered. Desktop only.
+              Absolutely positioned so its fixed height never forces the row taller
+              than the Vital Signs + Clinical Information content. */}
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0" style={{ width: "2.5px" }}>
             {LEFT_ACCENT_SEGMENTS.map((seg, i) => (
               <div
                 key={seg.key}
@@ -64,7 +66,7 @@ export default function PatientInfoBar({
           />
 
           {/* ── Right Panel ── */}
-          <div className="flex-1 flex flex-col lg:flex-row min-w-0">
+          <div className="flex-1 flex flex-col lg:flex-row min-w-0 " style={{ height: "100%" }}>
             
             {/* Left side - Vital Signs + Clinical Information (stacked vertically) */}
             <div className="flex-1 flex flex-col min-w-0">

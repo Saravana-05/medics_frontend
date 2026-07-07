@@ -484,7 +484,7 @@ export default function PrescriptionViewModal({
             <div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
-                <span className="text-[0.55rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Vital Signs</span>
+                <span className="text-[0.55rem] font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Vital Signs</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#ef444418", border: "1px solid #ef444435" }}>
@@ -514,7 +514,7 @@ export default function PrescriptionViewModal({
             <div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <Clipboard size={12} style={{ color: "var(--color-primary)" }} />
-                <span className="text-[0.55rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
+                <span className="text-[0.8rem] font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {clinicalData.chiefComplaint && clinicalData.chiefComplaint !== "—" && (

@@ -13,6 +13,7 @@ import FindingsTab from "./OPDeskScreen/FindingsTab";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
 import { MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
 import IPTimeSheetTab from "./OPDeskScreen/IPTimeSheetTab";
+import Divider from "@mui/material/Divider";
 
 export default function OPDeskScreen({ user, onLogout }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -67,7 +68,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--color-surface-alt)", fontFamily: "var(--font-body)" }}>
+    <div className="h-screen flex flex-col overflow-hidden " style={{ background: "var(--color-surface-alt)", fontFamily: "var(--font-body)" }}>
 
       {/* ── Fixed App Bar ── */}
       <div className="flex-shrink-0">
@@ -84,7 +85,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       {/* ── Second Row: LeftSidebar + PatientInfoBar + RightSidebar ── */}
       {/* On tablet/mobile this row is capped at 50% of viewport height and scrolls
           internally, so the main workspace below always keeps usable space. */}
-      <div className="flex-shrink-0 flex max-h-[50vh] overflow-y-auto lg:max-h-none lg:overflow-visible">
+      <div className="flex-shrink-0 flex max-h-screen overflow-y-auto md:max-h-none lg:overflow-visible">
         <div className="flex-shrink-0">
           <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} />
         </div>
@@ -107,9 +108,9 @@ export default function OPDeskScreen({ user, onLogout }) {
           <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>
-
+<Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />
       {/* ── Main workspace with responsive split ── */}
-      <div className="flex-1 flex overflow-hidden min-h-0 relative">
+      <div className="flex-1 flex  min-h-0 relative ">
         
         {!selectedPatient ? (
           <div className="flex-1 overflow-y-auto flex items-center justify-center">
@@ -125,7 +126,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           <>
             {/* Left Section - Prescription Tabs + Active Tab Content */}
             <div 
-              className={`flex flex-col overflow-hidden min-w-0 transition-all duration-300 ${
+              className={`flex flex-col  overflow-hidden min-w-0 transition-all duration-300 ${
                 isTabletView 
                   ? isRightPanelExpanded ? 'flex-[5]' : 'flex-1'
                   : 'flex-[7]'

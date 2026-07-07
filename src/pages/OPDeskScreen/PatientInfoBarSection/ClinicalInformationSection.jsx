@@ -29,7 +29,7 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
       <div className="flex items-center gap-1.5 mb-1 md:mb-0">
         <Icon size={12} className="md:w-2.5 md:h-2.5" style={{ color: iconColor }} />
         <span 
-          className="text-[0.55rem] font-bold uppercase tracking-wide truncate md:text-[0.5rem]" 
+          className="text-[0.7rem] font-bold tracking-wide truncate md:text-[0.7rem]" 
           style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
         >
           {label}
@@ -82,12 +82,12 @@ export default function ClinicalInformationSection({ patient, isInline = false }
   });
   
   return (
-    <div className="px-3 py-4 md:py-1.5" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
+    <div className="px-3 py-1 sm:py-0" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)"  }}>
       {/* Clinical Information header - hidden on tablet, visible on mobile and desktop */}
-      <div className="flex items-center gap-2 mb-2 md:hidden lg:flex lg:mb-2">
+      <div className="flex items-center gap-2  md:hidden lg:flex lg:mt-1 ">
         <Clipboard size={14} style={{ color: "var(--color-primary)" }} />
         <span 
-          className="text-[0.65rem] font-bold uppercase tracking-wide" 
+          className="text-[0.8rem] font-bold tracking-wide" 
           style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
         >
           Clinical Information

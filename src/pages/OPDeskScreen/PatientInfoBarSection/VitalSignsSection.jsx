@@ -232,7 +232,7 @@ export default function VitalSignsSection({ patient }) {
         <div className="flex items-center gap-1.5 mb-1.5">
           <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
           <span
-            className="text-[0.6rem] font-bold uppercase tracking-wide"
+            className="text-[0.8rem] font-bold tracking-wide"
             style={{ color: "var(--color-text-base)", fontFamily: "var(--font-archivo)" }}
           >
             Vital Signs

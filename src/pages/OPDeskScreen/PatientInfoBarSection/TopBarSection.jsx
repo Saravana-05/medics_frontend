@@ -165,8 +165,9 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
         <div
           className="flex flex-col"
           style={{
-            width: "5px",
+            width: "2.5px",
             flexShrink: 0,
+            marginRight: "2.5px",
           }}
         >
           {ACCENT_SEGMENTS.map((seg, i) => (

@@ -47,7 +47,7 @@ export default function AppBar({ user, onLogout, saved }) {
 
   return (
     <>
-      <div className="flex-shrink-0" style={{ background: "linear-gradient(135deg, var(--color-sidebar-bg) 0%, #0a4a6e 100%)" }}>
+      <div className="flex-shrink-0 mb-1" style={{ background: "linear-gradient(135deg, var(--color-sidebar-bg) 0%, #0a4a6e 100%)" }}>
         <div className="px-4 py-2 flex items-center justify-between">
 
           {/* ── Left: Brand / Logo ────────────────────────────────────── */}
@@ -63,7 +63,7 @@ export default function AppBar({ user, onLogout, saved }) {
                 className="flex items-center gap-1 cursor-pointer"
                 onClick={toggleUserMenu}
               >
-                <div className="text-xs font-semibold text-white">{user?.name || "Dr. Aravind Kumar"}</div>
+                <div className="text-lg font-semibold text-white">{user?.name || "Dr. Aravind Kumar"}</div>
                 <ChevronDown
                   size={12}
                   style={{

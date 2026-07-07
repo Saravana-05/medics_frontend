@@ -3,25 +3,29 @@ import {
   ClipboardList, User, Users, ChevronDown, Search
 } from "lucide-react";
 
-/* ── Compact Relation Card (Extra short for tablet) ── */
-function CompactRelationCard({ value }) {
+/* ── Attendant Card — same layout as ClinicalCard (icon + title + data) ── */
+function CompactRelationCard({ attendant }) {
+  const a = attendant || {};
+  const value = [a.name, a.relationship, a.phone].filter(Boolean).join(" · ") || "—";
   return (
     <div
-      className="rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full"
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-      }}
+      className="flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all hover:shadow-sm md:p-1 md:min-w-[110px] h-full"
+      style={{ background: "transparent", border: "1px solid var(--color-border)" }}
     >
-      <div className="flex items-center justify-between h-full">
-        <div className="flex items-center gap-2 md:gap-1 flex-1 min-w-0">
-          <div className="p-1 rounded-lg flex-shrink-0 md:p-0.5" style={{ background: "var(--color-primary-muted)" }}>
-            <Users size={14} className="md:w-3 md:h-3" style={{ color: "var(--color-primary)" }} />
-          </div>
-          <span className="text-sm md:text-xs font-semibold truncate" style={{ color: "var(--color-primary-dark)" }}>
-            {value || "—"}
-          </span>
-        </div>
+      <div className="flex items-center gap-1 mb-4 md:mb-0">
+        <Users size={12} className="md:w-2.5 md:h-2.5" style={{ color: "var(--color-text-muted)" }} />
+        <span
+          className="text-[0.7rem] font-bold tracking-wide truncate md:text-[0.7rem]"
+          style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
+        >
+          Attendant
+        </span>
+      </div>
+      <div
+        className="lg:text-[0.7rem] font-regular break-words md:text-[0.6rem]"
+        style={{ color: "textStyle.color", fontFamily: "var(--font-inter)" }}
+      >
+        {value}
       </div>
     </div>
   );
@@ -40,7 +44,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
+        className="w-full flex items-center justify-between rounded-xl px-3 mb-5 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
         style={{
           background: "var(--color-surface)",
           border: `1px solid ${open ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -175,6 +179,7 @@ export default function LeftPatientSection({
     borderColor: "var(--color-border)", 
     background: "var(--color-surface-alt)",
     width: "calc(20% - 40px)",
+    height: "100%",
     marginLeft: "10px",
     marginRight: "10px",
   }}
@@ -187,22 +192,10 @@ export default function LeftPatientSection({
       */}
       <div className="flex flex-col md:flex-row lg:flex-col gap-2 md:gap-1 lg:gap-0 p-3 md:p-1 lg:p-0">
 
-        {/* Patient Selection — narrower on tablet */}
-        <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-3 lg:border-b" style={{ borderColor: "var(--color-border)" }}>
-          {/* Patient Info header: visible on mobile and desktop, hidden on tablet */}
-          <div className="flex items-center justify-between mb-1 md:hidden lg:flex lg:mb-2">
-            <div className="text-[0.65rem] font-bold uppercase tracking-wide flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-              <User size={12} /> Patient Info
-            </div>
-            {/* OP Number */}
-            {p && (
-              <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-md" style={{ background: "var(--color-primary-muted)" }}>
-                <ClipboardList size={10} style={{ color: "var(--color-primary)" }} />
-                <span className="text-[0.6rem] font-bold" style={{ color: "var(--color-primary)" }}>
-                  OP: {p.appt || "—"}
-                </span>
-              </div>
-            )}
+        {/* Patient Selection */}
+        <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">
+          <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center gap-1 md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
+            <User size={12} /> Appointments
           </div>
           <PatientDropdown
             patients={patients}
@@ -215,13 +208,13 @@ export default function LeftPatientSection({
 
         {/* Patient Details */}
         {p && (
-          <div className="flex flex-col sm:flex-row md:flex-1 lg:flex-none lg:flex-col gap-2 md:gap-1 lg:p-3 lg:pt-2">
+          <div className="flex flex-col sm:flex-row md:flex-1 lg:flex-none lg:flex-col gap-2 md:gap-1 lg:p-1 lg:gap-2">
 
-            {/* Sex / Age / DOB — extra compact on tablet */}
+            {/* Sex / Age / DOB — same card styling as CompactRelationCard */}
             <div
-              className="md:w-[58%] flex-1 lg:w-auto rounded-lg p-2 md:px-4 md:py-0.5 lg:p-2"
+              className="md:w-[58%] flex-1 lg:w-auto rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full"
               style={{
-                background: "var(--color-surface-alt)",
+                background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
               }}
             >
@@ -230,7 +223,7 @@ export default function LeftPatientSection({
                 {/* Sex */}
                 <div>
                   <div
-                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    className="text-[0.7rem] font-bold tracking-wide mb-0.5 md:mb-0"
                     style={{ color: "var(--color-text-muted)" }}
                   >
                     Sex
@@ -251,7 +244,7 @@ export default function LeftPatientSection({
                 {/* Age */}
                 <div>
                   <div
-                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    className="text-[0.7rem] font-bold  tracking-wide mb-0.5 md:mb-0"
                     style={{ color: "var(--color-text-muted)" }}
                   >
                     Age
@@ -266,7 +259,7 @@ export default function LeftPatientSection({
                 {/* DOB */}
                 <div>
                   <div
-                    className="text-[0.55rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    className="text-[0.6rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
                     style={{ color: "var(--color-text-muted)" }}
                   >
                     DOB
@@ -279,9 +272,9 @@ export default function LeftPatientSection({
               </div>
             </div>
 
-            {/* Relation — narrower on tablet with reduced height */}
+            {/* Attendant — ClinicalCard-style card (icon + title + data) */}
             <div className="md:w-[28%] flex-1 lg:w-auto">
-              <CompactRelationCard value={p.relation} />
+              <CompactRelationCard attendant={p.attendant} />
             </div>
 
           </div>
