@@ -67,74 +67,101 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
           {/* <Users size={16} style={{ color: "#004d00" }} /> */}
           <span className="text-md font-bold text-white" >Patient Family History</span>
           <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full"
-            style={{ background: "#004d00", color: "white" }}>{items.length}</span>
+            style={{ background: "white", color: "#679cbc" }}>{items.length}</span>
         </div>
         
       </div>
 
-      {/* Content */}
-      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
+      {/* Add button row — right-aligned with light-grey divider + drop shadow (matches SchedulePanel) */}
+      <div className="px-3 py-2 flex items-center justify-end gap-2"
+        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="p-1 rounded transition-all hover:bg-white/50"
-          style={{ background: "var(--color-surface)" }}
+          className="flex items-center justify-center rounded-lg transition-all hover:bg-black/5 flex-shrink-0"
+          style={{ width: 40, height: 40, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+          title="Add family member"
         >
-          <Plus size={14} style={{ color: "#004d00" }} />
+          <Plus size={24} style={{ color: "#679cbc" }} />
         </button>
-        {/* Add/Edit Form */}
+      </div>
+
+      {/* Content */}
+      <div className="overflow-y-auto" style={{ height: panelHeight - headerH }}>
+        {/* Add/Edit Form — modal popup (blue theme only) */}
         {showAddForm && (
-          <div className="p-3 border-b" style={{ borderColor: "#b0d8b0", background: "#f5fff5" }}>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Member Name"
-                  value={newMember.name}
-                  onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                  className="flex-1 px-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-                />
-                <input
-                  type="text"
-                  placeholder="Age"
-                  value={newMember.age}
-                  onChange={(e) => setNewMember({ ...newMember, age: e.target.value })}
-                  className="flex-1 px-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-                />
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.45)" }}
+            onClick={handleCancel}
+          >
+            <div
+              className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              style={{ background: "var(--color-surface)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal header */}
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#679cbc" }}>
+                <span className="text-base font-bold text-white">
+                  {editingIndex !== null ? "Edit" : "Add"} Family Member
+                </span>
+                <button onClick={handleCancel} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
+                  <X size={20} className="text-white" />
+                </button>
               </div>
-              <div className="flex gap-2">
+
+              {/* Modal body */}
+              <div className="p-4 space-y-3">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Member Name"
+                    value={newMember.name}
+                    onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Age"
+                    value={newMember.age}
+                    onChange={(e) => setNewMember({ ...newMember, age: e.target.value })}
+                    className="w-20 px-3 py-2 text-base rounded-lg border outline-none"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                  />
+                </div>
                 <input
                   type="text"
                   placeholder="Relationship (e.g., Father, Mother)"
                   value={newMember.relation}
                   onChange={(e) => setNewMember({ ...newMember, relation: e.target.value })}
-                  className="flex-1 px-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
                 <input
                   type="text"
                   placeholder="Condition (e.g., Diabetes, Nil)"
                   value={newMember.condition}
                   onChange={(e) => setNewMember({ ...newMember, condition: e.target.value })}
-                  className="flex-1 px-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
               </div>
-              <div className="flex gap-2">
+
+              {/* Modal footer */}
+              <div className="flex gap-3 px-4 pb-4">
                 <button
                   onClick={editingIndex !== null ? handleUpdate : handleAdd}
-                  className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#004d00", color: "white" }}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-success)", color: "white" }}
                 >
-                  <Check size={12} /> {editingIndex !== null ? "Update" : "Add"}
+                  <Check size={16} /> {editingIndex !== null ? "Update" : "Add"}
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#d8f0d8", color: "#004d00" }}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-danger)", color: "white" }}
                 >
-                  <X size={12} /> Cancel
+                  <X size={16} /> Cancel
                 </button>
               </div>
             </div>
@@ -149,26 +176,26 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
           </div>
         ) : items.map((member, i) => (
           <div key={i} className="relative p-3 pr-16 border-b group"
-            style={{ borderColor: "#d8f0d8", background: i % 2 === 0 ? "white" : "#f5fff5" }}>
-            
+            style={{ borderColor: "var(--color-border)", background: i % 2 === 0 ? "white" : "#f2f7fb" }}>
+
             {/* Main Content */}
             <div className="flex items-start justify-between mb-1">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm" style={{ color: "#004d00" }}>{member.name}</span>
-                  <span className="text-[0.55rem] font-medium px-1.5 py-0.5 rounded" 
-                    style={{ background: "#c8e8c8", color: "#004d00" }}>
+                  <span className="font-bold text-sm" style={{ color: "var(--color-text-base)" }}>{member.name}</span>
+                  <span className="text-[0.55rem] font-medium px-1.5 py-0.5 rounded"
+                    style={{ background: "#e6eff6", color: "#3f6f8f" }}>
                     {member.relation || "—"}
                   </span>
                 </div>
-                <div className="text-[0.65rem] mt-0.5" style={{ color: "#5a8a5a" }}>
+                <div className="text-[0.65rem] mt-0.5" style={{ color: "var(--color-text-muted)" }}>
                   Age: {member.age || "—"}
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{
-                  background: member.condition === "Nil" ? "var(--color-drugs-light)" : "var(--color-lab-light)",
-                  color: member.condition === "Nil" ? "var(--color-drugs)" : "var(--color-lab)",
+                  background: member.condition === "Nil" ? "#eef3f8" : "#679cbc",
+                  color: member.condition === "Nil" ? "var(--color-text-muted)" : "white",
                 }}>
                   {member.condition || "Nil"}
                 </span>
@@ -181,8 +208,8 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
                 {member.chronicAllergy.map((allergy, idx) => (
                   <span key={idx} className="text-[0.55rem] font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5"
                     style={{
-                      background: allergy.type === "Allergy" ? "#fee2e2" : "var(--color-lab-light)",
-                      color: allergy.type === "Allergy" ? "var(--color-danger)" : "var(--color-lab)",
+                      background: allergy.type === "Allergy" ? "#679cbc" : "#e6eff6",
+                      color: allergy.type === "Allergy" ? "white" : "#3f6f8f",
                     }}>
                     <AlertCircle size={10} />
                     {allergy.name}
@@ -190,21 +217,21 @@ function PatientFamilyPanel({ patient, panelHeight, onUpdate }) {
                 ))}
               </div>
             )}
-            
-            {/* Edit and Delete Buttons - Properly positioned */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+            {/* Edit and Delete Buttons - horizontal, green / red */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => handleEdit(i)}
                 className="p-1.5 rounded hover:bg-white/50 transition-all"
-                style={{ background: "var(--color-surface)", border: "1px solid #c8e8c8" }}
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                 title="Edit"
               >
-                <Pencil size={13} style={{ color: "#004d00" }} />
+                <Pencil size={13} style={{ color: "var(--color-success)" }} />
               </button>
               <button
                 onClick={() => handleDelete(i)}
                 className="p-1.5 rounded hover:bg-white/50 transition-all"
-                style={{ background: "var(--color-surface)", border: "1px solid #f8d8d8" }}
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                 title="Delete"
               >
                 <X size={13} style={{ color: "var(--color-danger)" }} />

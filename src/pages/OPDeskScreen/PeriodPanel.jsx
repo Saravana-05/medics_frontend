@@ -109,7 +109,7 @@ function PeriodPanel({ patient, panelHeight }) {
                   onClick={() => setSelectedYear(year)}
                   className="px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
                   style={{
-                    background: selectedYear === year ? "#d97706" : "var(--color-surface-alt)",
+                    background: selectedYear === year ? "#0c324a" : "var(--color-surface-alt)",
                     color: selectedYear === year ? "white" : "var(--color-text-muted)",
                     border: "1px solid var(--color-border)"
                   }}

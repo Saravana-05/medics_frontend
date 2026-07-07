@@ -336,21 +336,22 @@ export default function PatientInfoPanel({
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className="flex-1 flex items-end justify-center rounded-b-[22px] transition-all duration-200"
+              className="flex-1 flex items-center justify-center rounded-b-[22px] transition-all duration-200"
               style={{
-                height: isActive ? 172 : 158,
+                height: 168,
                 background: isActive ? "var(--color-success)" : "var(--color-danger)",
-                opacity: isActive ? 1 : 0.88,
+                opacity: isActive ? 1 : 0.9,
                 boxShadow: isActive ? "0 8px 16px rgba(0,0,0,0.20)" : "none",
               }}
             >
               <span
-                className="font-bold text-white pb-4 whitespace-nowrap"
+                className="font-bold text-white whitespace-nowrap leading-none"
                 style={{
                   writingMode: "vertical-rl",
                   transform: "rotate(180deg)",
                   fontSize: "0.8rem",
-                  letterSpacing: "0.02em",
+                  letterSpacing: "0.03em",
+                  textAlign: "center",
                 }}
               >
                 {tab.label}
