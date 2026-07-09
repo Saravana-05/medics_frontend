@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ParkingCircle, Save, FileText as FileIcon, Calendar, CalendarDays, ClipboardList, BedDouble } from "lucide-react";
+import { FileText as FileIcon, Calendar, CalendarDays } from "lucide-react";
 import OPListModal from "../../../modal/Oplistmodal";
 
 // Keys must match RightSidebar's RIGHT_TABS keys, in the same top-to-bottom order.
@@ -36,7 +36,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
               <div className="flex gap-2 flex-1">
                 <button
                   onClick={() => setShowOPList(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all hover:shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
                   style={{
                     borderRadius: 0,
                     background: "var(--color-primary)",
@@ -50,7 +50,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 </button>
                <button
     onClick={onPark}
-    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all hover:shadow-sm"
+    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all shadow-sm hover:shadow-md"
     style={{
       borderRadius: 0,
       background: "#fbbf24",
@@ -68,7 +68,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
               <div className="flex gap-2 flex-1">
                 <button
                   onClick={onIPList}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all hover:shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
                   style={{
                     borderRadius: 0,
                     background: "var(--color-danger)",
@@ -113,7 +113,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                     type="date"
                     value={followUpDate}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="w-full pl-8 pr-2 py-1.5 text-sm border outline-none"
+                    className="w-full pl-8 pr-2 py-2.5 text-sm border outline-none shadow-sm"
                     style={{
                       borderRadius: 0,
                       background: "var(--color-surface)",
@@ -130,7 +130,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
               {/* Doc No */}
               <div className="flex-1 lg:flex-none">
                 <div className="text-[0.55rem] font-bold uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
-                <div className="flex items-center justify-between gap-1.5 px-2 py-1 h-full md:h-auto" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
+                <div className="flex items-center justify-between gap-1.5 px-2 py-2.5 h-full md:h-auto shadow-sm" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
                   <div className="flex items-center gap-1.5">
                     <FileIcon size={12} style={{ color: "var(--color-primary)" }} />
                     <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
@@ -142,7 +142,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
               {/* Doc Date */}
               <div className="flex-1 lg:flex-none">
                 <div className="text-[0.55rem] font-bold uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>
-                <div className="flex items-center justify-between gap-1.5 px-2 py-1 h-full md:h-auto" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
+                <div className="flex items-center justify-between gap-1.5 px-2 py-2.5 h-full md:h-auto shadow-sm" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
                   <div className="flex items-center gap-1.5">
                     <Calendar size={12} style={{ color: "var(--color-primary)" }} />
                     <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>

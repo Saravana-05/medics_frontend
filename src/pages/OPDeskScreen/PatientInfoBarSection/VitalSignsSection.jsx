@@ -25,7 +25,7 @@ const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
 function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
   return (
     <div
-      className="flex items-center gap-1 px-2 py-0.5 rounded-full flex-shrink-0"
+      className="flex items-center gap-1 px-2 py-0.5 rounded-full flex-shrink-0 shadow-sm"
       style={{ background: accent }}
     >
       <Icon size={11} style={{ color: "#ffffff" }} />
@@ -51,7 +51,7 @@ function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
 function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, trend }) {
   return (
     <div
-      className="group relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105"
+      className="group relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105 shadow-sm"
       style={{ background: "var(--color-surface)", border: `1px solid ${tint(accent, "20%")}` }}
     >
       <div className="flex items-center justify-between">

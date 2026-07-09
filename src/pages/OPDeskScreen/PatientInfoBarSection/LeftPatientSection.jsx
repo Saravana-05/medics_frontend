@@ -9,8 +9,8 @@ function CompactRelationCard({ attendant }) {
   const value = [a.name, a.relationship, a.phone].filter(Boolean).join(" · ") || "—";
   return (
     <div
-      className="flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all hover:shadow-sm md:p-1 md:min-w-[110px] h-full"
-      style={{ background: "transparent", border: "1px solid var(--color-border)" }}
+      className="flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 md:min-w-[110px] h-full"
+      style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
     >
       <div className="flex items-center gap-1 mb-4 md:mb-0">
         <Users size={12} className="md:w-2.5 md:h-2.5" style={{ color: "var(--color-primary)" }} />
@@ -44,7 +44,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between rounded-xl px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
+        className="w-full flex items-center justify-between rounded-xl px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all shadow-sm"
         style={{
           background: "var(--color-surface)",
           border: `1px solid ${open ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -174,14 +174,14 @@ export default function LeftPatientSection({
 
   return (
     <div
-  className="w-full lg:shrink-0 box-border border"
+  className="w-full lg:shrink-0 box-border border shadow-md"
   style={{
     borderColor: "var(--color-border)",
     background: "var(--color-surface-alt)",
     width: "calc(20% - 40px)",
     marginLeft: "10px",
     marginRight: "10px",
-    marginBottom: "2px",
+    marginBottom: "5px",
   }}
 >
       {/*
@@ -212,7 +212,7 @@ export default function LeftPatientSection({
 
             {/* Sex / Age / DOB — same card styling as CompactRelationCard */}
             <div
-              className="md:w-[58%] flex-1 lg:w-auto rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full"
+              className="md:w-[58%] flex-1 lg:w-auto rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full shadow-sm"
               style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",

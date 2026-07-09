@@ -20,7 +20,7 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
 
   return (
     <div
-      className={`flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all hover:shadow-sm md:p-1 md:min-w-[110px] ${disabled ? 'opacity-70' : ''}`}
+      className={`flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 md:min-w-[110px] ${disabled ? 'opacity-70' : ''}`}
       style={{ 
         background: disabled ? "var(--color-surface-alt)" : "transparent", 
         border: disabled ? "1px dashed var(--color-border)" : "1px solid var(--color-border)" 

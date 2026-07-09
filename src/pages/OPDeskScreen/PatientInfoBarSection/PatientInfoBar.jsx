@@ -41,7 +41,7 @@ export default function PatientInfoBar({
               its matching LeftSidebar tab is hovered. Desktop only.
               Absolutely positioned so its fixed height never forces the row taller
               than the Vital Signs + Clinical Information content. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0 lg:bottom-0" style={{ width: "2.5px" }}>
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0 lg:bottom-[5px]" style={{ width: "2.5px" }}>
             {LEFT_ACCENT_SEGMENTS.map((seg) => (
               <div
                 key={seg.key}
@@ -68,7 +68,7 @@ export default function PatientInfoBar({
           <div className="flex-1 flex flex-col lg:flex-row min-w-0 lg:gap-2" style={{ height: "100%" }}>
             
             {/* Left side - Vital Signs + Clinical Information (one bordered section) */}
-            <div className="flex-1 flex flex-col min-w-0 box-border border mb-[2px]" style={{ borderColor: "var(--color-border)" }}>
+            <div className="flex-1 flex flex-col min-w-0 box-border border mb-[5px] shadow-md" style={{ borderColor: "var(--color-border)" }}>
               {/* Vital Signs Section - At the TOP */}
               {p && <VitalSignsSection patient={p} />}
 
@@ -79,7 +79,7 @@ export default function PatientInfoBar({
             {/* Right side - TopBar Section (full width on tablet, vertical sidebar on desktop) */}
             {p && (
               <div
-                className="w-full lg:w-80 flex-shrink-0 box-border border mb-[2px]"
+                className="w-full lg:w-80 flex-shrink-0 box-border border mb-[5px] shadow-md"
                 style={{ borderColor: "var(--color-border)" }}
               >
                 <TopBarSection

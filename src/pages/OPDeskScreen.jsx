@@ -86,7 +86,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       {/* On tablet/mobile this row is capped at 50% of viewport height and scrolls
           internally, so the main workspace below always keeps usable space. */}
       <div className="flex-shrink-0 flex items-stretch max-h-screen overflow-y-auto md:max-h-none lg:overflow-visible">
-        <div className="flex-shrink-0 flex">
+        <div className="flex-shrink-0 flex mb-[5px]">
           <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} />
         </div>
 
@@ -104,7 +104,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           />
         </div>
 
-        <div className="flex-shrink-0 flex">
+        <div className="flex-shrink-0 flex mb-[5px]">
           <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>
