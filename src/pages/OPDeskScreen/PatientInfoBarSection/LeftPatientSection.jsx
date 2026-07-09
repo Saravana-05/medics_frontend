@@ -13,7 +13,7 @@ function CompactRelationCard({ attendant }) {
       style={{ background: "transparent", border: "1px solid var(--color-border)" }}
     >
       <div className="flex items-center gap-1 mb-4 md:mb-0">
-        <Users size={12} className="md:w-2.5 md:h-2.5" style={{ color: "var(--color-text-muted)" }} />
+        <Users size={12} className="md:w-2.5 md:h-2.5" style={{ color: "var(--color-primary)" }} />
         <span
           className="text-[0.7rem] font-bold tracking-wide truncate md:text-[0.7rem]"
           style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
@@ -22,8 +22,8 @@ function CompactRelationCard({ attendant }) {
         </span>
       </div>
       <div
-        className="lg:text-[0.7rem] font-regular break-words md:text-[0.6rem]"
-        style={{ color: "textStyle.color", fontFamily: "var(--font-inter)" }}
+        className="lg:text-[0.7rem] font-medium break-words md:text-[0.6rem]"
+        style={{ color: "var(--color-primary)", fontFamily: "var(--font-inter)" }}
       >
         {value}
       </div>
@@ -44,7 +44,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between rounded-xl px-3 mb-5 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
+        className="w-full flex items-center justify-between rounded-xl px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all"
         style={{
           background: "var(--color-surface)",
           border: `1px solid ${open ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -174,14 +174,14 @@ export default function LeftPatientSection({
 
   return (
     <div
-  className="w-full lg:shrink-0 border-b lg:border-b-0 lg:border-r"
-  style={{ 
-    borderColor: "var(--color-border)", 
+  className="w-full lg:shrink-0 box-border border"
+  style={{
+    borderColor: "var(--color-border)",
     background: "var(--color-surface-alt)",
     width: "calc(20% - 40px)",
-    height: "100%",
     marginLeft: "10px",
     marginRight: "10px",
+    marginBottom: "2px",
   }}
 >
       {/*
@@ -190,7 +190,7 @@ export default function LeftPatientSection({
         - Tablet (md-lg):   single row, "F"/"M", reduced padding/gaps for a shorter row
         - Desktop (lg+):    original stacked sidebar layout, full "Female"/"Male"
       */}
-      <div className="flex flex-col md:flex-row lg:flex-col gap-2 md:gap-1 lg:gap-0 p-3 md:p-1 lg:p-0">
+      <div className="flex flex-col md:flex-row lg:flex-col gap-1 md:gap-1 lg:gap-0 p-3 md:p-1 lg:p-0">
 
         {/* Patient Selection */}
         <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">

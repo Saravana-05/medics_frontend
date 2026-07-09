@@ -82,7 +82,7 @@ export default function ClinicalInformationSection({ patient, isInline = false }
   });
   
   return (
-    <div className="px-3 py-1 sm:py-0" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)"  }}>
+    <div className="px-3 py-2 sm:py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)"  }}>
       {/* Clinical Information header - hidden on tablet, visible on mobile and desktop */}
       <div className="flex items-center gap-2  md:hidden lg:flex lg:mt-1 ">
         <Clipboard size={14} style={{ color: "var(--color-primary)" }} />
@@ -95,7 +95,7 @@ export default function ClinicalInformationSection({ patient, isInline = false }
       </div>
       
       {/* Single Row Cards — scrolls horizontally if it can't all fit */}
-      <div className="flex gap-2 md:gap-1 overflow-x-auto md:pb-1 lg:pb-6 lg:pt-1">
+      <div className="flex gap-2 md:gap-1 overflow-x-auto md:pb-1 lg:pb-1 lg:pt-1">
         {clinicalCards.map((card, index) => (
           <ClinicalCard 
             key={index}

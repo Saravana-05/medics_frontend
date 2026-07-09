@@ -18,29 +18,25 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
   return (
     <>
       <div
-        className="flex"
-
+        className="flex gap-1 h-full"
       >
         {/* Main content */}
         <div
-          className="flex-1 p-2 md:p-1.5 flex flex-col"
+          className="flex-1 p-2 md:p-1.5 flex flex-col border border-solid border-gray-300"
           style={{
             background: "var(--color-surface-alt)",
-            width: "calc(100% - 40px)",
-            marginLeft: "auto",
-            marginRight: "auto",
           }}
         >
           <div className="flex flex-col gap-0">
 
-            {/* ── BUTTONS: 4-in-a-row on tablet (md), 2x2 on large screens (lg+) ── */}
-            <div className="flex md:flex-row lg:flex-col gap-2 mb-2">
+            {/* ── BUTTONS: all 4 in a single row on every breakpoint ── */}
+            <div className="flex flex-row gap-2 mb-2">
 
               {/* Pair 1: OP List + Park */}
-              <div className="flex gap-2 flex-1 lg:flex-none">
+              <div className="flex gap-2 flex-1">
                 <button
                   onClick={() => setShowOPList(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-bold transition-all hover:shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all hover:shadow-sm"
                   style={{
                     borderRadius: 0,
                     background: "var(--color-primary)",
@@ -49,12 +45,12 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                   onMouseEnter={e => e.currentTarget.style.background = "var(--color-primary-light)"}
                   onMouseLeave={e => e.currentTarget.style.background = "var(--color-primary)"}
                 >
-                  <ClipboardList size={14} />
+                  {/* <ClipboardList size={14} /> */}
                   OP List
                 </button>
                <button
     onClick={onPark}
-    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-semibold transition-all hover:shadow-sm"
+    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all hover:shadow-sm"
     style={{
       borderRadius: 0,
       background: "#fbbf24",
@@ -63,16 +59,16 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
     onMouseEnter={e => e.currentTarget.style.background = "var(--color-warning)"}
     onMouseLeave={e => e.currentTarget.style.background = "#fbbf24"}
   >
-    <ParkingCircle size={14} />
+    {/* <ParkingCircle size={14} /> */}
     Park
   </button>
               </div>
 
               {/* Pair 2: IP List + Finalize */}
-              <div className="flex gap-2 flex-1 lg:flex-none">
+              <div className="flex gap-2 flex-1">
                 <button
                   onClick={onIPList}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-bold transition-all hover:shadow-sm"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all hover:shadow-sm"
                   style={{
                     borderRadius: 0,
                     background: "var(--color-danger)",
@@ -81,12 +77,12 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                   onMouseEnter={e => e.currentTarget.style.background = "#b91c1c"}
                   onMouseLeave={e => e.currentTarget.style.background = "var(--color-danger)"}
                 >
-                  <BedDouble size={14} />
+                  {/* <BedDouble size={14} /> */}
                   IP List
                 </button>
                <button
     onClick={onFinalize}
-    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.6rem] font-bold transition-all shadow-sm"
+    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm"
     style={{
       borderRadius: 0,
       background: "#16a34a",
@@ -95,7 +91,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
     onMouseEnter={e => e.currentTarget.style.background = "#15803d"}
     onMouseLeave={e => e.currentTarget.style.background = "#16a34a"}
   >
-    <Save size={14} />
+    {/* <Save size={14} /> */}
     Finalize
   </button>
               </div>
@@ -163,21 +159,19 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
         {/* Right accent bar — segmented to match the 4 sidebar tabs (Parked/Emergency/Reports/Schedule) */}
         {/* Invisible by default; a segment becomes visible only while its matching RightSidebar tab is hovered/active. */}
         <div
-          className="flex flex-col"
+          className="flex flex-col h-full"
           style={{
             width: "2.5px",
             flexShrink: 0,
             marginRight: "2.5px",
           }}
         >
-          {ACCENT_SEGMENTS.map((seg, i) => (
+          {ACCENT_SEGMENTS.map((seg) => (
             <div
               key={seg.key}
               style={{
-                height: "52px",
-                flexShrink: 0,
+                flex: 1,
                 background: seg.color,
-                borderBottom: i < ACCENT_SEGMENTS.length - 1 ? "2px solid var(--color-surface)" : "none",
                 opacity: highlightedTab === seg.key ? 1 : 0,
                 transition: "opacity 150ms ease",
               }}

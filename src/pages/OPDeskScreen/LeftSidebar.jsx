@@ -178,14 +178,14 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient, onHov
     <>
       <div
         ref={sidebarRef}
-        className="flex flex-col flex-shrink-0 items-center"
+        className="flex flex-col flex-shrink-0 items-center h-full"
         style={{
           width: `${SIDEBAR_WIDTH}px`,
           background: "var(--color-surface)",
           borderRight: "1px solid var(--color-border)",
         }}
       >
-        {LEFT_TABS.map(tab => {
+        {LEFT_TABS.map((tab) => {
           const isActive  = activePanel === tab.key;
           const isLit     = isActive;
 
@@ -195,7 +195,7 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient, onHov
               onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={() => setHoveredKey(tab.key)}
               onMouseLeave={() => setHoveredKey(null)}
-              className="relative cursor-pointer flex items-center justify-center w-full active:scale-95 transition-transform"
+              className="relative cursor-pointer flex-1 flex items-center justify-center w-full active:scale-95 transition-transform"
               style={{
                 minHeight: "52px",
                 background: tab.color,

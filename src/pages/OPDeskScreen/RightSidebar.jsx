@@ -159,7 +159,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
     <>
       <div
         ref={sidebarRef}
-        className="flex flex-col flex-shrink-0 items-center"
+        className="flex flex-col flex-shrink-0 items-center h-full"
         style={{
           width: `${SIDEBAR_WIDTH}px`,
           background: "var(--color-surface)",
@@ -176,7 +176,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
               onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={() => setHoveredKey(tab.key)}
               onMouseLeave={() => setHoveredKey(null)}
-              className="relative cursor-pointer flex items-center justify-center w-full active:scale-95 transition-transform"
+              className="relative cursor-pointer flex-1 flex items-center justify-center w-full active:scale-95 transition-transform"
               style={{
                 minHeight: "52px",
                 background: tab.color,
@@ -202,19 +202,6 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
             </div>
           );
         })}
-
-        <div className="flex-1" />
-
-        {/* <div
-          className="flex items-center justify-center rounded-lg cursor-pointer transition-all duration-150"
-          style={{ width: "36px", height: "36px" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-surface-alt)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-        >
-          <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--color-text-muted)", lineHeight: 1 }}>
-            +
-          </span>
-        </div> */}
       </div>
 
       {renderPopup()}

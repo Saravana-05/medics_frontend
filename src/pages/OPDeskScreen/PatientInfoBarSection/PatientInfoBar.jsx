@@ -30,25 +30,24 @@ export default function PatientInfoBar({
 
   return (
     <>
-      <div className="select-none" style={{ background: "var(--color-surface)", fontFamily: "var(--font-body)" }}>
-        
+      <div className="select-none w-full h-full flex flex-col" style={{ background: "var(--color-surface)", fontFamily: "var(--font-body)" }}>
+
         {/* ── Main Content Area ── */}
-        {/* Stacks vertically on tablet/mobile, side-by-side from lg up */}
-        <div className="flex flex-col lg:flex-row lg:relative ">
+        {/* Stacks vertically on tablet/mobile, side-by-side from lg up.
+            Height is driven by flex stretch (matches the sidebars) — no hardcoded height. */}
+        <div className="flex-1 flex flex-col lg:flex-row lg:relative lg:items-stretch">
 
           {/* Left accent bar — mirrors the right one; a segment shows only while
               its matching LeftSidebar tab is hovered. Desktop only.
               Absolutely positioned so its fixed height never forces the row taller
               than the Vital Signs + Clinical Information content. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0" style={{ width: "2.5px" }}>
-            {LEFT_ACCENT_SEGMENTS.map((seg, i) => (
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0 lg:bottom-0" style={{ width: "2.5px" }}>
+            {LEFT_ACCENT_SEGMENTS.map((seg) => (
               <div
                 key={seg.key}
                 style={{
-                  height: "52px",
-                  flexShrink: 0,
+                  flex: 1,
                   background: seg.color,
-                  borderBottom: i < LEFT_ACCENT_SEGMENTS.length - 1 ? "2px solid var(--color-surface)" : "none",
                   opacity: leftHighlightedTab === seg.key ? 1 : 0,
                   transition: "opacity 150ms ease",
                 }}
@@ -66,13 +65,13 @@ export default function PatientInfoBar({
           />
 
           {/* ── Right Panel ── */}
-          <div className="flex-1 flex flex-col lg:flex-row min-w-0 " style={{ height: "100%" }}>
+          <div className="flex-1 flex flex-col lg:flex-row min-w-0 lg:gap-2" style={{ height: "100%" }}>
             
-            {/* Left side - Vital Signs + Clinical Information (stacked vertically) */}
-            <div className="flex-1 flex flex-col min-w-0">
+            {/* Left side - Vital Signs + Clinical Information (one bordered section) */}
+            <div className="flex-1 flex flex-col min-w-0 box-border border mb-[2px]" style={{ borderColor: "var(--color-border)" }}>
               {/* Vital Signs Section - At the TOP */}
               {p && <VitalSignsSection patient={p} />}
-              
+
               {/* Clinical Information Section - Single Row (Below Vital Signs) */}
               {p && <ClinicalInformationSection patient={p} isInline={true} />}
             </div>
@@ -80,7 +79,7 @@ export default function PatientInfoBar({
             {/* Right side - TopBar Section (full width on tablet, vertical sidebar on desktop) */}
             {p && (
               <div
-                className="w-full lg:w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l"
+                className="w-full lg:w-80 flex-shrink-0 box-border border mb-[2px]"
                 style={{ borderColor: "var(--color-border)" }}
               >
                 <TopBarSection
