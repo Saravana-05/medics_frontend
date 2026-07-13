@@ -21,7 +21,7 @@ const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
 // RIGHT panel (Lab Result): Observed Value | Unit | Bio Ref | Specimen | Actions
 // This panel is now fully independent from the left table (own box, own header,
 // own row count) instead of being a second half of one shared grid.
-const RIGHT_GRID = "minmax(60px,1fr) 70px 1fr 110px 100px";
+const RIGHT_GRID = "minmax(60px,1fr) 70px 180px 80px 100px";
 
 // ── Lab Test Groups ──
 const LAB_GROUPS = [
@@ -367,7 +367,7 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
       {/* Title */}
       <div className="flex items-center justify-center px-4 py-2.5 border-b flex-shrink-0"
         style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-        <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Result</span>
+        <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Report</span>
       </div>
 
       {/* Header */}
@@ -376,7 +376,6 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
         <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Unit</div>
         <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Biological Ref. - Interval</div>
         <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
-        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Actions</div>
       </div>
 
       {/* Rows — one per lab, same count/order as the left panel, but its own box */}
@@ -420,26 +419,7 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
                   {lab.specimen || "—"}
                 </span>
               </div>
-              <div className="px-2 py-2 flex items-center justify-center gap-1.5">
-                <button onClick={e => { e.stopPropagation(); onEdit(lab); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
-                  style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
-                  <Edit2 size={14} />
-                </button>
-                <button onClick={e => { e.stopPropagation(); onStrike(lab.id); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
-                  style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#fde68a"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-lab-light)"}>
-                  {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
-                </button>
-                <button onClick={e => { e.stopPropagation(); onDelete(lab.id); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
-                  style={{ background: "#fee2e2", color: "var(--color-danger)" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
-                  <X size={14} />
-                </button>
-              </div>
+              
             </div>
           );
         })}
