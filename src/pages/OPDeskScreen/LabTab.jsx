@@ -180,31 +180,39 @@ function ShortcutHint() {
   );
 }
 
-/* ── Modern Toolbar Component ── */
-function ModernToolbar({ onProto, searchMode, onSearchModeChange, onClear, onSave }) {
+/* ── Search-mode checkboxes (Alphabet / Embedded) — sits above the add row ── */
+function SearchModeToggle({ searchMode, onSearchModeChange }) {
   return (
-    <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      <div className="flex items-center gap-3">
-        {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
-          const checked = searchMode === value;
-          return (
-            <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
-              style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-lab)" : "var(--color-text-muted)" }}>
-              <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
-                style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
-                  border: `2px solid ${checked ? "var(--color-lab)" : "var(--color-border)"}`,
-                  background: checked ? "var(--color-lab)" : "var(--color-surface)" }}>
-                {checked && (
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                    <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span onClick={() => onSearchModeChange(value)}>{label}</span>
-            </label>
-          );
-        })}
-      </div>
+    <div className="flex items-center gap-3 px-3 py-2 flex-shrink-0 border-t"
+      style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
+      {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
+        const checked = searchMode === value;
+        return (
+          <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
+            style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-lab)" : "var(--color-text-muted)" }}>
+            <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
+              style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
+                border: `2px solid ${checked ? "var(--color-lab)" : "var(--color-border)"}`,
+                background: checked ? "var(--color-lab)" : "var(--color-surface)" }}>
+              {checked && (
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </span>
+            <span onClick={() => onSearchModeChange(value)}>{label}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Modern Toolbar Component ── */
+function ModernToolbar({ onProto, onClear, onSave }) {
+  return (
+    <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
@@ -229,31 +237,20 @@ function PortalDropdown({ anchorEl, open, children }) {
     if (!open || !anchorEl) return;
     const rect = anchorEl.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    const dropHeight = 300;
-
-    if (spaceBelow >= dropHeight || spaceBelow >= spaceAbove) {
-      setStyle({
-        position: "fixed",
-        top: rect.bottom + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    } else {
-      setStyle({
-        position: "fixed",
-        bottom: window.innerHeight - rect.top + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    }
+    // Always open downward, sized to the space below so it stays on-screen and scrolls.
+    setStyle({
+      position: "fixed",
+      top: rect.bottom + 2,
+      left: rect.left,
+      width: rect.width,
+      maxHeight: spaceBelow - 8,
+      zIndex: 99999,
+    });
   }, [open, anchorEl]);
 
   if (!open) return null;
   return ReactDOM.createPortal(
-    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflow: "hidden" }}>
+    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>,
     document.body
@@ -280,28 +277,46 @@ function AddTableHeader() {
   );
 }
 
-/* ── Added Lab Table Header ── */
+/* ── Added Lab Table Header (left: test info, right: result entry) ── */
 function TableHeader() {
-  const columns = [
+  const leftColumns = [
     { label: "S.No", width: "w-16" },
     { label: "Name", width: "flex-1" },
     { label: "Remarks", width: "w-48" },
     { label: "Actions", width: "w-28", center: true },
   ];
+  const rightColumns = [
+    { label: "Observed Value", width: "flex-1" },
+    { label: "Unit", width: "w-24", center: true },
+    { label: "Biological Ref. - Interval", width: "w-64" },
+    { label: "Specimen", width: "w-32" },
+    { label: "Actions", width: "w-28", center: true },
+  ];
   return (
     <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
-      {columns.map(col => (
-        <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
-          style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>
-          {col.label}
-        </div>
-      ))}
+      <div className="flex flex-1">
+        {leftColumns.map(col => (
+          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
+            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>
+            {col.label}
+          </div>
+        ))}
+      </div>
+      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-lab)", opacity: 0.4 }} />
+      <div className="flex flex-1">
+        {rightColumns.map(col => (
+          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
+            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>
+            {col.label}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-/* ── Lab Row Component ── */
-function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav }) {
+/* ── Lab Row Component (left: test info + actions, right: result entry + actions) ── */
+function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, onResultChange }) {
   return (
     <div
       tabIndex={0}
@@ -326,45 +341,115 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
         boxShadow: isSelected ? "inset 0 0 0 2px var(--color-lab)" : "none",
       }}
     >
-      <div className="w-16 px-3 py-2 text-center">
-        <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>{index + 1}</span>
-      </div>
-      <div className="flex-1 px-3 py-2">
-        <div className="flex flex-col">
-          <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
-            <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
-            {lab.name}
-          </span>
-          {lab.group && (
-            <span className="text-[0.55rem] mt-0.5 flex items-center gap-1" style={{ color: "var(--color-text-subtle)" }}>
-              <FolderOpen size={10} />
-              {lab.group}
+      {/* ── Left: test info ── */}
+      <div className="flex flex-1">
+        <div className="w-16 px-3 py-2 text-center">
+          <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>{index + 1}</span>
+        </div>
+        <div className="flex-1 px-3 py-2">
+          <div className="flex flex-col">
+            <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
+              <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
+              {lab.name}
             </span>
-          )}
+            {lab.group && (
+              <span className="text-[0.55rem] mt-0.5 flex items-center gap-1" style={{ color: "var(--color-text-subtle)" }}>
+                <FolderOpen size={10} />
+                {lab.group}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="w-48 px-3 py-2">
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{lab.detail === "—" ? "—" : lab.detail}</span>
+        </div>
+        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+          <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
+            <Edit2 size={14} />
+          </button>
+          <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
+            style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fde68a"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-lab-light)"}>
+            {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
+          </button>
+          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
+            style={{ background: "#fee2e2", color: "var(--color-danger)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
+            <X size={14} />
+          </button>
         </div>
       </div>
-      <div className="w-48 px-3 py-2">
-        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{lab.detail === "—" ? "—" : lab.detail}</span>
-      </div>
-      <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
-        <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
-          style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
-          <Edit2 size={14} />
-        </button>
-        <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
-          style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#fde68a"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-lab-light)"}>
-          {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
-        </button>
-        <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
-          style={{ background: "#fee2e2", color: "var(--color-danger)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
-          <X size={14} />
-        </button>
+
+      {/* ── Divider ── */}
+      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-border)" }} />
+
+      {/* ── Right: result entry ── */}
+      <div className="flex flex-1">
+        <div className="flex-1 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+          <input
+            type="text"
+            value={lab.observedValue || ""}
+            onChange={e => onResultChange(lab.id, "observedValue", e.target.value)}
+            placeholder="Enter value"
+            className="w-full px-2 py-1.5 rounded text-sm outline-none"
+            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
+          />
+        </div>
+        <div className="w-24 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+          <input
+            type="text"
+            value={lab.unit || ""}
+            onChange={e => onResultChange(lab.id, "unit", e.target.value)}
+            placeholder="Unit"
+            className="w-full px-2 py-1.5 rounded text-sm text-center outline-none"
+            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
+          />
+        </div>
+        <div className="w-64 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+          <input
+            type="text"
+            value={lab.bioRef || ""}
+            onChange={e => onResultChange(lab.id, "bioRef", e.target.value)}
+            placeholder="Biological Ref. - Interval"
+            className="w-full px-2 py-1.5 rounded text-sm outline-none"
+            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
+          />
+        </div>
+        <div className="w-32 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+          <input
+            type="text"
+            value={lab.specimen || ""}
+            onChange={e => onResultChange(lab.id, "specimen", e.target.value)}
+            placeholder="Specimen"
+            className="w-full px-2 py-1.5 rounded text-sm outline-none"
+            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
+          />
+        </div>
+        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+          <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
+            <Edit2 size={14} />
+          </button>
+          <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
+            style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fde68a"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-lab-light)"}>
+            {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
+          </button>
+          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
+            style={{ background: "#fee2e2", color: "var(--color-danger)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
+            <X size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -688,7 +773,7 @@ const AddRow = React.forwardRef(({
         />
 
         <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
-          <div className="max-h-72 overflow-y-auto">
+          <div>
             {dropdownItems.map((item, i) => {
               if (item.type === "section-header") {
                 return (
@@ -788,6 +873,7 @@ const AddRow = React.forwardRef(({
 
 /* ═══════════════════════════════════════════════ MAIN LAB TAB COMPONENT ═══════════════════ */
 const EMPTY_DRAFT = { name: "", detail: "—" };
+const EMPTY_RESULT_FIELDS = { observedValue: "", unit: "", bioRef: "", specimen: "" };
 
 export default function LabTab({ labs, setLabs, patient }) {
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -822,7 +908,8 @@ export default function LabTab({ labs, setLabs, patient }) {
         id: Date.now() + Math.random() * 1000,
         name: test,
         detail: draft.detail,
-        group: selectedGroup.name
+        group: selectedGroup.name,
+        ...EMPTY_RESULT_FIELDS,
       }));
       setLabs(prev => [...prev, ...newLabs]);
     } else if (editId !== null) {
@@ -830,7 +917,7 @@ export default function LabTab({ labs, setLabs, patient }) {
       setEditId(null);
     } else {
       // Add individual test
-      setLabs(prev => [...prev, { id: Date.now(), ...draft }]);
+      setLabs(prev => [...prev, { id: Date.now(), ...draft, ...EMPTY_RESULT_FIELDS }]);
     }
     
     setDraft(EMPTY_DRAFT);
@@ -867,6 +954,10 @@ export default function LabTab({ labs, setLabs, patient }) {
     setLabs(prev => prev.filter(l => l.id !== id));
     setStruckIds(prev => prev.filter(x => x !== id));
     if (selectedRowId === id) setSelectedRowId(null);
+  };
+
+  const updateLabResultField = (id, field, value) => {
+    setLabs(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
   };
 
   const handleClearAll = () => {
@@ -937,35 +1028,16 @@ export default function LabTab({ labs, setLabs, patient }) {
       <div className="flex-shrink-0">
         <ModernToolbar
           onProto={handleProto}
-          searchMode={searchMode}
-          onSearchModeChange={setSearchMode}
           onClear={handleClearAll}
           onSave={handleSave}
         />
       </div>
 
-      {/* BODY */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* BODY — pb reserves room below the add row so its search dropdown can open downward */}
+      <div className="flex-1 flex flex-col overflow-hidden pb-44">
 
-        {/* ── ADD LAB TABLE ── */}
-        <div ref={addTableWrapperRef} className="flex-shrink-0">
-          <AddTableHeader />
-          {showAddRow ? (
-            <AddRow ref={addRowRef} {...addRowProps} />
-          ) : (
-            <div className="flex items-center justify-center py-3 border-b cursor-pointer transition-all"
-              style={{ background: "var(--color-lab-light)", borderColor: "var(--color-lab)" }}
-              onClick={handleAddNewTest}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
-                style={{ background: "var(--color-lab)", color: "white" }}>
-                <Plus size={14} /> Add Test
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ── ADDED LAB TABLE ── */}
-        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden mt-6">
+        {/* ── ADDED LAB TABLE (top): left = test info, right = result entry ── */}
+        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           {labs.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
               <div className="text-center">
@@ -974,21 +1046,14 @@ export default function LabTab({ labs, setLabs, patient }) {
                 </div>
                 <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Lab Tests Ordered Yet</h3>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table above to add your first lab test.
+                  Use the table below to add your first lab test.
                 </p>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 px-3 pb-2">
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-                <span className="text-[0.65rem] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-subtle)" }}>
-                  Added Lab Tests ({labs.length})
-                </span>
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-              </div>
               <TableHeader />
-              <div className="overflow-y-auto">
+              <div className="overflow-y-auto flex-1">
                 {labs.map((lab, index) => (
                   <LabRow
                     key={lab.id}
@@ -1001,10 +1066,31 @@ export default function LabTab({ labs, setLabs, patient }) {
                     onStrike={() => toggleStrike(lab.id)}
                     onEdit={() => startEdit(lab)}
                     onArrowNav={dir => handleRowArrowNav(lab.id, dir)}
+                    onResultChange={updateLabResultField}
                   />
                 ))}
               </div>
             </>
+          )}
+        </div>
+
+        {/* ── SEARCH MODE (above the add row) ── */}
+        <SearchModeToggle searchMode={searchMode} onSearchModeChange={setSearchMode} />
+
+        {/* ── ADD LAB TABLE (bottom) ── */}
+        <div ref={addTableWrapperRef} className="flex-shrink-0">
+          <AddTableHeader />
+          {showAddRow ? (
+            <AddRow ref={addRowRef} {...addRowProps} />
+          ) : (
+            <div className="flex items-center justify-center py-3 border-t cursor-pointer transition-all"
+              style={{ background: "var(--color-lab-light)", borderColor: "var(--color-lab)" }}
+              onClick={handleAddNewTest}>
+              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
+                style={{ background: "var(--color-lab)", color: "white" }}>
+                <Plus size={14} /> Add Test
+              </button>
+            </div>
           )}
         </div>
       </div>

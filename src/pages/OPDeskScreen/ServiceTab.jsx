@@ -5,7 +5,7 @@ import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
   Settings, Search, ChevronDown, Briefcase, Activity, Heart, Mic, Zap,
-  BookOpen, Trash, List, ListChecks, Info
+  BookOpen, Trash, List, ListChecks, Info, Paperclip, Download, Eye
 } from "lucide-react";
 import { SERVICE_SUGGESTIONS } from "./mockData";
 
@@ -14,6 +14,26 @@ const DETAIL_OPTIONS = ["—","Chest (Lung)","Abdomen","Upper Crest","Pelvis","W
 const SORTED_SERVICE_SUGGESTIONS = [...SERVICE_SUGGESTIONS].sort((a, b) => a.localeCompare(b));
 
 const FIELD_ORDER = ["name", "detail", "commit"];
+
+function formatFileSize(bytes) {
+  if (!bytes && bytes !== 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatDateTime(date) {
+  if (!date) return "";
+  const d = new Date(date);
+  return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" }) +
+    ", " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+}
+
+function getFileTypeLabel(fileName) {
+  if (!fileName) return "";
+  const ext = fileName.split(".").pop();
+  return ext ? ext.toUpperCase() : "";
+}
 
 /* ── Action Button Component ── */
 function ActionButton({ onClick, variant = "primary", icon: Icon, label, disabled = false }) {
@@ -71,74 +91,72 @@ function ShortcutHint() {
   );
 }
 
-/* ── Modern Toolbar Component ── */
-function ModernToolbar({ onProto, searchMode, onSearchModeChange, prescriptionMode, onPrescriptionModeChange, onClear, onSave }) {
+/* ── Search-mode + prescription-mode row — sits above the add row ── */
+function SearchModeToggle({ searchMode, onSearchModeChange, prescriptionMode, onPrescriptionModeChange }) {
   return (
-    <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      <div className="flex items-center gap-4">
-        {/* Alphabet/Embedded checkboxes */}
-        <div className="flex items-center gap-3">
-          {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
-            const checked = searchMode === value;
-            return (
-              <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
-                style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-services)" : "var(--color-text-muted)" }}>
-                <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
-                  style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
-                    border: `2px solid ${checked ? "var(--color-services)" : "var(--color-border)"}`,
-                    background: checked ? "var(--color-services)" : "var(--color-surface)" }}>
-                  {checked && (
-                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                      <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </span>
-                <span onClick={() => onSearchModeChange(value)}>{label}</span>
-              </label>
-            );
-          })}
-        </div>
-
-        {/* Divider */}
-        <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
-
-        {/* Prescription Mode Toggle */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPrescriptionModeChange("all")}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-              prescriptionMode === "all" 
-                ? "bg-var(--color-services) text-white" 
-                : "bg-transparent text-var(--color-text-muted) hover:bg-var(--color-surface-alt)"
-            }`}
-            style={{
-              background: prescriptionMode === "all" ? "var(--color-services)" : "transparent",
-              color: prescriptionMode === "all" ? "white" : "var(--color-text-muted)",
-              border: prescriptionMode === "all" ? "none" : "1px solid var(--color-border)",
-            }}
-          >
-            <List size={14} />
-            All
-          </button>
-          <button
-            onClick={() => onPrescriptionModeChange("onebyone")}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-              prescriptionMode === "onebyone" 
-                ? "bg-var(--color-services) text-white" 
-                : "bg-transparent text-var(--color-text-muted) hover:bg-var(--color-surface-alt)"
-            }`}
-            style={{
-              background: prescriptionMode === "onebyone" ? "var(--color-services)" : "transparent",
-              color: prescriptionMode === "onebyone" ? "white" : "var(--color-text-muted)",
-              border: prescriptionMode === "onebyone" ? "none" : "1px solid var(--color-border)",
-            }}
-          >
-            <ListChecks size={14} />
-            One by One
-          </button>
-        </div>
+    <div className="flex items-center gap-4 px-3 py-2 flex-shrink-0 border-t" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      {/* Alphabet/Embedded checkboxes */}
+      <div className="flex items-center gap-3">
+        <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
+        {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
+          const checked = searchMode === value;
+          return (
+            <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
+              style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-services)" : "var(--color-text-muted)" }}>
+              <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
+                style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
+                  border: `2px solid ${checked ? "var(--color-services)" : "var(--color-border)"}`,
+                  background: checked ? "var(--color-services)" : "var(--color-surface)" }}>
+                {checked && (
+                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                    <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span onClick={() => onSearchModeChange(value)}>{label}</span>
+            </label>
+          );
+        })}
       </div>
 
+      {/* Divider */}
+      <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
+
+      {/* Prescription Mode Toggle */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onPrescriptionModeChange("all")}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
+          style={{
+            background: prescriptionMode === "all" ? "var(--color-services)" : "transparent",
+            color: prescriptionMode === "all" ? "white" : "var(--color-text-muted)",
+            border: prescriptionMode === "all" ? "none" : "1px solid var(--color-border)",
+          }}
+        >
+          <List size={14} />
+          All
+        </button>
+        <button
+          onClick={() => onPrescriptionModeChange("onebyone")}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
+          style={{
+            background: prescriptionMode === "onebyone" ? "var(--color-services)" : "transparent",
+            color: prescriptionMode === "onebyone" ? "white" : "var(--color-text-muted)",
+            border: prescriptionMode === "onebyone" ? "none" : "1px solid var(--color-border)",
+          }}
+        >
+          <ListChecks size={14} />
+          One by One
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Modern Toolbar Component ── */
+function ModernToolbar({ onProto, onClear, onSave }) {
+  return (
+    <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       {/* Right-side action buttons */}
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
@@ -164,31 +182,20 @@ function PortalDropdown({ anchorEl, open, children }) {
     if (!open || !anchorEl) return;
     const rect = anchorEl.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    const dropHeight = 300;
-
-    if (spaceBelow >= dropHeight || spaceBelow >= spaceAbove) {
-      setStyle({
-        position: "fixed",
-        top: rect.bottom + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    } else {
-      setStyle({
-        position: "fixed",
-        bottom: window.innerHeight - rect.top + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    }
+    // Always open downward, sized to the space below so it stays on-screen and scrolls.
+    setStyle({
+      position: "fixed",
+      top: rect.bottom + 2,
+      left: rect.left,
+      width: rect.width,
+      maxHeight: spaceBelow - 8,
+      zIndex: 99999,
+    });
   }, [open, anchorEl]);
 
   if (!open) return null;
   return ReactDOM.createPortal(
-    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflow: "hidden" }}>
+    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>,
     document.body
@@ -215,28 +222,74 @@ function AddTableHeader() {
   );
 }
 
-/* ── Added Service Table Header ── */
+/* ── Added Service Table Header (left: service info, right: attached file) ── */
 function TableHeader() {
-  const columns = [
+  const leftColumns = [
     { label: "S.No", width: "w-16" },
     { label: "Name", width: "flex-1" },
     { label: "Remarks", width: "w-40" },
     { label: "Actions", width: "w-28", center: true },
   ];
+  const rightColumns = [
+    { label: "File Name", width: "flex-1" },
+    { label: "Type", width: "w-20", center: true },
+    { label: "Size", width: "w-24", center: true },
+    { label: "Date & Time", width: "w-40", center: true },
+    { label: "Actions", width: "w-28", center: true },
+  ];
   return (
     <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-services-light)", borderColor: "var(--color-border)" }}>
-      {columns.map(col => (
-        <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
-          style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-services)" }}>
-          {col.label}
-        </div>
-      ))}
+      <div className="flex flex-1">
+        {leftColumns.map(col => (
+          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
+            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-services)" }}>
+            {col.label}
+          </div>
+        ))}
+      </div>
+      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-services)", opacity: 0.4 }} />
+      <div className="flex flex-1">
+        {rightColumns.map(col => (
+          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
+            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-services)" }}>
+            {col.label}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-/* ── Service Row Component ── */
-function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav }) {
+/* ── Service Row Component (left: service info + actions, right: attached file + actions) ── */
+function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, onFileUpload, onFileRemove }) {
+  const fileInputRef = useRef(null);
+  const hasFile = !!service.fileName;
+
+  const handleFilePick = (e) => {
+    e.stopPropagation();
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) onFileUpload(service.id, file);
+    e.target.value = "";
+  };
+
+  const handleView = (e) => {
+    e.stopPropagation();
+    if (service.fileUrl) window.open(service.fileUrl, "_blank");
+  };
+
+  const handleDownload = (e) => {
+    e.stopPropagation();
+    if (!service.fileUrl) return;
+    const a = document.createElement("a");
+    a.href = service.fileUrl;
+    a.download = service.fileName || "file";
+    a.click();
+  };
+
   return (
     <div
       tabIndex={0}
@@ -261,37 +314,93 @@ function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, 
         boxShadow: isSelected ? "inset 0 0 0 2px var(--color-services)" : "none",
       }}
     >
-      <div className="w-16 px-3 py-2 text-center">
-        <span className="text-sm font-bold" style={{ color: "var(--color-services)" }}>{index + 1}</span>
+      {/* ── Left: service info ── */}
+      <div className="flex flex-1">
+        <div className="w-16 px-3 py-2 text-center">
+          <span className="text-sm font-bold" style={{ color: "var(--color-services)" }}>{index + 1}</span>
+        </div>
+        <div className="flex-1 px-3 py-2">
+          <span className={`text-sm font-semibold inline-flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
+            <Briefcase size={14} style={{ color: "var(--color-services)" }} />
+            {service.name}
+          </span>
+        </div>
+        <div className="w-40 px-3 py-2">
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{service.detail === "—" ? "—" : service.detail}</span>
+        </div>
+        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+          <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
+            <Edit2 size={14} />
+          </button>
+          <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
+            style={{ background: "var(--color-services-light)", color: "var(--color-services)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#d0e4f5"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-services-light)"}>
+            {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
+          </button>
+          <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
+            style={{ background: "#fee2e2", color: "var(--color-danger)" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
+            <X size={14} />
+          </button>
+        </div>
       </div>
-      <div className="flex-1 px-3 py-2">
-        <span className={`text-sm font-semibold inline-flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
-          <Briefcase size={14} style={{ color: "var(--color-services)" }} />
-          {service.name}
-        </span>
-      </div>
-      <div className="w-40 px-3 py-2">
-        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{service.detail === "—" ? "—" : service.detail}</span>
-      </div>
-      <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
-        <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
-          style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
-          <Edit2 size={14} />
-        </button>
-        <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1.5 rounded transition-all" title={isStruck ? "Undo Strike (S)" : "Strike (S)"}
-          style={{ background: "var(--color-services-light)", color: "var(--color-services)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#d0e4f5"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-services-light)"}>
-          {isStruck ? <RotateCcw size={14} /> : <MinusCircle size={14} />}
-        </button>
-        <button onClick={e => { e.stopPropagation(); onDelete(); }} className="p-1.5 rounded transition-all" title="Delete (Alt+Del)"
-          style={{ background: "#fee2e2", color: "var(--color-danger)" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
-          <X size={14} />
-        </button>
+
+      {/* ── Divider ── */}
+      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-border)" }} />
+
+      {/* ── Right: attached file ── */}
+      <div className="flex flex-1">
+        <div className="flex-1 px-3 py-2 flex items-center min-w-0">
+          {hasFile ? (
+            <span className="text-sm truncate flex items-center gap-1.5" style={{ color: "var(--color-text-base)" }}>
+              <Paperclip size={13} style={{ color: "var(--color-services)" }} />
+              <span className="truncate">{service.fileName}</span>
+            </span>
+          ) : (
+            <button
+              onClick={handleFilePick}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
+              style={{ background: "var(--color-services-light)", color: "var(--color-services)", border: "1px dashed var(--color-services)" }}
+            >
+              <Paperclip size={12} /> Attach File
+            </button>
+          )}
+          <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+        </div>
+        <div className="w-20 px-2 py-2 text-center">
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{getFileTypeLabel(service.fileName)}</span>
+        </div>
+        <div className="w-24 px-2 py-2 text-center">
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{formatFileSize(service.fileSize)}</span>
+        </div>
+        <div className="w-40 px-2 py-2 text-center">
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{formatDateTime(service.fileDateTime)}</span>
+        </div>
+        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+          <button onClick={handleView} disabled={!hasFile} title="View" className="p-1.5 rounded transition-all"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)", opacity: hasFile ? 1 : 0.4, cursor: hasFile ? "pointer" : "not-allowed" }}
+            onMouseEnter={(e) => { if (hasFile) e.currentTarget.style.background = "var(--color-primary-light)"; }}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-primary-muted)"}>
+            <Eye size={14} />
+          </button>
+          <button onClick={handleDownload} disabled={!hasFile} title="Download" className="p-1.5 rounded transition-all"
+            style={{ background: "var(--color-services-light)", color: "var(--color-services)", opacity: hasFile ? 1 : 0.4, cursor: hasFile ? "pointer" : "not-allowed" }}
+            onMouseEnter={(e) => { if (hasFile) e.currentTarget.style.background = "#d0e4f5"; }}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--color-services-light)"}>
+            <Download size={14} />
+          </button>
+          <button onClick={e => { e.stopPropagation(); onFileRemove(service.id); }} disabled={!hasFile} title="Remove File" className="p-1.5 rounded transition-all"
+            style={{ background: "#fee2e2", color: "var(--color-danger)", opacity: hasFile ? 1 : 0.4, cursor: hasFile ? "pointer" : "not-allowed" }}
+            onMouseEnter={(e) => { if (hasFile) e.currentTarget.style.background = "#fecaca"; }}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
+            <X size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -495,7 +604,7 @@ const AddRow = React.forwardRef(({
         />
 
         <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
-          <div className="max-h-72 overflow-y-auto">
+          <div>
             <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider sticky top-0"
               style={{ color: "var(--color-text-muted)", background: "var(--color-primary-muted)" }}>
               {listLabel}
@@ -562,6 +671,7 @@ const AddRow = React.forwardRef(({
 
 /* ═══════════════════════════════════════════════ MAIN SERVICE TAB COMPONENT ═══════════════ */
 const EMPTY_DRAFT = { name: "", detail: "—" };
+const EMPTY_FILE_FIELDS = { fileName: "", fileType: "", fileSize: 0, fileDateTime: null, fileUrl: "" };
 
 export default function ServiceTab({ services, setServices, patient }) {
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -594,7 +704,7 @@ export default function ServiceTab({ services, setServices, patient }) {
         setServices(prev => prev.map(s => s.id === editId ? { ...s, ...draft } : s));
         setEditId(null);
       } else {
-        setServices(prev => [...prev, { id: Date.now(), ...draft }]);
+        setServices(prev => [...prev, { id: Date.now(), ...draft, ...EMPTY_FILE_FIELDS }]);
       }
       setDraft(EMPTY_DRAFT);
       setQuery("");
@@ -614,7 +724,7 @@ export default function ServiceTab({ services, setServices, patient }) {
         setQuery("");
         setTimeout(() => addRowRef.current?.focusName(), 100);
       } else {
-        setServices(prev => [...prev, { id: Date.now(), ...draft }]);
+        setServices(prev => [...prev, { id: Date.now(), ...draft, ...EMPTY_FILE_FIELDS }]);
         // Keep the form for next entry
         setDraft(EMPTY_DRAFT);
         setQuery("");
@@ -646,6 +756,22 @@ export default function ServiceTab({ services, setServices, patient }) {
     setServices(prev => prev.filter(s => s.id !== id));
     setStruckIds(prev => prev.filter(x => x !== id));
     if (selectedRowId === id) setSelectedRowId(null);
+  };
+
+  const handleFileUpload = (id, file) => {
+    const fileUrl = URL.createObjectURL(file);
+    setServices(prev => prev.map(s => s.id === id ? {
+      ...s,
+      fileName: file.name,
+      fileType: getFileTypeLabel(file.name),
+      fileSize: file.size,
+      fileDateTime: new Date().toISOString(),
+      fileUrl,
+    } : s));
+  };
+
+  const handleFileRemove = (id) => {
+    setServices(prev => prev.map(s => s.id === id ? { ...s, ...EMPTY_FILE_FIELDS } : s));
   };
 
   const handleClearAll = () => {
@@ -716,37 +842,16 @@ export default function ServiceTab({ services, setServices, patient }) {
       <div className="flex-shrink-0">
         <ModernToolbar
           onProto={handleProto}
-          searchMode={searchMode}
-          onSearchModeChange={setSearchMode}
-          prescriptionMode={prescriptionMode}
-          onPrescriptionModeChange={setPrescriptionMode}
           onClear={handleClearAll}
           onSave={handleSave}
         />
       </div>
 
-      {/* BODY */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* BODY — pb reserves room below the add row so its search dropdown can open downward */}
+      <div className="flex-1 flex flex-col overflow-hidden pb-44">
 
-        {/* ── ADD SERVICE TABLE ── */}
-        <div ref={addTableWrapperRef} className="flex-shrink-0">
-          <AddTableHeader />
-          {showAddRow ? (
-            <AddRow ref={addRowRef} {...addRowProps} />
-          ) : (
-            <div className="flex items-center justify-center py-3 border-b cursor-pointer transition-all"
-              style={{ background: "var(--color-services-light)", borderColor: "var(--color-services)" }}
-              onClick={handleAddNewService}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
-                style={{ background: "var(--color-services)", color: "white" }}>
-                <Plus size={14} /> Add Service
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ── ADDED SERVICE TABLE ── */}
-        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden mt-6">
+        {/* ── ADDED SERVICE TABLE (top): left = service info, right = attached file ── */}
+        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           {services.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
               <div className="text-center">
@@ -755,21 +860,14 @@ export default function ServiceTab({ services, setServices, patient }) {
                 </div>
                 <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Services Ordered Yet</h3>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table above to add your first service.
+                  Use the table below to add your first service.
                 </p>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 px-3 pb-2">
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-                <span className="text-[0.65rem] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-subtle)" }}>
-                  Added Services ({services.length})
-                </span>
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-              </div>
               <TableHeader />
-              <div className="overflow-y-auto">
+              <div className="overflow-y-auto flex-1">
                 {services.map((service, index) => (
                   <ServiceRow
                     key={service.id}
@@ -782,10 +880,37 @@ export default function ServiceTab({ services, setServices, patient }) {
                     onStrike={() => toggleStrike(service.id)}
                     onEdit={() => startEdit(service)}
                     onArrowNav={dir => handleRowArrowNav(service.id, dir)}
+                    onFileUpload={handleFileUpload}
+                    onFileRemove={handleFileRemove}
                   />
                 ))}
               </div>
             </>
+          )}
+        </div>
+
+        {/* ── SEARCH / PRESCRIPTION MODE (above the add row) ── */}
+        <SearchModeToggle
+          searchMode={searchMode}
+          onSearchModeChange={setSearchMode}
+          prescriptionMode={prescriptionMode}
+          onPrescriptionModeChange={setPrescriptionMode}
+        />
+
+        {/* ── ADD SERVICE TABLE (bottom) ── */}
+        <div ref={addTableWrapperRef} className="flex-shrink-0">
+          <AddTableHeader />
+          {showAddRow ? (
+            <AddRow ref={addRowRef} {...addRowProps} />
+          ) : (
+            <div className="flex items-center justify-center py-3 border-t cursor-pointer transition-all"
+              style={{ background: "var(--color-services-light)", borderColor: "var(--color-services)" }}
+              onClick={handleAddNewService}>
+              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
+                style={{ background: "var(--color-services)", color: "white" }}>
+                <Plus size={14} /> Add Service
+              </button>
+            </div>
           )}
         </div>
       </div>

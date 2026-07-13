@@ -68,33 +68,20 @@ function PortalDropdown({ anchorEl, open, children }) {
     if (!open || !anchorEl) return;
     const rect = anchorEl.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    const dropHeight = 300;
-
-    if (spaceBelow >= dropHeight || spaceBelow >= spaceAbove) {
-      // open downward
-      setStyle({
-        position: "fixed",
-        top: rect.bottom + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    } else {
-      // open upward
-      setStyle({
-        position: "fixed",
-        bottom: window.innerHeight - rect.top + 2,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 99999,
-      });
-    }
+    // Always open downward, sized to the space below so it stays on-screen and scrolls.
+    setStyle({
+      position: "fixed",
+      top: rect.bottom + 2,
+      left: rect.left,
+      width: rect.width,
+      maxHeight: spaceBelow - 8,
+      zIndex: 99999,
+    });
   }, [open, anchorEl]);
 
   if (!open) return null;
   return ReactDOM.createPortal(
-    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflow: "hidden" }}>
+    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>,
     document.body
@@ -157,32 +144,39 @@ function ShortcutHint() {
   );
 }
 
-/* ── Toolbar ── */
-function ModernToolbar({ onProto, searchMode, onSearchModeChange, onClear, onSave }) {
+/* ── Search-mode checkboxes (Alphabet / Embedded) — sits above the add row ── */
+function SearchModeToggle({ searchMode, onSearchModeChange }) {
   return (
-    <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      {/* Search mode checkboxes */}
-      <div className="flex items-center gap-3">
-        {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
-          const checked = searchMode === value;
-          return (
-            <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
-              style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-drugs)" : "var(--color-text-muted)" }}>
-              <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
-                style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
-                  border: `2px solid ${checked ? "var(--color-drugs)" : "var(--color-border)"}`,
-                  background: checked ? "var(--color-drugs)" : "var(--color-surface)" }}>
-                {checked && (
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                    <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span onClick={() => onSearchModeChange(value)}>{label}</span>
-            </label>
-          );
-        })}
-      </div>
+    <div className="flex items-center gap-3 px-3 py-2 flex-shrink-0 border-t"
+      style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
+      {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
+        const checked = searchMode === value;
+        return (
+          <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
+            style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? "var(--color-drugs)" : "var(--color-text-muted)" }}>
+            <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
+              style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
+                border: `2px solid ${checked ? "var(--color-drugs)" : "var(--color-border)"}`,
+                background: checked ? "var(--color-drugs)" : "var(--color-surface)" }}>
+              {checked && (
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </span>
+            <span onClick={() => onSearchModeChange(value)}>{label}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Toolbar ── */
+function ModernToolbar({ onProto, onClear, onSave }) {
+  return (
+    <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       {/* Right-side action buttons */}
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
@@ -203,14 +197,14 @@ function ModernToolbar({ onProto, searchMode, onSearchModeChange, onClear, onSav
 /* ── Add Table Header ── */
 function AddTableHeader() {
   const columns = [
-    { label: "S.No",    width: "w-12",  center: true },
-    { label: "Name",    width: "flex-1" },
-    { label: "Days",    width: "w-16",  center: true },
-    { label: "Dosage",  width: "w-20",  center: true },
-    { label: "Period",  width: "w-20",  center: true },
-    { label: "When",    width: "w-28",  center: true },
-    { label: "Remarks", width: "w-48" },
-    { label: "Actions", width: "w-16",  center: true },
+    { label: "S.No",    width: "w-12",   center: true },
+    { label: "Name",    width: "w-80",   center: true },
+    { label: "Days",    width: "w-16",   center: true },
+    { label: "Dosage",  width: "w-20",   center: true },
+    { label: "Period",  width: "w-20",   center: true },
+    { label: "When",    width: "w-28",   center: true },
+    { label: "Remarks", width: "flex-1", center: true },
+    { label: "Actions", width: "w-16",   center: true },
   ];
   return (
     <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-drugs)", borderColor: "var(--color-drugs)" }}>
@@ -227,16 +221,16 @@ function AddTableHeader() {
 /* ── Added Medicines Table Header ── */
 function TableHeader() {
   const columns = [
-    { label: "S.No",    width: "w-12",  center: true },
-    { label: "Name",    width: "flex-1" },
-    { label: "Buy",     width: "w-12",  center: true },
-    { label: "Mor",     width: "w-12",  center: true },
-    { label: "Noon",    width: "w-12",  center: true },
-    { label: "Eve",     width: "w-12",  center: true },
-    { label: "Night",   width: "w-12",  center: true },
-    { label: "When",    width: "w-20",  center: true },
-    { label: "Remarks",  width: "w-36" },
-    { label: "Actions", width: "w-24",  center: true },
+    { label: "S.No",    width: "w-12",   center: true },
+    { label: "Name",    width: "w-80",   center: true },
+    { label: "Buy",     width: "w-12",   center: true },
+    { label: "Mor",     width: "w-12",   center: true },
+    { label: "A.Noon",  width: "w-12",   center: true },
+    { label: "Eve",     width: "w-12",   center: true },
+    { label: "Night",   width: "w-12",   center: true },
+    { label: "When",    width: "w-20",   center: true },
+    { label: "Remarks", width: "flex-1", center: true },
+    { label: "Actions", width: "w-24",   center: true },
   ];
   return (
     <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)" }}>
@@ -283,7 +277,7 @@ function DrugRow({ drug, index, isStruck, isSelected, onSelect, onDelete, onStri
       <div className="w-12 px-2 py-2 text-center">
         <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}</span>
       </div>
-      <div className="flex-1 min-w-0 px-2 py-2">
+      <div className="w-80 min-w-0 px-2 py-2">
         <div className="font-semibold text-sm truncate" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
           {drug.name}
         </div>
@@ -307,7 +301,7 @@ function DrugRow({ drug, index, isStruck, isSelected, onSelect, onDelete, onStri
       <div className="w-20 px-2 py-2 text-center">
         <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{drug.when}</span>
       </div>
-      <div className="w-36 px-2 py-2">
+      <div className="flex-1 px-2 py-2 text-center">
         <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{drug.detail === "—" ? "" : drug.detail}</span>
       </div>
       <div className="w-24 px-1 py-2 flex items-center justify-center gap-1">
@@ -509,7 +503,7 @@ const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQue
       </div>
 
       {/* Name — portal dropdown so it escapes any overflow:hidden parent */}
-      <div className="flex-1 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
+      <div className="w-80 flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
         <Pill size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-drugs)" }} />
         <input
           data-field="name"
@@ -551,7 +545,7 @@ const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQue
 
         {/* FIXED: Portal dropdown — renders into document.body, never clipped */}
         <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
-          <div className="max-h-72 overflow-y-auto">
+          <div>
             <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider sticky top-0"
               style={{ color: "var(--color-text-muted)", background: "var(--color-primary-muted)" }}>
               {listLabel}
@@ -616,7 +610,7 @@ const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQue
       </div>
 
       {/* Remarks */}
-      <div className="w-48 flex-shrink-0 px-1 py-1.5 flex items-center">
+      <div className="flex-1 min-w-0 px-1 py-1.5 flex items-center">
         <TypableDetailInput dataField="detail" value={draft.detail}
           onChange={e => onDraftChange("detail")(e.target.value)}
           onKeyDown={e => handleFieldKeyDown(e, "detail")} />
@@ -786,34 +780,16 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
       <div className="flex-shrink-0">
         <ModernToolbar
           onProto={handleProto}
-          searchMode={searchMode}
-          onSearchModeChange={setSearchMode}
           onClear={handleClearAll}
           onSave={handleSave}
         />
       </div>
 
-      {/* BODY */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* BODY — pb reserves room below the add row so its search dropdown can open downward */}
+      <div className="flex-1 flex flex-col overflow-hidden pb-44">
 
-        {/* ── ADD MEDICINE TABLE ── */}
-        <div ref={addTableWrapperRef} className="flex-shrink-0">
-          <AddTableHeader />
-          {showAddRow ? (
-            <AddRow ref={addRowRef} {...addRowProps} />
-          ) : (
-            <div className="flex items-center justify-center py-3 border-b cursor-pointer transition-all"
-              style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-drugs)" }}
-              onClick={handleAddNewMedicine}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
-                style={{ background: "var(--color-drugs)", color: "white" }}>
-                <Plus size={14} /> Add Medicine
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden mt-6">
+        {/* ── ADDED MEDICINES TABLE (top) ── */}
+        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           {drugs.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
               <div className="text-center">
@@ -822,21 +798,14 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
                 </div>
                 <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Medicines Added Yet</h3>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table above to add your first medicine.
+                  Use the table below to add your first medicine.
                 </p>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 px-3 pb-2">
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-                <span className="text-[0.65rem] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-subtle)" }}>
-                  Added Medicines
-                </span>
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-              </div>
               <TableHeader />
-              <div className="overflow-y-auto">
+              <div className="overflow-y-auto flex-1">
                 {drugs.map((drug, index) => (
                   <DrugRow
                     key={drug.id}
@@ -853,6 +822,26 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
                 ))}
               </div>
             </>
+          )}
+        </div>
+
+        {/* ── SEARCH MODE (above the add row) ── */}
+        <SearchModeToggle searchMode={searchMode} onSearchModeChange={setSearchMode} />
+
+        {/* ── ADD MEDICINE TABLE (bottom) ── */}
+        <div ref={addTableWrapperRef} className="flex-shrink-0">
+          <AddTableHeader />
+          {showAddRow ? (
+            <AddRow ref={addRowRef} {...addRowProps} />
+          ) : (
+            <div className="flex items-center justify-center py-3 border-t cursor-pointer transition-all"
+              style={{ background: "var(--color-drugs-light)", borderColor: "var(--color-drugs)" }}
+              onClick={handleAddNewMedicine}>
+              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
+                style={{ background: "var(--color-drugs)", color: "white" }}>
+                <Plus size={14} /> Add Medicine
+              </button>
+            </div>
           )}
         </div>
       </div>

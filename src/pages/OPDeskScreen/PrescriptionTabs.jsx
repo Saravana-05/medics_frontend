@@ -29,7 +29,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
     <div className="flex-shrink-0" style={{ background: "var(--color-surface)", borderBottom: "1px solid var(--color-border)" }}>
       <div className="flex items-center justify-between px-2">
         {/* Tab Buttons */}
-        <div className="flex items-center gap-0.5 py-1.5">
+        <div className="flex items-center gap-1.5 py-2">
           {PRESCRIPTION_TABS.map(tab => {
             const isActive = activeTab === tab.key;
             const activeColor = getActiveTabColor(tab.key);
@@ -40,22 +40,22 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all duration-200"
+                className="relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all duration-200"
                 style={{
-                  background: isActive ? tint(activeColor, "12%") : "transparent",
+                  background: isActive ? tint(activeColor, "20%") : "transparent",
                   color: isActive ? activeColor : "var(--color-text-muted)",
                 }}
                 onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--color-surface-alt)"; }}
                 onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
               >
                 <Icon
-                  size={14}
+                  size={18}
                   style={{ color: isActive ? activeColor : "var(--color-text-subtle)" }}
                 />
                 <span className="whitespace-nowrap">{tab.label}</span>
                 {count > 0 && (
                   <span
-                    className="flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[0.55rem] font-bold leading-none text-white"
+                    className="flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-[0.65rem] font-bold leading-none text-white"
                     style={{ background: isActive ? activeColor : "var(--color-text-subtle)" }}
                   >
                     {count}

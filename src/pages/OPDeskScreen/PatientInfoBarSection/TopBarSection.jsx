@@ -29,73 +29,51 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
         >
           <div className="flex flex-col gap-0">
 
-            {/* ── BUTTONS: all 4 in a single row on every breakpoint ── */}
+            {/* ── BUTTONS: all in one row, equal size (Park) & equal spacing ── */}
             <div className="flex flex-row gap-2 mb-2">
-
-              {/* Pair 1: OP List + Park */}
-              <div className="flex gap-2 flex-1">
-                <button
-                  onClick={() => setShowOPList(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                  style={{
-                    borderRadius: 0,
-                    background: "var(--color-primary)",
-                    color: "white"
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--color-primary-light)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "var(--color-primary)"}
-                >
-                  {/* <ClipboardList size={14} /> */}
-                  OP List
-                </button>
-               <button
-    onClick={onPark}
-    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all shadow-sm hover:shadow-md"
-    style={{
-      borderRadius: 0,
-      background: "#fbbf24",
-      color: "#78350f"
-    }}
-    onMouseEnter={e => e.currentTarget.style.background = "var(--color-warning)"}
-    onMouseLeave={e => e.currentTarget.style.background = "#fbbf24"}
-  >
-    {/* <ParkingCircle size={14} /> */}
-    Park
-  </button>
-              </div>
-
-              {/* Pair 2: IP List + Finalize */}
-              <div className="flex gap-2 flex-1">
-                <button
-                  onClick={onIPList}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                  style={{
-                    borderRadius: 0,
-                    background: "var(--color-danger)",
-                    color: "white"
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#b91c1c"}
-                  onMouseLeave={e => e.currentTarget.style.background = "var(--color-danger)"}
-                >
-                  {/* <BedDouble size={14} /> */}
-                  IP List
-                </button>
-               <button
-    onClick={onFinalize}
-    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm"
-    style={{
-      borderRadius: 0,
-      background: "#16a34a",
-      color: "white"
-    }}
-    onMouseEnter={e => e.currentTarget.style.background = "#15803d"}
-    onMouseLeave={e => e.currentTarget.style.background = "#16a34a"}
-  >
-    {/* <Save size={14} /> */}
-    Finalize
-  </button>
-              </div>
-
+              <button
+                onClick={() => setShowOPList(true)}
+                className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
+                style={{ borderRadius: 0, background: "var(--color-primary)", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+                onMouseEnter={e => e.currentTarget.style.background = "var(--color-primary-light)"}
+                onMouseLeave={e => e.currentTarget.style.background = "var(--color-primary)"}
+              >
+                OP List
+              </button>
+              <button
+                onClick={onIPList}
+                className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
+                style={{ borderRadius: 0, background: "var(--color-danger)", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#b91c1c"}
+                onMouseLeave={e => e.currentTarget.style.background = "var(--color-danger)"}
+              >
+                IP List
+              </button>
+              <button
+                onClick={onPark}
+                className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
+                style={{ borderRadius: 0, background: "#656D78", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+              >
+                All Patients
+              </button>
+              <button
+                onClick={onPark}
+                className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all shadow-sm hover:shadow-md"
+                style={{ borderRadius: 0, background: "#fbbf24", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+                onMouseEnter={e => e.currentTarget.style.background = "var(--color-warning)"}
+                onMouseLeave={e => e.currentTarget.style.background = "#fbbf24"}
+              >
+                Park
+              </button>
+              <button
+                onClick={onFinalize}
+                className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
+                style={{ borderRadius: 0, background: "#16a34a", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#15803d"}
+                onMouseLeave={e => e.currentTarget.style.background = "#16a34a"}
+              >
+                Finalize
+              </button>
             </div>
 
             {/* ── DIVIDER: hidden on tablet (md), visible on lg+ ── */}

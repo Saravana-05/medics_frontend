@@ -131,30 +131,38 @@ function ShortcutHint() {
 }
 
 // ── Modern Toolbar Component ──
-function ModernToolbar({ onProto, searchMode, onSearchModeChange, onClear, onSave }) {
+/* ── Search-mode checkboxes — sits above the add row ── */
+function SearchModeToggle({ searchMode, onSearchModeChange }) {
   return (
-    <div className="flex items-center justify-between p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      <div className="flex items-center gap-3">
-        {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
-          const checked = searchMode === value;
-          return (
-            <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
-              style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? BURGUNDY : "var(--color-text-muted)" }}>
-              <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
-                style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
-                  border: `2px solid ${checked ? BURGUNDY : "var(--color-border)"}`,
-                  background: checked ? BURGUNDY : "var(--color-surface)" }}>
-                {checked && (
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                    <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span onClick={() => onSearchModeChange(value)}>{label}</span>
-            </label>
-          );
-        })}
-      </div>
+    <div className="flex items-center gap-3 px-3 py-2 flex-shrink-0 border-t"
+      style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
+      {[{ value: "alpha", label: "Alphabet" }, { value: "embedded", label: "Embedded" }].map(({ value, label }) => {
+        const checked = searchMode === value;
+        return (
+          <label key={value} className="flex items-center gap-1.5 cursor-pointer select-none"
+            style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? BURGUNDY : "var(--color-text-muted)" }}>
+            <span onClick={() => onSearchModeChange(value)} className="flex items-center justify-center rounded transition-all"
+              style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer",
+                border: `2px solid ${checked ? BURGUNDY : "var(--color-border)"}`,
+                background: checked ? BURGUNDY : "var(--color-surface)" }}>
+              {checked && (
+                <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                  <polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </span>
+            <span onClick={() => onSearchModeChange(value)}>{label}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+function ModernToolbar({ onProto, onClear, onSave }) {
+  return (
+    <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
@@ -693,8 +701,6 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
       <div className="flex-shrink-0">
         <ModernToolbar
           onProto={handleProto}
-          searchMode={searchMode}
-          onSearchModeChange={setSearchMode}
           onClear={handleClearAll}
           onSave={handleSave}
         />
@@ -703,25 +709,8 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
       {/* BODY */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* ── ADD IP TABLE ── */}
-        <div ref={addTableWrapperRef} className="flex-shrink-0">
-          <AddTableHeader />
-          {showAddRow ? (
-            <AddRow ref={addRowRef} {...addRowProps} />
-          ) : (
-            <div className="flex items-center justify-center py-3 border-b cursor-pointer transition-all"
-              style={{ background: BURGUNDY_LIGHT, borderColor: BURGUNDY }}
-              onClick={handleAddNewEntry}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
-                style={{ background: BURGUNDY, color: "white" }}>
-                <Plus size={14} /> Add IP Entry
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ── ADDED IP TABLE ── */}
-        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden mt-6">
+        {/* ── ADDED IP TABLE (top) ── */}
+        <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           {entries.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
               <div className="text-center">
@@ -730,21 +719,14 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
                 </div>
                 <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No IP Entries Yet</h3>
                 <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table above to add your first IP entry.
+                  Use the table below to add your first IP entry.
                 </p>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 px-3 pb-2">
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-                <span className="text-[0.65rem] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-subtle)" }}>
-                  Added IP Entries ({entries.length})
-                </span>
-                <div className="flex-1 h-px" style={{ background: "var(--color-border)" }} />
-              </div>
               <TableHeader />
-              <div className="overflow-y-auto">
+              <div className="overflow-y-auto flex-1">
                 {entries.map((entry, index) => (
                   <IPRow
                     key={entry.id}
@@ -761,6 +743,26 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
                 ))}
               </div>
             </>
+          )}
+        </div>
+
+        {/* ── SEARCH MODE (above the add row) ── */}
+        <SearchModeToggle searchMode={searchMode} onSearchModeChange={setSearchMode} />
+
+        {/* ── ADD IP TABLE (bottom) ── */}
+        <div ref={addTableWrapperRef} className="flex-shrink-0">
+          <AddTableHeader />
+          {showAddRow ? (
+            <AddRow ref={addRowRef} {...addRowProps} />
+          ) : (
+            <div className="flex items-center justify-center py-3 border-t cursor-pointer transition-all"
+              style={{ background: BURGUNDY_LIGHT, borderColor: BURGUNDY }}
+              onClick={handleAddNewEntry}>
+              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2"
+                style={{ background: BURGUNDY, color: "white" }}>
+                <Plus size={14} /> Add IP Entry
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -206,7 +206,7 @@ export default function VitalSignsSection({ patient }) {
     <div
       className="px-3 border-b"
       /* Tablet/mobile: tighter vertical padding. Desktop: normal. */
-      style={{ borderColor: "var(--color-border)", background: "#AAB2BD" }}
+      style={{ borderColor: "var(--color-border)", background: "lightgray" }}
     >
       {/* ── Tablet / Mobile ──
           • Header is HIDDEN (no ActivitySquare title row)
