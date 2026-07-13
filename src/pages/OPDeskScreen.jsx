@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Users, ChevronLeft, ChevronRight } from "lucide-react";
-
 import AppBar from "../components/AppBar/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
 import LeftSidebar from "./OPDeskScreen/LeftSidebar";
@@ -167,15 +166,17 @@ export default function OPDeskScreen({ user, onLogout }) {
               </button>
             )}
 
-            {/* Right Section - Previous Visits Table */}
-            <div 
+            {/* Right Section - Previous Visits Table
+                Desktop width = TopBar (w-96 = 384px) + RightSidebar (78px) = 462px,
+                so its left edge lines up with the TopBar section above. */}
+            <div
               className={`flex-shrink-0 border-l overflow-y-auto transition-all duration-300 ${
-                isTabletView 
-                  ? isRightPanelExpanded 
-                    ? 'flex-[5] w-auto' 
+                isTabletView
+                  ? isRightPanelExpanded
+                    ? 'flex-[5] w-auto'
                     : 'w-0 overflow-hidden border-l-0'
-                  : 'flex-[3] w-auto'
-              }`} 
+                  : 'w-[440px] flex-none'
+              }`}
               style={{ borderColor: "var(--color-border)" }}
             >
               <PreviousVisitsTable visits={visits} />

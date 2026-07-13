@@ -853,5 +853,4 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
     </div>
   );
 }
-
 //so good all perfect with embed and alpha check box

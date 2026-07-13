@@ -13,6 +13,21 @@ const DETAIL_OPTIONS = ["—","Empty Stomach","1Hr. After Food","Any Time","Fast
 
 const SORTED_LAB_SUGGESTIONS = [...LAB_SUGGESTIONS].sort((a, b) => a.localeCompare(b));
 
+/* ═══ Grid column templates — shared by header + rows so everything stays aligned ═══ */
+// "Add new test" row: S.No | Name | Remarks | Actions
+const ADD_GRID = "48px minmax(0,1fr) 192px 64px";
+// Added-lab table, LEFT half (test list): S.No | Name | Remarks | Actions
+const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
+// Added-lab table, RIGHT half (result entry): Observed Value | Unit | Bio Ref | Specimen | Actions
+// FIXED: Observed Value used minmax(0,1fr), which lets it collapse to 0 width whenever the
+// other four fixed-width columns (592px) don't fit inside the 35fr right panel — it then
+// visually disappears and looks "merged" into the Unit column next to it. Give it a real
+// minimum width instead, and trim the oversized Biological Ref. column so all 5 columns fit.
+const RIGHT_GRID = "minmax(130px,1fr) 90px 200px 120px 112px";
+// Outer split for the added-lab table — right panel widened so RIGHT_GRID's columns
+// (min ~652px) actually have room to render instead of squeezing the flexible column to 0.
+const OUTER_GRID = "55fr 3px 45fr";
+
 // ── Lab Test Groups ──
 const LAB_GROUPS = [
   {
@@ -96,7 +111,6 @@ const INDIVIDUAL_LAB_TESTS = [
   "Semen Analysis"
 ];
 
-// Get all tests from groups
 const getAllGroupTests = () => {
   const allTests = [];
   LAB_GROUPS.forEach(group => {
@@ -109,17 +123,14 @@ const getAllGroupTests = () => {
 
 const ALL_GROUP_TESTS = new Set(getAllGroupTests());
 
-// Combine all lab suggestions with individual tests
 const ALL_LAB_SUGGESTIONS = [...LAB_SUGGESTIONS, ...INDIVIDUAL_LAB_TESTS];
 
-// Get individual tests (not in any group) from ALL_LAB_SUGGESTIONS
 const getIndividualTests = () => {
   return ALL_LAB_SUGGESTIONS.filter(test => !ALL_GROUP_TESTS.has(test));
 };
 
 const INDIVIDUAL_TESTS = getIndividualTests();
 
-// Sorted list of all tests (for display)
 const SORTED_ALL_LAB_SUGGESTIONS = [...ALL_LAB_SUGGESTIONS].sort((a, b) => a.localeCompare(b));
 
 const FIELD_ORDER = ["name", "detail", "commit"];
@@ -237,7 +248,6 @@ function PortalDropdown({ anchorEl, open, children }) {
     if (!open || !anchorEl) return;
     const rect = anchorEl.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    // Always open downward, sized to the space below so it stays on-screen and scrolls.
     setStyle({
       position: "fixed",
       top: rect.bottom + 2,
@@ -257,65 +267,41 @@ function PortalDropdown({ anchorEl, open, children }) {
   );
 }
 
-/* ── Add Table Header ── */
+/* ── Add Table Header (grid: S.No | Name | Remarks | Actions) ── */
 function AddTableHeader() {
-  const columns = [
-    { label: "S.No", width: "w-12", center: true },
-    { label: "Name", width: "flex-1" },
-    { label: "Remarks", width: "w-48" },
-    { label: "Actions", width: "w-16", center: true },
-  ];
   return (
-    <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-lab)", borderColor: "var(--color-lab)" }}>
-      {columns.map(col => (
-        <div key={col.label} className={`${col.width} px-2 py-2 ${col.center ? 'text-center' : ''}`}
-          style={{ fontSize: "0.7rem", fontWeight: "700", letterSpacing: "0.03em", color: "white" }}>
-          {col.label}
-        </div>
-      ))}
+    <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: ADD_GRID, background: "var(--color-lab)", borderColor: "var(--color-lab)" }}>
+      <div className="px-2 py-2 text-center" style={{ fontSize: "0.7rem", fontWeight: "700", letterSpacing: "0.03em", color: "white" }}>S.No</div>
+      <div className="px-2 py-2" style={{ fontSize: "0.7rem", fontWeight: "700", letterSpacing: "0.03em", color: "white" }}>Name</div>
+      <div className="px-2 py-2" style={{ fontSize: "0.7rem", fontWeight: "700", letterSpacing: "0.03em", color: "white" }}>Remarks</div>
+      <div className="px-2 py-2 text-center" style={{ fontSize: "0.7rem", fontWeight: "700", letterSpacing: "0.03em", color: "white" }}>Actions</div>
     </div>
   );
 }
 
-/* ── Added Lab Table Header (left: test info, right: result entry) ── */
+/* ── Added Lab Table Header — grid: test-info | divider | result-entry ── */
 function TableHeader() {
-  const leftColumns = [
-    { label: "S.No", width: "w-16" },
-    { label: "Name", width: "flex-1" },
-    { label: "Remarks", width: "w-48" },
-    { label: "Actions", width: "w-28", center: true },
-  ];
-  const rightColumns = [
-    { label: "Observed Value", width: "flex-1" },
-    { label: "Unit", width: "w-24", center: true },
-    { label: "Biological Ref. - Interval", width: "w-64" },
-    { label: "Specimen", width: "w-32" },
-    { label: "Actions", width: "w-28", center: true },
-  ];
   return (
-    <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
-      <div className="flex flex-1">
-        {leftColumns.map(col => (
-          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
-            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>
-            {col.label}
-          </div>
-        ))}
+    <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: OUTER_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
+      <div className="grid" style={{ gridTemplateColumns: LEFT_GRID }}>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>S.No</div>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Name</div>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Remarks</div>
+        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Actions</div>
       </div>
-      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-lab)", opacity: 0.4 }} />
-      <div className="flex flex-1">
-        {rightColumns.map(col => (
-          <div key={col.label} className={`${col.width} px-3 py-2.5 ${col.center ? 'text-center' : ''}`}
-            style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>
-            {col.label}
-          </div>
-        ))}
+      <div style={{ background: "var(--color-lab)", opacity: 0.4 }} />
+      <div className="grid" style={{ gridTemplateColumns: RIGHT_GRID }}>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Observed Value</div>
+        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Unit</div>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Biological Ref. - Interval</div>
+        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
+        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Actions</div>
       </div>
     </div>
   );
 }
 
-/* ── Lab Row Component (left: test info + actions, right: result entry + actions) ── */
+/* ── Lab Row Component — grid mirrors TableHeader: test-info | divider | result-entry ── */
 function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, onResultChange }) {
   return (
     <div
@@ -329,8 +315,9 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
         if (e.key === "ArrowDown") { e.preventDefault(); onArrowNav?.("down"); return; }
         if (e.key === "ArrowUp")   { e.preventDefault(); onArrowNav?.("up");   return; }
       }}
-      className="flex border-b transition-all duration-150 outline-none cursor-pointer"
+      className="grid border-b transition-all duration-150 outline-none cursor-pointer"
       style={{
+        gridTemplateColumns: OUTER_GRID,
         borderColor: "var(--color-border)",
         background: isSelected
           ? "var(--color-lab-light)"
@@ -342,11 +329,11 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
       }}
     >
       {/* ── Left: test info ── */}
-      <div className="flex flex-1">
-        <div className="w-16 px-3 py-2 text-center">
+      <div className="grid" style={{ gridTemplateColumns: LEFT_GRID }}>
+        <div className="px-3 py-2 text-center">
           <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>{index + 1}</span>
         </div>
-        <div className="flex-1 px-3 py-2">
+        <div className="px-3 py-2 min-w-0">
           <div className="flex flex-col">
             <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
               <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
@@ -360,10 +347,10 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             )}
           </div>
         </div>
-        <div className="w-48 px-3 py-2">
+        <div className="px-3 py-2">
           <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{lab.detail === "—" ? "—" : lab.detail}</span>
         </div>
-        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+        <div className="px-2 py-2 flex items-center justify-center gap-1.5">
           <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
             style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
@@ -386,11 +373,11 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
       </div>
 
       {/* ── Divider ── */}
-      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-border)" }} />
+      <div style={{ background: "var(--color-border)" }} />
 
       {/* ── Right: result entry ── */}
-      <div className="flex flex-1">
-        <div className="flex-1 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+      <div className="grid" style={{ gridTemplateColumns: RIGHT_GRID }}>
+        <div className="px-2 py-1.5 flex items-center min-w-0" onClick={e => e.stopPropagation()}>
           <input
             type="text"
             value={lab.observedValue || ""}
@@ -400,7 +387,7 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
           />
         </div>
-        <div className="w-24 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
           <input
             type="text"
             value={lab.unit || ""}
@@ -410,7 +397,7 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
           />
         </div>
-        <div className="w-64 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
           <input
             type="text"
             value={lab.bioRef || ""}
@@ -420,7 +407,7 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
           />
         </div>
-        <div className="w-32 px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
+        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
           <input
             type="text"
             value={lab.specimen || ""}
@@ -430,7 +417,7 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
           />
         </div>
-        <div className="w-28 px-2 py-2 flex items-center justify-center gap-1.5">
+        <div className="px-2 py-2 flex items-center justify-center gap-1.5">
           <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
             style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "var(--color-primary-light)"}
@@ -519,7 +506,7 @@ function TypableDetailInput({ value, onChange, onKeyDown, dataField }) {
   );
 }
 
-/* ── Add Row Component ── */
+/* ── Add Row Component — grid mirrors AddTableHeader ── */
 const AddRow = React.forwardRef(({ 
   draft, onDraftChange, onCommit, query, setQuery, 
   suggestions, onCancel, rowNumber, searchMode 
@@ -539,17 +526,14 @@ const AddRow = React.forwardRef(({
 
   useEffect(() => { setTestSelected(!!query.trim()); }, [query]);
 
-  // Use sorted all lab suggestions
   const baseList = searchMode === "embedded" ? ALL_LAB_SUGGESTIONS : SORTED_ALL_LAB_SUGGESTIONS;
   
-  // Build dropdown items with groups and individual tests
   const getDropdownItems = () => {
     const items = [];
     const allGroupTests = new Set();
     LAB_GROUPS.forEach(g => g.tests.forEach(t => allGroupTests.add(t)));
     
     if (query === "") {
-      // Show all groups first with a section header
       if (LAB_GROUPS.length > 0) {
         items.push({
           type: "section-header",
@@ -566,7 +550,6 @@ const AddRow = React.forwardRef(({
         });
       }
       
-      // Then show individual tests with a section header
       const individualTests = baseList.filter(test => !allGroupTests.has(test));
       if (individualTests.length > 0) {
         items.push({
@@ -584,10 +567,8 @@ const AddRow = React.forwardRef(({
       
       return items;
     } else {
-      // Search results - show matching groups and individual tests
       const searchLower = query.toLowerCase();
       
-      // Check groups
       const matchingGroups = [];
       LAB_GROUPS.forEach(group => {
         const matchingTests = group.tests.filter(t => 
@@ -615,7 +596,6 @@ const AddRow = React.forwardRef(({
         matchingGroups.forEach(group => items.push(group));
       }
       
-      // Add individual matching tests
       const matchingTests = baseList.filter(test => 
         test.toLowerCase().includes(searchLower) && !allGroupTests.has(test)
       );
@@ -641,7 +621,6 @@ const AddRow = React.forwardRef(({
 
   const handleSelectItem = (item) => {
     if (item.type === "group") {
-      // Select the group name as the main entry
       setQuery(item.label);
       onDraftChange("name")(item.label);
       setSelectedGroup(item.groupName);
@@ -650,7 +629,6 @@ const AddRow = React.forwardRef(({
       setHighlightedIdx(-1);
       inputRef.current?.focus();
     } else if (item.type === "test") {
-      // Select individual test
       setQuery(item.label);
       onDraftChange("name")(item.label);
       setSelectedGroup(null);
@@ -659,7 +637,6 @@ const AddRow = React.forwardRef(({
       setHighlightedIdx(-1);
       inputRef.current?.focus();
     }
-    // Section headers are not selectable
   };
 
   const handleClearTest = () => {
@@ -718,17 +695,17 @@ const AddRow = React.forwardRef(({
     <div
       ref={rowRef}
       data-add-row="true"
-      className="flex items-stretch border-b relative"
-      style={{ background: "var(--color-lab-light)", borderColor: "var(--color-lab)" }}
+      className="grid items-stretch border-b relative"
+      style={{ gridTemplateColumns: ADD_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-lab)" }}
       onBlur={handleRowBlur}
     >
       {/* S.No */}
-      <div className="w-12 px-2 py-2 flex items-center justify-center flex-shrink-0">
+      <div className="px-2 py-2 flex items-center justify-center">
         <span className="text-sm font-semibold" style={{ color: "var(--color-lab)" }}>{rowNumber}</span>
       </div>
 
       {/* Name - with portal dropdown */}
-      <div className="flex-1 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
+      <div className="relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
         <FlaskConical size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-lab)" }} />
         <input
           data-field="name"
@@ -835,7 +812,7 @@ const AddRow = React.forwardRef(({
       </div>
 
       {/* Remarks */}
-      <div className="w-48 flex-shrink-0 px-1 py-1.5 flex items-center">
+      <div className="px-1 py-1.5 flex items-center">
         <TypableDetailInput
           dataField="detail"
           value={draft.detail}
@@ -845,7 +822,7 @@ const AddRow = React.forwardRef(({
       </div>
 
       {/* Actions */}
-      <div className="w-16 flex-shrink-0 px-1 py-1.5 flex gap-1 items-center justify-center">
+      <div className="px-1 py-1.5 flex gap-1 items-center justify-center">
         <button
           data-field="commit"
           onClick={onCommit}
@@ -888,7 +865,6 @@ export default function LabTab({ labs, setLabs, patient }) {
   const addTableWrapperRef = useRef(null);
   const addedTableWrapperRef = useRef(null);
 
-  // Use combined suggestions for search
   const baseSearchList = searchMode === "embedded" ? ALL_LAB_SUGGESTIONS : SORTED_ALL_LAB_SUGGESTIONS;
   const suggestions = query.length > 1
     ? baseSearchList.filter(s => s.toLowerCase().includes(query.toLowerCase()))
@@ -899,11 +875,9 @@ export default function LabTab({ labs, setLabs, patient }) {
   const commitDraft = () => {
     if (!draft.name.trim()) return;
     
-    // Check if the selected name is a group
     const selectedGroup = LAB_GROUPS.find(g => g.name === draft.name);
     
     if (selectedGroup) {
-      // Add all tests from the group
       const newLabs = selectedGroup.tests.map(test => ({
         id: Date.now() + Math.random() * 1000,
         name: test,
@@ -916,7 +890,6 @@ export default function LabTab({ labs, setLabs, patient }) {
       setLabs(prev => prev.map(l => l.id === editId ? { ...l, ...draft } : l));
       setEditId(null);
     } else {
-      // Add individual test
       setLabs(prev => [...prev, { id: Date.now(), ...draft, ...EMPTY_RESULT_FIELDS }]);
     }
     
@@ -987,7 +960,6 @@ export default function LabTab({ labs, setLabs, patient }) {
     if (row) row.focus();
   }, [labs]);
 
-  // Alt+T to toggle between tables
   useEffect(() => {
     const handler = (e) => {
       if (!e.altKey || (e.key !== "t" && e.key !== "T")) return;
@@ -1024,19 +996,24 @@ export default function LabTab({ labs, setLabs, patient }) {
         minHeight: "300px",
       }}
     >
-      {/* HEADER / TOOLBAR — Clear, Save & the shortcut info icon live here alongside Paste/Proto/etc. */}
-      <div className="flex-shrink-0">
-        <ModernToolbar
-          onProto={handleProto}
-          onClear={handleClearAll}
-          onSave={handleSave}
-        />
+      {/* HEADER / TOOLBAR — split: actions (left panel) + "Lab Result" title (right panel) */}
+      <div className="flex-shrink-0 flex items-stretch">
+        <div className="flex-1">
+          <ModernToolbar
+            onProto={handleProto}
+            onClear={handleClearAll}
+            onSave={handleSave}
+          />
+        </div>
+        <div className="flex-1 flex items-center justify-center px-4 border-b border-l" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+          <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Result</span>
+        </div>
       </div>
 
       {/* BODY — pb reserves room below the add row so its search dropdown can open downward */}
       <div className="flex-1 flex flex-col overflow-hidden pb-44">
 
-        {/* ── ADDED LAB TABLE (top): left = test info, right = result entry ── */}
+        {/* ── ADDED LAB TABLE (top): grid — test list | result entry ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           {labs.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center py-5">
@@ -1077,7 +1054,7 @@ export default function LabTab({ labs, setLabs, patient }) {
         {/* ── SEARCH MODE (above the add row) ── */}
         <SearchModeToggle searchMode={searchMode} onSearchModeChange={setSearchMode} />
 
-        {/* ── ADD LAB TABLE (bottom) ── */}
+        {/* ── ADD LAB TABLE (bottom): grid ── */}
         <div ref={addTableWrapperRef} className="flex-shrink-0">
           <AddTableHeader />
           {showAddRow ? (
