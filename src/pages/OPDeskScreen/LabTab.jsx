@@ -23,10 +23,10 @@ const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
 // other four fixed-width columns (592px) don't fit inside the 35fr right panel — it then
 // visually disappears and looks "merged" into the Unit column next to it. Give it a real
 // minimum width instead, and trim the oversized Biological Ref. column so all 5 columns fit.
-const RIGHT_GRID = "minmax(130px,1fr) 90px 200px 120px 112px";
-// Outer split for the added-lab table — right panel widened so RIGHT_GRID's columns
-// (min ~652px) actually have room to render instead of squeezing the flexible column to 0.
-const OUTER_GRID = "55fr 3px 45fr";
+const RIGHT_GRID = "minmax(50px,1fr) 90px 200px 120px 112px";
+// Outer split for the added-lab table — left (test info) panel 65%, right (Lab Result
+// entry) panel 35%.
+const OUTER_GRID = "65fr 3px 35fr";
 
 // ── Lab Test Groups ──
 const LAB_GROUPS = [
@@ -334,18 +334,10 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
           <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>{index + 1}</span>
         </div>
         <div className="px-3 py-2 min-w-0">
-          <div className="flex flex-col">
-            <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
-              <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
-              {lab.name}
-            </span>
-            {lab.group && (
-              <span className="text-[0.55rem] mt-0.5 flex items-center gap-1" style={{ color: "var(--color-text-subtle)" }}>
-                <FolderOpen size={10} />
-                {lab.group}
-              </span>
-            )}
-          </div>
+          <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
+            <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
+            {lab.name}
+          </span>
         </div>
         <div className="px-3 py-2">
           <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{lab.detail === "—" ? "—" : lab.detail}</span>
@@ -375,47 +367,27 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
       {/* ── Divider ── */}
       <div style={{ background: "var(--color-border)" }} />
 
-      {/* ── Right: result entry ── */}
+      {/* ── Right: result display (static text, no longer editable inputs) ── */}
       <div className="grid" style={{ gridTemplateColumns: RIGHT_GRID }}>
-        <div className="px-2 py-1.5 flex items-center min-w-0" onClick={e => e.stopPropagation()}>
-          <input
-            type="text"
-            value={lab.observedValue || ""}
-            onChange={e => onResultChange(lab.id, "observedValue", e.target.value)}
-            placeholder="Enter value"
-            className="w-full px-2 py-1.5 rounded text-sm outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
+        <div className="px-3 py-2 flex items-center min-w-0">
+          <span className="text-sm truncate" style={{ color: lab.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
+            {lab.observedValue || "—"}
+          </span>
         </div>
-        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
-          <input
-            type="text"
-            value={lab.unit || ""}
-            onChange={e => onResultChange(lab.id, "unit", e.target.value)}
-            placeholder="Unit"
-            className="w-full px-2 py-1.5 rounded text-sm text-center outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
+        <div className="px-3 py-2 flex items-center justify-center">
+          <span className="text-sm text-center" style={{ color: lab.unit ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
+            {lab.unit || "—"}
+          </span>
         </div>
-        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
-          <input
-            type="text"
-            value={lab.bioRef || ""}
-            onChange={e => onResultChange(lab.id, "bioRef", e.target.value)}
-            placeholder="Biological Ref. - Interval"
-            className="w-full px-2 py-1.5 rounded text-sm outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
+        <div className="px-3 py-2 flex items-center min-w-0">
+          <span className="text-sm truncate" style={{ color: lab.bioRef ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
+            {lab.bioRef || "—"}
+          </span>
         </div>
-        <div className="px-2 py-1.5 flex items-center" onClick={e => e.stopPropagation()}>
-          <input
-            type="text"
-            value={lab.specimen || ""}
-            onChange={e => onResultChange(lab.id, "specimen", e.target.value)}
-            placeholder="Specimen"
-            className="w-full px-2 py-1.5 rounded text-sm outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
+        <div className="px-3 py-2 flex items-center min-w-0">
+          <span className="text-sm truncate" style={{ color: lab.specimen ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
+            {lab.specimen || "—"}
+          </span>
         </div>
         <div className="px-2 py-2 flex items-center justify-center gap-1.5">
           <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded transition-all" title="Edit (Alt+E)"
@@ -518,7 +490,6 @@ const AddRow = React.forwardRef(({
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [testSelected, setTestSelected] = useState(() => !!query);
-  const [selectedGroup, setSelectedGroup] = useState(null);
 
   React.useImperativeHandle(ref, () => ({
     focusName: () => inputRef.current?.focus(),
@@ -527,122 +498,36 @@ const AddRow = React.forwardRef(({
   useEffect(() => { setTestSelected(!!query.trim()); }, [query]);
 
   const baseList = searchMode === "embedded" ? ALL_LAB_SUGGESTIONS : SORTED_ALL_LAB_SUGGESTIONS;
-  
+
+  // Flat list of every individual test — group tests are included here, but no
+  // group entries/headers are shown, so users only ever see and pick tests.
   const getDropdownItems = () => {
-    const items = [];
-    const allGroupTests = new Set();
-    LAB_GROUPS.forEach(g => g.tests.forEach(t => allGroupTests.add(t)));
-    
-    if (query === "") {
-      if (LAB_GROUPS.length > 0) {
-        items.push({
-          type: "section-header",
-          label: "📁 TEST GROUPS"
-        });
-        LAB_GROUPS.forEach(group => {
-          items.push({
-            type: "group",
-            label: group.name,
-            icon: group.icon || "📁",
-            tests: group.tests,
-            groupName: group.name
-          });
-        });
-      }
-      
-      const individualTests = baseList.filter(test => !allGroupTests.has(test));
-      if (individualTests.length > 0) {
-        items.push({
-          type: "section-header",
-          label: "🧪 INDIVIDUAL TESTS"
-        });
-        individualTests.forEach(test => {
-          items.push({
-            type: "test",
-            label: test,
-            icon: "🧪"
-          });
-        });
-      }
-      
-      return items;
-    } else {
-      const searchLower = query.toLowerCase();
-      
-      const matchingGroups = [];
-      LAB_GROUPS.forEach(group => {
-        const matchingTests = group.tests.filter(t => 
-          t.toLowerCase().includes(searchLower)
-        );
-        const groupNameMatches = group.name.toLowerCase().includes(searchLower);
-        
-        if (matchingTests.length > 0 || groupNameMatches) {
-          matchingGroups.push({
-            type: "group",
-            label: group.name,
-            icon: group.icon || "📁",
-            tests: groupNameMatches ? group.tests : matchingTests,
-            groupName: group.name,
-            isPartialMatch: !groupNameMatches && matchingTests.length > 0
-          });
-        }
-      });
-      
-      if (matchingGroups.length > 0) {
-        items.push({
-          type: "section-header",
-          label: "📁 TEST GROUPS"
-        });
-        matchingGroups.forEach(group => items.push(group));
-      }
-      
-      const matchingTests = baseList.filter(test => 
-        test.toLowerCase().includes(searchLower) && !allGroupTests.has(test)
-      );
-      if (matchingTests.length > 0) {
-        items.push({
-          type: "section-header",
-          label: "🧪 INDIVIDUAL TESTS"
-        });
-        matchingTests.forEach(test => {
-          items.push({
-            type: "test",
-            label: test,
-            icon: "🧪"
-          });
-        });
-      }
-      
-      return items;
-    }
+    const flatTests = Array.from(new Set([...baseList, ...getAllGroupTests()]));
+    const orderedTests = searchMode === "embedded"
+      ? flatTests
+      : [...flatTests].sort((a, b) => a.localeCompare(b));
+
+    const filtered = query === ""
+      ? orderedTests
+      : orderedTests.filter(test => test.toLowerCase().includes(query.toLowerCase()));
+
+    return filtered.map(test => ({ type: "test", label: test, icon: "🧪" }));
   };
 
   const dropdownItems = getDropdownItems();
 
   const handleSelectItem = (item) => {
-    if (item.type === "group") {
-      setQuery(item.label);
-      onDraftChange("name")(item.label);
-      setSelectedGroup(item.groupName);
-      setTestSelected(true);
-      setShowDropdown(false);
-      setHighlightedIdx(-1);
-      inputRef.current?.focus();
-    } else if (item.type === "test") {
-      setQuery(item.label);
-      onDraftChange("name")(item.label);
-      setSelectedGroup(null);
-      setTestSelected(true);
-      setShowDropdown(false);
-      setHighlightedIdx(-1);
-      inputRef.current?.focus();
-    }
+    setQuery(item.label);
+    onDraftChange("name")(item.label);
+    setTestSelected(true);
+    setShowDropdown(false);
+    setHighlightedIdx(-1);
+    inputRef.current?.focus();
   };
 
   const handleClearTest = () => {
     setQuery("");
     onDraftChange("name")("");
-    setSelectedGroup(null);
     setTestSelected(false);
     setShowDropdown(false);
     setTimeout(() => inputRef.current?.focus(), 0);
@@ -677,9 +562,7 @@ const AddRow = React.forwardRef(({
       if (e.key === "Enter" && highlightedIdx >= 0) { 
         e.preventDefault(); 
         const item = dropdownItems[highlightedIdx];
-        if (item.type !== "section-header") {
-          handleSelectItem(item);
-        }
+        handleSelectItem(item);
         return; 
       }
     }
@@ -714,7 +597,6 @@ const AddRow = React.forwardRef(({
           onChange={e => {
             setQuery(e.target.value);
             onDraftChange("name")(e.target.value);
-            setSelectedGroup(null);
             setShowDropdown(true);
             setHighlightedIdx(-1);
           }}
@@ -751,62 +633,22 @@ const AddRow = React.forwardRef(({
 
         <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
           <div>
-            {dropdownItems.map((item, i) => {
-              if (item.type === "section-header") {
-                return (
-                  <div
-                    key={`section-${item.label}`}
-                    className="px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-wider sticky top-0"
-                    style={{ 
-                      color: "var(--color-text-muted)", 
-                      background: "var(--color-surface)",
-                      borderBottom: "1px solid var(--color-border)"
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                );
-              }
-              
-              return (
-                <div
-                  key={item.type === "group" ? `group-${item.label}` : `test-${item.label}`}
-                  onMouseDown={() => handleSelectItem(item)}
-                  className={`px-4 py-2.5 cursor-pointer text-sm flex items-center gap-2 ${
-                    item.type === "group" ? "border-l-4" : ""
-                  }`}
-                  style={{
-                    borderBottom: "1px solid var(--color-border)",
-                    background: highlightedIdx === i ? "var(--color-lab-light)" : "transparent",
-                    borderLeftColor: item.type === "group" ? "var(--color-lab)" : "transparent",
-                  }}
-                  onMouseEnter={() => setHighlightedIdx(i)}
-                  onMouseLeave={() => setHighlightedIdx(-1)}
-                >
-                  {item.type === "group" ? (
-                    <>
-                      <FolderOpen size={14} style={{ color: "var(--color-lab)" }} />
-                      <span style={{ color: "var(--color-lab)", fontWeight: "700" }}>{item.label}</span>
-                      <span className="text-[0.6rem] px-1.5 py-0.5 rounded-full" 
-                        style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}>
-                        {item.tests.length} {item.tests.length === 1 ? 'test' : 'tests'}
-                      </span>
-                      {item.isPartialMatch && (
-                        <span className="text-[0.55rem] px-1 py-0.5 rounded" 
-                          style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}>
-                          Partial match
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <TestTube size={14} style={{ color: "var(--color-lab)" }} />
-                      <span style={{ color: "var(--color-text-base)" }}>{item.label}</span>
-                    </>
-                  )}
-                </div>
-              );
-            })}
+            {dropdownItems.map((item, i) => (
+              <div
+                key={`test-${item.label}`}
+                onMouseDown={() => handleSelectItem(item)}
+                className="px-4 py-2.5 cursor-pointer text-sm flex items-center gap-2"
+                style={{
+                  borderBottom: "1px solid var(--color-border)",
+                  background: highlightedIdx === i ? "var(--color-lab-light)" : "transparent",
+                }}
+                onMouseEnter={() => setHighlightedIdx(i)}
+                onMouseLeave={() => setHighlightedIdx(-1)}
+              >
+                <TestTube size={14} style={{ color: "var(--color-lab)" }} />
+                <span style={{ color: "var(--color-text-base)" }}>{item.label}</span>
+              </div>
+            ))}
           </div>
         </PortalDropdown>
       </div>
@@ -874,25 +716,14 @@ export default function LabTab({ labs, setLabs, patient }) {
 
   const commitDraft = () => {
     if (!draft.name.trim()) return;
-    
-    const selectedGroup = LAB_GROUPS.find(g => g.name === draft.name);
-    
-    if (selectedGroup) {
-      const newLabs = selectedGroup.tests.map(test => ({
-        id: Date.now() + Math.random() * 1000,
-        name: test,
-        detail: draft.detail,
-        group: selectedGroup.name,
-        ...EMPTY_RESULT_FIELDS,
-      }));
-      setLabs(prev => [...prev, ...newLabs]);
-    } else if (editId !== null) {
+
+    if (editId !== null) {
       setLabs(prev => prev.map(l => l.id === editId ? { ...l, ...draft } : l));
       setEditId(null);
     } else {
       setLabs(prev => [...prev, { id: Date.now(), ...draft, ...EMPTY_RESULT_FIELDS }]);
     }
-    
+
     setDraft(EMPTY_DRAFT);
     setQuery("");
     setShowAddRow(false);
@@ -996,7 +827,7 @@ export default function LabTab({ labs, setLabs, patient }) {
         minHeight: "300px",
       }}
     >
-      {/* HEADER / TOOLBAR — split: actions (left panel) + "Lab Result" title (right panel) */}
+      {/* HEADER / TOOLBAR — split: actions (left panel) + "Lab Tests" title (right panel) */}
       <div className="flex-shrink-0 flex items-stretch">
         <div className="flex-1">
           <ModernToolbar
@@ -1006,7 +837,7 @@ export default function LabTab({ labs, setLabs, patient }) {
           />
         </div>
         <div className="flex-1 flex items-center justify-center px-4 border-b border-l" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-          <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Result</span>
+          <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Tests</span>
         </div>
       </div>
 

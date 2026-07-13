@@ -203,10 +203,10 @@ export default function PreviousVisitsTable({ visits = [] }) {
             </div>
             <div>
               <h3 className="text-sm font-bold" style={{ color: "var(--color-primary-dark)" }}>
-                Previous Visits
+                Previous Information
               </h3>
               <p className="text-[0.6rem] font-medium mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                {visits.length} visit{visits.length !== 1 ? 's' : ''} recorded
+                {visits.length} Entries{visits.length !== 1 ? 's' : ''} Recorded
               </p>
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         if (col.key === "docModule") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
-                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[0.6rem] font-bold" style={{ background: module.bg, color: module.text }}>
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[0.75rem] font-bold" style={{ background: module.bg, color: module.text }}>
                                 {value}
                               </span>
                             </td>
@@ -357,7 +357,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-[0.65rem]" style={{ color: "var(--color-text-subtle)" }}>—</span>
+                                <span className="text-[0.75rem]" style={{ color: "var(--color-text-subtle)" }}>—</span>
                               )}
                             </td>
                           );
@@ -370,18 +370,18 @@ export default function PreviousVisitsTable({ visits = [] }) {
                                 <div className="flex flex-col">
                                   <div className="flex items-center gap-1">
                                     <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>BP</span>
-                                    <span className="text-[0.65rem] font-mono font-semibold" style={{ color: "var(--color-primary)" }}>{vitals.bp}</span>
+                                    <span className="text-[0.75rem] font-mono font-semibold" style={{ color: "var(--color-primary)" }}>{vitals.bp}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Pulse</span>
-                                    <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-drugs)" }}>{vitals.pulse}</span>
+                                    <span className="text-[0.75rem] font-mono" style={{ color: "var(--color-drugs)" }}>{vitals.pulse}</span>
                                   </div>
                                 </div>
                                 <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
                                 <div>
                                   <div className="flex items-center gap-1">
                                     <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Temp</span>
-                                    <span className="text-[0.65rem] font-mono" style={{ color: "var(--color-lab)" }}>{vitals.temp}°F</span>
+                                    <span className="text-[0.75rem] font-mono" style={{ color: "var(--color-lab)" }}>{vitals.temp}°F</span>
                                   </div>
                                 </div>
                               </div>
@@ -394,13 +394,13 @@ export default function PreviousVisitsTable({ visits = [] }) {
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value && value !== "<None>" ? (
                                 <div className="flex items-center gap-1.5">
-                                  <CalendarDays size={11} style={{ color: "var(--color-success)" }} />
-                                  <span className="text-[0.65rem] font-semibold" style={{ color: "var(--color-success)" }}>
+                                  {/* <CalendarDays size={11} style={{ color: "var(--color-success)" }} /> */}
+                                  <span className="text-[0.75rem] font-semibold" style={{ color: "var(--color-success)" }}>
                                     {value}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-[0.65rem] italic" style={{ color: "var(--color-text-subtle)" }}>No follow-up</span>
+                                <span className="text-[0.75rem] italic" style={{ color: "var(--color-text-subtle)" }}>No follow-up</span>
                               )}
                             </td>
                           );
@@ -429,8 +429,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
                               <span className="font-bold" style={{ color: "var(--color-primary)" }}>{value}</span>
                             ) : col.key === "entryDt" ? (
                               <div className="flex items-center gap-1.5">
-                                <Calendar size={11} style={{ color: "var(--color-text-muted)" }} />
-                                <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-text-base)" }}>
+                                {/* <Calendar size={11} style={{ color: "var(--color-text-muted)" }} /> */}
+                                <span className="font-mono text-[0.75rem]" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
                               </div>
