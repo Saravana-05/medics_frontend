@@ -65,16 +65,6 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, on
             );
           })}
         </div>
-
-        {/* Right-side section label — shown alongside the tabs row instead of a second row below.
-            Width matches the Lab Report panel (38%, min 420px) so the text centers above it. */}
-        {activeTab === "lab" && (
-          <div className="flex items-center justify-center flex-shrink-0" style={{ width: "38%", minWidth: "420px" }}>
-            <span className="text-xl font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>
-              Lab Report
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
-  Settings, Search, ChevronDown, Briefcase, Activity, Heart, Mic, Zap,
+  Settings, ChevronDown, Briefcase, Activity, Heart, Mic, Zap,
   BookOpen, Trash, List, ListChecks, Paperclip, Download, Eye
 } from "lucide-react";
 import { SERVICE_SUGGESTIONS } from "./mockData";
@@ -616,10 +616,6 @@ const AddRow = React.forwardRef(({
                 onMouseEnter={() => setHighlightedIdx(i)}
                 onMouseLeave={() => setHighlightedIdx(-1)}
               >
-                {query === ""
-                  ? <Briefcase size={14} style={{ color: "var(--color-services)" }} />
-                  : <Search size={12} style={{ color: "var(--color-primary)" }} />
-                }
                 <span style={{ color: "var(--color-text-base)" }}>{service}</span>
               </div>
             ))}

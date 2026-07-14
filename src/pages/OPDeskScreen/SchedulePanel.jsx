@@ -120,88 +120,97 @@ function SchedulePanel({ panelHeight }) {
       </div>
 
       <div className="p-3 space-y-2 overflow-y-auto" style={{ height: panelHeight - headerH }}>
-        {/* Add Form */}
+        {/* Add Form — modal popup (schedule theme only), same pattern as ChronicAllergyPanel/PatientFamilyPanel */}
         {showAddForm && (
-          <div className="p-3 rounded-lg border mb-3" style={{ borderColor: "var(--color-drugs)", background: "var(--color-drugs-light)" }}>
-            <div className="space-y-2">
-              <div className="relative">
-                <Briefcase size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.45)" }}
+            onClick={() => setShowAddForm(false)}
+          >
+            <div
+              className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              style={{ background: "var(--color-surface)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal header */}
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#0c324a" }}>
+                <span className="text-base font-bold text-white">Add Schedule</span>
+                <button onClick={() => setShowAddForm(false)} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+
+              {/* Modal body */}
+              <div className="p-4 space-y-3">
                 <input
                   type="text"
                   placeholder="Schedule Title"
                   value={newSchedule.title}
                   onChange={(e) => setNewSchedule({ ...newSchedule, title: e.target.value })}
-                  className="w-full pl-7 pr-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <Clock size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+                <div className="flex gap-3">
                   <input
                     type="time"
                     placeholder="From"
                     value={newSchedule.timeFrom}
                     onChange={(e) => setNewSchedule({ ...newSchedule, timeFrom: e.target.value })}
-                    className="w-full pl-7 pr-2 py-1.5 text-xs rounded border"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                   />
-                </div>
-                <div className="flex-1 relative">
-                  <Clock size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
                   <input
                     type="time"
                     placeholder="To"
                     value={newSchedule.timeTo}
                     onChange={(e) => setNewSchedule({ ...newSchedule, timeTo: e.target.value })}
-                    className="w-full pl-7 pr-2 py-1.5 text-xs rounded border"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
+                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                   />
                 </div>
-              </div>
-              <select
-                value={newSchedule.type}
-                onChange={(e) => setNewSchedule({ ...newSchedule, type: e.target.value })}
-                className="w-full px-2 py-1.5 text-xs rounded border"
-                style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-              >
-                <option value="Meeting">Meeting</option>
-                <option value="Work">Work</option>
-                <option value="Break">Break</option>
-                <option value="Virtual">Virtual</option>
-                <option value="Training">Training</option>
-              </select>
-              <div className="relative">
-                <MapPin size={12} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+                <select
+                  value={newSchedule.type}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, type: e.target.value })}
+                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                >
+                  <option value="Meeting">Meeting</option>
+                  <option value="Work">Work</option>
+                  <option value="Break">Break</option>
+                  <option value="Virtual">Virtual</option>
+                  <option value="Training">Training</option>
+                </select>
                 <input
                   type="text"
                   placeholder="Location (optional)"
                   value={newSchedule.location}
                   onChange={(e) => setNewSchedule({ ...newSchedule, location: e.target.value })}
-                  className="w-full pl-7 pr-2 py-1.5 text-xs rounded border"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
               </div>
-              <div className="flex gap-2">
+
+              {/* Modal footer */}
+              <div className="flex gap-3 px-4 pb-4">
                 <button
                   onClick={handleAddSchedule}
-                  className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "var(--color-drugs)", color: "white" }}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-success)", color: "white" }}
                 >
-                  <Check size={12} /> Add
+                  <Check size={16} /> Add
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 px-2 py-1 rounded text-xs font-semibold flex items-center justify-center gap-1"
-                  style={{ background: "#fee2e2", color: "var(--color-danger)" }}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-danger)", color: "white" }}
                 >
-                  <X size={12} /> Cancel
+                  <X size={16} /> Cancel
                 </button>
               </div>
             </div>
           </div>
         )}
-        
+
         {/* Schedule List */}
         {filteredSchedules.length === 0 ? (
           <div className="text-center py-4 text-xs" style={{ color: "var(--color-text-muted)" }}>

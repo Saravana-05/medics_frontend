@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
-  Pill, Search, ChevronDown, BookOpen, Trash
+  Pill, ChevronDown, BookOpen, Trash
 } from "lucide-react";
 import {
   DRUG_SUGGESTIONS
@@ -591,10 +591,6 @@ const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQue
                 onMouseEnter={() => setHighlightedIdx(i)}
                 onMouseLeave={() => setHighlightedIdx(-1)}
               >
-                {query === ""
-                  ? <Pill size={14} style={{ color: "var(--color-drugs)" }} />
-                  : <Search size={12} style={{ color: "var(--color-primary)" }} />
-                }
                 <span style={{ color: "var(--color-text-base)" }}>{med}</span>
               </div>
             ))}
@@ -672,168 +668,6 @@ const AddRow = React.forwardRef(({ draft, onDraftChange, onCommit, query, setQue
   );
 });
 
-/* ═══════════════════ REPEAT PRESCRIPTIONS (right panel) ═══════════════════ */
-
-const INITIAL_REPEAT_PRESCRIPTIONS = [
-  { id: 1, title: "Pain Killer & Sleep",          days: 5,  drugCount: 3 },
-  { id: 2, title: "Cold & Cough",                 days: 7,  drugCount: 4 },
-  { id: 3, title: "Fever, Head-ache, Body-Pain",  days: 5,  drugCount: 5 },
-  { id: 4, title: "Malarial Infection",            days: 10, drugCount: 6 },
-  { id: 5, title: "High Blood Pressure",           days: 30, drugCount: 2 },
-];
-
-/* Simple centered modal for adding/renaming a repeat-prescription entry */
-function RepeatPrescriptionModal({ initialTitle = "", onSave, onCancel }) {
-  const [title, setTitle] = useState(initialTitle);
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.35)" }}>
-      <div className="rounded-lg shadow-xl w-full max-w-sm" style={{ background: "var(--color-surface)", border: "1px solid var(--color-drugs)" }}>
-        <div className="px-4 py-3 border-b" style={{ borderColor: "var(--color-border)", background: "var(--color-drugs-light)" }}>
-          <span className="text-sm font-bold" style={{ color: "var(--color-drugs)" }}>
-            {initialTitle ? "Modify Prescription" : "Add Repeat Prescription"}
-          </span>
-        </div>
-        <div className="p-4">
-          <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Prescription Title</label>
-          <input
-            autoFocus
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter" && title.trim()) onSave(title.trim()); if (e.key === "Escape") onCancel(); }}
-            placeholder="e.g. Cold & Cough"
-            className="w-full px-3 py-2 rounded text-sm outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
-        </div>
-        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t" style={{ borderColor: "var(--color-border)" }}>
-          <button onClick={onCancel} className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-danger)", color: "white" }}>
-            Cancel
-          </button>
-          <button
-            onClick={() => title.trim() && onSave(title.trim())}
-            disabled={!title.trim()}
-            className="px-3 py-1.5 rounded-md text-xs font-semibold"
-            style={{ background: "var(--color-drugs)", color: "white", opacity: title.trim() ? 1 : 0.5 }}
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Row height (px) used to compute how many blank rows fill the remaining
-   visible space in the Repeat Prescriptions grid — see useFillRowCount. */
-const REPEAT_ROW_HEIGHT_PX = 42;
-
-/* ── Empty placeholder row — same grid as a prescription row, shown to fill remaining space ── */
-function EmptyRepeatRow({ index }) {
-  return (
-    <div className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}>
-      <div className="w-12 px-3 py-2.5 text-center">&nbsp;</div>
-      <div className="flex-1 px-3 py-2.5">&nbsp;</div>
-      <div className="w-16 px-3 py-2.5 text-center">&nbsp;</div>
-      <div className="w-24 px-3 py-2.5 text-center">&nbsp;</div>
-      <div className="w-40 px-3 py-2.5 text-center">&nbsp;</div>
-    </div>
-  );
-}
-
-function RepeatPrescriptionsPanel({ prescriptions, onAdd, onModify, onDelete, onView }) {
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [modalMode, setModalMode] = useState(null); // null | "add" | { id, title }
-  const rowsScrollRef = useRef(null);
-
-  const filtered = searchTerm.trim()
-    ? prescriptions.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    : prescriptions;
-
-  const fillRowCount = useFillRowCount(rowsScrollRef, REPEAT_ROW_HEIGHT_PX, filtered.length);
-
-  return (
-    <div
-      className="flex flex-col rounded-xs overflow-hidden shadow-lg flex-shrink-0"
-      style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", width: "38%", minWidth: "420px", alignSelf: "stretch" }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0"
-        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-        <span className="text-sm font-bold" style={{ color: "var(--color-text-base)", fontFamily: "var(--font-inter)" }}>Repeat Prescriptions</span>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setModalMode("add")} className="flex items-center gap-1 text-xs font-bold" style={{ color: "var(--color-drugs)" }}>
-            <Plus size={14} /> Add
-          </button>
-          <button onClick={() => setShowSearch(v => !v)} className="flex items-center gap-1 text-xs font-bold" style={{ color: "var(--color-primary)" }}>
-            <Search size={14} /> Search
-          </button>
-        </div>
-      </div>
-
-      {showSearch && (
-        <div className="px-4 py-2 border-b flex-shrink-0" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
-          <input
-            autoFocus
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search prescription title..."
-            className="w-full px-3 py-1.5 rounded text-sm outline-none"
-            style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
-          />
-        </div>
-      )}
-
-      {/* Table header */}
-      <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)" }}>
-        <div className="w-12 px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-primary-dark)" }}>S.No</div>
-        <div className="flex-1 px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-primary-dark)" }}>Prescription Title</div>
-        <div className="w-16 px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-primary-dark)" }}>Days</div>
-        <div className="w-24 px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-primary-dark)" }}>No. of Drugs</div>
-        <div className="w-40 px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-primary-dark)" }}>Actions</div>
-      </div>
-
-      {/* Rows */}
-      <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
-        {filtered.map((p, index) => (
-          <div key={p.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
-            <div className="flex-1 px-3 py-2.5"><span className="text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{p.title}</span></div>
-            <div className="w-16 px-3 py-2.5 text-center"><span className="text-sm" style={{ color: "var(--color-text-muted)" }}>{p.days || "—"}</span></div>
-            <div className="w-24 px-3 py-2.5 text-center"><span className="text-sm" style={{ color: "var(--color-text-muted)" }}>{p.drugCount}</span></div>
-            <div className="w-40 px-3 py-2.5 text-center whitespace-nowrap">
-              <button onClick={() => onView(p)} className="text-xs font-semibold underline" style={{ color: "var(--color-primary)" }}>View</button>
-              <span className="text-xs mx-1" style={{ color: "var(--color-text-subtle)" }}>/</span>
-              <button onClick={() => setModalMode({ id: p.id, title: p.title })} className="text-xs font-semibold underline" style={{ color: "var(--color-drugs)" }}>Modify</button>
-              <span className="text-xs mx-1" style={{ color: "var(--color-text-subtle)" }}>/</span>
-              <button onClick={() => onDelete(p.id)} className="text-xs font-semibold underline" style={{ color: "var(--color-danger)" }}>Delete</button>
-            </div>
-          </div>
-        ))}
-        {Array.from({ length: fillRowCount }).map((_, i) => (
-          <EmptyRepeatRow key={`empty-${i}`} index={filtered.length + i} />
-        ))}
-      </div>
-
-      {modalMode === "add" && (
-        <RepeatPrescriptionModal
-          onSave={title => { onAdd(title); setModalMode(null); }}
-          onCancel={() => setModalMode(null)}
-        />
-      )}
-      {modalMode && modalMode !== "add" && (
-        <RepeatPrescriptionModal
-          initialTitle={modalMode.title}
-          onSave={title => { onModify(modalMode.id, title); setModalMode(null); }}
-          onCancel={() => setModalMode(null)}
-        />
-      )}
-    </div>
-  );
-}
-
 /* ═══════════════════════════════════════════════ MAIN COMPONENT ═══════════════════ */
 
 const EMPTY_DRAFT = { name: "", form: "Tab", intake: "1", period: "OD", when: "AF", detail: "—", days: "1" };
@@ -855,7 +689,6 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
   const [searchMode, setSearchMode] = useState("alpha"); // "alpha" | "embedded"
   const [drugType, setDrugType] = useState("Currently Live");
   const [frequentOnly, setFrequentOnly] = useState(false);
-  const [repeatPrescriptions, setRepeatPrescriptions] = useState(INITIAL_REPEAT_PRESCRIPTIONS);
 
   const addRowRef            = useRef(null);
   const addTableWrapperRef   = useRef(null);
@@ -927,21 +760,6 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
   const handleSave  = () => alert("Prescription saved successfully!");
   const handleProto = () => alert("Proto feature coming soon!");
 
-  const handleAddRepeatPrescription = title => {
-    setRepeatPrescriptions(prev => [...prev, { id: Date.now(), title, days: 0, drugCount: 0 }]);
-  };
-  const handleModifyRepeatPrescription = (id, title) => {
-    setRepeatPrescriptions(prev => prev.map(p => p.id === id ? { ...p, title } : p));
-  };
-  const handleDeleteRepeatPrescription = id => {
-    if (window.confirm("Delete this repeat prescription?")) {
-      setRepeatPrescriptions(prev => prev.filter(p => p.id !== id));
-    }
-  };
-  const handleViewRepeatPrescription = p => {
-    alert(`${p.title}\n${p.drugCount} drug(s) · ${p.days} day(s)`);
-  };
-
   const handleAddNewMedicine = () => {
     setShowAddRow(true);
     setTimeout(() => addRowRef.current?.focusName(), 100);
@@ -984,8 +802,7 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
   };
 
   return (
-    <div className="flex items-start gap-3" style={{ height: "100%" }}>
-    <div className="flex flex-col rounded-xs overflow-hidden shadow-lg flex-1 min-w-0"
+    <div className="flex flex-col rounded-xs overflow-hidden shadow-lg"
       style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", height: "100%", minHeight: "300px" }}>
 
       {/* HEADER / TOOLBAR — Clear, Save & the shortcut info icon live here alongside Paste/Proto/etc. */}
@@ -1055,16 +872,6 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
       {/* FOOTER */}
       <div className="flex-shrink-0 h-1"
         style={{ background: "linear-gradient(90deg, var(--color-drugs) 0%, var(--color-primary) 50%, var(--color-lab) 100%)", opacity: 0.3 }}
-      />
-    </div>
-
-      {/* ══════════ RIGHT PANEL — Repeat Prescriptions ══════════ */}
-      <RepeatPrescriptionsPanel
-        prescriptions={repeatPrescriptions}
-        onAdd={handleAddRepeatPrescription}
-        onModify={handleModifyRepeatPrescription}
-        onDelete={handleDeleteRepeatPrescription}
-        onView={handleViewRepeatPrescription}
       />
     </div>
   );

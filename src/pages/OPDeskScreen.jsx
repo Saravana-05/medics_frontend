@@ -12,6 +12,8 @@ import FindingsTab from "./OPDeskScreen/FindingsTab";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
 import { MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
 import IPTimeSheetTab from "./OPDeskScreen/IPTimeSheetTab";
+import RepeatPrescriptionsPanel from "./OPDeskScreen/RepeatPrescriptionsPanel";
+import LabReportPanel from "./OPDeskScreen/LabReportPanel";
 import Divider from "@mui/material/Divider";
 
 export default function OPDeskScreen({ user, onLogout }) {
@@ -25,6 +27,8 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [isTabletView, setIsTabletView] = useState(window.innerWidth < 1024);
   const [drugs, setDrugs] = useState([]);
   const [labs, setLabs] = useState([]);
+  const [labStruckIds, setLabStruckIds] = useState([]);
+  const [labSelectedRowId, setLabSelectedRowId] = useState(null);
   const [services, setServices] = useState([]);
   const [findings, setFindings] = useState({
     diagnosis: "", clinicalNotes: "", advice: "",
@@ -45,6 +49,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   const selectPatient = (p) => {
     setSelectedPatient(p);
     setDrugs([]); setLabs([]); setServices([]);
+    setLabStruckIds([]); setLabSelectedRowId(null);
     setFindings({ diagnosis: "", clinicalNotes: "", advice: "", nextVisit: "", referTo: "", followupNote: "" });
     setSaved(false);
   };
@@ -130,7 +135,17 @@ export default function OPDeskScreen({ user, onLogout }) {
 
               <div className="flex-1 overflow-y-auto min-h-0">
                 {activeTab === "drugs" && <DrugTab drugs={drugs} setDrugs={setDrugs} patient={selectedPatient} />}
-                {activeTab === "lab" && <LabTab labs={labs} setLabs={setLabs} patient={selectedPatient} />}
+                {activeTab === "lab" && (
+                  <LabTab
+                    labs={labs}
+                    setLabs={setLabs}
+                    patient={selectedPatient}
+                    struckIds={labStruckIds}
+                    setStruckIds={setLabStruckIds}
+                    selectedRowId={labSelectedRowId}
+                    setSelectedRowId={setLabSelectedRowId}
+                  />
+                )}
                 {activeTab === "services" && <ServiceTab services={services} setServices={setServices} patient={selectedPatient} />}
                 {activeTab === "findings" && <FindingsTab findings={findings} setFindings={setFindings} patient={selectedPatient} />}
                 {activeTab === "iptime" && <IPTimeSheetTab entries={ipEntries} setEntries={setIpEntries} patient={selectedPatient} />}
@@ -155,6 +170,37 @@ export default function OPDeskScreen({ user, onLogout }) {
               </button>
             )}
 
+            {/* Repeat Prescriptions — own top-level column so its top aligns with
+                Previous Information (both start right after the divider), independent
+                of the Drug/Lab/Service/Findings/IP-Time tabs row height. Only shown
+                while the Drug tab is active. */}
+            {activeTab === "drugs" && (
+              <div
+                className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
+                style={{ width: "25%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
+              >
+                <RepeatPrescriptionsPanel />
+              </div>
+            )}
+
+            {/* Lab Report — own top-level column, same pattern as Repeat Prescriptions:
+                mirrors the lab tests entered on the Lab tab (shared labs/struckIds/
+                selectedRowId state), starts right after the divider so its top aligns
+                with Previous Information. Only shown while the Lab tab is active. */}
+            {activeTab === "lab" && (
+              <div
+                className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
+                style={{ width: "25%", minWidth: "420px", marginRight: "10px", background: "#ffffff" }}
+              >
+                <LabReportPanel
+                  labs={labs}
+                  struckIds={labStruckIds}
+                  selectedRowId={labSelectedRowId}
+                  onSelect={setLabSelectedRowId}
+                />
+              </div>
+            )}
+
             {/* Right Section - Previous Visits Table
                 Desktop width = TopBar (w-96 = 384px) + RightSidebar (78px) = 462px,
                 so its left edge lines up with the TopBar section above. */}
@@ -164,7 +210,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
                     : 'w-0 overflow-hidden'
-                  : 'w-[440px] flex-none'
+                  : 'w-[438px] flex-none'
               }`}
               style={{ background: "#ffffff" }}
             >

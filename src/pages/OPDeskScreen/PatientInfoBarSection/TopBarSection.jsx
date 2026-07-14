@@ -139,7 +139,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
         <div
           className="flex flex-col h-full"
           style={{
-            width: "2.5px",
+            width: "1.5px",
             flexShrink: 0,
             marginRight: "2.5px",
           }}

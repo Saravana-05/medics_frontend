@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
-  FlaskConical, Search, ChevronDown, TestTube, Microscope,
+  FlaskConical, Search, ChevronDown, Microscope,
   BookOpen, Trash, FolderOpen, List
 } from "lucide-react";
 import { LAB_SUGGESTIONS } from "./mockData";
@@ -19,14 +19,9 @@ const SORTED_LAB_SUGGESTIONS = [...LAB_SUGGESTIONS].sort((a, b) => a.localeCompa
 const ADD_GRID = "48px minmax(0,1fr) 180px 100px";
 // LEFT panel (order list): S.No | Name | Remarks | Actions
 const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
-// RIGHT panel (Lab Result): Observed Value | Unit | Bio Ref | Specimen | Actions
-// This panel is now fully independent from the left table (own box, own header,
-// own row count) instead of being a second half of one shared grid.
-const RIGHT_GRID = "minmax(60px,1fr) 70px 180px 80px 100px";
 
 /* Fixed row height (px) used to compute how many blank rows fill the remaining
-   visible space — see useFillRowCount. Shared by both the left order list and the
-   right Lab Result panel so their row counts stay aligned. */
+   visible space in the added-tests grid — see useFillRowCount. */
 const ROW_HEIGHT_PX = 45;
 
 // ── Lab Test Groups ──
@@ -275,21 +270,6 @@ function EmptyLabRow({ index }) {
   );
 }
 
-/* ── Empty placeholder row (right lab result panel) ── */
-function EmptyLabResultRow({ index }) {
-  return (
-    <div
-      className="grid border-b"
-      style={{ gridTemplateColumns: RIGHT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
-    >
-      <div className="px-3 py-2 min-w-0">&nbsp;</div>
-      <div className="px-3 py-2 text-center">&nbsp;</div>
-      <div className="px-3 py-2 min-w-0">&nbsp;</div>
-      <div className="px-3 py-2 min-w-0">&nbsp;</div>
-    </div>
-  );
-}
-
 /* ── LEFT (order list) row ── */
 function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav }) {
   return (
@@ -347,92 +327,6 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
           onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}>
           <X size={14} />
         </button>
-      </div>
-    </div>
-  );
-}
-
-/* ── RIGHT (Lab Result) independent panel ── */
-function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onStrike, onDelete }) {
-  const resultRowsScrollRef = useRef(null);
-  const resultFillRowCount = useFillRowCount(resultRowsScrollRef, ROW_HEIGHT_PX, labs.length);
-
-  return (
-    <div
-      className="flex flex-col rounded-xs overflow-hidden shadow-lg flex-shrink-0"
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        width: "38%",
-        minWidth: "420px",
-        height: "100%",
-        minHeight: "300px",
-        alignSelf: "stretch",
-      }}
-    >
-      {/* Spacer — "Lab Report" now lives in the tabs row above; this blank strip just
-          keeps the same height as the left panel's toolbar so both panels' rows align. */}
-      <div className="flex-shrink-0 border-b"
-        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", height: "45px", boxSizing: "border-box" }} />
-
-      {/* Header */}
-      <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: RIGHT_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Observed Value</div>
-        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Unit</div>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Biological Ref. - Interval</div>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
-      </div>
-
-      {/* Rows — one per lab, same count/order as the left panel, but its own box.
-          Own scroll container + own fill-row measurement so the grid always
-          stretches to the bottom of the panel regardless of how many real rows exist. */}
-      <div ref={resultRowsScrollRef} className="overflow-y-auto flex-1">
-        {labs.map((lab, index) => {
-          const isStruck = struckIds.includes(lab.id);
-          const isSelected = selectedRowId === lab.id;
-          return (
-            <div
-              key={lab.id}
-              onClick={() => onSelect(lab.id)}
-              className="grid border-b transition-all duration-150 cursor-pointer"
-              style={{
-                gridTemplateColumns: RIGHT_GRID,
-                borderColor: "var(--color-border)",
-                background: isSelected
-                  ? "var(--color-lab-light)"
-                  : isStruck
-                    ? "var(--color-surface-alt)"
-                    : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
-                opacity: isStruck ? 0.6 : 1,
-              }}
-            >
-              <div className="px-3 py-2 flex items-center min-w-0">
-                <span className="text-sm truncate" style={{ color: lab.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
-                  {lab.observedValue || "—"}
-                </span>
-              </div>
-              <div className="px-3 py-2 flex items-center justify-center">
-                <span className="text-sm text-center" style={{ color: lab.unit ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
-                  {lab.unit || "—"}
-                </span>
-              </div>
-              <div className="px-3 py-2 flex items-center min-w-0">
-                <span className="text-sm truncate" style={{ color: lab.bioRef ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
-                  {lab.bioRef || "—"}
-                </span>
-              </div>
-              <div className="px-3 py-2 flex items-center min-w-0">
-                <span className="text-sm truncate" style={{ color: lab.specimen ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>
-                  {lab.specimen || "—"}
-                </span>
-              </div>
-
-            </div>
-          );
-        })}
-        {Array.from({ length: resultFillRowCount }).map((_, i) => (
-          <EmptyLabResultRow key={`empty-${i}`} index={labs.length + i} />
-        ))}
       </div>
     </div>
   );
@@ -665,7 +559,6 @@ const AddRow = React.forwardRef(({
                 onMouseEnter={() => setHighlightedIdx(i)}
                 onMouseLeave={() => setHighlightedIdx(-1)}
               >
-                <TestTube size={14} style={{ color: "var(--color-lab)" }} />
                 <span style={{ color: "var(--color-text-base)" }}>{item.label}</span>
               </div>
             ))}
@@ -714,13 +607,11 @@ const AddRow = React.forwardRef(({
 const EMPTY_DRAFT = { name: "", detail: "—" };
 const EMPTY_RESULT_FIELDS = { observedValue: "", unit: "", bioRef: "", specimen: "" };
 
-export default function LabTab({ labs, setLabs, patient }) {
+export default function LabTab({ labs, setLabs, patient, struckIds, setStruckIds, selectedRowId, setSelectedRowId }) {
   const [draft, setDraft] = useState(EMPTY_DRAFT);
   const [editId, setEditId] = useState(null);
   const [query, setQuery] = useState("");
-  const [struckIds, setStruckIds] = useState([]);
   const [showAddRow, setShowAddRow] = useState(true);
-  const [selectedRowId, setSelectedRowId] = useState(null);
   const [searchMode, setSearchMode] = useState("alpha");
 
   const addRowRef = useRef(null);
@@ -836,18 +727,15 @@ export default function LabTab({ labs, setLabs, patient }) {
   };
 
   return (
-    <div className="flex items-start gap-3" style={{ height: "100%" }}>
-
-      {/* ══════════ LEFT PANEL — lab order list (toolbar, tests, add row) ══════════ */}
-      <div
-        className="flex flex-col rounded-xs overflow-hidden shadow-lg flex-1 min-w-0"
-        style={{
-          background: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          height: "100%",
-          minHeight: "300px",
-        }}
-      >
+    <div
+      className="flex flex-col rounded-xs overflow-hidden shadow-lg"
+      style={{
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
+        height: "100%",
+        minHeight: "300px",
+      }}
+    >
         <ModernToolbar
           onProto={handleProto}
           onClear={handleClearAll}
@@ -897,21 +785,9 @@ export default function LabTab({ labs, setLabs, patient }) {
           </div>
         </div>
 
-        <div
-          className="flex-shrink-0 h-1"
-          style={{ background: "linear-gradient(90deg, var(--color-lab) 0%, var(--color-primary) 50%, var(--color-drugs) 100%)", opacity: 0.3 }}
-        />
-      </div>
-
-      {/* ══════════ RIGHT PANEL — Lab Result, fully independent box ══════════ */}
-      <LabResultPanel
-        labs={labs}
-        struckIds={struckIds}
-        selectedRowId={selectedRowId}
-        onSelect={setSelectedRowId}
-        onEdit={startEdit}
-        onStrike={toggleStrike}
-        onDelete={deleteLab}
+      <div
+        className="flex-shrink-0 h-1"
+        style={{ background: "linear-gradient(90deg, var(--color-lab) 0%, var(--color-primary) 50%, var(--color-drugs) 100%)", opacity: 0.3 }}
       />
     </div>
   );
