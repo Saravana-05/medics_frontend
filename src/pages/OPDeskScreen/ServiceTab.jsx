@@ -846,7 +846,7 @@ export default function ServiceTab({ services, setServices, patient }) {
         {/* ── ADDED SERVICE TABLE (top): left = service info, right = attached file ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           <TableHeader />
-          <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+          <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
             {services.map((service, index) => (
               <ServiceRow
                 key={service.id}

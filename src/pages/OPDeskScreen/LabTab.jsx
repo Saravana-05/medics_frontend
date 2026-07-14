@@ -21,8 +21,9 @@ const ADD_GRID = "48px minmax(0,1fr) 180px 100px";
 const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
 
 /* Fixed row height (px) used to compute how many blank rows fill the remaining
-   visible space in the added-tests grid — see useFillRowCount. */
-const ROW_HEIGHT_PX = 45;
+   visible space in the added-tests grid — see useFillRowCount. Matches the
+   Lab Report panel's row height so both grids line up. */
+const ROW_HEIGHT_PX = 42;
 
 // ── Lab Test Groups ──
 const LAB_GROUPS = [
@@ -188,7 +189,7 @@ function SearchModeToggle({ searchMode, onSearchModeChange }) {
 /* ── Modern Toolbar Component ── */
 function ModernToolbar({ onProto, onClear, onSave }) {
   return (
-    <div className="flex items-center justify-end p-2 border-b flex-shrink-0" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)", height: "45px", boxSizing: "border-box" }}>
+    <div className="flex items-center justify-end p-1.5 border-b flex-shrink-0" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
@@ -246,11 +247,11 @@ function AddTableHeader() {
 /* ── LEFT (order list) table header — S.No | Name | Remarks | Actions ── */
 function OrderTableHeader() {
   return (
-    <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: LEFT_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
-      <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>S.No</div>
-      <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Name</div>
-      <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Remarks</div>
-      <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Actions</div>
+    <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: LEFT_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box", overflow: "hidden" }}>
+      <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>S.No</div>
+      <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Name</div>
+      <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Remarks</div>
+      <div className="px-3 py-2.5 text-center truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Actions</div>
     </div>
   );
 }
@@ -260,7 +261,7 @@ function EmptyLabRow({ index }) {
   return (
     <div
       className="grid border-b"
-      style={{ gridTemplateColumns: LEFT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+      style={{ gridTemplateColumns: LEFT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}
     >
       <div className="px-3 py-2 text-center">&nbsp;</div>
       <div className="px-3 py-2 min-w-0">&nbsp;</div>
@@ -295,6 +296,8 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
             : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
         opacity: isStruck ? 0.6 : 1,
         boxShadow: isSelected ? "inset 0 0 0 2px var(--color-lab)" : "none",
+        height: `${ROW_HEIGHT_PX}px`,
+        boxSizing: "border-box",
       }}
     >
       <div className="px-3 py-2 text-center">
@@ -745,7 +748,7 @@ export default function LabTab({ labs, setLabs, patient, struckIds, setStruckIds
         <div className="flex-1 flex flex-col overflow-hidden pb-44">
           <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
             <OrderTableHeader />
-            <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+            <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
               {labs.map((lab, index) => (
                 <LabRow
                   key={lab.id}

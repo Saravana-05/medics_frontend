@@ -3,18 +3,19 @@ import { FlaskConical } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
 // RIGHT panel (Lab Result) grid: Observed Value | Unit | Bio Ref | Specimen
-const RIGHT_GRID = "minmax(60px,1fr) 70px 180px 80px";
+const RIGHT_GRID = "minmax(60px,1fr) 100px 200px 80px";
 
 /* Row height (px) used to compute how many blank rows fill the remaining
-   visible space — see useFillRowCount. */
-const ROW_HEIGHT_PX = 45;
+   visible space — see useFillRowCount. Matches Previous Information's and
+   Repeat Prescriptions' row height so all three sections' grids line up. */
+const ROW_HEIGHT_PX = 42;
 
 /* ── Empty placeholder row — shown to fill remaining space ── */
 function EmptyLabResultRow({ index }) {
   return (
     <div
       className="grid border-b"
-      style={{ gridTemplateColumns: RIGHT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+      style={{ gridTemplateColumns: RIGHT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}
     >
       <div className="px-3 py-2 min-w-0">&nbsp;</div>
       <div className="px-3 py-2 text-center">&nbsp;</div>
@@ -59,16 +60,17 @@ export default function LabReportPanel({ labs, struckIds, selectedRowId, onSelec
         </div>
       </div>
 
-      {/* Table header */}
-      <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: RIGHT_GRID, background: "var(--color-primary-muted)", borderColor: "var(--color-border)" }}>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Observed Value</div>
-        <div className="px-3 py-2.5 text-center" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Unit</div>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Biological Ref. - Interval</div>
-        <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
+      {/* Table header — overflow:hidden + nowrap on the long label guarantees this
+          row can never grow past the fixed row height, matching the left panel exactly. */}
+      <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: RIGHT_GRID, background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box", overflow: "hidden" }}>
+        <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Observed Value</div>
+        <div className="px-3 py-2.5 text-center truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Unit</div>
+        <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)", whiteSpace: "nowrap" }}>Biological Ref. - Interval</div>
+        <div className="px-3 py-2.5 truncate" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
       </div>
 
       {/* Rows — one per lab, same count/order as the left order list */}
-      <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+      <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {labs.map((lab, index) => {
           const isStruck = struckIds.includes(lab.id);
           const isSelected = selectedRowId === lab.id;
@@ -86,6 +88,8 @@ export default function LabReportPanel({ labs, struckIds, selectedRowId, onSelec
                     ? "var(--color-surface-alt)"
                     : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
                 opacity: isStruck ? 0.6 : 1,
+                height: `${ROW_HEIGHT_PX}px`,
+                boxSizing: "border-box",
               }}
             >
               <div className="px-3 py-2 flex items-center min-w-0">

@@ -200,7 +200,7 @@ function ModernToolbar({ onProto, onClear, onSave }) {
 /* ── Add Table Header ── */
 function AddTableHeader() {
   const columns = [
-    { label: "S.No",    width: "w-12",   center: true },
+    { label: "No.",    width: "w-12",   center: true },
     { label: "Name",    width: "w-80",   center: true },
     { label: "Days",    width: "w-16",   center: true },
     { label: "Dosage",  width: "w-20",   center: true },
@@ -224,7 +224,7 @@ function AddTableHeader() {
 /* ── Added Medicines Table Header ── */
 function TableHeader() {
   const columns = [
-    { label: "S.No",    width: "w-12",   center: true },
+    { label: "No.",    width: "w-12",   center: true },
     { label: "Name",    width: "w-80",   center: true },
     { label: "Buy",     width: "w-12",   center: true },
     { label: "Mor",     width: "w-8",    center: true, vertical: true },
@@ -820,7 +820,7 @@ export default function DrugTab({ drugs, setDrugs, patient }) {
         {/* ── ADDED MEDICINES TABLE (top) ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           <TableHeader />
-          <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+          <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
             {drugs.map((drug, index) => (
               <DrugRow
                 key={drug.id}

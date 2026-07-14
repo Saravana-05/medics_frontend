@@ -278,10 +278,10 @@ export default function PreviousVisitsTable({ visits = [] }) {
         </div>
 
         {/* Table Container */}
-        <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0">
+        <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
-              <tr style={{ background: "var(--color-primary-muted)" }}>
+              <tr style={{ background: "var(--color-primary-muted)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
                 {visibleColumnsList.map(col => (
                   <th 
                     key={col.key}
@@ -331,12 +331,14 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   const vitals = getVitalsDisplay(visit.vitals);
                   
                   return (
-                    <tr 
+                    <tr
                       key={visit.sl}
                       className="transition-all duration-150 hover:shadow-sm hover:bg-primary-muted/30 cursor-pointer group"
-                      style={{ 
+                      style={{
                         borderBottom: "1px solid var(--color-border)",
-                        background: "var(--color-surface)"
+                        background: "var(--color-surface)",
+                        height: `${ROW_HEIGHT_PX}px`,
+                        boxSizing: "border-box",
                       }}
                       onClick={() => handleViewRow(visit, index)}
                     >
@@ -465,7 +467,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   );
                 })}
                 {Array.from({ length: fillRowCount }).map((_, index) => (
-                  <tr key={`empty-${index}`} style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
+                  <tr key={`empty-${index}`} style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
                     {visibleColumnsList.map(col => (
                       <td key={col.key} className={`${col.width} px-3 py-2.5`}>&nbsp;</td>
                     ))}

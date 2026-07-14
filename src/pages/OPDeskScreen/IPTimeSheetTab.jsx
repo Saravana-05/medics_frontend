@@ -694,7 +694,7 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
         {/* ── ADDED IP TABLE (top) ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
           <TableHeader />
-          <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+          <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
             {entries.map((entry, index) => (
               <IPRow
                 key={entry.id}

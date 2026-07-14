@@ -177,7 +177,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {activeTab === "drugs" && (
               <div
                 className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
-                style={{ width: "25%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
+                style={{ width: "27%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
               >
                 <RepeatPrescriptionsPanel />
               </div>
@@ -190,7 +190,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {activeTab === "lab" && (
               <div
                 className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
-                style={{ width: "25%", minWidth: "420px", marginRight: "10px", background: "#ffffff" }}
+                style={{ width: "27%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
               >
                 <LabReportPanel
                   labs={labs}
