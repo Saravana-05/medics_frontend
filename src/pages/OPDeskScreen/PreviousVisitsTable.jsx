@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Calendar, Clock, FileText, Activity, User, CalendarDays,
   ChevronDown, ChevronUp, History, Stethoscope, Syringe,
   ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
 import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
+import useFillRowCount from "../../hooks/useFillRowCount";
 
 // Store prescription history locally (in real app, this would come from an API/DB)
 let globalPrescriptionHistory = {};
@@ -34,6 +35,10 @@ const ALL_COLUMNS = [
   { key: "by", label: "By", width: "w-24", align: "left", defaultVisible: true, sortable: true },
   { key: "nextVisit", label: "Next", width: "w-28", align: "left", defaultVisible: false, sortable: true },
 ];
+
+/* Fixed row height (px) used to compute how many blank rows fill the remaining
+   visible space — see useFillRowCount. */
+const ROW_HEIGHT_PX = 42;
 
 export default function PreviousVisitsTable({ visits = [] }) {
   const [sortField, setSortField] = useState(null);
@@ -170,12 +175,15 @@ export default function PreviousVisitsTable({ visits = [] }) {
     return 0;
   });
 
-  const filteredVisits = sortedVisits.filter(visit => 
-    filterText === "" || 
+  const filteredVisits = sortedVisits.filter(visit =>
+    filterText === "" ||
     visit.complaint?.toLowerCase().includes(filterText.toLowerCase()) ||
     visit.docModule?.toLowerCase().includes(filterText.toLowerCase()) ||
     visit.by?.toLowerCase().includes(filterText.toLowerCase())
   );
+
+  const rowsScrollRef = useRef(null);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, filteredVisits.length);
 
   // Get only visible columns
   const visibleColumnsList = ALL_COLUMNS.filter(col => visibleColumns[col.key]);
@@ -255,7 +263,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
               <Search size={12} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
               <input
                 type="text"
-                placeholder="Search visits..."
+                placeholder="Search Entries..."
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
                 className="pl-8 pr-3 py-1.5 text-xs rounded-lg w-36 focus:w-48 transition-all duration-200 outline-none"
@@ -270,7 +278,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
         </div>
 
         {/* Table Container */}
-        <div className="flex-1 overflow-auto min-h-0">
+        <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
               <tr style={{ background: "var(--color-primary-muted)" }}>
@@ -298,28 +306,27 @@ export default function PreviousVisitsTable({ visits = [] }) {
             </thead>
             
             <tbody>
-              {filteredVisits.length === 0 ? (
+              {filteredVisits.length === 0 && visits.length > 0 && filterText ? (
                 <tr>
                   <td colSpan={visibleColumnsList.length} className="py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <History size={32} style={{ color: "var(--color-text-subtle)" }} />
                       <p className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-                        {visits.length === 0 ? "No visit records found" : "No matching records"}
+                        No matching records
                       </p>
-                      {filterText && (
-                        <button
-                          onClick={() => setFilterText("")}
-                          className="text-xs px-3 py-1 rounded-lg transition-all"
-                          style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
-                        >
-                          Clear filter
-                        </button>
-                      )}
+                      <button
+                        onClick={() => setFilterText("")}
+                        className="text-xs px-3 py-1 rounded-lg transition-all"
+                        style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
+                      >
+                        Clear filter
+                      </button>
                     </div>
                   </td>
                 </tr>
               ) : (
-                filteredVisits.map((visit, index) => {
+                <>
+                {filteredVisits.map((visit, index) => {
                   const module = moduleColor(visit.docModule);
                   const vitals = getVitalsDisplay(visit.vitals);
                   
@@ -351,8 +358,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value ? (
                                 <div className="flex items-center gap-1.5">
-                                  <FileText size={11} style={{ color: "var(--color-success)" }} />
-                                  <span className="font-mono text-[0.65rem]" style={{ color: "var(--color-success)" }}>
+                                  
+                                  <span className="font-mono text-[0.75rem]" style={{ color: "var(--color-success)" }}>
                                     {value}
                                   </span>
                                 </div>
@@ -436,14 +443,14 @@ export default function PreviousVisitsTable({ visits = [] }) {
                               </div>
                             ) : col.key === "complaint" ? (
                               <div className="flex items-center gap-1.5">
-                                <Activity size={11} style={{ color: "var(--color-danger)" }} />
+                                
                                 <span className="text-[0.7rem] font-medium line-clamp-2" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
                               </div>
                             ) : col.key === "by" ? (
                               <div className="flex items-center gap-1.5">
-                                <User size={11} style={{ color: "var(--color-primary)" }} />
+                                
                                 <span className="text-[0.7rem] font-medium truncate block max-w-[70px]" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
@@ -456,37 +463,43 @@ export default function PreviousVisitsTable({ visits = [] }) {
                       })}
                     </tr>
                   );
-                })
+                })}
+                {Array.from({ length: fillRowCount }).map((_, index) => (
+                  <tr key={`empty-${index}`} style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
+                    {visibleColumnsList.map(col => (
+                      <td key={col.key} className={`${col.width} px-3 py-2.5`}>&nbsp;</td>
+                    ))}
+                  </tr>
+                ))}
+                </>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Footer with summary */}
-        {filteredVisits.length > 0 && (
-          <div className="flex-shrink-0 px-4 py-2 border-t flex justify-between items-center" style={{ 
-            background: "var(--color-surface-alt)", 
-            borderColor: "var(--color-border)"
-          }}>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-primary)" }} />
-                <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>OP Visit</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-lab)" }} />
-                <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>IP Visit</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-drugs)" }} />
-                <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>Report Ready</span>
-              </div>
+        {/* Footer with summary — always shown, even before any visit data arrives */}
+        <div className="flex-shrink-0 px-4 py-2 border-t flex justify-between items-center" style={{
+          background: "var(--color-surface-alt)",
+          borderColor: "var(--color-border)"
+        }}>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-primary)" }} />
+              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>OP Visit</span>
             </div>
-            <div className="text-[0.6rem] font-medium" style={{ color: "var(--color-text-muted)" }}>
-              Showing {filteredVisits.length} of {visits.length} records
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-lab)" }} />
+              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>IP Visit</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-drugs)" }} />
+              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>Report Ready</span>
             </div>
           </div>
-        )}
+          <div className="text-[0.6rem] font-medium" style={{ color: "var(--color-text-muted)" }}>
+            Showing {filteredVisits.length} of {visits.length} records
+          </div>
+        </div>
       </div>
 
       {/* Prescription View Modal */}

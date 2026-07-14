@@ -106,39 +106,22 @@ export default function PatientInfoPanel({
   const [imageError, setImageError] = useState(false);
   const [activeTab, setActiveTab] = useState("address");
 
-  if (!patient) {
-    return (
-      <div className="flex items-center justify-center rounded-lg"
-        style={{
-          width: popupWidth,
-          height: popupHeight,
-          background: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-        }}>
-        <div className="text-center">
-          <User size={32} style={{ color: "var(--color-text-subtle)" }} />
-          <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>No patient selected</p>
-        </div>
-      </div>
-    );
-  }
-
-  const p = patient;
+  const p = patient || {};
 
   const patientData = {
     address: p.address || {
-      line1: "Ram Krishna Apartments",
-      line2: "12/24, Srinivasapuram 3rd St.",
-      line3: "Samayanallur – 625 102",
-      line4: "Madurai Dt",
-      phone: "9855523456",
+      line1: "",
+      line2: "",
+      line3: "",
+      line4: "",
+      phone: "",
     },
-    attendant: p.attendant || { name: "Sri.Krishnaswamy", relationship: "Husband", phone: "9300440039" },
-    appointment: p.appointment || { datetime: "Today, 10:30 AM", priority: "Normal" },
-    todaysVisit: p.todaysVisit || { type: "Follow-up", firstVisit: "02/01/2024", visitCount: "5th visit", corporate: "ABC Corp Ltd", fee: "Cash" },
-    insurer: p.insurer || { name: "Star Health", plan: "Family Floater", period: "2024-2025", claim: "Yes (₹25,000)" },
+    attendant: p.attendant || { name: "", relationship: "", phone: "" },
+    appointment: p.appointment || { datetime: "", priority: "" },
+    todaysVisit: p.todaysVisit || { type: "", firstVisit: "", visitCount: "", corporate: "", fee: "" },
+    insurer: p.insurer || { name: "", plan: "", period: "", claim: "" },
     gynacInfo: p.gynacInfo || null,
-    ipInfo: p.ipInfo || { ward: "General Ward", bed: "Bed No. 12A", admitDate: "15/02/2024", consultant: "Dr. Aravind Kumar" },
+    ipInfo: p.ipInfo || { ward: "", bed: "", admitDate: "", consultant: "" },
   };
 
   // Scrollable content area height
@@ -147,7 +130,7 @@ export default function PatientInfoPanel({
 
   // Get the initial letter for fallback avatar
   const getInitials = () => {
-    const name = patient.name || "Patient";
+    const name = p.name || "Patient";
     const parts = name.split(" ");
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
@@ -284,10 +267,10 @@ export default function PatientInfoPanel({
             border: "3px solid white",
           }}>
           
-          {patient.photo && !imageError ? (
+          {p.photo && !imageError ? (
             <img
-              src={patient.photo}
-              alt={patient.name}
+              src={p.photo}
+              alt={p.name}
               className="w-full h-full object-cover"
               onError={() => setImageError(true)}
             />
@@ -296,7 +279,7 @@ export default function PatientInfoPanel({
               <span className="text-white font-bold text-4xl">{getInitials()}</span>
             </div>
           )}
-          
+
           {/* Edit/Camera button overlay */}
           <button className="absolute bottom-1 right-1 p-1.5 rounded-full bg-white shadow-md transition-all opacity-0 group-hover:opacity-100">
             <Camera size={12} style={{ color: "var(--color-primary)" }} />
@@ -306,21 +289,21 @@ export default function PatientInfoPanel({
         {/* Patient details below photo */}
         <div className="text-center mt-2.5">
           <h3 className="text-lg font-bold truncate" style={{ color: "var(--color-text-base)" }}>
-            {patient.name || "Smt. Vijayalakshmi"}
+            {p.name || "—"}
           </h3>
           <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
             <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-              <Activity size={10} /> {patient.age || 29} yrs
+              <Activity size={10} /> {p.age || "—"} yrs
             </span>
             <span className="w-1 h-1 rounded-full" style={{ background: "var(--color-text-muted)" }} />
             <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-              <Heart size={10} /> {patient.bloodGroup || "O+"}
+              <Heart size={10} /> {p.bloodGroup || "—"}
             </span>
-            {patient.gender && (
+            {p.gender && (
               <>
                 <span className="w-1 h-1 rounded-full" style={{ background: "var(--color-text-muted)" }} />
                 <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-                  <User size={10} /> {patient.gender === "Female" ? "Female" : patient.gender === "Male" ? "Male" : patient.gender}
+                  <User size={10} /> {p.gender === "Female" ? "Female" : p.gender === "Male" ? "Male" : p.gender}
                 </span>
               </>
             )}

@@ -113,7 +113,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                     <FileIcon size={12} style={{ color: "var(--color-primary)" }} />
                     <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
                   </div>
-                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docNo || "OP: 3902"}</div>
+                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docNo || "—"}</div>
                 </div>
               </div>
 
@@ -125,7 +125,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                     <Calendar size={12} style={{ color: "var(--color-primary)" }} />
                     <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>
                   </div>
-                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docDate || "03/02/2024"}</div>
+                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docDate || "—"}</div>
                 </div>
               </div>
 

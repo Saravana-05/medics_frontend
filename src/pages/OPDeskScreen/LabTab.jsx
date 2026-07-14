@@ -5,9 +5,10 @@ import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
   FlaskConical, Search, ChevronDown, TestTube, Microscope,
-  BookOpen, Trash, FolderOpen, List, Info
+  BookOpen, Trash, FolderOpen, List
 } from "lucide-react";
 import { LAB_SUGGESTIONS } from "./mockData";
+import useFillRowCount from "../../hooks/useFillRowCount";
 
 const DETAIL_OPTIONS = ["—","Empty Stomach","1Hr. After Food","Any Time","Fasting","Random","Early Morning","Immediately"];
 
@@ -22,6 +23,11 @@ const LEFT_GRID = "64px minmax(0,1fr) 192px 112px";
 // This panel is now fully independent from the left table (own box, own header,
 // own row count) instead of being a second half of one shared grid.
 const RIGHT_GRID = "minmax(60px,1fr) 70px 180px 80px 100px";
+
+/* Fixed row height (px) used to compute how many blank rows fill the remaining
+   visible space — see useFillRowCount. Shared by both the left order list and the
+   right Lab Result panel so their row counts stay aligned. */
+const ROW_HEIGHT_PX = 45;
 
 // ── Lab Test Groups ──
 const LAB_GROUPS = [
@@ -155,37 +161,6 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
   );
 }
 
-/* ── Keyboard-shortcut hint — icon that reveals shortcuts on hover ── */
-function ShortcutHint() {
-  const shortcuts = [
-    { keys: "Alt + T", desc: "Switch tables" },
-    { keys: "Alt + E", desc: "Edit row" },
-    { keys: "Alt + Del", desc: "Delete row" },
-  ];
-  return (
-    <div className="relative group flex items-center">
-      <Info size={16} className="cursor-help" style={{ color: "var(--color-text-subtle)" }} />
-      <div
-        className="absolute right-0 top-full mt-1.5 z-50 hidden group-hover:block rounded-lg p-2 shadow-lg"
-        style={{ background: "var(--color-text-base)", minWidth: "180px" }}
-      >
-        <div className="text-[0.6rem] font-bold uppercase tracking-wider mb-1.5 px-1" style={{ color: "var(--color-text-subtle)" }}>
-          Keyboard shortcuts
-        </div>
-        {shortcuts.map(s => (
-          <div key={s.keys} className="flex items-center justify-between gap-3 px-1 py-0.5">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>{s.desc}</span>
-            <kbd className="text-[0.6rem] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
-              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
-              {s.keys}
-            </kbd>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ── Search-mode checkboxes (Alphabet / Embedded) — sits above the add row ── */
 function SearchModeToggle({ searchMode, onSearchModeChange }) {
   return (
@@ -218,7 +193,7 @@ function SearchModeToggle({ searchMode, onSearchModeChange }) {
 /* ── Modern Toolbar Component ── */
 function ModernToolbar({ onProto, onClear, onSave }) {
   return (
-    <div className="flex items-center justify-end p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+    <div className="flex items-center justify-end p-2 border-b flex-shrink-0" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)", height: "45px", boxSizing: "border-box" }}>
       <div className="flex items-center gap-2">
         <ActionButton variant="ghost" icon={Clipboard} label="Paste" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
@@ -227,7 +202,6 @@ function ModernToolbar({ onProto, onClear, onSave }) {
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
-        <ShortcutHint />
         <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
         <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
@@ -286,6 +260,36 @@ function OrderTableHeader() {
   );
 }
 
+/* ── Empty placeholder row (left order list) — shown when no tests added yet ── */
+function EmptyLabRow({ index }) {
+  return (
+    <div
+      className="grid border-b"
+      style={{ gridTemplateColumns: LEFT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+    >
+      <div className="px-3 py-2 text-center">&nbsp;</div>
+      <div className="px-3 py-2 min-w-0">&nbsp;</div>
+      <div className="px-3 py-2">&nbsp;</div>
+      <div className="px-2 py-2 text-center">&nbsp;</div>
+    </div>
+  );
+}
+
+/* ── Empty placeholder row (right lab result panel) ── */
+function EmptyLabResultRow({ index }) {
+  return (
+    <div
+      className="grid border-b"
+      style={{ gridTemplateColumns: RIGHT_GRID, borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+    >
+      <div className="px-3 py-2 min-w-0">&nbsp;</div>
+      <div className="px-3 py-2 text-center">&nbsp;</div>
+      <div className="px-3 py-2 min-w-0">&nbsp;</div>
+      <div className="px-3 py-2 min-w-0">&nbsp;</div>
+    </div>
+  );
+}
+
 /* ── LEFT (order list) row ── */
 function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav }) {
   return (
@@ -317,8 +321,7 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
         <span className="text-sm font-bold" style={{ color: "var(--color-lab)" }}>{index + 1}</span>
       </div>
       <div className="px-3 py-2 min-w-0">
-        <span className={`text-sm font-semibold flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
-          <FlaskConical size={14} style={{ color: "var(--color-lab)" }} />
+        <span className={`text-sm font-semibold ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
           {lab.name}
         </span>
       </div>
@@ -351,7 +354,8 @@ function LabRow({ lab, index, isStruck, isSelected, onSelect, onDelete, onStrike
 
 /* ── RIGHT (Lab Result) independent panel ── */
 function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onStrike, onDelete }) {
-  if (labs.length === 0) return null;
+  const resultRowsScrollRef = useRef(null);
+  const resultFillRowCount = useFillRowCount(resultRowsScrollRef, ROW_HEIGHT_PX, labs.length);
 
   return (
     <div
@@ -361,14 +365,15 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
         border: "1px solid var(--color-border)",
         width: "38%",
         minWidth: "420px",
-        alignSelf: "flex-start",
+        height: "100%",
+        minHeight: "300px",
+        alignSelf: "stretch",
       }}
     >
-      {/* Title */}
-      <div className="flex items-center justify-center px-4 py-2.5 border-b flex-shrink-0"
-        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-        <span className="text-sm font-bold" style={{ color: "var(--color-lab)", fontFamily: "var(--font-inter)" }}>Lab Report</span>
-      </div>
+      {/* Spacer — "Lab Report" now lives in the tabs row above; this blank strip just
+          keeps the same height as the left panel's toolbar so both panels' rows align. */}
+      <div className="flex-shrink-0 border-b"
+        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", height: "45px", boxSizing: "border-box" }} />
 
       {/* Header */}
       <div className="grid border-b flex-shrink-0" style={{ gridTemplateColumns: RIGHT_GRID, background: "var(--color-lab-light)", borderColor: "var(--color-border)" }}>
@@ -378,8 +383,10 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
         <div className="px-3 py-2.5" style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: "var(--color-lab)" }}>Specimen</div>
       </div>
 
-      {/* Rows — one per lab, same count/order as the left panel, but its own box */}
-      <div>
+      {/* Rows — one per lab, same count/order as the left panel, but its own box.
+          Own scroll container + own fill-row measurement so the grid always
+          stretches to the bottom of the panel regardless of how many real rows exist. */}
+      <div ref={resultRowsScrollRef} className="overflow-y-auto flex-1">
         {labs.map((lab, index) => {
           const isStruck = struckIds.includes(lab.id);
           const isSelected = selectedRowId === lab.id;
@@ -419,10 +426,13 @@ function LabResultPanel({ labs, struckIds, selectedRowId, onSelect, onEdit, onSt
                   {lab.specimen || "—"}
                 </span>
               </div>
-              
+
             </div>
           );
         })}
+        {Array.from({ length: resultFillRowCount }).map((_, i) => (
+          <EmptyLabResultRow key={`empty-${i}`} index={labs.length + i} />
+        ))}
       </div>
     </div>
   );
@@ -473,20 +483,18 @@ function TypableDetailInput({ value, onChange, onKeyDown, dataField }) {
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
       />
       <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filteredOptions.length > 0}>
-        <div className="max-h-48 overflow-y-auto">
-          {filteredOptions.map((opt, i) => (
-            <div
-              key={opt}
-              onMouseDown={() => handleSelectOption(opt)}
-              className="px-3 py-2 cursor-pointer text-sm transition-colors"
-              style={{ background: highlightedIdx === i ? "var(--color-lab-light)" : "transparent" }}
-              onMouseEnter={() => setHighlightedIdx(i)}
-              onMouseLeave={() => setHighlightedIdx(-1)}
-            >
-              {opt}
-            </div>
-          ))}
-        </div>
+        {filteredOptions.map((opt, i) => (
+          <div
+            key={opt}
+            onMouseDown={() => handleSelectOption(opt)}
+            className="px-3 py-2 cursor-pointer text-sm transition-colors"
+            style={{ background: highlightedIdx === i ? "var(--color-lab-light)" : "transparent" }}
+            onMouseEnter={() => setHighlightedIdx(i)}
+            onMouseLeave={() => setHighlightedIdx(-1)}
+          >
+            {opt}
+          </div>
+        ))}
       </PortalDropdown>
     </div>
   );
@@ -718,6 +726,8 @@ export default function LabTab({ labs, setLabs, patient }) {
   const addRowRef = useRef(null);
   const addTableWrapperRef = useRef(null);
   const addedTableWrapperRef = useRef(null);
+  const rowsScrollRef = useRef(null);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, labs.length);
 
   const baseSearchList = searchMode === "embedded" ? ALL_LAB_SUGGESTIONS : SORTED_ALL_LAB_SUGGESTIONS;
   const suggestions = query.length > 1
@@ -846,39 +856,26 @@ export default function LabTab({ labs, setLabs, patient }) {
 
         <div className="flex-1 flex flex-col overflow-hidden pb-44">
           <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
-            {labs.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center py-5">
-                <div className="text-center">
-                  <div className="mb-2 p-4 rounded-full inline-flex" style={{ background: "var(--color-lab-light)" }}>
-                    <FlaskConical size={20} style={{ color: "var(--color-lab)" }} />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Lab Tests Ordered Yet</h3>
-                  <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                    Use the table below to add your first lab test.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <OrderTableHeader />
-                <div className="overflow-y-auto flex-1">
-                  {labs.map((lab, index) => (
-                    <LabRow
-                      key={lab.id}
-                      lab={lab}
-                      index={index}
-                      isStruck={struckIds.includes(lab.id)}
-                      isSelected={selectedRowId === lab.id}
-                      onSelect={() => setSelectedRowId(lab.id)}
-                      onDelete={() => deleteLab(lab.id)}
-                      onStrike={() => toggleStrike(lab.id)}
-                      onEdit={() => startEdit(lab)}
-                      onArrowNav={dir => handleRowArrowNav(lab.id, dir)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
+            <OrderTableHeader />
+            <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+              {labs.map((lab, index) => (
+                <LabRow
+                  key={lab.id}
+                  lab={lab}
+                  index={index}
+                  isStruck={struckIds.includes(lab.id)}
+                  isSelected={selectedRowId === lab.id}
+                  onSelect={() => setSelectedRowId(lab.id)}
+                  onDelete={() => deleteLab(lab.id)}
+                  onStrike={() => toggleStrike(lab.id)}
+                  onEdit={() => startEdit(lab)}
+                  onArrowNav={dir => handleRowArrowNav(lab.id, dir)}
+                />
+              ))}
+              {Array.from({ length: fillRowCount }).map((_, i) => (
+                <EmptyLabRow key={`empty-${i}`} index={labs.length + i} />
+              ))}
+            </div>
           </div>
 
           <SearchModeToggle searchMode={searchMode} onSearchModeChange={setSearchMode} />

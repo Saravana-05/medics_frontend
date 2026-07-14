@@ -137,7 +137,7 @@ export default function LeftPatientSection({
   open,
   setOpen
 }) {
-  const p = selectedPatient;
+  const p = selectedPatient || {};
 
   // Calculate age in years, months, days from DOB
   const calculateAge = (dob) => {
@@ -208,8 +208,7 @@ export default function LeftPatientSection({
         </div>
 
         {/* Patient Details */}
-        {p && (
-          <div className="flex flex-col sm:flex-row md:flex-1 lg:flex-none lg:flex-col gap-2 md:gap-1 lg:p-1 lg:gap-2">
+        <div className="flex flex-col sm:flex-row md:flex-1 lg:flex-none lg:flex-col gap-2 md:gap-1 lg:p-1 lg:gap-2">
 
             {/* Sex / Age / DOB — same card styling as CompactRelationCard */}
             <div
@@ -279,7 +278,6 @@ export default function LeftPatientSection({
             </div>
 
           </div>
-        )}
       </div>
     </div>
   );

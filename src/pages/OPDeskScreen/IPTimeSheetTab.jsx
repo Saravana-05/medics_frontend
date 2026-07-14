@@ -3,16 +3,21 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
 import {
   Plus, Clipboard, FileText, Printer, Save, X,
-  Edit2, MinusCircle, RotateCcw, Clock, Calendar,
-  Search, ChevronDown, BookOpen, Trash, User,
-  Stethoscope, Pill, Activity, Info
+  Edit2, MinusCircle, RotateCcw, Calendar,
+  Search, ChevronDown, BookOpen, Trash,
+  Stethoscope, Pill, Activity
 } from "lucide-react";
+import useFillRowCount from "../../hooks/useFillRowCount";
 
 /* ── Burgundy theme tokens (scoped to this tab) ── */
 const BURGUNDY = "#8e2a4c";        // main accent (was --color-warning)
 const BURGUNDY_DARK = "#6e1f3a";   // hover / pressed (was #d97706)
 const BURGUNDY_LIGHT = "#fbe7ee";  // tinted background (was var(--color-lab-light))
 const BURGUNDY_LIGHTER = "#f5cdda"; // hover tint (was #fde68a)
+
+/* Fixed row height (px) used to compute how many blank rows fill the remaining
+   visible space in the added-entries grid — see useFillRowCount. */
+const ROW_HEIGHT_PX = 44;
 
 const IP_SUBJECT_OPTIONS = [
   "General Check",
@@ -99,37 +104,6 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
   );
 }
 
-// ── Keyboard-shortcut hint — icon that reveals shortcuts on hover ──
-function ShortcutHint() {
-  const shortcuts = [
-    { keys: "Alt + T", desc: "Switch tables" },
-    { keys: "Alt + E", desc: "Edit row" },
-    { keys: "Alt + Del", desc: "Delete row" },
-  ];
-  return (
-    <div className="relative group flex items-center">
-      <Info size={16} className="cursor-help" style={{ color: "var(--color-text-subtle)" }} />
-      <div
-        className="absolute right-0 top-full mt-1.5 z-50 hidden group-hover:block rounded-lg p-2 shadow-lg"
-        style={{ background: "var(--color-text-base)", minWidth: "180px" }}
-      >
-        <div className="text-[0.6rem] font-bold uppercase tracking-wider mb-1.5 px-1" style={{ color: "var(--color-text-subtle)" }}>
-          Keyboard shortcuts
-        </div>
-        {shortcuts.map(s => (
-          <div key={s.keys} className="flex items-center justify-between gap-3 px-1 py-0.5">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>{s.desc}</span>
-            <kbd className="text-[0.6rem] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
-              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
-              {s.keys}
-            </kbd>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ── Modern Toolbar Component ──
 /* ── Search-mode checkboxes — sits above the add row ── */
 function SearchModeToggle({ searchMode, onSearchModeChange }) {
@@ -171,7 +145,6 @@ function ModernToolbar({ onProto, onClear, onSave }) {
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
-        <ShortcutHint />
         <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
         <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
@@ -230,6 +203,24 @@ function TableHeader() {
   );
 }
 
+/* ── Empty placeholder row — same grid as IPRow, shown when no entries added yet ── */
+function EmptyIPRow({ index }) {
+  return (
+    <div
+      className="flex items-center border-b gap-3 px-2"
+      style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+    >
+      <div className="w-16 px-3 py-2 text-center flex-shrink-0">&nbsp;</div>
+      <div className="flex-1 px-3 py-2">&nbsp;</div>
+      <div className="flex-1 px-3 py-2">&nbsp;</div>
+      <div className="flex-1 px-3 py-2">&nbsp;</div>
+      <div className="flex-1 px-3 py-2">&nbsp;</div>
+      <div className="flex-1 px-3 py-2">&nbsp;</div>
+      <div className="w-28 px-3 py-2 text-center flex-shrink-0">&nbsp;</div>
+    </div>
+  );
+}
+
 // ── IP Row Component ──
 function IPRow({ item, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav }) {
   return (
@@ -260,8 +251,7 @@ function IPRow({ item, index, isStruck, isSelected, onSelect, onDelete, onStrike
         <span className="text-sm font-bold" style={{ color: BURGUNDY }}>{index + 1}</span>
       </div>
       <div className="flex-1 px-3 py-2">
-        <span className="text-xs font-mono flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-          <Clock size={10} />
+        <span className="text-xs font-mono" style={{ color: "var(--color-text-muted)" }}>
           {item.dateTime || "—"}
         </span>
       </div>
@@ -274,9 +264,8 @@ function IPRow({ item, index, isStruck, isSelected, onSelect, onDelete, onStrike
         <span className="text-sm" style={{ color: "var(--color-text-base)" }}>{item.advice}</span>
       </div>
       <div className="flex-1 px-3 py-2">
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
           style={{ background: BURGUNDY_LIGHT, color: BURGUNDY_DARK }}>
-          <User size={10} />
           {item.nurse}
         </span>
       </div>
@@ -307,6 +296,34 @@ function IPRow({ item, index, isStruck, isSelected, onSelect, onDelete, onStrike
   );
 }
 
+/* ── Portal Dropdown ── renders into document.body to escape overflow:hidden.
+   Always opens downward, sized to the space below, matching Drug/Lab/Service tabs. */
+function PortalDropdown({ anchorEl, open, children }) {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    if (!open || !anchorEl) return;
+    const rect = anchorEl.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    setStyle({
+      position: "fixed",
+      top: rect.bottom + 2,
+      left: rect.left,
+      width: rect.width,
+      maxHeight: spaceBelow - 8,
+      zIndex: 99999,
+    });
+  }, [open, anchorEl]);
+
+  if (!open) return null;
+  return ReactDOM.createPortal(
+    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
+      {children}
+    </div>,
+    document.body
+  );
+}
+
 // ── Typable Select/Input Component ──
 function TypableSelect({ options, sortedOptions, value, onChange, placeholder, dataField, onKeyDown, searchMode }) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -314,7 +331,6 @@ function TypableSelect({ options, sortedOptions, value, onChange, placeholder, d
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const inputRef = useRef(null);
   const anchorRef = useRef(null);
-  const [dropdownStyle, setDropdownStyle] = useState({});
 
   // Use sorted or original based on searchMode
   const displayOptions = searchMode === "alpha" ? sortedOptions : options;
@@ -322,30 +338,6 @@ function TypableSelect({ options, sortedOptions, value, onChange, placeholder, d
   const filteredOptions = displayOptions.filter(opt =>
     opt.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const recalcDropdown = useCallback(() => {
-    if (!inputRef.current) return;
-    const rect = inputRef.current.getBoundingClientRect();
-    setDropdownStyle({
-      position: "fixed",
-      bottom: window.innerHeight - rect.top + 8,
-      left: rect.left,
-      width: rect.width,
-      zIndex: 99999,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (showDropdown) {
-      recalcDropdown();
-      window.addEventListener("scroll", recalcDropdown, true);
-      window.addEventListener("resize", recalcDropdown);
-    }
-    return () => {
-      window.removeEventListener("scroll", recalcDropdown, true);
-      window.removeEventListener("resize", recalcDropdown);
-    };
-  }, [showDropdown, recalcDropdown]);
 
   const handleSelect = (option) => {
     onChange(option);
@@ -384,39 +376,27 @@ function TypableSelect({ options, sortedOptions, value, onChange, placeholder, d
           setShowDropdown(true);
           setHighlightedIdx(-1);
         }}
-        onFocus={() => { recalcDropdown(); setShowDropdown(true); }}
+        onFocus={() => setShowDropdown(true)}
         onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => { setShowDropdown(false); setSearchTerm(""); }, 200)}
         placeholder={placeholder}
         className="w-full px-2 py-1.5 rounded text-sm outline-none"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
       />
-      {showDropdown && filteredOptions.length > 0 && (
-        <div
-          className="rounded-lg shadow-xl overflow-hidden"
-          style={{
-            ...dropdownStyle,
-            background: "var(--color-surface)",
-            border: "1px solid var(--color-border)",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-          }}
-        >
-          <div className="max-h-48 overflow-y-auto">
-            {filteredOptions.map((opt, i) => (
-              <div
-                key={opt}
-                onMouseDown={() => handleSelect(opt)}
-                className="px-3 py-2 cursor-pointer text-sm transition-colors"
-                style={{ background: highlightedIdx === i ? BURGUNDY_LIGHT : "transparent" }}
-                onMouseEnter={() => setHighlightedIdx(i)}
-                onMouseLeave={() => setHighlightedIdx(-1)}
-              >
-                {opt}
-              </div>
-            ))}
+      <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filteredOptions.length > 0}>
+        {filteredOptions.map((opt, i) => (
+          <div
+            key={opt}
+            onMouseDown={() => handleSelect(opt)}
+            className="px-3 py-2 cursor-pointer text-sm transition-colors"
+            style={{ background: highlightedIdx === i ? BURGUNDY_LIGHT : "transparent" }}
+            onMouseEnter={() => setHighlightedIdx(i)}
+            onMouseLeave={() => setHighlightedIdx(-1)}
+          >
+            {opt}
           </div>
-        </div>
-      )}
+        ))}
+      </PortalDropdown>
     </div>
   );
 }
@@ -569,6 +549,8 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
   const addRowRef = useRef(null);
   const addTableWrapperRef = useRef(null);
   const addedTableWrapperRef = useRef(null);
+  const rowsScrollRef = useRef(null);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, entries.length);
 
   const setD = (k) => (v) => setDraft(prev => ({ ...prev, [k]: v }));
 
@@ -706,44 +688,31 @@ export default function IPTimeSheetTab({ entries, setEntries, patient }) {
         />
       </div>
 
-      {/* BODY */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* BODY — pb reserves room below the add row so its dropdowns can open downward */}
+      <div className="flex-1 flex flex-col overflow-hidden pb-44">
 
         {/* ── ADDED IP TABLE (top) ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
-          {entries.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-5">
-              <div className="text-center">
-                <div className="mb-2 p-4 rounded-full inline-flex" style={{ background: BURGUNDY_LIGHT }}>
-                  <Clock size={20} style={{ color: BURGUNDY }} />
-                </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No IP Entries Yet</h3>
-                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table below to add your first IP entry.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <TableHeader />
-              <div className="overflow-y-auto flex-1">
-                {entries.map((entry, index) => (
-                  <IPRow
-                    key={entry.id}
-                    item={entry}
-                    index={index}
-                    isStruck={struckIds.includes(entry.id)}
-                    isSelected={selectedRowId === entry.id}
-                    onSelect={() => setSelectedRowId(entry.id)}
-                    onDelete={() => deleteEntry(entry.id)}
-                    onStrike={() => toggleStrike(entry.id)}
-                    onEdit={() => startEdit(entry)}
-                    onArrowNav={dir => handleRowArrowNav(entry.id, dir)}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          <TableHeader />
+          <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+            {entries.map((entry, index) => (
+              <IPRow
+                key={entry.id}
+                item={entry}
+                index={index}
+                isStruck={struckIds.includes(entry.id)}
+                isSelected={selectedRowId === entry.id}
+                onSelect={() => setSelectedRowId(entry.id)}
+                onDelete={() => deleteEntry(entry.id)}
+                onStrike={() => toggleStrike(entry.id)}
+                onEdit={() => startEdit(entry)}
+                onArrowNav={dir => handleRowArrowNav(entry.id, dir)}
+              />
+            ))}
+            {Array.from({ length: fillRowCount }).map((_, i) => (
+              <EmptyIPRow key={`empty-${i}`} index={entries.length + i} />
+            ))}
+          </div>
         </div>
 
         {/* ── SEARCH MODE (above the add row) ── */}

@@ -107,7 +107,7 @@ function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, tre
 }
 
 export default function VitalSignsSection({ patient }) {
-  const p = patient;
+  const p = patient || {};
 
   /* ── BMI ── */
   const calculateBMI = () => {
@@ -138,7 +138,7 @@ export default function VitalSignsSection({ patient }) {
   const vitals = [
     {
       icon: ActivitySquare,
-      value: `${p.bpSystolic || 145}/${p.bpDiastolic || 90}`,
+      value: p.bpSystolic && p.bpDiastolic ? `${p.bpSystolic}/${p.bpDiastolic}` : "—",
       label: "BP",
       accent: VITAL_ACCENTS.bp,
       valueColor: VALUE_COLOR,
@@ -146,7 +146,7 @@ export default function VitalSignsSection({ patient }) {
     },
     {
       icon: Thermometer,
-      value: p.temp || "101.2",
+      value: p.temp || "—",
       label: "Temp",
       accent: VITAL_ACCENTS.temp,
       valueColor: VALUE_COLOR,
@@ -154,7 +154,7 @@ export default function VitalSignsSection({ patient }) {
     },
     {
       icon: Heart,
-      value: p.pulse || "95",
+      value: p.pulse || "—",
       label: "Pulse",
       accent: VITAL_ACCENTS.pulse,
       valueColor: VALUE_COLOR,
@@ -162,7 +162,7 @@ export default function VitalSignsSection({ patient }) {
     },
     {
       icon: Wind,
-      value: p.oxygenLevel || "98",
+      value: p.oxygenLevel || "—",
       label: "SpO₂",
       accent: VITAL_ACCENTS.spo2,
       valueColor: VALUE_COLOR,
@@ -178,7 +178,7 @@ export default function VitalSignsSection({ patient }) {
     },
     {
       icon: Ruler,
-      value: p.height || "68",
+      value: p.height || "—",
       label: "Height",
       accent: VITAL_ACCENTS.height,
       valueColor: VALUE_COLOR,
@@ -186,7 +186,7 @@ export default function VitalSignsSection({ patient }) {
     },
     {
       icon: Weight,
-      value: p.weight || "86",
+      value: p.weight || "—",
       label: "Weight",
       accent: VITAL_ACCENTS.weight,
       valueColor: VALUE_COLOR,

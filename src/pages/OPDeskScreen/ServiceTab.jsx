@@ -5,15 +5,20 @@ import {
   Plus, Clipboard, FileText, Printer, Save, X,
   Edit2, MinusCircle, RotateCcw, Stethoscope, Calendar, Hash,
   Settings, Search, ChevronDown, Briefcase, Activity, Heart, Mic, Zap,
-  BookOpen, Trash, List, ListChecks, Info, Paperclip, Download, Eye
+  BookOpen, Trash, List, ListChecks, Paperclip, Download, Eye
 } from "lucide-react";
 import { SERVICE_SUGGESTIONS } from "./mockData";
+import useFillRowCount from "../../hooks/useFillRowCount";
 
 const DETAIL_OPTIONS = ["—","Chest (Lung)","Abdomen","Upper Crest","Pelvis","Whole Abdomen","Brain","Lumbar Spine","Right Knee","Left Knee","Shoulder","Hip","Ankle","Both Knees","Neck"];
 
 const SORTED_SERVICE_SUGGESTIONS = [...SERVICE_SUGGESTIONS].sort((a, b) => a.localeCompare(b));
 
 const FIELD_ORDER = ["name", "detail", "commit"];
+
+/* Fixed row height (px) used to compute how many blank rows fill the remaining
+   visible space in the added-services grid — see useFillRowCount. */
+const ROW_HEIGHT_PX = 52;
 
 function formatFileSize(bytes) {
   if (!bytes && bytes !== 0) return "";
@@ -57,37 +62,6 @@ function ActionButton({ onClick, variant = "primary", icon: Icon, label, disable
       {Icon && <Icon size={14} />}
       {label}
     </button>
-  );
-}
-
-/* ── Keyboard-shortcut hint — icon that reveals shortcuts on hover ── */
-function ShortcutHint() {
-  const shortcuts = [
-    { keys: "Alt + T", desc: "Switch tables" },
-    { keys: "Alt + E", desc: "Edit row" },
-    { keys: "Alt + Del", desc: "Delete row" },
-  ];
-  return (
-    <div className="relative group flex items-center">
-      <Info size={16} className="cursor-help" style={{ color: "var(--color-text-subtle)" }} />
-      <div
-        className="absolute right-0 top-full mt-1.5 z-50 hidden group-hover:block rounded-lg p-2 shadow-lg"
-        style={{ background: "var(--color-text-base)", minWidth: "180px" }}
-      >
-        <div className="text-[0.6rem] font-bold uppercase tracking-wider mb-1.5 px-1" style={{ color: "var(--color-text-subtle)" }}>
-          Keyboard shortcuts
-        </div>
-        {shortcuts.map(s => (
-          <div key={s.keys} className="flex items-center justify-between gap-3 px-1 py-0.5">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.85)" }}>{s.desc}</span>
-            <kbd className="text-[0.6rem] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
-              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
-              {s.keys}
-            </kbd>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -166,7 +140,6 @@ function ModernToolbar({ onProto, onClear, onSave }) {
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
         <ActionButton variant="ghost" icon={Printer} label="Print" />
         <div className="w-px h-6 self-center" style={{ background: "var(--color-border)" }} />
-        <ShortcutHint />
         <ActionButton variant="warning" icon={Trash} label="Clear" onClick={onClear} />
         <ActionButton variant="success" icon={Save} label="Save" onClick={onSave} />
       </div>
@@ -260,6 +233,31 @@ function TableHeader() {
   );
 }
 
+/* ── Empty placeholder row — same grid as ServiceRow, shown when no services added yet ── */
+function EmptyServiceRow({ index }) {
+  return (
+    <div
+      className="flex border-b"
+      style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)" }}
+    >
+      <div className="flex flex-1">
+        <div className="w-16 px-3 py-2 text-center">&nbsp;</div>
+        <div className="flex-1 px-3 py-2">&nbsp;</div>
+        <div className="w-40 px-3 py-2">&nbsp;</div>
+        <div className="w-28 px-3 py-2 text-center">&nbsp;</div>
+      </div>
+      <div className="w-0.5 flex-shrink-0" style={{ background: "var(--color-services)", opacity: 0.2 }} />
+      <div className="flex flex-1">
+        <div className="flex-1 px-3 py-2">&nbsp;</div>
+        <div className="w-20 px-3 py-2 text-center">&nbsp;</div>
+        <div className="w-24 px-3 py-2 text-center">&nbsp;</div>
+        <div className="w-40 px-3 py-2 text-center">&nbsp;</div>
+        <div className="w-28 px-3 py-2 text-center">&nbsp;</div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Service Row Component (left: service info + actions, right: attached file + actions) ── */
 function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, onFileUpload, onFileRemove }) {
   const fileInputRef = useRef(null);
@@ -320,8 +318,7 @@ function ServiceRow({ service, index, isStruck, isSelected, onSelect, onDelete, 
           <span className="text-sm font-bold" style={{ color: "var(--color-services)" }}>{index + 1}</span>
         </div>
         <div className="flex-1 px-3 py-2">
-          <span className={`text-sm font-semibold inline-flex items-center gap-1.5 ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
-            <Briefcase size={14} style={{ color: "var(--color-services)" }} />
+          <span className={`text-sm font-semibold ${isStruck ? "line-through" : ""}`} style={{ color: "var(--color-text-base)" }}>
             {service.name}
           </span>
         </div>
@@ -451,20 +448,18 @@ function TypableDetailInput({ value, onChange, onKeyDown, dataField }) {
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}
       />
       <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filteredOptions.length > 0}>
-        <div className="max-h-48 overflow-y-auto">
-          {filteredOptions.map((opt, i) => (
-            <div
-              key={opt}
-              onMouseDown={() => handleSelectOption(opt)}
-              className="px-3 py-2 cursor-pointer text-sm transition-colors"
-              style={{ background: highlightedIdx === i ? "var(--color-services-light)" : "transparent" }}
-              onMouseEnter={() => setHighlightedIdx(i)}
-              onMouseLeave={() => setHighlightedIdx(-1)}
-            >
-              {opt}
-            </div>
-          ))}
-        </div>
+        {filteredOptions.map((opt, i) => (
+          <div
+            key={opt}
+            onMouseDown={() => handleSelectOption(opt)}
+            className="px-3 py-2 cursor-pointer text-sm transition-colors"
+            style={{ background: highlightedIdx === i ? "var(--color-services-light)" : "transparent" }}
+            onMouseEnter={() => setHighlightedIdx(i)}
+            onMouseLeave={() => setHighlightedIdx(-1)}
+          >
+            {opt}
+          </div>
+        ))}
       </PortalDropdown>
     </div>
   );
@@ -686,6 +681,8 @@ export default function ServiceTab({ services, setServices, patient }) {
   const addRowRef = useRef(null);
   const addTableWrapperRef = useRef(null);
   const addedTableWrapperRef = useRef(null);
+  const rowsScrollRef = useRef(null);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, services.length);
 
   const baseSearchList = searchMode === "embedded" ? SERVICE_SUGGESTIONS : SORTED_SERVICE_SUGGESTIONS;
   const suggestions = query.length > 1
@@ -852,41 +849,28 @@ export default function ServiceTab({ services, setServices, patient }) {
 
         {/* ── ADDED SERVICE TABLE (top): left = service info, right = attached file ── */}
         <div ref={addedTableWrapperRef} className="flex-1 flex flex-col overflow-hidden">
-          {services.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-5">
-              <div className="text-center">
-                <div className="mb-2 p-4 rounded-full inline-flex" style={{ background: "var(--color-services-light)" }}>
-                  <Settings size={20} style={{ color: "var(--color-services)" }} />
-                </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-base)" }}>No Services Ordered Yet</h3>
-                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  Use the table below to add your first service.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <TableHeader />
-              <div className="overflow-y-auto flex-1">
-                {services.map((service, index) => (
-                  <ServiceRow
-                    key={service.id}
-                    service={service}
-                    index={index}
-                    isStruck={struckIds.includes(service.id)}
-                    isSelected={selectedRowId === service.id}
-                    onSelect={() => setSelectedRowId(service.id)}
-                    onDelete={() => deleteService(service.id)}
-                    onStrike={() => toggleStrike(service.id)}
-                    onEdit={() => startEdit(service)}
-                    onArrowNav={dir => handleRowArrowNav(service.id, dir)}
-                    onFileUpload={handleFileUpload}
-                    onFileRemove={handleFileRemove}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          <TableHeader />
+          <div ref={rowsScrollRef} className="overflow-y-auto flex-1">
+            {services.map((service, index) => (
+              <ServiceRow
+                key={service.id}
+                service={service}
+                index={index}
+                isStruck={struckIds.includes(service.id)}
+                isSelected={selectedRowId === service.id}
+                onSelect={() => setSelectedRowId(service.id)}
+                onDelete={() => deleteService(service.id)}
+                onStrike={() => toggleStrike(service.id)}
+                onEdit={() => startEdit(service)}
+                onArrowNav={dir => handleRowArrowNav(service.id, dir)}
+                onFileUpload={handleFileUpload}
+                onFileRemove={handleFileRemove}
+              />
+            ))}
+            {Array.from({ length: fillRowCount }).map((_, i) => (
+              <EmptyServiceRow key={`empty-${i}`} index={services.length + i} />
+            ))}
+          </div>
         </div>
 
         {/* ── SEARCH / PRESCRIPTION MODE (above the add row) ── */}

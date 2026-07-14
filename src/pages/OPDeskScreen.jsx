@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import AppBar from "../components/AppBar/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
 import LeftSidebar from "./OPDeskScreen/LeftSidebar";
@@ -110,26 +110,15 @@ export default function OPDeskScreen({ user, onLogout }) {
       <Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />
       {/* ── Main workspace with responsive split ── */}
       <div className="flex-1 flex  min-h-0 relative ">
-        
-        {!selectedPatient ? (
-          <div className="flex-1 overflow-y-auto flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center gap-3" style={{ color: "var(--color-text-subtle)" }}>
-              <div className="p-4 rounded-full" style={{ background: "var(--color-surface-alt)" }}>
-                <Users size={48} strokeWidth={1} />
-              </div>
-              <p className="font-semibold text-base">Select a patient from the queue</p>
-              <p className="text-sm">Use the dropdown above to load patient records</p>
-            </div>
-          </div>
-        ) : (
-          <>
+        <>
             {/* Left Section - Prescription Tabs + Active Tab Content */}
-            <div 
-              className={`flex flex-col  overflow-hidden min-w-0 transition-all duration-300 ${
-                isTabletView 
+            <div
+              className={`flex flex-col overflow-hidden min-w-0 pt-[5px] pb-[8px] transition-all duration-300 ${
+                isTabletView
                   ? isRightPanelExpanded ? 'flex-[5]' : 'flex-1'
                   : 'flex-[7]'
               }`}
+              style={{ background: "#ffffff" }}
             >
               <PrescriptionTabs 
                 activeTab={activeTab}
@@ -170,19 +159,18 @@ export default function OPDeskScreen({ user, onLogout }) {
                 Desktop width = TopBar (w-96 = 384px) + RightSidebar (78px) = 462px,
                 so its left edge lines up with the TopBar section above. */}
             <div
-              className={`flex-shrink-0 border-l overflow-y-auto transition-all duration-300 ${
+              className={`flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px] transition-all duration-300 ${
                 isTabletView
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
-                    : 'w-0 overflow-hidden border-l-0'
+                    : 'w-0 overflow-hidden'
                   : 'w-[440px] flex-none'
               }`}
-              style={{ borderColor: "var(--color-border)" }}
+              style={{ background: "#ffffff" }}
             >
               <PreviousVisitsTable visits={visits} />
             </div>
-          </>
-        )}
+        </>
       </div>
     </div>
   );

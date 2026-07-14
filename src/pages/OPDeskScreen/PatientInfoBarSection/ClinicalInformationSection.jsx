@@ -46,39 +46,39 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
 }
 
 export default function ClinicalInformationSection({ patient, isInline = false }) {
-  const p = patient;
-  
+  const p = patient || {};
+
   // Define clinical cards
   const clinicalCards = [
-    { 
-      icon: Stethoscope, 
-      label: "Chief Complaint", 
-      value: p.chiefComplaint || "Allergy, Anxiety", 
-      variant: "info" 
+    {
+      icon: Stethoscope,
+      label: "Chief Complaint",
+      value: p.chiefComplaint || "",
+      variant: "info"
     },
-    { 
-      icon: Eye, 
-      label: "First Observation", 
-      value: p.firstObservation || "Rashes, Weak, No sleep", 
-      variant: "info" 
+    {
+      icon: Eye,
+      label: "First Observation",
+      value: p.firstObservation || "",
+      variant: "info"
     },
   ];
-  
+
   // Pregnancy Status - Show for all genders, but disabled for males
   const isMale = p.gender === "M" || p.gender === "Male";
-  clinicalCards.push({ 
-    icon: Baby, 
-    label: "Pregnancy Status", 
-    value: isMale ? "N/A" : (p.pregnancy || "Yes. 60 Days"), 
+  clinicalCards.push({
+    icon: Baby,
+    label: "Pregnancy Status",
+    value: isMale ? "N/A" : (p.pregnancy || ""),
     variant: "info",  // Always use purple for the icon
     disabled: isMale
   });
-  
-  clinicalCards.push({ 
-    icon: ArrowRightLeft, 
-    label: "Referral", 
-    value: p.referral || "Dr. Sheela (From)", 
-    variant: "info" 
+
+  clinicalCards.push({
+    icon: ArrowRightLeft,
+    label: "Referral",
+    value: p.referral || "",
+    variant: "info"
   });
   
   return (
