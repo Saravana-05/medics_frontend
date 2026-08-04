@@ -1,20 +1,19 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import AppBar from "../components/AppBar/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
 import LeftSidebar from "./OPDeskScreen/LeftSidebar";
 import RightSidebar from "./OPDeskScreen/RightSidebar";
 import PrescriptionTabs from "./OPDeskScreen/PrescriptionTabs";
-import DrugTab from "./OPDeskScreen/DrugTab";
-import LabTab from "./OPDeskScreen/LabTab";
-import ServiceTab from "./OPDeskScreen/ServiceTab";
-import FindingsTab from "./OPDeskScreen/FindingsTab";
+import PrescriptionEntryTab, { ModernToolbar } from "./OPDeskScreen/PrescriptionEntryTab";
+import PrescriptionSidePanel from "./OPDeskScreen/PrescriptionSidePanel";
+import { TAB_CONFIGS } from "../config/tabConfig";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
 import { MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
-import IPTimeSheetTab from "./OPDeskScreen/IPTimeSheetTab";
-import RepeatPrescriptionsPanel from "./OPDeskScreen/RepeatPrescriptionsPanel";
-import LabReportPanel from "./OPDeskScreen/LabReportPanel";
 import Divider from "@mui/material/Divider";
+import medicineList from "../data/medicines.json";
+import labTestList from "../data/labTest.json";
+import serviceList from "../data/services.json";
 
 export default function OPDeskScreen({ user, onLogout }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -27,13 +26,8 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [isTabletView, setIsTabletView] = useState(window.innerWidth < 1024);
   const [drugs, setDrugs] = useState([]);
   const [labs, setLabs] = useState([]);
-  const [labStruckIds, setLabStruckIds] = useState([]);
-  const [labSelectedRowId, setLabSelectedRowId] = useState(null);
+  const [labShowReport, setLabShowReport] = useState(false);
   const [services, setServices] = useState([]);
-  const [findings, setFindings] = useState({
-    diagnosis: "", clinicalNotes: "", advice: "",
-    nextVisit: "", referTo: "", followupNote: "",
-  });
   const [ipEntries, setIpEntries] = useState([]);
   const [saved, setSaved] = useState(false);
 
@@ -48,40 +42,41 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const selectPatient = (p) => {
     setSelectedPatient(p);
-    setDrugs([]); setLabs([]); setServices([]);
-    setLabStruckIds([]); setLabSelectedRowId(null);
-    setFindings({ diagnosis: "", clinicalNotes: "", advice: "", nextVisit: "", referTo: "", followupNote: "" });
+    setDrugs([]); setLabs([]); setServices([]); setIpEntries([]);
+    setLabShowReport(false);
     setSaved(false);
   };
 
-  const handleSave = () => { 
-    setSaved(true); 
+  const handleSave = () => {
+    setSaved(true);
     setTimeout(() => setSaved(false), 4000);
-  };
-  
-  const handleClear = () => {
-    setDrugs([]); setLabs([]); setServices([]);
-    setFindings({ diagnosis: "", clinicalNotes: "", advice: "", nextVisit: "", referTo: "", followupNote: "" });
   };
 
   const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
-  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, findings: 0, iptime: ipEntries.length };
+  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, iptime: ipEntries.length };
 
   const toggleRightPanel = () => {
     setIsRightPanelExpanded(!isRightPanelExpanded);
   };
+
+  const updateLabReportField = (id, field, value) => {
+    setLabs(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
+  };
+
+  const activeConfig = TAB_CONFIGS[activeTab];
+  const activeEntryTabRef = useRef(null);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden " style={{ background: "var(--color-surface-alt)", fontFamily: "var(--font-body)" }}>
 
       {/* ── Fixed App Bar ── */}
       <div className="flex-shrink-0">
-        <AppBar 
-          user={user} 
-          onLogout={onLogout} 
-          saved={saved} 
+        <AppBar
+          user={user}
+          onLogout={onLogout}
+          saved={saved}
           onOPListClick={selectPatient}
-          patients={MOCK_PATIENTS} 
+          patients={MOCK_PATIENTS}
           screenType="opdesk"
         />
       </div>
@@ -114,41 +109,47 @@ export default function OPDeskScreen({ user, onLogout }) {
       </div>
       <Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />
       {/* ── Main workspace with responsive split ── */}
-      <div className="flex-1 flex  min-h-0 relative ">
+      <div className="flex-1 flex gap-2 min-h-0 relative px-2" style={{ background: "var(--color-surface-alt)" }}>
         <>
             {/* Left Section - Prescription Tabs + Active Tab Content */}
             <div
-              className={`flex flex-col overflow-hidden min-w-0 pt-[5px] pb-[8px] transition-all duration-300 ${
+              className={`flex flex-col overflow-hidden min-w-0 mt-[8px] mb-[8px] rounded-md shadow-md transition-all duration-300 ${
                 isTabletView
                   ? isRightPanelExpanded ? 'flex-[5]' : 'flex-1'
                   : 'flex-[7]'
               }`}
-              style={{ background: "#ffffff" }}
+              style={{ background: "#ffffff", border: "1px solid var(--color-border)" }}
             >
-              <PrescriptionTabs 
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                tabCount={tabCount}
-                onClear={handleClear}
-                onSave={handleSave}
-              />
+              {/* Tabs + toolbar share one row — tab buttons on the left, action
+                  buttons (Clear/Paste/Preview/Save/Print) right-aligned on the right,
+                  matching the reference ribbon-tab layout. */}
+              <div className="flex-shrink-0 flex items-stretch justify-between px-2"
+                style={{ background: "var(--color-surface-alt)", borderBottom: "1px solid var(--color-border)" }}>
+                <PrescriptionTabs activeTab={activeTab} setActiveTab={setActiveTab} tabCount={tabCount} />
+                <div className="flex items-center flex-shrink-0 pl-3">
+                  <ModernToolbar
+                    onClear={() => activeEntryTabRef.current?.clearAll()}
+                    onSave={() => activeEntryTabRef.current?.save()}
+                    onPreview={activeTab === "lab" ? () => setLabShowReport(v => !v) : undefined}
+                    accentColor={activeConfig?.color}
+                    accentLight={activeConfig?.colorLight}
+                  />
+                </div>
+              </div>
 
               <div className="flex-1 overflow-y-auto min-h-0">
-                {activeTab === "drugs" && <DrugTab drugs={drugs} setDrugs={setDrugs} patient={selectedPatient} />}
-                {activeTab === "lab" && (
-                  <LabTab
-                    labs={labs}
-                    setLabs={setLabs}
-                    patient={selectedPatient}
-                    struckIds={labStruckIds}
-                    setStruckIds={setLabStruckIds}
-                    selectedRowId={labSelectedRowId}
-                    setSelectedRowId={setLabSelectedRowId}
-                  />
+                {activeTab === "drugs" && (
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.drugs} items={drugs} setItems={setDrugs} searchList={medicineList} />
                 )}
-                {activeTab === "services" && <ServiceTab services={services} setServices={setServices} patient={selectedPatient} />}
-                {activeTab === "findings" && <FindingsTab findings={findings} setFindings={setFindings} patient={selectedPatient} />}
-                {activeTab === "iptime" && <IPTimeSheetTab entries={ipEntries} setEntries={setIpEntries} patient={selectedPatient} />}
+                {activeTab === "lab" && (
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.lab} items={labs} setItems={setLabs} searchList={labTestList} />
+                )}
+                {activeTab === "services" && (
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.services} items={services} setItems={setServices} searchList={serviceList} />
+                )}
+                {activeTab === "iptime" && (
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.iptime} items={ipEntries} setItems={setIpEntries} />
+                )}
               </div>
             </div>
 
@@ -170,33 +171,22 @@ export default function OPDeskScreen({ user, onLogout }) {
               </button>
             )}
 
-            {/* Repeat Prescriptions — own top-level column so its top aligns with
-                Previous Information (both start right after the divider), independent
-                of the Drug/Lab/Service/Findings/IP-Time tabs row height. Only shown
-                while the Drug tab is active. */}
-            {activeTab === "drugs" && (
+            {/* Middle "report/group" panel — one generic column driven by the active tab's
+                config.sidePanel, own top-level column so its top aligns with Previous
+                Information (both start right after the divider), independent of the
+                Drug/Lab/Service/IP-Time tabs row height. Hidden on tablet per the
+                "small screen: hide, don't restructure" requirement. */}
+            {activeConfig?.sidePanel && !isTabletView && (
               <div
-                className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
-                style={{ width: "27%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
+                className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] rounded-md shadow-md"
+                style={{ width: "27%", minWidth: "420px", background: "#ffffff", border: "1px solid var(--color-border)" }}
               >
-                <RepeatPrescriptionsPanel />
-              </div>
-            )}
-
-            {/* Lab Report — own top-level column, same pattern as Repeat Prescriptions:
-                mirrors the lab tests entered on the Lab tab (shared labs/struckIds/
-                selectedRowId state), starts right after the divider so its top aligns
-                with Previous Information. Only shown while the Lab tab is active. */}
-            {activeTab === "lab" && (
-              <div
-                className="flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px]"
-                style={{ width: "27%", minWidth: "420px", marginRight: "8px", background: "#ffffff" }}
-              >
-                <LabReportPanel
-                  labs={labs}
-                  struckIds={labStruckIds}
-                  selectedRowId={labSelectedRowId}
-                  onSelect={setLabSelectedRowId}
+                <PrescriptionSidePanel
+                  config={activeConfig}
+                  showReport={activeTab === "lab" && labShowReport}
+                  reportItems={labs}
+                  onUpdateReportItem={updateLabReportField}
+                  onTogglePreview={() => setLabShowReport(v => !v)}
                 />
               </div>
             )}
@@ -205,14 +195,14 @@ export default function OPDeskScreen({ user, onLogout }) {
                 Desktop width = TopBar (w-96 = 384px) + RightSidebar (78px) = 462px,
                 so its left edge lines up with the TopBar section above. */}
             <div
-              className={`flex-shrink-0 overflow-y-auto pt-[8px] pb-[8px] transition-all duration-300 ${
+              className={`flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] rounded-md shadow-md transition-all duration-300 ${
                 isTabletView
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
-                    : 'w-0 overflow-hidden'
+                    : 'w-0 overflow-hidden border-none shadow-none'
                   : 'w-[438px] flex-none'
               }`}
-              style={{ background: "#ffffff" }}
+              style={{ background: "#ffffff", border: isTabletView && !isRightPanelExpanded ? "none" : "1px solid var(--color-border)" }}
             >
               <PreviousVisitsTable visits={visits} />
             </div>

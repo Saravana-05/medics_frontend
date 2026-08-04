@@ -195,44 +195,44 @@ export default function PreviousVisitsTable({ visits = [] }) {
 
   return (
     <>
-      <div className="h-full flex flex-col rounded-sm overflow-hidden shadow-sm" style={{ 
-        background: "var(--color-surface)", 
+      <div className="h-full flex flex-col overflow-hidden" style={{
+        background: "var(--color-surface)",
         fontFamily: "var(--font-body)"
       }}>
         
         {/* Header Section with FULL background color */}
-        <div className="flex-shrink-0 px-4 py-[0.44rem] border-b flex justify-between items-center" style={{ 
+        <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{
           background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg" style={{ background: "var(--color-primary)", color: "white" }}>
-              <History size={14} />
+          <div className="flex items-center gap-2">
+            <div className="p-1 rounded-md" style={{ background: "var(--color-primary)", color: "white" }}>
+              <History size={12} />
             </div>
             <div>
-              <h3 className="text-sm font-bold" style={{ color: "var(--color-primary-dark)" }}>
+              <h3 className="text-xs font-bold leading-tight" style={{ color: "var(--color-primary-dark)" }}>
                 Previous Information
               </h3>
-              <p className="text-[0.6rem] font-medium mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+              <p className="text-[0.58rem] font-medium leading-tight" style={{ color: "var(--color-text-muted)" }}>
                 {visits.length} Entries{visits.length !== 1 ? 's' : ''} Recorded
               </p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-1.5">
             {/* Column Visibility Button */}
             <div className="relative">
               <button
                 onClick={() => setShowColumnMenu(!showColumnMenu)}
-                className="p-1.5 rounded-lg transition-all"
+                className="p-1 rounded-md transition-all"
                 style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                 title="Toggle Columns"
               >
-                <ListFilter  size={14} style={{ color: "var(--color-text-muted)" }} />
+                <ListFilter  size={12} style={{ color: "var(--color-text-muted)" }} />
               </button>
-              
+
               {showColumnMenu && (
-                <div 
+                <div
                   className="absolute right-0 top-full mt-1 w-40 rounded-lg shadow-xl z-50 animate-fade-in"
                   style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                   onMouseLeave={() => setShowColumnMenu(false)}
@@ -257,18 +257,18 @@ export default function PreviousVisitsTable({ visits = [] }) {
                 </div>
               )}
             </div>
-            
+
             {/* Search Input */}
             <div className="relative">
-              <Search size={12} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+              <Search size={11} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
               <input
                 type="text"
                 placeholder="Search Entries..."
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs rounded-lg w-36 focus:w-48 transition-all duration-200 outline-none"
-                style={{ 
-                  border: "1px solid var(--color-border)", 
+                className="pl-7 pr-2 py-1 text-[0.7rem] rounded-lg w-28 focus:w-40 transition-all duration-200 outline-none"
+                style={{
+                  border: "1px solid var(--color-border)",
                   background: "var(--color-surface)",
                   color: "var(--color-text-base)"
                 }}
@@ -281,17 +281,18 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
-              <tr style={{ background: "var(--color-primary-muted)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+              <tr style={{ background: "var(--color-primary-muted)", height: "30px", boxSizing: "border-box" }}>
                 {visibleColumnsList.map(col => (
-                  <th 
+                  <th
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
-                    className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
-                    style={{ 
+                    className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
+                    style={{
                       borderBottom: "1px solid var(--color-border)",
-                      fontSize: "0.65rem",
+                      fontSize: "0.62rem",
                       fontWeight: "700",
-                      letterSpacing: "0.05em",
+                      letterSpacing: "0.03em",
+                      lineHeight: 1,
                       color: "var(--color-primary-dark)",
                       textTransform: "uppercase"
                     }}
@@ -479,8 +480,12 @@ export default function PreviousVisitsTable({ visits = [] }) {
           </table>
         </div>
 
-        {/* Footer with summary — always shown, even before any visit data arrives */}
-        <div className="flex-shrink-0 px-4 py-2 border-t flex justify-between items-center" style={{
+        {/* Footer with summary — always shown, even before any visit data arrives.
+            Height matches the Drug Type / Group List footer bars in the other two
+            columns so all three bottom rows line up as one continuous strip. */}
+        <div className="flex-shrink-0 px-4 border-t flex justify-between items-center" style={{
+          height: "48px",
+          boxSizing: "border-box",
           background: "var(--color-surface-alt)",
           borderColor: "var(--color-border)"
         }}>

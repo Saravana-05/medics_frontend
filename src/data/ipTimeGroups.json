@@ -1,0 +1,5 @@
+[
+  { "id": 1, "title": "Morning Rounds Checklist", "doctor": "Dr. Anil Sharma", "metrics": [1, 4] },
+  { "id": 2, "title": "Post-Op Monitoring", "doctor": "Dr. Ravi Menon", "metrics": [3, 6] },
+  { "id": 3, "title": "ICU Observation", "doctor": "Dr. Sneha Iyer", "metrics": [2, 5] }
+]

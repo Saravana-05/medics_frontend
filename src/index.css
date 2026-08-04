@@ -41,6 +41,9 @@
   --color-services: #1565c0;
   /* blue   – Services      */
   --color-services-light: #e3f0fc;
+  --color-iptime: #8e2a4c;
+  /* burgundy – IP Time     */
+  --color-iptime-light: #fbe7ee;
   --color-info: #0ea5e9;
   /* blue   – Info/Findings */
   --color-info-light: #c8eef4;
@@ -135,7 +138,7 @@
   --font-worksans: 'Inter', sans-serif;
 }
 
-/* ─── Tab Colours with Findings Support ── */
+/* ─── Tab Colours ─────────────────────────────────────────────────────────── */
 .tab-drugs {
   --tab-color: var(--color-drugs);
   --tab-bg: var(--color-drugs-light);
@@ -151,9 +154,9 @@
   --tab-bg: var(--color-services-light);
 }
 
-.tab-findings {
-  --tab-color: var(--color-info);
-  --tab-bg: var(--color-info-light);
+.tab-iptime {
+  --tab-color: var(--color-iptime);
+  --tab-bg: var(--color-iptime-light);
 }
 
 /* ─── Global Base ─────────────────────────────────────────────────────────── */

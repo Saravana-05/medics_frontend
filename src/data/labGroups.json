@@ -1,0 +1,7 @@
+[
+  { "id": 1, "title": "Diabetic Profile", "doctor": "Dr. Anil Sharma", "metrics": [3] },
+  { "id": 2, "title": "Lipid Profile", "doctor": "Dr. Priya Nair", "metrics": [4] },
+  { "id": 3, "title": "Liver Function Test", "doctor": "Dr. Ravi Menon", "metrics": [5] },
+  { "id": 4, "title": "Cardiac Profile", "doctor": "Dr. Sneha Iyer", "metrics": [6] },
+  { "id": 5, "title": "Pre-Operative Profile", "doctor": "Dr. Kiran Rao", "metrics": [2] }
+]

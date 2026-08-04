@@ -710,36 +710,3 @@ export const PREVIOUS_VISITS = {
   ],
 };
 
-export const DRUG_SUGGESTIONS = [
-  "Paracetamol 500mg Tab", "Amoxicillin 250mg Cap", "Ibuprofen 400mg Tab",
-  "Metformin 500mg Tab", "Atorvastatin 10mg Tab", "Omeprazole 20mg Cap",
-  "Azithromycin 500mg Tab", "Cetirizine 10mg Tab", "Pantoprazole 40mg Tab",
-  "Ranitidine 150mg Tab", "Dolo 650mg Tab", "Crocin 500mg Tab",
-  "Combiflam Tab", "Allegra 120mg Tab", "Montair LC Tab",
-  "Losartan 50mg Tab", "Amlodipine 5mg Tab", "Hydrochlorothiazide 25mg Tab",
-  "Levothyroxine 50mcg Tab", "Insulin Glargine 100IU/mL", "Salbutamol Inhaler 100mcg",
-  "Diclofenac 50mg Tab", "Gabapentin 300mg Cap", "Pregabalin 75mg Cap",
-];
-
-export const LAB_SUGGESTIONS = [
-  "Complete Blood Count (CBC)", "Blood Sugar Fasting", "Blood Sugar PP",
-  "HbA1c", "Lipid Profile", "Thyroid Profile (T3,T4,TSH)",
-  "Liver Function Test (LFT)", "Kidney Function Test (KFT)", "Urine Routine",
-  "ESR", "CRP", "Dengue NS1 Antigen", "Malaria Antigen Test",
-  "Widal Test", "HIV Screening", "Vitamin D Total", "Vitamin B12",
-  "Ferritin", "Iron Studies", "Blood Culture",
-];
-
-export const SERVICE_SUGGESTIONS = [
-  "X-Ray Chest PA", "X-Ray Right Knee AP/Lat", "X-Ray Left Knee AP/Lat",
-  "USG Abdomen", "USG Pelvis", "USG Whole Abdomen",
-  "CT Brain Plain", "CT Chest", "MRI Lumbar Spine", "MRI Brain",
-  "ECG 12 Lead", "2D Echo", "Pulmonary Function Test (PFT)",
-  "Bone Density Scan (DEXA)", "Mammography", "Ultrasound Thyroid",
-  "Doppler Study", "Coronary Angiography",
-];
-
-export const FREQUENCY_OPTIONS = ["Once daily (OD)", "Twice daily (BD)", "Three times (TID)", "Four times (QID)", "Every 6 hrs", "Every 8 hrs", "As needed (SOS)", "At bedtime (HS)", "Before food", "After food"];
-export const DURATION_OPTIONS = ["1 day", "3 days", "5 days", "7 days", "10 days", "14 days", "1 month", "2 months", "3 months", "Continuous"];
-export const ROUTE_OPTIONS = ["Oral", "IV Injection", "IM Injection", "Topical", "Inhaler", "Sublingual", "Ear drops", "Eye drops", "Nasal drops"];
-export const TIMING_OPTIONS = ["Before food", "After food", "With food", "Empty stomach", "Bedtime only"];

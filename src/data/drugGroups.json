@@ -1,0 +1,7 @@
+[
+  { "id": 1, "title": "Pain Killer & Sleep", "doctor": "Dr. Anil Sharma", "metrics": [5, 3] },
+  { "id": 2, "title": "Cold & Cough", "doctor": "Dr. Priya Nair", "metrics": [7, 4] },
+  { "id": 3, "title": "Fever, Head-ache, Body-Pain", "doctor": "Dr. Anil Sharma", "metrics": [5, 5] },
+  { "id": 4, "title": "Malarial Infection", "doctor": "Dr. Ravi Menon", "metrics": [10, 6] },
+  { "id": 5, "title": "High Blood Pressure", "doctor": "Dr. Sneha Iyer", "metrics": [30, 2] }
+]
