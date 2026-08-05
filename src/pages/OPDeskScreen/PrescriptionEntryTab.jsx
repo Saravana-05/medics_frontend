@@ -44,13 +44,13 @@ function ActionButton({ onClick, label, bg, hoverBg, textColor = "white" }) {
   );
 }
 
-function SearchModeCheckbox({ checked, onClick, label, accentColor }) {
+function SearchModeCheckbox({ checked, onClick, label, accentColor, textAccent, accentText = "white" }) {
   return (
     <label className="flex items-center gap-1.5 cursor-pointer select-none"
-      style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? accentColor : "var(--color-text-muted)" }}>
+      style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? (textAccent || accentColor) : "var(--color-text-muted)" }}>
       <span onClick={onClick} className="flex items-center justify-center rounded transition-all"
         style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer", border: `2px solid ${checked ? accentColor : "var(--color-border)"}`, background: checked ? accentColor : "var(--color-surface)" }}>
-        {checked && <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,7 7.5,2" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+        {checked && <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,7 7.5,2" stroke={accentText} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
       </span>
       <span onClick={onClick}>{label}</span>
     </label>
@@ -61,7 +61,7 @@ function SearchModeCheckbox({ checked, onClick, label, accentColor }) {
    search mode + "New X" button — sits below the add-row (config-driven labels). ── */
 function EntryFooterBar({
   searchMode, onSearchModeChange, typeValue, onTypeChange, typeOptions, filterLabel,
-  frequentOnly, onFrequentOnlyChange, accentColor, recordCount, newEntityButton, onNewEntity, className = "",
+  frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, className = "",
 }) {
   return (
     <div className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
@@ -77,14 +77,14 @@ function EntryFooterBar({
 
       <div className="flex items-center gap-4">
         <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
-        <SearchModeCheckbox checked={searchMode === "alpha"} onClick={() => onSearchModeChange("alpha")} label="Alphabet" accentColor={accentColor} />
-        <SearchModeCheckbox checked={searchMode === "embedded"} onClick={() => onSearchModeChange("embedded")} label="Embedded" accentColor={accentColor} />
-        <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} />
+        <SearchModeCheckbox checked={searchMode === "alpha"} onClick={() => onSearchModeChange("alpha")} label="Alphabet" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
+        <SearchModeCheckbox checked={searchMode === "embedded"} onClick={() => onSearchModeChange("embedded")} label="Embedded" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
+        <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
       </div>
 
-      <button onClick={onNewEntity} className="flex items-center gap-1.5 text-xs font-bold" style={{ color: accentColor }}>
+      <button onClick={onNewEntity} className="flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
         {newEntityButton}
-        <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: "white" }}>
+        <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
           <Plus size={12} />
         </span>
       </button>
@@ -92,8 +92,9 @@ function EntryFooterBar({
   );
 }
 
-export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentLight }) {
+export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentLight, accentText }) {
   const color = accentColor || "var(--color-primary)";
+  const darkText = accentText || "white";
   // Five distinct shades of the active tab's own accent color, lightest to
   // darkest — one per button, not just a 3-tier split.
   const shade = pct => pct <= 100
@@ -104,11 +105,11 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 
   return (
     <div className="flex items-center overflow-hidden rounded-md">
-      <ActionButton label="Clear" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
+      <ActionButton label="Clear" onClick={onClear} bg="var(--color-danger)" hoverBg="#b91c1c" textColor="white" />
       <ActionButton label="Paste" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
-      <ActionButton label="Preview" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} />
-      <ActionButton label="Save" onClick={onSave} bg={shades[3]} hoverBg={hoverShades[3]} />
-      <ActionButton label="Print" bg={shades[4]} hoverBg={hoverShades[4]} />
+      <ActionButton label="Preview" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />
+      <ActionButton label="Save" onClick={onSave} bg="var(--color-success)" hoverBg="#128a54" textColor="white" />
+      <ActionButton label="Print" bg={shades[4]} hoverBg={hoverShades[4]} textColor={darkText} />
     </div>
   );
 }
@@ -118,9 +119,9 @@ function TableHeader({ columns, accentColor }) {
   return (
     <div className="flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
       {columns.map(col => (
-        <div key={col.key} className={`${col.width} ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
+        <div key={col.key} className={`${col.width} min-w-0 ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
-            ...(col.vertical ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" } : {}) }}>
+            ...(col.vertical ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" } : { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }) }}>
           {col.label}
         </div>
       ))}
@@ -128,12 +129,12 @@ function TableHeader({ columns, accentColor }) {
   );
 }
 
-function AddTableHeader({ columns, accentColor }) {
+function AddTableHeader({ columns, accentColor, accentText = "white" }) {
   return (
     <div className="flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "30px", boxSizing: "border-box" }}>
       {columns.map(col => (
-        <div key={col.key} className={`${col.width} px-2 py-1 flex items-center justify-center text-center`}
-          style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "white" }}>
+        <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 flex items-center justify-center text-center`}
+          style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: accentText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {col.label}
         </div>
       ))}
@@ -170,7 +171,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
           </div>
         );
         if (col.key === "name") return (
-          <div key="name" className={`${col.width} min-w-0 px-2 py-2`}>
+          <div key="name" className={`${col.width} min-w-0 px-2 py-2 ${col.align === "center" ? "text-center" : ""}`}>
             <div className="font-semibold text-sm truncate" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
               {item.display.primaryLine ?? item.name}
             </div>
@@ -198,8 +199,8 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         );
         // plain text columns (when/detail/etc.)
         return (
-          <div key={col.key} className={`${col.width} px-2 py-2 text-center`}>
-            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.display[col.key] ?? ""}</span>
+          <div key={col.key} className={`${col.width} min-w-0 px-2 py-2 text-center`}>
+            <span className="text-xs block truncate" style={{ color: "var(--color-text-muted)" }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
           </div>
         );
       })}
@@ -335,89 +336,94 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       onBlur={e => { if (rowRef.current && !rowRef.current.contains(e.relatedTarget)) { setShowDropdown(false); setHighlightedIdx(-1); } }}>
 
       <div className="w-12 px-2 py-2 flex items-center justify-center flex-shrink-0">
-        <span className="text-sm font-semibold" style={{ color: config.color }}>{rowNumber}</span>
+        <span className="text-sm font-semibold" style={{ color: config.textAccent || config.color }}>{rowNumber}</span>
       </div>
 
-      {config.hasSearchField !== false && (
-        <div className="w-80 flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
-          <config.icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: config.color }} />
-          <input data-field="name" ref={inputRef} value={query}
-            onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowDropdown(true); setHighlightedIdx(-1); }}
-            onFocus={() => setShowDropdown(true)}
-            onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
-            onKeyDown={e => handleFieldKeyDown(e, "name")}
-            placeholder={config.labels.searchPlaceholder}
-            className="w-full py-1.5 rounded text-sm font-medium"
-            style={{ border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
-              background: selected ? config.colorLight : "var(--color-surface)", color: config.color,
-              paddingLeft: "1.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
-          {selected && (
-            <button type="button" onMouseDown={e => { e.preventDefault(); handleClear(); }} title="Clear"
-              className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full"
-              style={{ right: "1.5rem", width: 16, height: 16, background: "var(--color-danger)", color: "white" }}><X size={10} strokeWidth={3} /></button>
-          )}
-          <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
-            onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
-          <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
-            <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider sticky top-0" style={{ color: "var(--color-text-muted)", background: "var(--color-primary-muted)" }}>
-              {config.labels.searchListLabel}
+      {/* Fields render in config.addRowFields order (so e.g. IP Time-line can put
+          Medic before the Subject search field, matching the view table's column
+          order) — only the widget used per field differs, not its position. */}
+      {fieldOrder.filter(f => f !== "commit").map(field => {
+        if (field === "name") {
+          if (config.hasSearchField === false) return null;
+          return (
+            <div key="name" className="w-80 flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
+              <config.icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: config.textAccent || config.color }} />
+              <input data-field="name" ref={inputRef} value={query}
+                onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowDropdown(true); setHighlightedIdx(-1); }}
+                onFocus={() => setShowDropdown(true)}
+                onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
+                onKeyDown={e => handleFieldKeyDown(e, "name")}
+                placeholder={config.labels.searchPlaceholder}
+                className="w-full py-1.5 rounded text-sm font-medium"
+                style={{ border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
+                  background: selected ? config.colorLight : "var(--color-surface)", color: config.textAccent || config.color,
+                  paddingLeft: "1.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
+              {selected && (
+                <button type="button" onMouseDown={e => { e.preventDefault(); handleClear(); }} title="Clear"
+                  className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full"
+                  style={{ right: "1.5rem", width: 16, height: 16, background: "var(--color-danger)", color: "white" }}><X size={10} strokeWidth={3} /></button>
+              )}
+              <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
+                onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
+              <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
+                <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider sticky top-0" style={{ color: "var(--color-text-muted)", background: "var(--color-primary-muted)" }}>
+                  {config.labels.searchListLabel}
+                </div>
+                {dropdownItems.map((item, i) => (
+                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-2.5 cursor-pointer text-sm"
+                    style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
+                    {item}
+                  </div>
+                ))}
+              </PortalDropdown>
             </div>
-            {dropdownItems.map((item, i) => (
-              <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-2.5 cursor-pointer text-sm"
-                style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
-                {item}
-              </div>
-            ))}
-          </PortalDropdown>
-        </div>
-      )}
+          );
+        }
 
-      {fieldOrder.includes("days") && (
-        <div className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
-          <input data-field="days" type="number" min="1" max="365" value={draft.days}
-            onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-            className="w-full px-2 py-1.5 rounded text-sm text-center font-semibold" style={{ border: "1px solid var(--color-border)" }} placeholder="Days" />
-        </div>
-      )}
-      {fieldOrder.includes("intake") && (
-        <div className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
-          <ArrowSelect dataField="intake" value={draft.intake} options={config.fieldOptions.intake} onChange={v => onDraftChange("intake")(v)} onNavigate={e => handleFieldKeyDown(e, "intake")} />
-        </div>
-      )}
-      {fieldOrder.includes("period") && (
-        <div className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
-          <ArrowSelect dataField="period" value={draft.period} options={config.fieldOptions.period} onChange={v => onDraftChange("period")(v)} onNavigate={e => handleFieldKeyDown(e, "period")} style={{ color: "var(--color-primary)", fontWeight: 700 }} />
-        </div>
-      )}
-      {fieldOrder.includes("when") && (
-        <div className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
-          <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
-        </div>
-      )}
+        if (field === "days") return (
+          <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <input data-field="days" type="number" min="1" max="365" value={draft.days}
+              onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
+              className="w-full px-2 py-1.5 rounded text-sm text-center font-semibold" style={{ border: "1px solid var(--color-border)" }} placeholder="Days" />
+          </div>
+        );
+        if (field === "intake") return (
+          <div key="intake" className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <ArrowSelect dataField="intake" value={draft.intake} options={config.fieldOptions.intake} onChange={v => onDraftChange("intake")(v)} onNavigate={e => handleFieldKeyDown(e, "intake")} />
+          </div>
+        );
+        if (field === "period") return (
+          <div key="period" className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <ArrowSelect dataField="period" value={draft.period} options={config.fieldOptions.period} onChange={v => onDraftChange("period")(v)} onNavigate={e => handleFieldKeyDown(e, "period")} style={{ color: "var(--color-primary)", fontWeight: 700 }} />
+          </div>
+        );
+        if (field === "when") return (
+          <div key="when" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
+          </div>
+        );
+        if (field === "detail") return (
+          <div key="detail" className="flex-1 min-w-0 px-1 py-1.5 flex items-center">
+            <TypableInput dataField="detail" value={draft.detail} options={config.fieldOptions?.detail || []}
+              placeholder="Type or select remarks..." onChange={e => onDraftChange("detail")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "detail")} />
+          </div>
+        );
 
-      {fieldOrder.includes("detail") && (
-        <div className="flex-1 min-w-0 px-1 py-1.5 flex items-center">
-          <TypableInput dataField="detail" value={draft.detail} options={config.fieldOptions?.detail || []}
-            placeholder="Type or select remarks..." onChange={e => onDraftChange("detail")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "detail")} />
-        </div>
-      )}
-
-      {/* Generic typable-or-select fields (e.g. IP Time's Subject/Advice/Nurse/Treatment) —
-          any addRowFields entry not already handled above renders as a free-type-or-pick input. */}
-      {fieldOrder
-        .filter(f => !["name", "days", "intake", "period", "when", "detail", "commit"].includes(f))
-        .map(field => (
+        // Generic typable-or-select fields (e.g. IP Time-line's Medic/Notes/Entry Type) —
+        // any addRowFields entry not already handled above renders as a free-type-or-pick input.
+        return (
           <div key={field} className="flex-1 min-w-0 px-1 py-1.5 flex items-center">
             <TypableInput dataField={field} value={draft[field] ?? ""} options={config.fieldOptions?.[field] || []}
               placeholder={`${config.tableColumns?.find(c => c.key === field)?.label || field}...`}
               onChange={e => onDraftChange(field)(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, field)} />
           </div>
-        ))}
+        );
+      })}
 
       <div className="w-16 flex-shrink-0 px-1 py-1.5 flex gap-1 items-center justify-center">
         <button data-field="commit" onClick={onCommit} onKeyDown={e => handleFieldKeyDown(e, "commit")}
-          className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: config.color, color: "white" }} title="Add (Enter)"><Plus size={16} /></button>
-        <button onClick={onCancel} className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: "#fee2e2", color: "var(--color-danger)" }} title="Cancel (Esc)"><X size={16} /></button>
+          className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: "var(--color-success)", color: "white" }} title="Add (Enter)"><Plus size={16} /></button>
+        <button onClick={onCancel} className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: "var(--color-danger)", color: "white" }} title="Cancel (Esc)"><X size={16} /></button>
       </div>
     </div>
   );
@@ -437,9 +443,13 @@ const ADD_ROW_FIELD_META = {
 
 function buildAddRowColumns(config) {
   const cols = [{ key: "no", label: "No.", width: "w-12" }];
-  if (config.hasSearchField !== false) cols.push({ key: "name", label: "Name", width: "w-80" });
   config.addRowFields.forEach(field => {
-    if (field === "name" || field === "commit") return;
+    if (field === "commit") return;
+    if (field === "name") {
+      if (config.hasSearchField === false) return;
+      cols.push({ key: "name", label: config.labels.searchColumnLabel || "Name", width: "w-80" });
+      return;
+    }
     const meta = ADD_ROW_FIELD_META[field];
     if (meta) { cols.push({ key: field, ...meta }); return; }
     const tableCol = config.tableColumns?.find(c => c.key === field);
@@ -517,7 +527,6 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const toggleStrike = id => setStruckIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const deleteItem = id => { setItems(prev => prev.filter(it => it.id !== id)); setStruckIds(prev => prev.filter(x => x !== id)); if (selectedRowId === id) setSelectedRowId(null); };
   const handleClearAll = () => { if (window.confirm(`Clear all ${config.label.toLowerCase()} entries?`)) { setItems([]); setStruckIds([]); setShowAddRow(false); setSelectedRowId(null); } };
-  const handleSave = () => alert(`${config.label} entries saved successfully!`);
   const handleAddNew = () => {
     setEditId(null);
     setDraft(makeFreshDraft(config, persistedDaysRef.current));
@@ -534,7 +543,6 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
 
   React.useImperativeHandle(ref, () => ({
     clearAll: handleClearAll,
-    save: handleSave,
   }));
 
   return (
@@ -555,13 +563,13 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
         </div>
 
         <div className="flex-shrink-0 mt-3">
-          <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} />
+          <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.colorText} />
           {showAddRow ? (
             <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
               query={query} setQuery={setQuery} suggestions={suggestions} rowNumber={items.length + 1} searchMode={searchMode} />
           ) : (
             <div className="flex items-center justify-center py-3 border-t cursor-pointer" style={{ background: config.colorLight, borderColor: config.color }} onClick={handleAddNew}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2" style={{ background: config.color, color: "white" }}>
+              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2" style={{ background: config.color, color: config.colorText || "white" }}>
                 <Plus size={14} /> {config.labels.addButton}
               </button>
             </div>
@@ -575,7 +583,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
         <EntryFooterBar searchMode={searchMode} onSearchModeChange={setSearchMode}
           typeValue={typeValue} onTypeChange={setTypeValue} typeOptions={config.filters.typeOptions}
           filterLabel={config.labels.footerFilterLabel} frequentOnly={frequentOnly} onFrequentOnlyChange={setFrequentOnly}
-          accentColor={config.color} recordCount={items.length} newEntityButton={config.labels.newEntityButton || config.labels.addButton}
+          accentColor={config.color} accentText={config.colorText} textAccent={config.textAccent} recordCount={items.length} newEntityButton={config.labels.newEntityButton || config.labels.addButton}
           onNewEntity={handleAddNew} />
       </div>
     </div>

@@ -31,19 +31,23 @@
   --color-primary-muted: #e8f2fb;
   /* tinted backgrounds  */
 
-  /* ── Tabs ── */
-  --color-drugs: #1a7f5a;
-  /* green  – Drugs         */
-  --color-drugs-light: #e6f5f0;
-  --color-lab: #b45309;
-  /* amber  – LAB           */
-  --color-lab-light: #fef3e2;
-  --color-services: #1565c0;
+  /* ── Tabs ── one shared brand palette (navy / red / blue / cream) reused
+     verbatim across every tab, table header, and accent in the app instead of
+     each tab having its own unrelated hue. */
+  --color-drugs: #0c324a;
+  /* navy   – Drugs         */
+  --color-drugs-light: color-mix(in srgb, #0c324a 12%, white);
+  --color-lab: #c11720;
+  /* red    – Lab           */
+  --color-lab-light: color-mix(in srgb, #c11720 12%, white);
+  --color-services: #679cbc;
   /* blue   – Services      */
-  --color-services-light: #e3f0fc;
-  --color-iptime: #8e2a4c;
-  /* burgundy – IP Time     */
-  --color-iptime-light: #fbe7ee;
+  --color-services-light: color-mix(in srgb, #679cbc 20%, white);
+  --color-iptime: #fef1d5;
+  /* cream  – IP Time-line  */
+  --color-iptime-light: color-mix(in srgb, #fef1d5 55%, white);
+  --color-iptime-text: #0c324a;
+  /* dark text for the pale cream accent, so it stays legible */
   --color-info: #0ea5e9;
   /* blue   – Info/Findings */
   --color-info-light: #c8eef4;

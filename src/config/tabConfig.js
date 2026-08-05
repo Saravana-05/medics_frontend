@@ -1,9 +1,7 @@
 import { Pill, FlaskConical, Settings as ServicesIcon, Clock } from "lucide-react";
 import labTestDetails from "../data/labTestDetails.json";
-import ipSubjects from "../data/ipSubjects.json";
 import ipAdvice from "../data/ipAdvice.json";
 import ipNurses from "../data/ipNurses.json";
-import ipTreatments from "../data/ipTreatments.json";
 
 /* ── shared dropdown option sets that Lab/Service reuse verbatim ── */
 const SIMPLE_SEARCH_ONLY = {
@@ -35,6 +33,12 @@ export const TAB_CONFIGS = {
     icon: Pill,
     color: "var(--color-drugs)",
     colorLight: "var(--color-drugs-light)",
+    colorText: "white",
+    // Used wherever the accent is rendered as TEXT/icon color on a white or
+    // near-white background (not as a solid background needing colorText on
+    // top of it). For the 3 saturated tabs this is just `color` itself; IP
+    // Time-line's pale cream isn't legible as text, so it uses colorText (navy) instead.
+    textAccent: "var(--color-drugs)",
 
     labels: {
       addButton: "Add Medicine",
@@ -57,7 +61,7 @@ export const TAB_CONFIGS = {
 
     tableColumns: [
       { key: "no",      label: "No.",    width: "w-12",   type: "index" },
-      { key: "name",    label: "Name",   width: "w-80",   type: "text" },
+      { key: "name",    label: "Name",   width: "w-80",   type: "text", align: "center" },
       { key: "buy",     label: "Buy",    width: "w-12",   type: "computed" },
       { key: "mor",     label: "M",      width: "w-7",    type: "computed" },
       { key: "noon",    label: "A",      width: "w-7",    type: "computed" },
@@ -95,6 +99,12 @@ export const TAB_CONFIGS = {
       newButtonLabel: "New Group",
       listSourceLabel: "Drug Group List",
       dataFile: "drugGroups",
+      // Each group holds a real list of medicines (not just a count) — the New/Modify
+      // modal lets you search and add multiple, and clicking "Use" loads them into
+      // the Drug grid in one go.
+      medicinePicker: true,
+      pickerLabel: "Medicines",
+      applyLabel: "Use",
     },
 
     searchSource: "medicines", // API endpoint key
@@ -107,6 +117,8 @@ export const TAB_CONFIGS = {
     icon: FlaskConical,
     color: "var(--color-lab)",
     colorLight: "var(--color-lab-light)",
+    colorText: "white",
+    textAccent: "var(--color-lab)",
 
     labels: {
       addButton: "Add Test",
@@ -119,6 +131,9 @@ export const TAB_CONFIGS = {
     filters: { typeOptions: ["Currently Live", "All", "Discontinued"] },
 
     ...SIMPLE_SEARCH_ONLY,
+    // Lab's Name column is centered; Service (which reuses the same shared
+    // tableColumns) stays left-aligned, so override just this one column here.
+    tableColumns: SIMPLE_SEARCH_ONLY.tableColumns.map(col => col.key === "name" ? { ...col, align: "center" } : col),
 
     // Auto-populate the report-view's Unit/Bio-Ref/Specimen from the test catalog
     // the moment a test is added; Observed Value stays blank for the user to fill in.
@@ -142,6 +157,11 @@ export const TAB_CONFIGS = {
       newButtonLabel: "New Group",
       listSourceLabel: "Test Group List",
       dataFile: "labGroups",
+      // Same as Drug — each group holds a real list of tests, searchable/addable
+      // in the New/Modify modal, with "Use" loading them into the Lab grid.
+      medicinePicker: true,
+      pickerLabel: "Tests",
+      applyLabel: "Use",
       reportView: {
         type: "report-view",
         title: "Test Report",
@@ -160,6 +180,8 @@ export const TAB_CONFIGS = {
     icon: ServicesIcon,
     color: "var(--color-services)",
     colorLight: "var(--color-services-light)",
+    colorText: "white",
+    textAccent: "var(--color-services)",
 
     labels: {
       addButton: "Add Service",
@@ -188,63 +210,66 @@ export const TAB_CONFIGS = {
   /* ══════════════════ IP TIME ══════════════════ */
   iptime: {
     key: "iptime",
-    label: "IP Time",
+    label: "IP Time-line",
     icon: Clock,
     color: "var(--color-iptime)",
     colorLight: "var(--color-iptime-light)",
+    colorText: "var(--color-iptime-text)", // pale cream accent needs dark text to stay legible
+    textAccent: "var(--color-iptime-text)", // cream itself is unreadable as text — use the dark navy instead
 
     labels: {
       addButton: "Add Entry",
+      searchPlaceholder: "Search or select Subject",
+      searchListLabel: "IP Subjects",
+      searchColumnLabel: "Subject", // AddRow's search field is labeled "Subject" here, not "Name"
+      newEntityButton: "New Entry",
       footerFilterLabel: "Entry Type",
     },
 
     filters: { typeOptions: ["Currently Live", "All"] },
 
-    // No catalog-search field — 4 independent typable-or-select fields instead.
-    hasSearchField: false,
-    requiredField: "subject",
-
     fieldOptions: {
-      subject: ipSubjects,
-      advice: ipAdvice,
-      nurse: ipNurses,
-      treatment: ipTreatments,
+      medic: ipNurses,
+      notes: ipAdvice,
+      entryType: ["Support", "Instruction"],
     },
 
-    addRowFields: ["subject", "advice", "nurse", "treatment", "commit"],
+    addRowFields: ["medic", "name", "notes", "entryType", "commit"],
 
     tableColumns: [
       { key: "no",        label: "No.",         width: "w-12",   type: "index" },
-      { key: "dateTime",  label: "Date-Time",    width: "w-32",   type: "text" },
-      { key: "subject",   label: "IP Subject",   width: "flex-1", type: "text" },
-      { key: "advice",    label: "IP Advice",    width: "flex-1", type: "text" },
-      { key: "nurse",     label: "Nurse",        width: "flex-1", type: "text" },
-      { key: "treatment", label: "IP Treatment", width: "flex-1", type: "text" },
-      { key: "actions",   label: "Actions",      width: "w-24",   type: "actions" },
+      { key: "time",       label: "Time",        width: "w-24",   type: "text" },
+      { key: "medic",      label: "Medic",       width: "w-28",   type: "text" },
+      { key: "name",       label: "Subject",     width: "flex-1", type: "text", align: "center" },
+      { key: "notes",      label: "Notes",       width: "flex-1", type: "text" },
+      { key: "entryType",  label: "Entry Type",  width: "w-24",   type: "text" },
+      { key: "actions",    label: "Actions",     width: "w-24",   type: "actions" },
     ],
 
     computeRowDisplay: (draft) => {
       const now = new Date();
       const pad = n => String(n).padStart(2, "0");
-      const dateTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}.${pad(now.getMinutes())}`;
+      const hours12 = now.getHours() % 12 || 12;
+      const time = `${pad(hours12)}:${pad(now.getMinutes())} ${now.getHours() >= 12 ? "PM" : "AM"}`;
       return {
-        dateTime,
-        subject: draft.subject,
-        advice: draft.advice,
-        nurse: draft.nurse,
-        treatment: draft.treatment,
+        primaryLine: draft.name,
+        time,
+        medic: draft.medic,
+        notes: draft.notes,
+        entryType: draft.entryType,
       };
     },
 
     sidePanel: {
-      type: "group-list",
-      title: "IP Time Group",
+      // Not an aggregated group list — a live read-only mirror of this tab's own
+      // entries, shown as Entry Type / Subject / Notes rows (see EntryMirrorPanel).
+      type: "entry-mirror",
+      title: "Patient Group Service",
       itemLabel: "Entries Recorded",
-      columns: ["Entry Title", "Days", "Items"],
-      newButtonLabel: "New Group",
-      listSourceLabel: "IP Time Group List",
-      dataFile: "ipTimeGroups",
+      columns: ["Entry Type", "Subject", "Notes"],
     },
+
+    searchSource: "ip_subjects",
 
     searchSource: null,
   },

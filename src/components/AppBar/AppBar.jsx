@@ -1,24 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  Maximize2, Minimize2, ChevronDown
+  Maximize2, Minimize2, ChevronDown, X
 } from "lucide-react";
 import UserMenuDropdown from "./UserMenuDropdown";
 
-export default function AppBar({ user, onLogout, saved }) {
+export default function AppBar({ user, onLogout, savedMessage }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
+  const hideTimerRef = useRef(null);
 
   const doctorSectionRef = useRef(null);
 
-  // Saved toast
+  // Saved snackbar — re-fires every time savedMessage.key changes (even if the
+  // text repeats, e.g. saving Drug twice in a row), auto-hides after 3s, and
+  // can be dismissed early via the close icon or by clicking the blur backdrop.
   useEffect(() => {
-    if (saved) {
+    if (savedMessage) {
       setShowSavedToast(true);
-      const t = setTimeout(() => setShowSavedToast(false), 4000);
-      return () => clearTimeout(t);
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => setShowSavedToast(false), 3000);
     }
-  }, [saved]);
+    return () => clearTimeout(hideTimerRef.current);
+  }, [savedMessage?.key]);
+
+  const dismissToast = () => {
+    setShowSavedToast(false);
+    clearTimeout(hideTimerRef.current);
+  };
 
   // Click-outside: doctor menu
   useEffect(() => {
@@ -101,17 +110,26 @@ export default function AppBar({ user, onLogout, saved }) {
         </div>
       </div>
 
-      {/* Saved Toast */}
+      {/* Saved Snackbar — blurred full-screen backdrop while it's showing,
+          auto-hides after 3s, dismissible early via the close icon or backdrop click. */}
       {showSavedToast && (
-        <div className="fixed top-20 right-4 z-50 animate-slide-in">
-          <div className="px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2"
-            style={{ background: "#10b981", color: "white" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="text-sm font-semibold">Prescription Saved Successfully!</span>
+        <>
+          <div className="fixed inset-0 z-40 transition-opacity duration-300"
+            style={{ background: "rgba(15,23,42,0.35)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
+            onClick={dismissToast} />
+          <div className="fixed top-1/2 left-1/2 z-50" style={{ transform: "translate(-50%, -50%)" }}>
+            <div className="px-5 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-fade-in"
+              style={{ background: "var(--color-success)", color: "white" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-sm font-semibold whitespace-nowrap">{savedMessage?.text || "Saved successfully!"}</span>
+              <button onClick={dismissToast} className="flex items-center justify-center rounded-full flex-shrink-0 transition-all hover:bg-white/20" style={{ width: 20, height: 20 }} title="Close">
+                <X size={13} />
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

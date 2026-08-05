@@ -14,6 +14,8 @@ import Divider from "@mui/material/Divider";
 import medicineList from "../data/medicines.json";
 import labTestList from "../data/labTest.json";
 import serviceList from "../data/services.json";
+import ipSubjectList from "../data/ipSubjects.json";
+import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecordStore";
 
 export default function OPDeskScreen({ user, onLogout }) {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -29,7 +31,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [labShowReport, setLabShowReport] = useState(false);
   const [services, setServices] = useState([]);
   const [ipEntries, setIpEntries] = useState([]);
-  const [saved, setSaved] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null); // { text, key } — key forces the toast to re-fire even on repeat text
 
   // Check window resize for tablet view
   useState(() => {
@@ -42,14 +44,43 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const selectPatient = (p) => {
     setSelectedPatient(p);
-    setDrugs([]); setLabs([]); setServices([]); setIpEntries([]);
+    const record = p ? getPatientRecord(p.id) : null;
+    setDrugs(record?.drugs || []);
+    setLabs(record?.labs || []);
+    setServices(record?.services || []);
+    setIpEntries(record?.ipEntries || []);
     setLabShowReport(false);
-    setSaved(false);
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 4000);
+  const handleSave = (text = "Prescription saved successfully!") => {
+    setSaveMessage({ text, key: Date.now() });
+  };
+
+  // Persists the active tab's current items against the selected patient (in
+  // memory for this session — no backend yet) and shows the "Saved" snackbar.
+  const handleSaveActiveTab = () => {
+    if (!selectedPatient) { alert("Please select a patient first."); return; }
+    const field = { drugs: "drugs", lab: "labs", services: "services", iptime: "ipEntries" }[activeTab];
+    savePatientRecord(selectedPatient.id, { [field]: activeItems });
+    handleSave(`${activeConfig?.label || "Prescription"} saved successfully!`);
+  };
+
+  // Loads a Drug/Lab Group's items straight into that tab's grid, replacing
+  // whatever's currently there — same computeRowDisplay/enrichItem logic the
+  // add-row itself uses, just applied to every item in the group at once.
+  const applyGroup = (entry) => {
+    const config = TAB_CONFIGS[activeTab];
+    const setItems = { drugs: setDrugs, lab: setLabs }[activeTab];
+    if (!config || !setItems) return;
+    const draftBase = activeTab === "drugs"
+      ? { days: String(entry.days || 1), intake: "1", period: "OD", when: "AF", detail: "—" }
+      : { detail: "—" };
+    const newItems = (entry.medicines || []).map(name => {
+      const draft = { name, ...draftBase };
+      const extra = config.enrichItem ? config.enrichItem(draft) : {};
+      return { id: Date.now() + Math.random(), ...draft, ...extra, display: config.computeRowDisplay(draft) };
+    });
+    setItems(newItems);
   };
 
   const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
@@ -65,6 +96,7 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const activeConfig = TAB_CONFIGS[activeTab];
   const activeEntryTabRef = useRef(null);
+  const activeItems = { drugs, lab: labs, services, iptime: ipEntries }[activeTab];
 
   return (
     <div className="h-screen flex flex-col overflow-hidden " style={{ background: "var(--color-surface-alt)", fontFamily: "var(--font-body)" }}>
@@ -74,7 +106,7 @@ export default function OPDeskScreen({ user, onLogout }) {
         <AppBar
           user={user}
           onLogout={onLogout}
-          saved={saved}
+          savedMessage={saveMessage}
           onOPListClick={selectPatient}
           patients={MOCK_PATIENTS}
           screenType="opdesk"
@@ -97,7 +129,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             onOPList={() => {}}
             onIPList={() => {}}
             onPark={() => {}}
-            onFinalize={handleSave}
+            onFinalize={() => handleSave()}
             highlightedTab={highlightedTab}
             leftHighlightedTab={leftHighlightedTab}
           />
@@ -129,10 +161,11 @@ export default function OPDeskScreen({ user, onLogout }) {
                 <div className="flex items-center flex-shrink-0 pl-3">
                   <ModernToolbar
                     onClear={() => activeEntryTabRef.current?.clearAll()}
-                    onSave={() => activeEntryTabRef.current?.save()}
+                    onSave={handleSaveActiveTab}
                     onPreview={activeTab === "lab" ? () => setLabShowReport(v => !v) : undefined}
                     accentColor={activeConfig?.color}
                     accentLight={activeConfig?.colorLight}
+                    accentText={activeConfig?.colorText}
                   />
                 </div>
               </div>
@@ -148,7 +181,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                   <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.services} items={services} setItems={setServices} searchList={serviceList} />
                 )}
                 {activeTab === "iptime" && (
-                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.iptime} items={ipEntries} setItems={setIpEntries} />
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.iptime} items={ipEntries} setItems={setIpEntries} searchList={ipSubjectList} />
                 )}
               </div>
             </div>
@@ -187,6 +220,9 @@ export default function OPDeskScreen({ user, onLogout }) {
                   reportItems={labs}
                   onUpdateReportItem={updateLabReportField}
                   onTogglePreview={() => setLabShowReport(v => !v)}
+                  mirrorItems={activeItems}
+                  hasPatient={!!selectedPatient}
+                  onApplyGroup={["drugs", "lab"].includes(activeTab) ? applyGroup : undefined}
                 />
               </div>
             )}
