@@ -105,10 +105,10 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 
   return (
     <div className="flex items-center overflow-hidden rounded-md">
-      <ActionButton label="Clear" onClick={onClear} bg="var(--color-danger)" hoverBg="#b91c1c" textColor="white" />
+      <ActionButton label="Clear" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
       <ActionButton label="Paste" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
       <ActionButton label="Preview" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />
-      <ActionButton label="Save" onClick={onSave} bg="var(--color-success)" hoverBg="#128a54" textColor="white" />
+      <ActionButton label="Save" onClick={onSave} bg={shades[3]} hoverBg={hoverShades[3]} textColor={darkText} />
       <ActionButton label="Print" bg={shades[4]} hoverBg={hoverShades[4]} textColor={darkText} />
     </div>
   );

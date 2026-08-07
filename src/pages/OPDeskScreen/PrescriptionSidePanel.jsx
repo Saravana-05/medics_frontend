@@ -93,16 +93,18 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
   const hasDaysField = metricCount > 1;
   const metricsFor = e => e.medicines ? (hasDaysField ? [e.days, e.medicines.length] : [e.medicines.length]) : e.metrics;
 
-  const handleAdd = (title, metrics, medicines) => setEntries(prev => [...prev, {
+  const handleAdd = (title, metrics, medicines, remarks) => setEntries(prev => [...prev, {
     id: Date.now(), title, doctor: doctorFilter === "All Doctors" ? doctors[0] : doctorFilter,
     ...(sidePanel.medicinePicker ? { ...(hasDaysField ? { days: metrics[0] } : {}), medicines: medicines || [] } : { metrics }),
+    ...(sidePanel.remarksField ? { remarks: remarks || "" } : {}),
   }]);
-  const handleModify = (id, title, metrics, medicines) => setEntries(prev => prev.map(e => e.id === id ? {
+  const handleModify = (id, title, metrics, medicines, remarks) => setEntries(prev => prev.map(e => e.id === id ? {
     ...e, title,
     ...(sidePanel.medicinePicker ? { ...(hasDaysField ? { days: metrics[0] } : {}), medicines: medicines || [] } : { metrics }),
+    ...(sidePanel.remarksField ? { remarks: remarks || "" } : {}),
   } : e));
   const handleDelete = id => { if (window.confirm("Delete this entry?")) setEntries(prev => prev.filter(e => e.id !== id)); };
-  const handleView = e => alert(`${e.title}\n${sidePanel.columns.slice(1).map((c, i) => `${c}: ${metricsFor(e)[i]}`).join(" · ")}${e.medicines ? `\n\n${sidePanel.pickerLabel || "Items"}: ${e.medicines.join(", ")}` : ""}`);
+  const handleView = e => alert(`${e.title}\n${sidePanel.columns.slice(1).map((c, i) => `${c}: ${metricsFor(e)[i]}`).join(" · ")}${e.medicines ? `\n\n${sidePanel.pickerLabel || "Items"}: ${e.medicines.join(", ")}` : ""}${e.remarks ? `\n\nRemarks: ${e.remarks}` : ""}`);
 
   return (
     <>
@@ -123,7 +125,10 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
         {filtered.map((e, index) => (
           <div key={e.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
-            <div className="flex-1 px-3 py-2.5"><span className="text-xs font-medium" style={{ color: "var(--color-text-base)" }}>{e.title}</span></div>
+            <div className="flex-1 px-3 py-2.5 min-w-0">
+              <div className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>{e.title}</div>
+              {e.remarks && <div className="text-[0.6rem] truncate" style={{ color: "var(--color-text-subtle)" }}>{e.remarks}</div>}
+            </div>
             {metricsFor(e).map((m, i) => (
               <div key={i} className="w-16 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{m}</span></div>
             ))}
@@ -132,7 +137,7 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
                 <button onClick={() => onApplyGroup(e)} className="p-1 rounded transition-all" title={`${sidePanel.applyLabel} — load into the grid`} style={{ background: accentLight, color: textAccent || accentColor }}><ArrowRightCircle size={11} /></button>
               )}
               <button onClick={() => handleView(e)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
-              <button onClick={() => setModalMode(sidePanel.medicinePicker ? { id: e.id, title: e.title, days: e.days, medicines: e.medicines } : { id: e.id, title: e.title, metrics: e.metrics })} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
+              <button onClick={() => setModalMode(sidePanel.medicinePicker ? { id: e.id, title: e.title, days: e.days, medicines: e.medicines, remarks: e.remarks } : { id: e.id, title: e.title, metrics: e.metrics })} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
               <button onClick={() => handleDelete(e.id)} className="p-1 rounded transition-all" title="Delete" style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={11} /></button>
             </div>
           </div>
@@ -167,12 +172,14 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
           medicinePicker={sidePanel.medicinePicker}
           pickerLabel={sidePanel.pickerLabel || "Items"}
           catalogList={catalogList}
+          remarksField={sidePanel.remarksField}
           initialTitle={modalMode === "add" ? "" : modalMode.title}
           initialDays={modalMode === "add" ? "" : modalMode.days}
           initialMedicines={modalMode === "add" ? [] : (modalMode.medicines || [])}
           initialMetrics={modalMode === "add" ? Array(metricCount).fill(0) : modalMode.metrics}
+          initialRemarks={modalMode === "add" ? "" : (modalMode.remarks || "")}
           heading={modalMode === "add" ? sidePanel.newButtonLabel : "Modify Entry"}
-          onSave={(title, metrics, medicines) => { modalMode === "add" ? handleAdd(title, metrics, medicines) : handleModify(modalMode.id, title, metrics, medicines); setModalMode(null); }}
+          onSave={(title, metrics, medicines, remarks) => { modalMode === "add" ? handleAdd(title, metrics, medicines, remarks) : handleModify(modalMode.id, title, metrics, medicines, remarks); setModalMode(null); }}
           onCancel={() => setModalMode(null)}
         />
       )}
@@ -184,14 +191,15 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
    so "New Group" captures everything the table actually displays, not just the title. */
 function GroupEntryModal({
   accentColor, accentLight, accentText = "white", textAccent, metricLabels, medicinePicker,
-  pickerLabel = "Items", catalogList = [],
-  initialTitle, initialMetrics, initialDays, initialMedicines = [], heading, onSave, onCancel,
+  pickerLabel = "Items", catalogList = [], remarksField,
+  initialTitle, initialMetrics, initialDays, initialMedicines = [], initialRemarks = "", heading, onSave, onCancel,
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [metrics, setMetrics] = useState(initialMetrics);
   const [days, setDays] = useState(initialDays ?? "");
   const [medicines, setMedicines] = useState(initialMedicines);
   const [medQuery, setMedQuery] = useState("");
+  const [remarks, setRemarks] = useState(initialRemarks);
 
   // Some group types (Lab) don't have a separate Days metric — just the item count.
   const hasDaysField = metricLabels.length > 1;
@@ -208,7 +216,7 @@ function GroupEntryModal({
     if (!title.trim()) return;
     if (medicinePicker) {
       const nextMetrics = hasDaysField ? [parseInt(days, 10) || 0, medicines.length] : [medicines.length];
-      onSave(title.trim(), nextMetrics, medicines);
+      onSave(title.trim(), nextMetrics, medicines, remarks.trim());
     } else {
       onSave(title.trim(), metrics.map(m => parseInt(m, 10) || 0));
     }
@@ -266,6 +274,14 @@ function GroupEntryModal({
               ))}
             </div>
           )}
+
+          {remarksField && (
+            <div className="mt-3">
+              <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Remarks</label>
+              <textarea value={remarks} onChange={e => setRemarks(e.target.value)} rows={2}
+                placeholder="Enter remarks..." className="w-full px-3 py-2 rounded text-sm outline-none resize-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+            </div>
+          )}
         </>
       ) : metricLabels.length > 0 && (
         <div className="flex gap-3 mt-3">
@@ -306,7 +322,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
 
       <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box", overflow: "hidden" }}>
         {sidePanel.reportView.columns.map((col, i) => (
-          <div key={col} className={`${i === 0 ? "flex-1" : i === 1 ? "w-20" : i === 2 ? "w-48" : "w-24"} px-3 py-2.5 truncate`}
+          <div key={col} className={`${i === 0 ? "flex-1" : i === 1 ? "w-28" : i === 2 ? "w-20" : i === 3 ? "w-48" : "w-24"} px-3 py-2.5 truncate`}
             style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: accentColor, whiteSpace: "nowrap" }}>{col}</div>
         ))}
       </div>
@@ -314,13 +330,14 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {reportItems.map((item, index) => (
           <div key={item.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.observedValue || "—"}</span></div>
+            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || item.name || "—"}</span></div>
+            <div className="w-28 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.observedValue || "—"}</span></div>
             <div className="w-20 px-3 py-2.5 text-center"><span className="text-sm" style={{ color: item.unit ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.unit || "—"}</span></div>
             <div className="w-48 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.bioRef ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.bioRef || "—"}</span></div>
             <div className="w-24 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.specimen ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.specimen || "—"}</span></div>
           </div>
         ))}
-        {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={4} />)}
+        {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={5} />)}
       </div>
     </>
   );

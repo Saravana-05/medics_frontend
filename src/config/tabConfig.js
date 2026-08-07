@@ -162,11 +162,14 @@ export const TAB_CONFIGS = {
       medicinePicker: true,
       pickerLabel: "Tests",
       applyLabel: "Use",
+      remarksField: true,
       reportView: {
         type: "report-view",
         title: "Test Report",
         actions: ["Preview", "Print"],
-        columns: ["Observed Value", "Unit", "Biological Reference - Interval", "Specimen"],
+        // "Test Name" first so each row is identifiable — critical once a group
+        // applies several tests at once, otherwise every row looks the same.
+        columns: ["Test Name", "Observed Value", "Unit", "Biological Reference - Interval", "Specimen"],
       },
     },
 

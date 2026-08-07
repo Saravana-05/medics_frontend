@@ -141,11 +141,11 @@ export default function OPDeskScreen({ user, onLogout }) {
       </div>
       <Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />
       {/* ── Main workspace with responsive split ── */}
-      <div className="flex-1 flex gap-2 min-h-0 relative px-2" style={{ background: "var(--color-surface-alt)" }}>
+      <div className="flex-1 flex gap-2 min-h-0 relative pl-2" style={{ background: "var(--color-surface-alt)" }}>
         <>
             {/* Left Section - Prescription Tabs + Active Tab Content */}
             <div
-              className={`flex flex-col overflow-hidden min-w-0 mt-[8px] mb-[8px] rounded-md shadow-md transition-all duration-300 ${
+              className={`flex flex-col overflow-hidden min-w-0 mt-[8px] mb-[8px] shadow-md transition-all duration-300 ${
                 isTabletView
                   ? isRightPanelExpanded ? 'flex-[5]' : 'flex-1'
                   : 'flex-[7]'
@@ -211,7 +211,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 "small screen: hide, don't restructure" requirement. */}
             {activeConfig?.sidePanel && !isTabletView && (
               <div
-                className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] rounded-md shadow-md"
+                className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] shadow-md"
                 style={{ width: "27%", minWidth: "420px", background: "#ffffff", border: "1px solid var(--color-border)" }}
               >
                 <PrescriptionSidePanel
@@ -231,7 +231,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 Desktop width = TopBar (w-96 = 384px) + RightSidebar (78px) = 462px,
                 so its left edge lines up with the TopBar section above. */}
             <div
-              className={`flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] rounded-md shadow-md transition-all duration-300 ${
+              className={`flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] shadow-md transition-all duration-300 ${
                 isTabletView
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
