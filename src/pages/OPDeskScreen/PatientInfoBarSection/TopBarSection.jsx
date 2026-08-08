@@ -2,31 +2,22 @@ import { useState } from "react";
 import { FileText as FileIcon, Calendar, CalendarDays } from "lucide-react";
 import OPListModal from "../../../modal/Oplistmodal";
 
-// Keys must match RightSidebar's RIGHT_TABS keys, in the same top-to-bottom order.
-const ACCENT_SEGMENTS = [
-  { key: "parked",    color: "#eb6367" },
-  { key: "emergency", color: "#73bfb8" },
-  { key: "reports",   color: "#679cbc" },
-  { key: "schedule",  color: "#0c324a" },
-];
-
-export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient, highlightedTab }) {
+export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient }) {
   const p = patient;
   const [followUpDate, setFollowUpDate] = useState("");
   const [showOPList, setShowOPList] = useState(false);
 
   return (
     <>
+      {/* The right accent bar used to live here, but that put it INSIDE this
+          section's border — it's now rendered by PatientInfoBar.jsx as a
+          sibling outside the box, matching the left accent bar's positioning. */}
       <div
-        className="flex gap-1 h-full"
+        className="h-full p-2 md:p-1.5 flex flex-col"
+        style={{
+          background: "var(--color-surface-alt)",
+        }}
       >
-        {/* Main content */}
-        <div
-          className="flex-1 p-2 md:p-1.5 flex flex-col border border-solid border-gray-300"
-          style={{
-            background: "var(--color-surface-alt)",
-          }}
-        >
           <div className="flex flex-col gap-0">
 
             {/* ── BUTTONS: all in one row, equal size (Park) & equal spacing ── */}
@@ -133,30 +124,6 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
 
           </div>
         </div>
-
-        {/* Right accent bar — segmented to match the 4 sidebar tabs (Parked/Emergency/Reports/Schedule) */}
-        {/* Invisible by default; a segment becomes visible only while its matching RightSidebar tab is hovered/active. */}
-        <div
-          className="flex flex-col h-full"
-          style={{
-            width: "1.5px",
-            flexShrink: 0,
-            marginRight: "2.5px",
-          }}
-        >
-          {ACCENT_SEGMENTS.map((seg) => (
-            <div
-              key={seg.key}
-              style={{
-                flex: 1,
-                background: seg.color,
-                opacity: highlightedTab === seg.key ? 1 : 0,
-                transition: "opacity 150ms ease",
-              }}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* ── OP List Modal ── */}
       {showOPList && (

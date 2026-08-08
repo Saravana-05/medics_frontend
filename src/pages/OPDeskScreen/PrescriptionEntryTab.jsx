@@ -160,7 +160,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         if (e.key === "ArrowDown") { e.preventDefault(); onArrowNav?.("down"); return; }
         if (e.key === "ArrowUp") { e.preventDefault(); onArrowNav?.("up"); return; }
       }}
-      className="flex border-b transition-all duration-150 outline-none cursor-pointer"
+      className="flex items-center border-b transition-all duration-150 outline-none cursor-pointer"
       style={{ borderColor: "var(--color-border)",
         background: isSelected ? accentLight : isStruck ? "var(--color-surface-alt)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
         opacity: isStruck ? 0.6 : 1, boxShadow: isSelected ? `inset 0 0 0 2px ${accentColor}` : "none" }}>
@@ -408,6 +408,13 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               placeholder="Type or select remarks..." onChange={e => onDraftChange("detail")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "detail")} />
           </div>
         );
+        if (field === "time") return (
+          <div key="time" className="w-24 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <input data-field="time" type="time" value={draft.time}
+              onChange={e => onDraftChange("time")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "time")}
+              className="w-full px-1.5 py-1.5 rounded text-sm" style={{ border: "1px solid var(--color-border)" }} />
+          </div>
+        );
 
         // Generic typable-or-select fields (e.g. IP Time-line's Medic/Notes/Entry Type) —
         // any addRowFields entry not already handled above renders as a free-type-or-pick input.
@@ -439,6 +446,7 @@ const ADD_ROW_FIELD_META = {
   period: { label: "Period", width: "w-20" },
   when:   { label: "When",   width: "w-28" },
   detail: { label: "Remarks", width: "flex-1" },
+  time:   { label: "Time",   width: "w-24" },
 };
 
 function buildAddRowColumns(config) {
@@ -469,12 +477,13 @@ function makeFreshDraft(config, keepDays) {
     else if (field === "period") draft.period = "OD";
     else if (field === "when") draft.when = "AF";
     else if (field === "detail") draft.detail = "—";
+    else if (field === "time") draft.time = "";
     else draft[field] = ""; // generic typable fields (e.g. subject/advice/nurse/treatment)
   });
   return draft;
 }
 
-const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ config, items, setItems, searchList = [] }, ref) {
+const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ config, items, setItems, searchList = [], currentMedicName }, ref) {
   const persistedDaysRef = useRef("1");
   const [draft, setDraft] = useState(() => makeFreshDraft(config));
   const [editId, setEditId] = useState(null);
@@ -492,11 +501,11 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     const suggestions = query.trim() ? searchList.filter(s => s.toLowerCase().includes(query.toLowerCase())) : searchList;
     const setD = k => v => setDraft(prev => ({ ...prev, [k]: v }));
 
-  const requiredField = config.requiredField || "name";
+  const requiredFields = config.requiredFields || [config.requiredField || "name"];
 
   const commitDraft = () => {
-    if (!draft[requiredField]?.trim()) return;
-    const display = config.computeRowDisplay(draft);
+    if (requiredFields.some(f => !draft[f]?.trim())) return;
+    const display = config.computeRowDisplay(draft, { currentMedicName });
     if (editId !== null) {
       setItems(prev => prev.map(it => it.id === editId ? { ...it, ...draft, display } : it));
       setEditId(null);

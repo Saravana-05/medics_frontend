@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Plus, Search, Eye, Edit2, X, Upload, FileText, ArrowRightCircle } from "lucide-react";
+import { Plus, Search, Eye, Edit2, X, Upload, FileText, ArrowRightCircle, CheckCircle2 } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
 import drugGroups from "../../data/drugGroups.json";
@@ -75,11 +75,23 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
 }
 
 /* ── "group-list" panel type: Drug Group Prescription / Test Group Prescription / IP Time Group ── */
-function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon, hasPatient = false, onApplyGroup, catalogList = [] }) {
+function GroupListPanel({
+  sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon, hasPatient = false, onApplyGroup, catalogList = [], typeLabel = "", onGroupSaved,
+  // New-group flow, step 2: the title popup closes and hands off to the main
+  // grid's own add-row — draftActive/draftTitle/draftItems mirror OPDeskScreen's
+  // groupDraft state (items are whatever's been added to the grid since the
+  // draft started), so no separate add-entry UI is built here.
+  draftActive = false, draftTitle = "", draftItems = [], onStartDraft, onSaveDraft, onCancelDraft,
+}) {
   const [entries, setEntries] = useState(() => GROUP_LIST_SEEDS[sidePanel.dataFile] || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [doctorFilter, setDoctorFilter] = useState("All Doctors");
   const [modalMode, setModalMode] = useState(null); // null | "add" | { id, title, days, medicines } | { id, title, metrics }
+  const [selectedId, setSelectedId] = useState(null);
+  const [draftDays, setDraftDays] = useState("1");
+  // Which groups have already been "Used" (loaded into the grid) — several can be
+  // applied at once, so this is a set of ids, not a single last-clicked row.
+  const [appliedIds, setAppliedIds] = useState([]);
   const rowsScrollRef = useRef(null);
 
   const byDoctor = doctorFilter === "All Doctors" ? entries : entries.filter(e => e.doctor === doctorFilter);
@@ -93,18 +105,39 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
   const hasDaysField = metricCount > 1;
   const metricsFor = e => e.medicines ? (hasDaysField ? [e.days, e.medicines.length] : [e.medicines.length]) : e.metrics;
 
-  const handleAdd = (title, metrics, medicines, remarks) => setEntries(prev => [...prev, {
-    id: Date.now(), title, doctor: doctorFilter === "All Doctors" ? doctors[0] : doctorFilter,
-    ...(sidePanel.medicinePicker ? { ...(hasDaysField ? { days: metrics[0] } : {}), medicines: medicines || [] } : { metrics }),
-    ...(sidePanel.remarksField ? { remarks: remarks || "" } : {}),
-  }]);
+  const handleAdd = (title, metrics, medicines, remarks) => {
+    setEntries(prev => [...prev, {
+      id: Date.now(), title, doctor: doctorFilter === "All Doctors" ? doctors[0] : doctorFilter,
+      ...(sidePanel.medicinePicker ? { ...(hasDaysField ? { days: metrics[0] } : {}), medicines: medicines || [] } : { metrics }),
+      ...(sidePanel.remarksField ? { remarks: remarks || "" } : {}),
+    }]);
+    onGroupSaved?.(`"${title}" group of ${typeLabel.toLowerCase() || "items"} saved!`);
+  };
   const handleModify = (id, title, metrics, medicines, remarks) => setEntries(prev => prev.map(e => e.id === id ? {
     ...e, title,
     ...(sidePanel.medicinePicker ? { ...(hasDaysField ? { days: metrics[0] } : {}), medicines: medicines || [] } : { metrics }),
     ...(sidePanel.remarksField ? { remarks: remarks || "" } : {}),
   } : e));
-  const handleDelete = id => { if (window.confirm("Delete this entry?")) setEntries(prev => prev.filter(e => e.id !== id)); };
+  const handleDelete = id => { if (window.confirm("Delete this entry?")) { setEntries(prev => prev.filter(e => e.id !== id)); setAppliedIds(prev => prev.filter(x => x !== id)); } };
   const handleView = e => alert(`${e.title}\n${sidePanel.columns.slice(1).map((c, i) => `${c}: ${metricsFor(e)[i]}`).join(" · ")}${e.medicines ? `\n\n${sidePanel.pickerLabel || "Items"}: ${e.medicines.join(", ")}` : ""}${e.remarks ? `\n\nRemarks: ${e.remarks}` : ""}`);
+  // Clicking Use toggles: first click applies the group (loads its items into
+  // the grid), clicking again on an already-applied group reverts it (removes
+  // just that group's items) — so re-clicking is how you undo a selection.
+  const handleToggleApply = e => {
+    const isApplied = appliedIds.includes(e.id);
+    onApplyGroup(e, isApplied);
+    setAppliedIds(prev => isApplied ? prev.filter(x => x !== e.id) : [...prev, e.id]);
+  };
+
+  // New Group, step 2: title confirmed → tell OPDeskScreen to start capturing
+  // into the main grid's own add-row instead of opening a second modal here.
+  const startDraft = title => { setModalMode(null); setDraftDays("1"); onStartDraft?.(title); };
+  const handleSaveDraft = () => {
+    if (!draftActive || draftItems.length === 0) return;
+    const metrics = hasDaysField ? [parseInt(draftDays, 10) || 0, draftItems.length] : [draftItems.length];
+    handleAdd(draftTitle, metrics, draftItems, "");
+    onSaveDraft?.();
+  };
 
   return (
     <>
@@ -118,32 +151,69 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
           <div key={col} className={i === 0 ? "flex-1 px-3" : "w-16 px-3 text-center"}
             style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{col}</div>
         ))}
-        <div className="w-40 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="w-40 pl-3 pr-2 text-right" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
-        {filtered.map((e, index) => (
-          <div key={e.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+        {filtered.map((e, index) => {
+          const isApplied = appliedIds.includes(e.id);
+          return (
+          <div key={e.id} tabIndex={0} onClick={() => setSelectedId(e.id)} onFocus={() => setSelectedId(e.id)}
+            className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === e.id ? accentLight : isApplied ? "var(--color-success-light, #dcfce7)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === e.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
             <div className="flex-1 px-3 py-2.5 min-w-0">
-              <div className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>{e.title}</div>
+              <div className="flex items-center gap-1">
+                {isApplied && <CheckCircle2 size={11} style={{ color: "var(--color-success)", flexShrink: 0 }} />}
+                <div className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>{e.title}</div>
+              </div>
               {e.remarks && <div className="text-[0.6rem] truncate" style={{ color: "var(--color-text-subtle)" }}>{e.remarks}</div>}
             </div>
             {metricsFor(e).map((m, i) => (
               <div key={i} className="w-16 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{m}</span></div>
             ))}
-            <div className="w-40 px-3 py-2.5 flex items-center justify-center gap-1.5">
+            <div className="w-40 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
               {onApplyGroup && sidePanel.applyLabel && (
-                <button onClick={() => onApplyGroup(e)} className="p-1 rounded transition-all" title={`${sidePanel.applyLabel} — load into the grid`} style={{ background: accentLight, color: textAccent || accentColor }}><ArrowRightCircle size={11} /></button>
+                <button onClick={() => handleToggleApply(e)} className="p-1 rounded transition-all"
+                  title={isApplied ? "Used — click to remove from the grid" : `${sidePanel.applyLabel} — load into the grid`}
+                  style={{ background: isApplied ? "var(--color-success-light, #dcfce7)" : accentLight, color: isApplied ? "var(--color-success)" : (textAccent || accentColor) }}>
+                  {isApplied ? <CheckCircle2 size={11} /> : <ArrowRightCircle size={11} />}
+                </button>
               )}
               <button onClick={() => handleView(e)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
               <button onClick={() => setModalMode(sidePanel.medicinePicker ? { id: e.id, title: e.title, days: e.days, medicines: e.medicines, remarks: e.remarks } : { id: e.id, title: e.title, metrics: e.metrics })} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
               <button onClick={() => handleDelete(e.id)} className="p-1 rounded transition-all" title="Delete" style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={11} /></button>
             </div>
           </div>
-        ))}
+          );
+        })}
         {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={2 + metricCount + 1} />)}
       </div>
+
+      {/* Status bar while a new group is being built — actual items are added
+          via the main grid's own add-row below, not here; this just shows
+          the running count and lets you finish or discard the capture. */}
+      {draftActive && (
+        <div className="flex-shrink-0 border-t p-3 flex items-center justify-between gap-3" style={{ borderColor: accentColor, background: accentLight }}>
+          <div className="min-w-0">
+            <div className="text-xs font-bold truncate" style={{ color: textAccent || accentColor }}>Adding: {draftTitle}</div>
+            <div className="text-[0.65rem]" style={{ color: textAccent || accentColor, opacity: 0.85 }}>
+              {draftItems.length} item{draftItems.length !== 1 ? "s" : ""} added — add more from the tab below, then Save.
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {hasDaysField && (
+              <div className="flex items-center gap-1.5">
+                <label className="text-[0.65rem] font-semibold" style={{ color: textAccent || accentColor }}>Days</label>
+                <input type="number" min="0" value={draftDays} onChange={e => setDraftDays(e.target.value)}
+                  className="w-14 px-2 py-1 rounded text-xs outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+              </div>
+            )}
+            <button onClick={onCancelDraft} className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-danger)", color: "white" }}>Cancel</button>
+            <button onClick={handleSaveDraft} disabled={draftItems.length === 0}
+              className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-success)", color: "white", opacity: draftItems.length ? 1 : 0.5 }}>Save</button>
+          </div>
+        </div>
+      )}
 
       <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
@@ -155,7 +225,7 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
           </select>
           <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {byDoctor.length} records</span>
         </div>
-        {!hasPatient && (
+        {!hasPatient && !draftActive && (
           <button onClick={() => setModalMode("add")} className="flex items-center gap-1.5 text-xs font-bold flex-shrink-0" style={{ color: textAccent || accentColor }}>
             {sidePanel.newButtonLabel}
             <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
@@ -173,13 +243,15 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
           pickerLabel={sidePanel.pickerLabel || "Items"}
           catalogList={catalogList}
           remarksField={sidePanel.remarksField}
+          mode={modalMode === "add" ? "new" : "modify"}
           initialTitle={modalMode === "add" ? "" : modalMode.title}
           initialDays={modalMode === "add" ? "" : modalMode.days}
           initialMedicines={modalMode === "add" ? [] : (modalMode.medicines || [])}
           initialMetrics={modalMode === "add" ? Array(metricCount).fill(0) : modalMode.metrics}
           initialRemarks={modalMode === "add" ? "" : (modalMode.remarks || "")}
           heading={modalMode === "add" ? sidePanel.newButtonLabel : "Modify Entry"}
-          onSave={(title, metrics, medicines, remarks) => { modalMode === "add" ? handleAdd(title, metrics, medicines, remarks) : handleModify(modalMode.id, title, metrics, medicines, remarks); setModalMode(null); }}
+          onTitleConfirmed={startDraft}
+          onSave={(title, metrics, medicines, remarks) => { handleModify(modalMode.id, title, metrics, medicines, remarks); setModalMode(null); }}
           onCancel={() => setModalMode(null)}
         />
       )}
@@ -188,11 +260,16 @@ function GroupListPanel({ sidePanel, accentColor, accentLight, accentText = "whi
 }
 
 /* Title + one numeric field per metric column (e.g. Days/Drugs, Tests, Days/Items) —
-   so "New Group" captures everything the table actually displays, not just the title. */
+   so "Modify" captures everything the table actually displays, not just the title.
+   "New" (mode="new") groups only collect the Title here — clicking Add closes this
+   popup, and the actual items get added via the main grid's own add-row (see
+   OPDeskScreen's groupDraft state), not a second modal screen here.
+   "Modify" (mode="modify") keeps the original single-screen form, unchanged. */
 function GroupEntryModal({
   accentColor, accentLight, accentText = "white", textAccent, metricLabels, medicinePicker,
   pickerLabel = "Items", catalogList = [], remarksField,
-  initialTitle, initialMetrics, initialDays, initialMedicines = [], initialRemarks = "", heading, onSave, onCancel,
+  initialTitle, initialMetrics, initialDays, initialMedicines = [], initialRemarks = "",
+  heading, mode = "modify", onSave, onTitleConfirmed, onCancel,
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [metrics, setMetrics] = useState(initialMetrics);
@@ -208,7 +285,6 @@ function GroupEntryModal({
   const medSuggestions = medQuery.trim()
     ? catalogList.filter(m => m.toLowerCase().includes(medQuery.toLowerCase()) && !medicines.includes(m)).slice(0, 6)
     : [];
-
   const addMedicine = name => { if (name && !medicines.includes(name)) setMedicines(prev => [...prev, name]); setMedQuery(""); };
   const removeMedicine = name => setMedicines(prev => prev.filter(m => m !== name));
 
@@ -222,6 +298,25 @@ function GroupEntryModal({
     }
   };
 
+  // ── New group: Title only, then hand off to the inline add-entry section ──
+  if (mode === "new" && medicinePicker) {
+    const confirm = () => { if (title.trim()) onTitleConfirmed(title.trim()); };
+    return (
+      <SidePanelModal title={heading} accentColor={accentColor} accentLight={accentLight} textAccent={textAccent} onCancel={onCancel}
+        footer={<>
+          <button onClick={onCancel} className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-danger)", color: "white" }}>Cancel</button>
+          <button onClick={confirm} disabled={!title.trim()}
+            className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: accentColor, color: accentText, opacity: title.trim() ? 1 : 0.5 }}>Add</button>
+        </>}>
+        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Title</label>
+        <input autoFocus type="text" value={title} onChange={e => setTitle(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" && title.trim()) confirm(); if (e.key === "Escape") onCancel(); }}
+          placeholder="Enter title..." className="w-full px-3 py-2 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+      </SidePanelModal>
+    );
+  }
+
+  // ── Single-screen form: Modify Entry (any type), or a New non-medicinePicker group ──
   return (
     <SidePanelModal title={heading} accentColor={accentColor} accentLight={accentLight} textAccent={textAccent} onCancel={onCancel}
       footer={<>
@@ -302,6 +397,7 @@ function GroupEntryModal({
 /* ── "report-view" panel type (Lab only, toggled by the tab's Preview button) ── */
 function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItems, onTogglePreview }) {
   const rowsScrollRef = useRef(null);
+  const [selectedId, setSelectedId] = useState(null);
   const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, reportItems.length);
 
   return (
@@ -329,7 +425,8 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {reportItems.map((item, index) => (
-          <div key={item.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+          <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
+            className="flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="flex-1 px-3 py-2.5 truncate"><span className="text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || item.name || "—"}</span></div>
             <div className="w-28 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.observedValue || "—"}</span></div>
             <div className="w-20 px-3 py-2.5 text-center"><span className="text-sm" style={{ color: item.unit ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.unit || "—"}</span></div>
@@ -349,6 +446,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
 function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon, mirrorItems = [] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [entryTypeFilter, setEntryTypeFilter] = useState("All Types");
+  const [selectedId, setSelectedId] = useState(null);
   const rowsScrollRef = useRef(null);
 
   const byType = entryTypeFilter === "All Types" ? mirrorItems : mirrorItems.filter(it => it.entryType === entryTypeFilter);
@@ -377,7 +475,8 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {filtered.map((item, index) => (
-          <div key={item.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+          <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
+            className="flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
             <div className="w-24 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.entryType || "—"}</span></div>
             <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-medium" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || "—"}</span></div>
@@ -411,6 +510,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
   const [fileTypeFilter, setFileTypeFilter] = useState("All Types");
   const [searchTerm, setSearchTerm] = useState("");
   const [showUpload, setShowUpload] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const rowsScrollRef = useRef(null);
   const byType = fileTypeFilter === "All Types" ? files : files.filter(f => f.type === fileTypeFilter);
   const filtered = searchTerm.trim() ? byType.filter(f => f.fileName.toLowerCase().includes(searchTerm.toLowerCase())) : byType;
@@ -420,16 +520,20 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
   const formatBytes = bytes => bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)}KB` : `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
 
   const handleFilePick = e => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = Array.from(e.target.files || []);
+    if (picked.length === 0) return;
     const now = new Date();
     const pad = n => String(n).padStart(2, "0");
     const dtTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${String(now.getFullYear()).slice(2)} ${pad(now.getHours() % 12 || 12)}.${pad(now.getMinutes())}${now.getHours() >= 12 ? "PM" : "AM"}`;
+    const totalSize = picked.reduce((sum, f) => sum + f.size, 0);
+    // One upload action = one row, however many files were picked in it — the
+    // No. column marks it with a trailing "+" only when it holds more than one file.
     setFiles(prev => [...prev, {
       id: Date.now(),
-      fileName: file.name.replace(/\.[^/.]+$/, ""),
-      type: (file.name.split(".").pop() || "FILE").toUpperCase(),
-      size: formatBytes(file.size),
+      fileName: picked[0].name.replace(/\.[^/.]+$/, ""),
+      fileCount: picked.length,
+      type: (picked[0].name.split(".").pop() || "FILE").toUpperCase(),
+      size: formatBytes(totalSize),
       dtTime,
     }]);
     setShowUpload(false);
@@ -454,11 +558,14 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {filtered.map((f, index) => (
-          <div key={f.id} className="flex border-b" style={{ borderColor: "var(--color-border)", background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
+          <div key={f.id} tabIndex={0} onClick={() => setSelectedId(f.id)} onFocus={() => setSelectedId(f.id)}
+            className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === f.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === f.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}{f.fileCount > 1 ? "+" : ""}</span></div>
             <div className="flex-1 px-3 py-2.5 flex items-center gap-1.5 min-w-0">
               <FileText size={12} style={{ color: textAccent || accentColor, flexShrink: 0 }} />
-              <span className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>{f.fileName}</span>
+              <span className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>
+                {f.fileName}{f.fileCount > 1 ? ` +${f.fileCount - 1} more` : ""}
+              </span>
             </div>
             <div className="w-14 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{f.type}</span></div>
             <div className="w-16 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{f.size}</span></div>
@@ -495,7 +602,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
           <label className="flex flex-col items-center justify-center gap-2 py-6 rounded-lg cursor-pointer transition-all" style={{ border: `2px dashed ${accentColor}`, background: accentLight }}>
             <Upload size={22} style={{ color: textAccent || accentColor }} />
             <span className="text-xs font-semibold" style={{ color: textAccent || accentColor }}>Click to choose a file</span>
-            <input type="file" className="hidden" onChange={handleFilePick} />
+            <input type="file" multiple className="hidden" onChange={handleFilePick} />
           </label>
         </SidePanelModal>
       )}
@@ -504,7 +611,10 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 }
 
 /* ═══════════════ MAIN GENERIC MIDDLE PANEL — one file for all 4 tabs' report/group panels ═══════════════ */
-export default function PrescriptionSidePanel({ config, showReport = false, reportItems = [], onUpdateReportItem, onTogglePreview, mirrorItems = [], hasPatient = false, onApplyGroup }) {
+export default function PrescriptionSidePanel({
+  config, showReport = false, reportItems = [], onUpdateReportItem, onTogglePreview, mirrorItems = [], hasPatient = false, onApplyGroup, onGroupSaved,
+  draftActive = false, draftTitle = "", draftItems = [], onStartDraft, onSaveDraft, onCancelDraft,
+}) {
   const { sidePanel } = config;
   if (!sidePanel) return null;
 
@@ -540,7 +650,8 @@ export default function PrescriptionSidePanel({ config, showReport = false, repo
   // Drug ↔ Lab remounts fresh (and re-seeds entries) instead of reusing stale state.
   return (
     <div className={wrapperClass} style={wrapperStyle}>
-      <GroupListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} hasPatient={hasPatient} onApplyGroup={onApplyGroup} catalogList={CATALOG_SOURCES[config.searchSource] || []} />
+      <GroupListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} hasPatient={hasPatient} onApplyGroup={onApplyGroup} catalogList={CATALOG_SOURCES[config.searchSource] || []} typeLabel={config.label} onGroupSaved={onGroupSaved}
+        draftActive={draftActive} draftTitle={draftTitle} draftItems={draftItems} onStartDraft={onStartDraft} onSaveDraft={onSaveDraft} onCancelDraft={onCancelDraft} />
     </div>
   );
 }

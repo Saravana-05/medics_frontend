@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  ClipboardList, User, Users, ChevronDown, Search
+  ClipboardList, User, Users, ChevronDown, Search, Plus, X
 } from "lucide-react";
 
 /* ── Attendant Card — same layout as ClinicalCard (icon + title + data) ── */
@@ -145,14 +145,93 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
   );
 }
 
+/* ── Add Patient modal — Name/Age/Sex/DOB/Attendant/APT-ID, the minimum fields
+   the rest of the app (vitals bar, dropdown row, attendant card) reads. ── */
+function AddPatientModal({ onCancel, onSave }) {
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("Male");
+  const [dob, setDob] = useState("");
+  const [attendant, setAttendant] = useState("");
+  const [appt, setAppt] = useState("");
+
+  const canSave = name.trim() && appt.trim();
+
+  const handleSave = () => {
+    if (!canSave) return;
+    // <input type="date"> gives YYYY-MM-DD; the rest of the app (calculateAge)
+    // expects DD/MM/YYYY, same as the mock patient data.
+    const dobFormatted = dob ? dob.split("-").reverse().join("/") : "";
+    onSave({
+      id: `PID-${Date.now()}`,
+      name: name.trim(),
+      age: age ? parseInt(age, 10) : null,
+      gender,
+      dob: dobFormatted,
+      appt: appt.trim(),
+      docNo: appt.trim(),
+      slot: "—",
+      attendant: { name: attendant.trim(), relationship: "", phone: "" },
+    });
+  };
+
+  const field = (label, input) => (
+    <div>
+      <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>{label}</label>
+      {input}
+    </div>
+  );
+  const inputClass = "w-full px-3 py-2 rounded text-sm outline-none";
+  const inputStyle = { border: "1px solid var(--color-border)", background: "var(--color-surface)" };
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.35)" }} onClick={onCancel}>
+      <div className="rounded-lg shadow-xl w-full max-w-sm" style={{ background: "var(--color-surface)", border: "1px solid var(--color-primary)" }} onClick={e => e.stopPropagation()}>
+        <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "var(--color-border)", background: "var(--color-primary-muted)" }}>
+          <span className="text-sm font-bold" style={{ color: "var(--color-primary-dark)" }}>Add New Patient</span>
+          <button onClick={onCancel} className="flex items-center justify-center rounded-full" style={{ width: 20, height: 20 }} title="Close"><X size={13} /></button>
+        </div>
+
+        <div className="p-4 flex flex-col gap-3">
+          {field("Patient Name", <input autoFocus type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Enter patient name..." className={inputClass} style={inputStyle} />)}
+
+          <div className="flex gap-3">
+            <div className="flex-1 min-w-0">{field("Age", <input type="number" min="0" value={age} onChange={e => setAge(e.target.value)} placeholder="Years" className={inputClass} style={inputStyle} />)}</div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Sex</label>
+              <select value={gender} onChange={e => setGender(e.target.value)} className={inputClass} style={inputStyle}>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          {field("Date of Birth", <input type="date" value={dob} onChange={e => setDob(e.target.value)} className={inputClass} style={inputStyle} />)}
+          {field("Attendant", <input type="text" value={attendant} onChange={e => setAttendant(e.target.value)} placeholder="Attendant name..." className={inputClass} style={inputStyle} />)}
+          {field("APT-ID", <input type="text" value={appt} onChange={e => setAppt(e.target.value)} placeholder="e.g. APT-001" className={inputClass} style={inputStyle} />)}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t" style={{ borderColor: "var(--color-border)" }}>
+          <button onClick={onCancel} className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-danger)", color: "white" }}>Cancel</button>
+          <button onClick={handleSave} disabled={!canSave}
+            className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-success)", color: "white", opacity: canSave ? 1 : 0.5 }}>Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LeftPatientSection({
   patients,
   selectedPatient,
   onSelectPatient,
+  onAddPatient,
   open,
   setOpen
 }) {
   const p = selectedPatient || {};
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Calculate age in years, months, days from DOB
   const calculateAge = (dob) => {
@@ -210,8 +289,17 @@ export default function LeftPatientSection({
 
         {/* Patient Selection */}
         <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">
-          <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center gap-1 md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
-            <User size={12} /> Appointments
+          <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center justify-between md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
+            <span className="flex items-center gap-1"><User size={12} /> Appointments</span>
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center justify-center rounded-md flex-shrink-0 transition-all"
+              style={{ width: 16, height: 16, background: "var(--color-primary)", color: "white" }}
+              title="Add new patient"
+            >
+              <Plus size={11} />
+            </button>
           </div>
           <PatientDropdown
             patients={patients}
@@ -294,6 +382,16 @@ export default function LeftPatientSection({
 
           </div>
       </div>
+
+      {showAddModal && (
+        <AddPatientModal
+          onCancel={() => setShowAddModal(false)}
+          onSave={(newPatient) => {
+            onAddPatient?.(newPatient);
+            setShowAddModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

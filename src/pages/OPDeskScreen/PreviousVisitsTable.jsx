@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
-  Calendar, Clock, FileText, Activity, User, CalendarDays,
-  ChevronDown, ChevronUp, History, Stethoscope, Syringe,
+  
+  ChevronDown, ChevronUp, History, 
   ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
 import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
@@ -46,6 +46,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
   const [filterText, setFilterText] = useState("");
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [currentVisitIndex, setCurrentVisitIndex] = useState(0);
+  const [selectedRowSl, setSelectedRowSl] = useState(null);
   const [prescriptions, setPrescriptions] = useState({});
   const [visibleColumns, setVisibleColumns] = useState(() => {
     // Load saved column visibility from localStorage
@@ -130,6 +131,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
   };
 
   const handleViewRow = (visit, index) => {
+    setSelectedRowSl(visit.sl);
     setSelectedVisit(visit);
     setCurrentVisitIndex(index);
   };
@@ -334,14 +336,17 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   return (
                     <tr
                       key={visit.sl}
-                      className="transition-all duration-150 hover:shadow-sm hover:bg-primary-muted/30 cursor-pointer group"
+                      tabIndex={0}
+                      className="transition-all duration-150 hover:shadow-sm hover:bg-primary-muted/30 cursor-pointer outline-none group"
                       style={{
                         borderBottom: "1px solid var(--color-border)",
-                        background: "var(--color-surface)",
+                        background: selectedRowSl === visit.sl ? "var(--color-primary-muted)" : "var(--color-surface)",
+                        boxShadow: selectedRowSl === visit.sl ? "inset 0 0 0 2px var(--color-primary)" : "none",
                         height: `${ROW_HEIGHT_PX}px`,
                         boxSizing: "border-box",
                       }}
                       onClick={() => handleViewRow(visit, index)}
+                      onFocus={() => setSelectedRowSl(visit.sl)}
                     >
                       {visibleColumnsList.map(col => {
                         const value = visit[col.key];

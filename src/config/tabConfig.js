@@ -1,7 +1,6 @@
 import { Pill, FlaskConical, Settings as ServicesIcon, Clock } from "lucide-react";
 import labTestDetails from "../data/labTestDetails.json";
 import ipAdvice from "../data/ipAdvice.json";
-import ipNurses from "../data/ipNurses.json";
 
 /* ── shared dropdown option sets that Lab/Service reuse verbatim ── */
 const SIMPLE_SEARCH_ONLY = {
@@ -232,32 +231,40 @@ export const TAB_CONFIGS = {
     filters: { typeOptions: ["Currently Live", "All"] },
 
     fieldOptions: {
-      medic: ipNurses,
       notes: ipAdvice,
       entryType: ["Support", "Instruction"],
     },
 
-    addRowFields: ["medic", "name", "notes", "entryType", "commit"],
+    // Medic isn't typed — it's derived from who's logged in (see computeRowDisplay's
+    // context arg), so it has no addRowFields entry. Time is now a picked field
+    // instead of an auto-stamp, so it must be chosen before an entry can be added.
+    addRowFields: ["time", "name", "notes", "entryType", "commit"],
+    // Subject stays required (primary identifying field, like every other tab);
+    // Time must also be chosen before an entry can be added.
+    requiredFields: ["name", "time"],
 
     tableColumns: [
       { key: "no",        label: "No.",         width: "w-12",   type: "index" },
-      { key: "time",       label: "Time",        width: "w-24",   type: "text" },
       { key: "medic",      label: "Medic",       width: "w-28",   type: "text" },
+      { key: "time",       label: "Time",        width: "w-24",   type: "text" },
       { key: "name",       label: "Subject",     width: "flex-1", type: "text", align: "center" },
       { key: "notes",      label: "Notes",       width: "flex-1", type: "text" },
       { key: "entryType",  label: "Entry Type",  width: "w-24",   type: "text" },
       { key: "actions",    label: "Actions",     width: "w-24",   type: "actions" },
     ],
 
-    computeRowDisplay: (draft) => {
-      const now = new Date();
+    // `context.currentMedicName` is threaded in from OPDeskScreen (derived from the
+    // logged-in user) — Medic is never typed by hand, it just reflects who's logged in.
+    computeRowDisplay: (draft, context = {}) => {
+      const [h, m] = (draft.time || "").split(":").map(Number);
       const pad = n => String(n).padStart(2, "0");
-      const hours12 = now.getHours() % 12 || 12;
-      const time = `${pad(hours12)}:${pad(now.getMinutes())} ${now.getHours() >= 12 ? "PM" : "AM"}`;
+      const time = Number.isFinite(h) && Number.isFinite(m)
+        ? `${pad(h % 12 || 12)}:${pad(m)} ${h >= 12 ? "PM" : "AM"}`
+        : "";
       return {
         primaryLine: draft.name,
         time,
-        medic: draft.medic,
+        medic: context.currentMedicName || "",
         notes: draft.notes,
         entryType: draft.entryType,
       };

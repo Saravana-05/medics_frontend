@@ -45,7 +45,7 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
   );
 }
 
-export default function ClinicalInformationSection({ patient, isInline = false }) {
+export default function ClinicalInformationSection({ patient, isInline = false, firstObservationCardRef }) {
   const p = patient || {};
 
   // Define clinical cards
@@ -96,16 +96,22 @@ export default function ClinicalInformationSection({ patient, isInline = false }
       
       {/* Single Row Cards — scrolls horizontally if it can't all fit */}
       <div className="flex gap-2 md:gap-1 overflow-x-auto md:pb-1 lg:pb-1 lg:pt-1">
-        {clinicalCards.map((card, index) => (
-          <ClinicalCard 
-            key={index}
-            icon={card.icon} 
-            label={card.label} 
-            value={card.value} 
-            variant={card.variant}
-            disabled={card.disabled || false}
-          />
-        ))}
+        {clinicalCards.map((card, index) => {
+          // First Observation (1) gets a ref — the bottom Drug panel measures
+          // its right edge at runtime to stay pixel-aligned with it.
+          const cardRef = index === 1 ? firstObservationCardRef : undefined;
+          return (
+            <div key={index} ref={cardRef} className="flex-1 min-w-[130px] lg:min-w-0 md:min-w-[110px]">
+              <ClinicalCard
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+                variant={card.variant}
+                disabled={card.disabled || false}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

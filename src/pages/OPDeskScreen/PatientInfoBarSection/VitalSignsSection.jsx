@@ -1,5 +1,5 @@
 
-import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet } from "lucide-react";
+import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet, BedDouble, CalendarDays, Stethoscope, UserRound, Building2, Users, CalendarCheck } from "lucide-react";
 
 /* Fonts (Inter) are loaded globally in index.html + registered in the Tailwind
    theme (index.css). Colors below come from the shared design tokens. */
@@ -20,6 +20,10 @@ const VITAL_ACCENTS = {
 
 /* Translucent tint of a token color (works with CSS variables). pct like "15%". */
 const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
+
+/* ── IP Time-line's admission-info accents (same card component as Vital Signs,
+   just a different accent per card since there's no vital-specific meaning here) ── */
+const IP_ACCENTS = ["#0c324a", "#679cbc", "#73bfb8", "#eb6367", "#9333ea", "#d97706", "#16a34a", "#0284c7"];
 
 /* ── Compact Badge (tablet / mobile) — solid vital-colored bg for ALL vitals ── */
 function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
@@ -47,31 +51,35 @@ function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
   );
 }
 
-/* ── Vital Sign Card (Compact, desktop) ── */
+/* ── Vital Sign Card (Compact, desktop) ── Fixed height + truncated text so
+   longer content (e.g. IP Admission Info) can never stretch the row and
+   break the rest of the layout — every card stays exactly the same size. */
 function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, trend }) {
   return (
     <div
       className="group relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105 shadow-sm"
-      style={{ background: "var(--color-surface)", border: `1px solid ${tint(accent, "20%")}` }}
+      style={{ background: "var(--color-surface)", border: `1px solid ${tint(accent, "20%")}`, height: "58px", boxSizing: "border-box" }}
     >
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-center justify-between h-full">
+        <div className="min-w-0 flex-1">
           <div
-            className="text-[0.58rem] uppercase tracking-wide mb-0.5"
+            className="text-[0.58rem] uppercase tracking-wide mb-0.5 truncate"
             style={{ color: "darkslategray",fontWeight: "600", letterSpacing: "0.1em", fontFamily: "var(--font-inter)" }}
           >
             {label}
           </div>
-          <div 
-            className="text-sm font-black leading-tight" 
+          <div
+            className="text-sm font-black leading-tight truncate"
             style={{ color: valueColor,letterSpacing: "0.05em", fontWeight: "600", fontFamily: "var(--font-inter)" }}
+            title={value || ""}
           >
             {value || "—"}
           </div>
           {unit && (
-            <div 
-              className="text-[0.80rem] font-regular mt-0.5" 
+            <div
+              className="text-[0.7rem] font-regular mt-0.5 truncate"
               style={{ color: "#000000", fontFamily: "var(--font-inter)" }}
+              title={unit}
             >
               {unit}
             </div>
@@ -106,8 +114,79 @@ function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, tre
   );
 }
 
-export default function VitalSignsSection({ patient }) {
+export default function VitalSignsSection({ patient, activeTab }) {
   const p = patient || {};
+  const ip = p.ipInfo || {};
+  const isIPTime = activeTab === "iptime";
+
+  /* ── IP Time-line: same card grid, swapped for admission info (Admission,
+     Treatment, Attender, Admitted@, Currently@, Doctors, Nursing, Discharge) ── */
+  const ipCards = [
+    {
+      icon: CalendarDays,
+      value: ip.admitDate || "—",
+      label: "Admission",
+      accent: IP_ACCENTS[0],
+      valueColor: VALUE_COLOR,
+      unit: ip.admitTime || "",
+    },
+    {
+      icon: Stethoscope,
+      value: ip.treatment || "—",
+      label: "Treatment",
+      accent: IP_ACCENTS[1],
+      valueColor: VALUE_COLOR,
+      unit: "",
+    },
+    {
+      icon: UserRound,
+      value: ip.attenderName || "—",
+      label: "Attender",
+      accent: IP_ACCENTS[2],
+      valueColor: VALUE_COLOR,
+      unit: ip.attenderPhone ? `${ip.attenderPhone}${ip.attenderRelation ? " · " + ip.attenderRelation : ""}` : "",
+    },
+    {
+      icon: BedDouble,
+      value: ip.ward || "—",
+      label: "Admitted",
+      accent: IP_ACCENTS[3],
+      valueColor: VALUE_COLOR,
+      unit: ip.room || ip.bed ? `Room ${ip.room || "—"} · Bed ${ip.bed || "—"}` : "",
+    },
+    {
+      icon: Building2,
+      value: ip.currentWard || "—",
+      label: "Currently",
+      accent: IP_ACCENTS[4],
+      valueColor: VALUE_COLOR,
+      unit: ip.currentRoom || ip.currentBed ? `Room ${ip.currentRoom || "—"} · Bed ${ip.currentBed || "—"}` : "",
+    },
+    {
+      icon: Users,
+      value: ip.consultant || "—",
+      label: "Doctors",
+      accent: IP_ACCENTS[5],
+      valueColor: VALUE_COLOR,
+      unit: ip.consultant2 || "",
+    },
+    {
+      icon: Heart,
+      value: ip.nurse1 || "—",
+      label: "Nursing",
+      accent: IP_ACCENTS[6],
+      valueColor: VALUE_COLOR,
+      unit: ip.nurse2 || "",
+    },
+    {
+      icon: CalendarCheck,
+      value: ip.dischargeDate || "—",
+      label: "Discharge",
+      accent: IP_ACCENTS[7],
+      valueColor: VALUE_COLOR,
+      unit: "",
+    },
+  ];
 
   /* ── BMI ── */
   const calculateBMI = () => {
@@ -202,6 +281,10 @@ export default function VitalSignsSection({ patient }) {
     },
   ];
 
+  const cards = isIPTime ? ipCards : vitals;
+  const HeaderIcon = isIPTime ? BedDouble : ActivitySquare;
+  const headerLabel = isIPTime ? "IP Admission Info" : "Vital Signs";
+
   return (
     <div
       className="px-3 border-b"
@@ -213,7 +296,7 @@ export default function VitalSignsSection({ patient }) {
           • Compact single row of coloured badges
           • py-1 keeps the whole strip lean                           */}
       <div className="flex lg:hidden items-center gap-4 overflow-x-auto py-1">
-        {vitals.map((v) => (
+        {cards.map((v) => (
           <VitalBadge
             key={v.label}
             icon={v.icon}
@@ -227,20 +310,21 @@ export default function VitalSignsSection({ patient }) {
 
       {/* ── Desktop ──
           • Header shown
-          • Full 8-column card grid                                   */}
+          • Full 8-column card grid — swapped to IP admission info while the
+            IP Time-line tab is active, Vital Signs otherwise                */}
       <div className="hidden lg:block py-2">
         <div className="flex items-center gap-1.5 mb-1.5">
-          <ActivitySquare size={12} style={{ color: "var(--color-primary)" }} />
+          <HeaderIcon size={12} style={{ color: "var(--color-primary)" }} />
           <span
             className="text-[0.8rem] font-bold tracking-wide"
             style={{ color: "var(--color-text-base)", fontFamily: "var(--font-archivo)" }}
           >
-            Vital Signs
+            {headerLabel}
           </span>
         </div>
 
         <div className="grid grid-cols-8 gap-1.5">
-          {vitals.map((v) => (
+          {cards.map((v) => (
             <VitalSignCard
               key={v.label}
               icon={v.icon}

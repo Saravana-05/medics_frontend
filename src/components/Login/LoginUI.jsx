@@ -1,4 +1,5 @@
 // src/components/Login/LoginUI.jsx
+import { Link } from "react-router-dom";
 import LoginImg from "../../assets/login.png";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -212,6 +213,18 @@ export default function LoginUI({
               ))}
             </div>
           </div>
+
+          <p className="text-center text-sm mt-6" style={{ color: "var(--color-text-muted)" }}>
+            New hospital?{" "}
+            <Link to="/register" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
+              Create an account
+            </Link>
+          </p>
+          <p className="text-center text-xs mt-2">
+            <Link to="/" className="hover:underline" style={{ color: "var(--color-text-subtle)" }}>
+              ← Back to Home
+            </Link>
+          </p>
 
           <p className="text-center text-xs text-slate-400 mt-5">
             © {currentYear} Medix · Secure Health Platform

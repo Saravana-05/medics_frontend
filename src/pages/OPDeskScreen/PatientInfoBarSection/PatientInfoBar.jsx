@@ -13,15 +13,26 @@ const LEFT_ACCENT_SEGMENTS = [
   { key: "period",         color: "#0c324a" },
 ];
 
+// Keys must match RightSidebar's RIGHT_TABS keys, in the same top-to-bottom order.
+const RIGHT_ACCENT_SEGMENTS = [
+  { key: "parked",    color: "#eb6367" },
+  { key: "emergency", color: "#73bfb8" },
+  { key: "reports",   color: "#679cbc" },
+  { key: "schedule",  color: "#0c324a" },
+];
+
 export default function PatientInfoBar({
   patients,
   selectedPatient,
   onSelectPatient,
+  onAddPatient,
   onIPList,
   onPark,
   onFinalize,
   highlightedTab, // comes from OPDeskScreen (via RightSidebar's onHoverChange)
   leftHighlightedTab, // comes from OPDeskScreen (via LeftSidebar's onHoverChange)
+  firstObservationCardRef, // ref OPDeskScreen uses to measure First Observation's right edge
+  activeTab, // which prescription tab is active — swaps Vital Signs for IP Admission Info on "iptime"
 }) {
   const [open, setOpen] = useState(false);
   const [opList, setOpList] = useState(false);
@@ -40,7 +51,7 @@ export default function PatientInfoBar({
               its matching LeftSidebar tab is hovered. Desktop only.
               Absolutely positioned so its fixed height never forces the row taller
               than the Vital Signs + Clinical Information content. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2.5px] lg:top-0 lg:bottom-[8px]" style={{ width: "2.5px" }}>
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[1.5px] lg:top-0 lg:bottom-[8px]" style={{ width: "1.5px" }}>
             {LEFT_ACCENT_SEGMENTS.map((seg) => (
               <div
                 key={seg.key}
@@ -59,6 +70,7 @@ export default function PatientInfoBar({
             patients={patients}
             selectedPatient={selectedPatient}
             onSelectPatient={onSelectPatient}
+            onAddPatient={onAddPatient}
             open={open}
             setOpen={setOpen}
           />
@@ -67,12 +79,12 @@ export default function PatientInfoBar({
           <div className="flex-1 flex flex-col lg:flex-row min-w-0 lg:gap-2" style={{ height: "100%" }}>
             
             {/* Left side - Vital Signs + Clinical Information (one bordered section) */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden box-border border mb-[8px]" style={{ borderColor: "var(--color-border)", boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)" }}>
-              {/* Vital Signs Section - At the TOP */}
-              <VitalSignsSection patient={p} />
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden box-border border mb-[8px]" style={{ borderColor: "var(--color-border)", boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)", background: "var(--color-surface-alt)" }}>
+              {/* Vital Signs Section - At the TOP (swapped for IP Admission Info while the IP Time-line tab is active) */}
+              <VitalSignsSection patient={p} activeTab={activeTab} />
 
               {/* Clinical Information Section - Single Row (Below Vital Signs) */}
-              <ClinicalInformationSection patient={p} isInline={true} />
+              <ClinicalInformationSection patient={p} isInline={true} firstObservationCardRef={firstObservationCardRef} />
             </div>
 
             {/* Right side - TopBar Section (full width on tablet, vertical sidebar on desktop) */}
@@ -87,8 +99,24 @@ export default function PatientInfoBar({
                 onOPList={() => {}}
                 onIPList={onIPList}
                 onSelectPatient={onSelectPatient}
-                highlightedTab={highlightedTab}
               />
+            </div>
+
+            {/* Right accent bar — sits OUTSIDE the OP/IP List box's border (mirrors
+                the left accent bar's positioning), a segment lights up only while
+                its matching RightSidebar tab is hovered. Desktop only. */}
+            <div className="hidden lg:flex flex-col flex-shrink-0 mb-[8px]" style={{ width: "1.5px" }}>
+              {RIGHT_ACCENT_SEGMENTS.map((seg) => (
+                <div
+                  key={seg.key}
+                  style={{
+                    flex: 1,
+                    background: seg.color,
+                    opacity: highlightedTab === seg.key ? 1 : 0,
+                    transition: "opacity 150ms ease",
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>

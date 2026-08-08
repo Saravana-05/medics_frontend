@@ -1,6 +1,8 @@
 // routes/Router.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "../pages/Home/Home";
 import LoginPage from "../pages/LoginPage";
+import CreateHospital from "../pages/Home/CreateHospital";
 import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
 import PlatformDeskScreen from "../pages/PlatformDeskScreen";
@@ -18,6 +20,8 @@ function ProtectedRoute({ children, user, requiredRole }) {
 
 const ROUTES = {
   HOME: "/",
+  LOGIN: "/login",
+  REGISTER: "/register",
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
   PLATFORM_DESK: "/platformdesk",
@@ -27,20 +31,32 @@ export default function AppRouter({ user, onLogin, onLogout }) {
   return (
     <BrowserRouter basename="/">
       <Routes>
-        {/* Login Route - Home */}
-        <Route 
-          path={ROUTES.HOME} 
-          element={<LoginPage onLogin={onLogin} />} 
+        {/* Public landing page — product overview, Login / Create New Hospital entry points */}
+        <Route
+          path={ROUTES.HOME}
+          element={<Home />}
         />
-        
+
+        {/* Login Route */}
+        <Route
+          path={ROUTES.LOGIN}
+          element={<LoginPage onLogin={onLogin} />}
+        />
+
+        {/* Create New Hospital ("new book") Route */}
+        <Route
+          path={ROUTES.REGISTER}
+          element={<CreateHospital />}
+        />
+
         {/* OP Desk Route - Protected for doctors */}
-        <Route 
-          path={ROUTES.OP_DESK} 
+        <Route
+          path={ROUTES.OP_DESK}
           element={
             <ProtectedRoute user={user} requiredRole="doctor">
               <OPDeskScreen user={user} onLogout={onLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
         
         {/* Front Office Desk Route - Protected for office staff */}

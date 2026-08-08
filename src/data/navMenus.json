@@ -1,0 +1,106 @@
+[
+  {
+    "key": "open",
+    "label": "Open",
+    "icon": "FolderOpen",
+    "items": [
+      "Open Books",
+      "Create A New Book",
+      "Define Users",
+      "Define User Rights",
+      "Backup All Books",
+      "Restore Data by Creating Books",
+      "Show Profile",
+      "Check & Update Data",
+      "Exit"
+    ]
+  },
+  {
+    "key": "settings",
+    "label": "Settings",
+    "icon": "Settings",
+    "items": [
+      "Patient List",
+      "Staff List",
+      "Insurer List",
+      "Drug List",
+      "Lab & Services List",
+      "Vendor List",
+      "Room List",
+      "Inventory List",
+      "Set Medical-Word List",
+      "Set Staff Shift & Schedule",
+      "Set Report Output Formats",
+      "Set Equipment Configuration"
+    ]
+  },
+  {
+    "key": "patientTreatment",
+    "label": "Patient & Treatment",
+    "icon": "UserRound",
+    "items": [
+      "Out-Patient Appointment",
+      "Doctor's Desk",
+      "In-Patient Admission",
+      "Nurse's Desk",
+      "In-Patient Discharge",
+      "Staff Shift & Schedule Plan",
+      "Doctor's Calendar",
+      "Patient Report & Certificate",
+      "Room Management",
+      "House-Keeping & Inventory"
+    ]
+  },
+  {
+    "key": "labServices",
+    "label": "Lab & Services",
+    "icon": "FlaskConical",
+    "items": [
+      "Prescription Entry",
+      "Specimen Collection",
+      "Result Pick-Entry",
+      "Report Authorization",
+      "Report Delivery"
+    ]
+  },
+  {
+    "key": "reports",
+    "label": "Reports",
+    "icon": "FileText",
+    "items": [
+      "Daily Reports",
+      "Periodical Reports",
+      "Analysis Reports",
+      "Management Reports",
+      "Listing Reports"
+    ]
+  },
+  {
+    "key": "tools",
+    "label": "Tools",
+    "icon": "Wrench",
+    "items": [
+      "Report File Manager",
+      "Show Current Book Profile",
+      "Backup Current Book",
+      "Restore Current Backup",
+      "Shift Closure",
+      "Day Closure",
+      "Year Closure",
+      "Wipe All Transaction Data",
+      "Wipe Inessential Data",
+      "Export Data Settings"
+    ]
+  },
+  {
+    "key": "assist",
+    "label": "Assist",
+    "icon": "Headset",
+    "items": [
+      "Help & About",
+      "Connect to Trident",
+      "Software Keys",
+      "Close Current Book"
+    ]
+  }
+]

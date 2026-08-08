@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginUI from "../components/Login/LoginUI";
+import { findHospitalByUsername } from "../services/hospitalRegistry";
 
 // Route paths
 const ROUTES = {
@@ -52,7 +53,10 @@ export default function LoginPage({ onLogin }) {
     // Simulate API delay
     setTimeout(() => {
       const userCred = HARDCODED_CREDENTIALS[username];
-      
+      // Hospitals created via "Create New Hospital" log in the same way as the
+      // built-in demo doctor account — their admin lands straight on OP Desk.
+      const hospital = !userCred ? findHospitalByUsername(username) : null;
+
       if (userCred && userCred.password === password) {
         const user = {
           id: `hardcoded-${Date.now()}`,
@@ -62,9 +66,9 @@ export default function LoginPage({ onLogin }) {
           roleName: userCred.roleName,
           bearerToken: `hardcoded-token-${Date.now()}`,
         };
-        
+
         onLogin(user, rememberMe);
-        
+
         // Navigate based on role
         if (userCred.role === 'doctor') {
           navigate(ROUTES.DOCTOR);
@@ -73,6 +77,17 @@ export default function LoginPage({ onLogin }) {
         } else if (userCred.role === 'platform') {
           navigate(ROUTES.PLATFORM);
         }
+      } else if (hospital && hospital.password === password) {
+        const user = {
+          id: hospital.id,
+          name: hospital.adminName,
+          email: hospital.username,
+          role: "doctor",
+          roleName: hospital.hospitalName,
+          bearerToken: `hospital-token-${Date.now()}`,
+        };
+        onLogin(user, rememberMe);
+        navigate(ROUTES.DOCTOR);
       } else {
         setError("Invalid email or password. Please try again.");
       }
