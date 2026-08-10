@@ -26,7 +26,7 @@ export function getPrescriptionForVisit(visitSl) {
 
 // Column configuration with visibility toggle option
 const ALL_COLUMNS = [
-  { key: "sl", label: "SL", width: "w-12", align: "right", defaultVisible: true, sortable: true },
+  { key: "sl", label: "SL", width: "w-12", align: "left", defaultVisible: true, sortable: true },
   { key: "entryDt", label: "Entry", width: "w-28", align: "left", defaultVisible: true, sortable: true },
   { key: "docModule", label: "Module", width: "w-32", align: "left", defaultVisible: true, sortable: true },
   { key: "reportDt", label: "Report", width: "w-28", align: "left", defaultVisible: false, sortable: true },
@@ -244,7 +244,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   </div>
                   <div className="p-2 space-y-1">
                     {ALL_COLUMNS.map(col => (
-                      <label key={col.key} className="flex items-center gap-2 cursor-pointer text-xs py-1 hover:bg-surface-alt px-1 rounded transition-all">
+                      <label key={col.key} className="flex items-center gap-2 cursor-pointer text-[0.7rem] py-0.5 hover:bg-surface-alt px-1 rounded transition-all">
                         <input
                           type="checkbox"
                           checked={visibleColumns[col.key]}
@@ -288,7 +288,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   <th
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
-                    className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
+                    className={`${col.width} px-3 py-1 text-center ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
                     style={{
                       borderBottom: "1px solid var(--color-border)",
                       fontSize: "0.62rem",
@@ -299,7 +299,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                       textTransform: "uppercase"
                     }}
                   >
-                    <div className={`flex items-center gap-1 ${col.align === 'right' ? 'justify-end' : 'justify-start'}`}>
+                    <div className="flex items-center justify-center gap-1">
                       {col.label}
                       {col.sortable && <SortIcon field={col.key} />}
                     </div>
@@ -354,68 +354,68 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         if (col.key === "docModule") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
-                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[0.75rem] font-bold" style={{ background: module.bg, color: module.text }}>
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-normal" style={{ background: module.bg, color: "var(--color-text-base)" }}>
                                 {value}
                               </span>
                             </td>
                           );
                         }
-                        
+
                         if (col.key === "reportDt") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value ? (
                                 <div className="flex items-center gap-1.5">
-                                  
-                                  <span className="font-mono text-[0.75rem]" style={{ color: "var(--color-success)" }}>
+
+                                  <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                     {value}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-[0.75rem]" style={{ color: "var(--color-text-subtle)" }}>—</span>
+                                <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>—</span>
                               )}
                             </td>
                           );
                         }
-                        
+
                         if (col.key === "vitals") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-col">
                                   <div className="flex items-center gap-1">
-                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>BP</span>
-                                    <span className="text-[0.75rem] font-mono font-semibold" style={{ color: "var(--color-primary)" }}>{vitals.bp}</span>
+                                    <span className="text-xs font-normal uppercase" style={{ color: "var(--color-text-base)" }}>BP</span>
+                                    <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{vitals.bp}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Pulse</span>
-                                    <span className="text-[0.75rem] font-mono" style={{ color: "var(--color-drugs)" }}>{vitals.pulse}</span>
+                                    <span className="text-xs font-normal uppercase" style={{ color: "var(--color-text-base)" }}>Pulse</span>
+                                    <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{vitals.pulse}</span>
                                   </div>
                                 </div>
                                 <div className="w-px h-6" style={{ background: "var(--color-border)" }} />
                                 <div>
                                   <div className="flex items-center gap-1">
-                                    <span className="text-[0.55rem] font-bold uppercase" style={{ color: "var(--color-text-muted)" }}>Temp</span>
-                                    <span className="text-[0.75rem] font-mono" style={{ color: "var(--color-lab)" }}>{vitals.temp}°F</span>
+                                    <span className="text-xs font-normal uppercase" style={{ color: "var(--color-text-base)" }}>Temp</span>
+                                    <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{vitals.temp}°F</span>
                                   </div>
                                 </div>
                               </div>
                             </td>
                           );
                         }
-                        
+
                         if (col.key === "nextVisit") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value && value !== "<None>" ? (
                                 <div className="flex items-center gap-1.5">
                                   {/* <CalendarDays size={11} style={{ color: "var(--color-success)" }} /> */}
-                                  <span className="text-[0.75rem] font-semibold" style={{ color: "var(--color-success)" }}>
+                                  <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                     {value}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-[0.75rem] italic" style={{ color: "var(--color-text-subtle)" }}>No follow-up</span>
+                                <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>No follow-up</span>
                               )}
                             </td>
                           );
@@ -441,30 +441,30 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         return (
                           <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                             {col.key === "sl" ? (
-                              <span className="font-bold" style={{ color: "var(--color-primary)" }}>{value}</span>
+                              <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{value}</span>
                             ) : col.key === "entryDt" ? (
                               <div className="flex items-center gap-1.5">
                                 {/* <Calendar size={11} style={{ color: "var(--color-text-muted)" }} /> */}
-                                <span className="font-mono text-[0.75rem]" style={{ color: "var(--color-text-base)" }}>
+                                <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
                               </div>
                             ) : col.key === "complaint" ? (
                               <div className="flex items-center gap-1.5">
-                                
-                                <span className="text-[0.7rem] font-medium line-clamp-2" style={{ color: "var(--color-text-base)" }}>
+
+                                <span className="text-xs font-normal line-clamp-2" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
                               </div>
                             ) : col.key === "by" ? (
                               <div className="flex items-center gap-1.5">
-                                
-                                <span className="text-[0.7rem] font-medium truncate block max-w-[70px]" style={{ color: "var(--color-text-base)" }}>
+
+                                <span className="text-xs font-normal truncate block max-w-[70px]" style={{ color: "var(--color-text-base)" }}>
                                   {value}
                                 </span>
                               </div>
                             ) : (
-                              <span style={{ color: "var(--color-text-base)" }}>{value || "—"}</span>
+                              <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{value || "—"}</span>
                             )}
                           </td>
                         );

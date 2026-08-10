@@ -317,6 +317,9 @@ export const TAB_CONFIGS = {
     // Time field) → Milestone → Pathway Name → Activity Type → Activity
     // Description → Sch. Status — same order the view table shows them in.
     addRowFields: ["name", "schedule", "schDate", "milestone", "pathwayName", "activityType", "activityDescription", "schStatus", "commit"],
+    // No manual add-row for Care-Plan — activities come from the Care-Plan
+    // Template panel, not typed in one by one.
+    hideAddRow: true,
 
     tableColumns: [
       { key: "no",                  label: "No.",                 width: "w-12",   type: "index" },

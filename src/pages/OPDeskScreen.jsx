@@ -245,7 +245,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 style={{ background: "var(--color-surface-alt)", borderBottom: "1px solid var(--color-border)" }}>
                 <PrescriptionTabs activeTab={activeTab} setActiveTab={setActiveTab} tabCount={tabCount} />
                 <div className="flex items-center flex-shrink-0 pl-3">
-                  {activeTab !== "iptime" && (
+                  {!["iptime", "carePlan"].includes(activeTab) && (
                     <ModernToolbar
                       onClear={() => activeEntryTabRef.current?.clearAll()}
                       onSave={handleSaveActiveTab}

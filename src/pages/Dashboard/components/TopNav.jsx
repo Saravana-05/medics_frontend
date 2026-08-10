@@ -69,13 +69,13 @@ export default function TopNav({ user, notificationCount = 0, onLogout }) {
                   <div className="text-xs font-bold text-slate-800 truncate">{user?.name || "Dr. John Doe"}</div>
                   <div className="text-[0.65rem] text-slate-400 truncate">{user?.email || "admin@medixhms.com"}</div>
                 </div>
-                <button className="w-full flex items-center gap-2 text-left px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                <button className="w-full flex items-center gap-2 text-left px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                   <UserRound size={14} /> My Profile
                 </button>
-                <button className="w-full flex items-center gap-2 text-left px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                <button className="w-full flex items-center gap-2 text-left px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
                   <Settings size={14} /> Account Settings
                 </button>
-                <button onClick={onLogout} className="w-full flex items-center gap-2 text-left px-3.5 py-2 text-xs font-semibold hover:bg-red-50" style={{ color: "#ef4444" }}>
+                <button onClick={onLogout} className="w-full flex items-center gap-2 text-left px-3.5 py-1.5 text-xs font-semibold hover:bg-red-50" style={{ color: "#ef4444" }}>
                   <LogOut size={14} /> Logout
                 </button>
               </div>

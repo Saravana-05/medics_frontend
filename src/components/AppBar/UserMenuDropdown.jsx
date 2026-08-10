@@ -101,7 +101,7 @@ export default function UserMenuDropdown({ user, onLogout, onClose }) {
             <button
               key={key}
               onClick={() => handleItemClick(key)}
-              className="w-full px-3 py-2 text-left flex items-center gap-2.5 transition-all group"
+              className="w-full px-3 py-1.5 text-left flex items-center gap-2.5 transition-all group"
               onMouseEnter={e => e.currentTarget.style.background = "var(--color-surface-alt)"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
@@ -117,7 +117,7 @@ export default function UserMenuDropdown({ user, onLogout, onClose }) {
 
           <button
             onClick={onLogout}
-            className="w-full px-3 py-2 text-left flex items-center gap-2.5 transition-all"
+            className="w-full px-3 py-1.5 text-left flex items-center gap-2.5 transition-all"
             onMouseEnter={e => e.currentTarget.style.background = "#fee2e2"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
           >

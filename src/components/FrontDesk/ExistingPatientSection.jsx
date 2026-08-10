@@ -228,15 +228,15 @@ const ExistingPatientSection = ({ onFormSubmit }) => {
       <div 
         key={patient.id}
         onClick={() => handleSelectPatient(patient)}
-        className="px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
+        className="px-3 py-1.5 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-800">{patient.name}</span>
-              <span className="text-xs text-gray-400">{patient.id}</span>
+              <span className="text-xs font-semibold text-gray-800">{patient.name}</span>
+              <span className="text-[0.68rem] text-gray-400">{patient.id}</span>
             </div>
-            <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-500">
+            <div className="flex items-center gap-3 mt-0.5 text-[0.68rem] text-gray-500">
               <span>{patient.relation || '—'}</span>
               <span>•</span>
               <span>{patient.phone || '—'}</span>

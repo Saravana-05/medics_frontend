@@ -30,7 +30,7 @@ export default function NavDropdown({ label, icon, items, color = "#334155" }) {
         <div className="absolute left-0 top-full mt-1.5 w-56 rounded-lg shadow-xl border border-slate-100 bg-white z-50 py-1.5 animate-fade-in">
           {items.map(item => (
             <button key={item} onClick={() => setOpen(false)}
-              className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+              className="w-full text-left px-3.5 py-1.5 text-[0.7rem] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
               {item}
             </button>
           ))}

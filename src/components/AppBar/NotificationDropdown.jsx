@@ -99,7 +99,7 @@ export default function NotificationDropdown({ onClose }) {
           items.map(({ id, icon: Icon, color, title, body, time, unread }) => (
             <div
               key={id}
-              className="relative flex items-start gap-3 px-4 py-3 border-b transition-all cursor-pointer"
+              className="relative flex items-start gap-3 px-4 py-2 border-b transition-all cursor-pointer"
               style={{
                 borderColor: "var(--color-border)",
                 background: unread ? `${color}07` : "transparent",

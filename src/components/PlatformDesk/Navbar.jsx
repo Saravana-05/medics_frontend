@@ -70,19 +70,19 @@ export default function Navbar({ user, onLogout, toggleSidebar, isSidebarOpen })
                   <div className="text-[0.55rem] mt-1" style={{ color: "var(--color-primary)" }}>{user?.email || "admin@medix.com"}</div>
                 </div>
                 <div className="py-1">
-                  <button className="w-full px-3 py-2 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-1.5 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
                     <User size={12} /> My Profile
                   </button>
-                  <button className="w-full px-3 py-2 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-1.5 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
                     <Settings size={12} /> Settings
                   </button>
-                  <button className="w-full px-3 py-2 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
+                  <button className="w-full px-3 py-1.5 text-left text-xs hover:bg-surface-alt transition-colors flex items-center gap-2">
                     <HelpCircle size={12} /> Help & Support
                   </button>
                   <hr className="my-1" style={{ borderColor: "var(--color-border)" }} />
                   <button 
                     onClick={onLogout} 
-                    className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                    className="w-full px-3 py-1.5 text-left text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                   >
                     <LogOut size={12} /> Logout
                   </button>

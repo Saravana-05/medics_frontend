@@ -2,10 +2,10 @@
 import React from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown } from "lucide-react";
+import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown, ListFilter, Search } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
-const ROW_HEIGHT_PX = 52;
+const ROW_HEIGHT_PX = 42;
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
 function PortalDropdown({ anchorEl, open, children }) {
@@ -61,7 +61,7 @@ function SearchModeCheckbox({ checked, onClick, label, accentColor, textAccent, 
    search mode + "New X" button — sits below the add-row (config-driven labels). ── */
 function EntryFooterBar({
   searchMode, onSearchModeChange, typeValue, onTypeChange, typeOptions, filterLabel,
-  frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, className = "",
+  frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
 }) {
   return (
     <div className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
@@ -82,12 +82,14 @@ function EntryFooterBar({
         <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
       </div>
 
-      <button onClick={onNewEntity} className="flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
-        {newEntityButton}
-        <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
-          <Plus size={12} />
-        </span>
-      </button>
+      {!hideNewButton && (
+        <button onClick={onNewEntity} className="flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
+          {newEntityButton}
+          <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
+            <Plus size={12} />
+          </span>
+        </button>
+      )}
     </div>
   );
 }
@@ -144,8 +146,8 @@ function AddTableHeader({ columns, accentColor, accentText = "white" }) {
 
 function EmptyRow({ columns }) {
   return (
-    <div className="flex border-b" style={{ borderColor: "var(--color-border)" }}>
-      {columns.map(col => <div key={col.key} className={`${col.width} px-2 py-2 text-center`}>&nbsp;</div>)}
+    <div className="flex border-b" style={{ borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+      {columns.map(col => <div key={col.key} className={`${col.width} px-2 py-1 text-left`}>&nbsp;</div>)}
     </div>
   );
 }
@@ -160,28 +162,28 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         if (e.key === "ArrowDown") { e.preventDefault(); onArrowNav?.("down"); return; }
         if (e.key === "ArrowUp") { e.preventDefault(); onArrowNav?.("up"); return; }
       }}
-      className="flex items-center border-b transition-all duration-150 outline-none cursor-pointer"
-      style={{ borderColor: "var(--color-border)",
+      className="flex items-center border-b transition-all duration-150 outline-none cursor-pointer overflow-hidden"
+      style={{ borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box",
         background: isSelected ? accentLight : isStruck ? "var(--color-surface-alt)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
         opacity: isStruck ? 0.6 : 1, boxShadow: isSelected ? `inset 0 0 0 2px ${accentColor}` : "none" }}>
       {columns.map(col => {
         if (col.key === "no") return (
-          <div key="no" className="w-12 px-2 py-2 text-center">
-            <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}</span>
+          <div key="no" className="w-12 px-2 py-1 text-left">
+            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}</span>
           </div>
         );
         if (col.key === "name") return (
-          <div key="name" className={`${col.width} min-w-0 px-2 py-2 ${col.align === "center" ? "text-center" : ""}`}>
-            <div className="font-semibold text-sm truncate" style={{ color: isStruck ? "var(--color-text-muted)" : "var(--color-text-base)" }}>
+          <div key="name" className={`${col.width} min-w-0 px-2 py-1 text-left`}>
+            <div className="font-normal text-xs truncate" style={{ color: "var(--color-text-base)" }}>
               {item.display.primaryLine ?? item.name}
             </div>
             {item.display.secondaryLine && (
-              <div className="text-[0.6rem] mt-0.5" style={{ color: "var(--color-text-subtle)" }}>{item.display.secondaryLine}</div>
+              <div className="text-xs mt-0.5 font-normal truncate" style={{ color: "var(--color-text-base)" }}>{item.display.secondaryLine}</div>
             )}
           </div>
         );
         if (col.key === "actions") return (
-          <div key="actions" className={`${col.width} px-1 py-2 flex items-center justify-center gap-1`}>
+          <div key="actions" className={`${col.width} px-1 py-1 flex items-center justify-center gap-1`}>
             <button onClick={e => { e.stopPropagation(); onEdit(); }} className="p-1 rounded" title="Edit (Alt+E)"
               style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Edit2 size={12} /></button>
             <button onClick={e => { e.stopPropagation(); onStrike(); }} className="p-1 rounded" title="Strike"
@@ -191,16 +193,16 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
           </div>
         );
         if (col.type === "computed") return (
-          <div key={col.key} className={`${col.width} px-0.5 py-2 text-center`}>
-            <span className="text-sm" style={{ color: col.key === "buy" ? accentColor : "inherit", fontWeight: col.key === "buy" ? 700 : 400 }}>
+          <div key={col.key} className={`${col.width} px-0.5 py-1 text-left`}>
+            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
               {item.display[col.key] ?? ""}
             </span>
           </div>
         );
         // plain text columns (when/detail/etc.)
         return (
-          <div key={col.key} className={`${col.width} min-w-0 px-2 py-2 text-center`}>
-            <span className="text-xs block truncate" style={{ color: "var(--color-text-muted)" }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
+          <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 text-left`}>
+            <span className="text-xs font-normal block truncate" style={{ color: "var(--color-text-base)" }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
           </div>
         );
       })}
@@ -235,8 +237,8 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
           {filtered.map((opt, i) => (
-            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-2 cursor-pointer text-sm"
-              style={{ background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
+            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-xs"
+              style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}>{opt}</div>
           ))}
         </PortalDropdown>
@@ -249,7 +251,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
    only, shows ~5 options at a time, and scrolls for the rest. Arrow keys still
    step the value directly without opening the list, matching the old behavior. */
 const VISIBLE_OPTION_COUNT = 5;
-const OPTION_ROW_PX = 32;
+const OPTION_ROW_PX = 26;
 
 function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {} }) {
   const idx = options.indexOf(value);
@@ -267,7 +269,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
     <div ref={anchorRef} className="relative w-full">
       <button type="button" data-field={dataField} onClick={() => setOpen(v => !v)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="w-full flex items-center justify-between px-2 py-1.5 rounded text-sm text-left"
+        className="w-full flex items-center justify-between px-2 py-1 rounded text-xs text-left"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", ...extraStyle }}>
         <span>{value}</span>
         <ChevronDown size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
@@ -276,8 +278,8 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
         <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
           {options.map(opt => (
             <div key={opt} onMouseDown={() => select(opt)}
-              className="px-3 flex items-center cursor-pointer text-sm"
-              style={{ height: OPTION_ROW_PX, background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
+              className="px-3 flex items-center cursor-pointer text-xs"
+              style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
               {opt}
             </div>
           ))}
@@ -366,11 +368,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
                 onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
               <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
-                <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider sticky top-0" style={{ color: "var(--color-text-muted)", background: "var(--color-primary-muted)" }}>
-                  {config.labels.searchListLabel}
-                </div>
                 {dropdownItems.map((item, i) => (
-                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-2.5 cursor-pointer text-sm"
+                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-1.5 cursor-pointer text-xs"
                     style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
                     {item}
                   </div>
@@ -384,7 +383,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="days" type="number" min="1" max="365" value={draft.days}
               onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-              className="w-full px-2 py-1.5 rounded text-sm text-center font-semibold" style={{ border: "1px solid var(--color-border)" }} placeholder="Days" />
+              className="w-full px-2 py-1.5 rounded text-sm text-left font-semibold" style={{ border: "1px solid var(--color-border)" }} placeholder="Days" />
           </div>
         );
         if (field === "intake") return (
@@ -503,8 +502,34 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const [typeValue, setTypeValue] = useState(config.filters.typeOptions[0]);
   const [frequentOnly, setFrequentOnly] = useState(false);
 
+  // Column visibility + row search — opt-in via config.showColumnFilter (Care-Plan),
+  // same Show/Hide Columns + search pattern Previous Information uses.
+  const columnFilterKey = `${config.key}TableColumns`;
+  const [visibleColOverrides, setVisibleColOverrides] = useState(() => {
+    if (!config.showColumnFilter) return {};
+    try {
+      const saved = localStorage.getItem(columnFilterKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const [gridSearchTerm, setGridSearchTerm] = useState("");
+
+  useEffect(() => {
+    if (config.showColumnFilter) localStorage.setItem(columnFilterKey, JSON.stringify(visibleColOverrides));
+  }, [visibleColOverrides, config.showColumnFilter, columnFilterKey]);
+
+  const toggleColumnVisible = key => setVisibleColOverrides(prev => ({ ...prev, [key]: prev[key] === false ? true : false }));
+  const displayColumns = config.showColumnFilter
+    ? config.tableColumns.filter(c => c.key === "no" || c.key === "actions" || visibleColOverrides[c.key] !== false)
+    : config.tableColumns;
+  const toggleableColumns = config.tableColumns.filter(c => c.key !== "no" && c.key !== "actions");
+
   const addRowRef = useRef(null), rowsScrollRef = useRef(null);
-  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, items.length);
+  const visibleCountForFill = config.showColumnFilter && gridSearchTerm.trim()
+    ? items.filter(it => Object.values(it.display || {}).some(v => String(v ?? "").toLowerCase().includes(gridSearchTerm.trim().toLowerCase()))).length
+    : items.length;
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, visibleCountForFill);
 
     const suggestions = query.trim() ? searchList.filter(s => s.toLowerCase().includes(query.toLowerCase())) : searchList;
     const setD = k => v => setDraft(prev => ({ ...prev, [k]: v }));
@@ -562,46 +587,92 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     clearAll: handleClearAll,
   }));
 
+  const visibleItems = config.showColumnFilter && gridSearchTerm.trim()
+    ? items.filter(it => Object.values(it.display || {}).some(v => String(v ?? "").toLowerCase().includes(gridSearchTerm.trim().toLowerCase())))
+    : items;
+
   return (
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TableHeader columns={config.tableColumns} accentColor={config.color} />
+          {config.showColumnFilter && (
+            <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)" }}>
+              <span className="text-[0.68rem] font-semibold" style={{ color: "var(--color-primary-dark)" }}>
+                Showing {visibleItems.length} of {items.length} records
+              </span>
+              <div className="flex items-center gap-1.5">
+                <div className="relative">
+                  <button onClick={() => setShowColumnMenu(v => !v)} className="p-1 rounded-md transition-all"
+                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} title="Toggle Columns">
+                    <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} />
+                  </button>
+                  {showColumnMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-44 rounded-lg shadow-xl z-50 animate-fade-in"
+                      style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                      onMouseLeave={() => setShowColumnMenu(false)}>
+                      <div className="p-2 border-b" style={{ borderColor: "var(--color-border)" }}>
+                        <span className="text-xs font-semibold">Show/Hide Columns</span>
+                      </div>
+                      <div className="p-2 space-y-1">
+                        {toggleableColumns.map(col => (
+                          <label key={col.key} className="flex items-center gap-2 cursor-pointer text-[0.7rem] py-0.5 hover:bg-surface-alt px-1 rounded transition-all">
+                            <input type="checkbox" checked={visibleColOverrides[col.key] !== false}
+                              onChange={() => toggleColumnVisible(col.key)} className="w-3.5 h-3.5 rounded" style={{ accentColor: config.color }} />
+                            <span style={{ color: "var(--color-text-base)" }}>{col.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+                  <input type="text" placeholder="Search entries..." value={gridSearchTerm} onChange={e => setGridSearchTerm(e.target.value)}
+                    className="pl-7 pr-2 py-1 text-[0.7rem] rounded-lg w-28 focus:w-40 transition-all duration-200 outline-none"
+                    style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }} />
+                </div>
+              </div>
+            </div>
+          )}
+          <TableHeader columns={displayColumns} accentColor={config.color} />
           <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
-            {items.map((item, index) => (
-              <EntryRow key={item.id} item={item} index={index} columns={config.tableColumns}
+            {visibleItems.map((item, index) => (
+              <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
                 isStruck={struckIds.includes(item.id)} isSelected={selectedRowId === item.id}
                 onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
                 onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
                 onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight} />
             ))}
-            {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={config.tableColumns} />)}
+            {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
           </div>
         </div>
 
-        <div className="flex-shrink-0 mt-3">
-          <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.colorText} />
-          {showAddRow ? (
-            <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
-              query={query} setQuery={setQuery} suggestions={suggestions} rowNumber={items.length + 1} searchMode={searchMode} />
-          ) : (
-            <div className="flex items-center justify-center py-3 border-t cursor-pointer" style={{ background: config.colorLight, borderColor: config.color }} onClick={handleAddNew}>
-              <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2" style={{ background: config.color, color: config.colorText || "white" }}>
-                <Plus size={14} /> {config.labels.addButton}
-              </button>
-            </div>
-          )}
-        </div>
+        {!config.hideAddRow && (
+          <div className="flex-shrink-0 mt-3">
+            <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.colorText} />
+            {showAddRow ? (
+              <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
+                query={query} setQuery={setQuery} suggestions={suggestions} rowNumber={items.length + 1} searchMode={searchMode} />
+            ) : (
+              <div className="flex items-center justify-center py-3 border-t cursor-pointer" style={{ background: config.colorLight, borderColor: config.color }} onClick={handleAddNew}>
+                <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2" style={{ background: config.color, color: config.colorText || "white" }}>
+                  <Plus size={14} /> {config.labels.addButton}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Fixed empty gap so the green entry row sits well clear of the footer,
-            leaving visible room for the medicine dropdown to render downward. */}
-        <div className="flex-shrink-0" style={{ height: "140px" }} />
+            leaving visible room for the medicine dropdown to render downward.
+            Not needed when there's no add-row (config.hideAddRow) to clear. */}
+        {!config.hideAddRow && <div className="flex-shrink-0" style={{ height: "140px" }} />}
 
         <EntryFooterBar searchMode={searchMode} onSearchModeChange={setSearchMode}
           typeValue={typeValue} onTypeChange={setTypeValue} typeOptions={config.filters.typeOptions}
           filterLabel={config.labels.footerFilterLabel} frequentOnly={frequentOnly} onFrequentOnlyChange={setFrequentOnly}
           accentColor={config.color} accentText={config.colorText} textAccent={config.textAccent} recordCount={items.length} newEntityButton={config.labels.newEntityButton || config.labels.addButton}
-          onNewEntity={handleAddNew} />
+          onNewEntity={handleAddNew} hideNewButton={config.hideAddRow} />
       </div>
     </div>
   );

@@ -34,17 +34,32 @@ const HARDCODED_CREDENTIALS = {
   }
 };
 
+// How long the animated success popup stays up before redirecting.
+const SUCCESS_POPUP_MS = 1400;
+
 export default function LoginPage({ onLogin }) {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  // Pre-filled with the demo doctor login so the form works out of the box —
+  // no separate quick-login tiles needed.
+  const [username, setUsername] = useState("opdesk@gmail.com");
+  const [password, setPassword] = useState("Password@123");
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [focusEmail, setFocusEmail] = useState(false);
   const [focusPwd, setFocusPwd] = useState(false);
   const currentYear = new Date().getFullYear();
+
+  // Logs the user in immediately (so the rest of the app already has the
+  // session) but delays navigation behind the animated success popup.
+  const completeLogin = (user, destination) => {
+    onLogin(user, rememberMe);
+    setLoading(false);
+    setShowSuccess(true);
+    setTimeout(() => navigate(destination), SUCCESS_POPUP_MS);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,17 +82,8 @@ export default function LoginPage({ onLogin }) {
           roleName: userCred.roleName,
           bearerToken: `hardcoded-token-${Date.now()}`,
         };
-
-        onLogin(user, rememberMe);
-
-        // Navigate based on role
-        if (userCred.role === 'doctor') {
-          navigate(ROUTES.DOCTOR);
-        } else if (userCred.role === 'office') {
-          navigate(ROUTES.OFFICE);
-        } else if (userCred.role === 'platform') {
-          navigate(ROUTES.PLATFORM);
-        }
+        const destination = { doctor: ROUTES.DOCTOR, office: ROUTES.OFFICE, platform: ROUTES.PLATFORM }[userCred.role];
+        completeLogin(user, destination);
       } else if (hospital && hospital.password === password) {
         const user = {
           id: hospital.id,
@@ -87,42 +93,12 @@ export default function LoginPage({ onLogin }) {
           roleName: hospital.hospitalName,
           bearerToken: `hospital-token-${Date.now()}`,
         };
-        onLogin(user, rememberMe);
-        navigate(ROUTES.DOCTOR);
+        completeLogin(user, ROUTES.DOCTOR);
       } else {
         setError("Invalid email or password. Please try again.");
+        setLoading(false);
       }
-      setLoading(false);
     }, 700);
-  };
-
-  const handleRoleSelect = (email, roleType) => {
-    setUsername(email);
-    setPassword("Password@123");
-    
-    // Auto-login for quick access
-    setTimeout(() => {
-      const userCred = HARDCODED_CREDENTIALS[email];
-      if (userCred) {
-        const user = {
-          id: `hardcoded-${Date.now()}`,
-          name: userCred.name,
-          email: email,
-          role: userCred.role,
-          roleName: userCred.roleName,
-          bearerToken: `hardcoded-token-${Date.now()}`,
-        };
-        onLogin(user, false);
-        
-        if (userCred.role === 'doctor') {
-          navigate(ROUTES.DOCTOR);
-        } else if (userCred.role === 'office') {
-          navigate(ROUTES.OFFICE);
-        } else if (userCred.role === 'platform') {
-          navigate(ROUTES.PLATFORM);
-        }
-      }
-    }, 100);
   };
 
   return (
@@ -135,6 +111,7 @@ export default function LoginPage({ onLogin }) {
       setShowPwd={setShowPwd}
       error={error}
       loading={loading}
+      showSuccess={showSuccess}
       rememberMe={rememberMe}
       setRememberMe={setRememberMe}
       focusEmail={focusEmail}
@@ -142,7 +119,6 @@ export default function LoginPage({ onLogin }) {
       focusPwd={focusPwd}
       setFocusPwd={setFocusPwd}
       handleSubmit={handleSubmit}
-      handleRoleSelect={handleRoleSelect}
       currentYear={currentYear}
     />
   );

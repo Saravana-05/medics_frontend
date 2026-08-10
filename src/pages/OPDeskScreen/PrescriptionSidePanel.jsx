@@ -150,10 +150,10 @@ function GroupListPanel({
       <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {sidePanel.columns.map((col, i) => (
-          <div key={col} className={i === 0 ? "flex-1 px-3" : "w-16 px-3 text-center"}
+          <div key={col} className={i === 0 ? "flex-1 px-3 text-center" : "w-16 px-3 text-center"}
             style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{col}</div>
         ))}
-        <div className="w-40 pl-3 pr-2 text-right" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="w-40 pl-3 pr-2 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
@@ -162,16 +162,16 @@ function GroupListPanel({
           return (
           <div key={e.id} tabIndex={0} onClick={() => setSelectedId(e.id)} onFocus={() => setSelectedId(e.id)}
             className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === e.id ? accentLight : isApplied ? "var(--color-success-light, #dcfce7)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === e.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
+            <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}.</span></div>
             <div className="flex-1 px-3 py-2.5 min-w-0">
               <div className="flex items-center gap-1">
                 {isApplied && <CheckCircle2 size={11} style={{ color: "var(--color-success)", flexShrink: 0 }} />}
-                <div className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>{e.title}</div>
+                <div className="text-xs font-normal truncate" style={{ color: "var(--color-text-base)" }}>{e.title}</div>
               </div>
-              {e.remarks && <div className="text-[0.6rem] truncate" style={{ color: "var(--color-text-subtle)" }}>{e.remarks}</div>}
+              {e.remarks && <div className="text-xs font-normal truncate" style={{ color: "var(--color-text-base)" }}>{e.remarks}</div>}
             </div>
             {metricsFor(e).map((m, i) => (
-              <div key={i} className="w-16 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{m}</span></div>
+              <div key={i} className="w-16 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{m}</span></div>
             ))}
             <div className="w-40 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
               {onApplyGroup && sidePanel.applyLabel && (
@@ -353,7 +353,7 @@ function GroupEntryModal({
             {medSuggestions.length > 0 && (
               <div className="absolute left-0 right-0 mt-1 rounded shadow-lg z-10 overflow-hidden" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}>
                 {medSuggestions.map(m => (
-                  <div key={m} onMouseDown={() => addMedicine(m)} className="px-3 py-2 text-sm cursor-pointer" style={{ borderBottom: "1px solid var(--color-border)" }}>{m}</div>
+                  <div key={m} onMouseDown={() => addMedicine(m)} className="px-3 py-1.5 text-xs cursor-pointer" style={{ borderBottom: "1px solid var(--color-border)" }}>{m}</div>
                 ))}
               </div>
             )}
@@ -420,7 +420,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
 
       <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box", overflow: "hidden" }}>
         {sidePanel.reportView.columns.map((col, i) => (
-          <div key={col} className={`${i === 0 ? "flex-1" : i === 1 ? "w-28" : i === 2 ? "w-20" : i === 3 ? "w-48" : "w-24"} px-3 py-2.5 truncate`}
+          <div key={col} className={`${i === 0 ? "flex-1" : i === 1 ? "w-28" : i === 2 ? "w-20" : i === 3 ? "w-48" : "w-24"} px-3 py-2.5 truncate text-center`}
             style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: accentColor, whiteSpace: "nowrap" }}>{col}</div>
         ))}
       </div>
@@ -429,11 +429,11 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
         {reportItems.map((item, index) => (
           <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
             className="flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || item.name || "—"}</span></div>
-            <div className="w-28 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.observedValue ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.observedValue || "—"}</span></div>
-            <div className="w-20 px-3 py-2.5 text-center"><span className="text-sm" style={{ color: item.unit ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.unit || "—"}</span></div>
-            <div className="w-48 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.bioRef ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.bioRef || "—"}</span></div>
-            <div className="w-24 px-3 py-2.5 truncate"><span className="text-sm" style={{ color: item.specimen ? "var(--color-text-base)" : "var(--color-text-subtle)" }}>{item.specimen || "—"}</span></div>
+            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || item.name || "—"}</span></div>
+            <div className="w-28 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.observedValue || "—"}</span></div>
+            <div className="w-20 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.unit || "—"}</span></div>
+            <div className="w-48 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.bioRef || "—"}</span></div>
+            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.specimen || "—"}</span></div>
           </div>
         ))}
         {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={5} />)}
@@ -469,7 +469,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
       <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {sidePanel.columns.map((col, i) => (
-          <div key={col} className={i !== 1 ? "w-24 px-3 text-center" : "flex-1 px-3"}
+          <div key={col} className={i !== 1 ? "w-24 px-3 text-center" : "flex-1 px-3 text-center"}
             style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{col}</div>
         ))}
         <div className="w-16 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
@@ -479,10 +479,10 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
         {filtered.map((item, index) => (
           <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
             className="flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
-            <div className="w-24 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.entryType || "—"}</span></div>
-            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-medium" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || "—"}</span></div>
-            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.notes || "—"}</span></div>
+            <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}.</span></div>
+            <div className="w-24 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.entryType || "—"}</span></div>
+            <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || "—"}</span></div>
+            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.notes || "—"}</span></div>
             <div className="w-16 px-3 py-2.5 flex items-center justify-center">
               <button onClick={() => handleView(item)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
             </div>
@@ -551,7 +551,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
       <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
-        <div className="flex-1 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>File Name</div>
+        <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>File Name</div>
         <div className="w-14 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Type</div>
         <div className="w-16 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Size</div>
         <div className="w-32 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Dt-Time</div>
@@ -562,16 +562,16 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
         {filtered.map((f, index) => (
           <div key={f.id} tabIndex={0} onClick={() => setSelectedId(f.id)} onFocus={() => setSelectedId(f.id)}
             className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === f.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === f.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}{f.fileCount > 1 ? "+" : ""}</span></div>
+            <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}{f.fileCount > 1 ? "+" : ""}</span></div>
             <div className="flex-1 px-3 py-2.5 flex items-center gap-1.5 min-w-0">
               <FileText size={12} style={{ color: textAccent || accentColor, flexShrink: 0 }} />
-              <span className="text-xs font-medium truncate" style={{ color: "var(--color-text-base)" }}>
+              <span className="text-xs font-normal truncate" style={{ color: "var(--color-text-base)" }}>
                 {f.fileName}{f.fileCount > 1 ? ` +${f.fileCount - 1} more` : ""}
               </span>
             </div>
-            <div className="w-14 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{f.type}</span></div>
-            <div className="w-16 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{f.size}</span></div>
-            <div className="w-32 px-3 py-2.5 text-center"><span className="text-xs whitespace-nowrap" style={{ color: "var(--color-text-muted)" }}>{f.dtTime}</span></div>
+            <div className="w-14 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{f.type}</span></div>
+            <div className="w-16 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{f.size}</span></div>
+            <div className="w-32 px-3 py-2.5 text-left"><span className="text-xs font-normal whitespace-nowrap" style={{ color: "var(--color-text-base)" }}>{f.dtTime}</span></div>
             <div className="w-16 px-3 py-2.5 flex items-center justify-center gap-1.5">
               <button onClick={() => handleDelete(f.id)} className="p-1 rounded transition-all" title="Delete" style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={11} /></button>
             </div>
@@ -647,22 +647,22 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
 
       <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
-        <div className="w-24 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Speciality</div>
-        <div className="flex-1 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>
+        <div className="w-24 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Speciality</div>
+        <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>
         <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Milestones</div>
         <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Period</div>
-        <div className="w-24 pl-3 pr-2 text-right" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="w-24 pl-3 pr-2 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {filtered.map((e, index) => (
           <div key={e.id} tabIndex={0} onClick={() => setSelectedId(e.id)} onFocus={() => setSelectedId(e.id)}
             className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === e.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === e.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
-            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
-            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.speciality}</span></div>
-            <div className="flex-1 px-3 py-2.5 min-w-0"><span className="text-xs font-medium truncate block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>
-            <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.milestones}</span></div>
-            <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.period}</span></div>
+            <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}.</span></div>
+            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.speciality}</span></div>
+            <div className="flex-1 px-3 py-2.5 min-w-0"><span className="text-xs font-normal truncate block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>
+            <div className="w-20 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.milestones}</span></div>
+            <div className="w-20 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.period}</span></div>
             <div className="w-24 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
               <button onClick={() => handleView(e)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
               <button onClick={() => setModalMode(e)} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
