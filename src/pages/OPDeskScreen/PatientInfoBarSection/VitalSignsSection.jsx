@@ -51,6 +51,23 @@ function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
   );
 }
 
+/* ── IP Admission Info row item — plain text, no card box, just label:value
+   arrangement (used instead of VitalSignCard while the IP Time-line tab is
+   active, per an explicit "remove the card" request). ── */
+function IPInfoText({ icon: Icon, label, value, unit, accent }) {
+  return (
+    <div className="flex items-center gap-1.5 min-w-0">
+      <Icon size={13} style={{ color: accent, flexShrink: 0 }} />
+      <span className="text-[0.68rem] font-bold uppercase tracking-wide flex-shrink-0" style={{ color: "darkslategray", fontFamily: "var(--font-inter)" }}>
+        {label}:
+      </span>
+      <span className="text-[0.8rem] font-semibold truncate" style={{ color: VALUE_COLOR, fontFamily: "var(--font-inter)" }} title={value || ""}>
+        {value || "—"}{unit ? ` · ${unit}` : ""}
+      </span>
+    </div>
+  );
+}
+
 /* ── Vital Sign Card (Compact, desktop) ── Fixed height + truncated text so
    longer content (e.g. IP Admission Info) can never stretch the row and
    break the rest of the layout — every card stays exactly the same size. */
@@ -293,25 +310,27 @@ export default function VitalSignsSection({ patient, activeTab }) {
     >
       {/* ── Tablet / Mobile ──
           • Header is HIDDEN (no ActivitySquare title row)
-          • Compact single row of coloured badges
-          • py-1 keeps the whole strip lean                           */}
+          • Vital Signs: compact row of coloured badges
+          • IP Admission Info: plain text, no card/badge box              */}
       <div className="flex lg:hidden items-center gap-4 overflow-x-auto py-1">
-        {cards.map((v) => (
-          <VitalBadge
-            key={v.label}
-            icon={v.icon}
-            value={v.value}
-            accent={v.accent}
-            valueColor={v.valueColor}
-            unit={v.unit}
-          />
-        ))}
+        {isIPTime
+          ? cards.map((v) => <IPInfoText key={v.label} icon={v.icon} label={v.label} value={v.value} unit={v.unit} accent={v.accent} />)
+          : cards.map((v) => (
+              <VitalBadge
+                key={v.label}
+                icon={v.icon}
+                value={v.value}
+                accent={v.accent}
+                valueColor={v.valueColor}
+                unit={v.unit}
+              />
+            ))}
       </div>
 
       {/* ── Desktop ──
           • Header shown
-          • Full 8-column card grid — swapped to IP admission info while the
-            IP Time-line tab is active, Vital Signs otherwise                */}
+          • Vital Signs: 8-column card grid
+          • IP Admission Info: plain text arrangement, no card boxes        */}
       <div className="hidden lg:block py-2">
         <div className="flex items-center gap-1.5 mb-1.5">
           <HeaderIcon size={12} style={{ color: "var(--color-primary)" }} />
@@ -323,19 +342,25 @@ export default function VitalSignsSection({ patient, activeTab }) {
           </span>
         </div>
 
-        <div className="grid grid-cols-8 gap-1.5">
-          {cards.map((v) => (
-            <VitalSignCard
-              key={v.label}
-              icon={v.icon}
-              value={v.value}
-              label={v.label}
-              accent={v.accent}
-              valueColor={v.valueColor}
-              unit={v.unit}
-            />
-          ))}
-        </div>
+        {isIPTime ? (
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+            {cards.map((v) => <IPInfoText key={v.label} icon={v.icon} label={v.label} value={v.value} unit={v.unit} accent={v.accent} />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-8 gap-1.5">
+            {cards.map((v) => (
+              <VitalSignCard
+                key={v.label}
+                icon={v.icon}
+                value={v.value}
+                label={v.label}
+                accent={v.accent}
+                valueColor={v.valueColor}
+                unit={v.unit}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

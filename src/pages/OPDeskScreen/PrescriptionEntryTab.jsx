@@ -415,6 +415,13 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               className="w-full px-1.5 py-1.5 rounded text-sm" style={{ border: "1px solid var(--color-border)" }} />
           </div>
         );
+        if (field === "schDate") return (
+          <div key="schDate" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <input data-field="schDate" type="date" value={draft.schDate}
+              onChange={e => onDraftChange("schDate")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "schDate")}
+              className="w-full px-1.5 py-1.5 rounded text-sm" style={{ border: "1px solid var(--color-border)" }} />
+          </div>
+        );
 
         // Generic typable-or-select fields (e.g. IP Time-line's Medic/Notes/Entry Type) —
         // any addRowFields entry not already handled above renders as a free-type-or-pick input.
@@ -447,6 +454,7 @@ const ADD_ROW_FIELD_META = {
   when:   { label: "When",   width: "w-28" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-24" },
+  schDate: { label: "Sch. Date", width: "w-28" },
 };
 
 function buildAddRowColumns(config) {

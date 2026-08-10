@@ -36,7 +36,7 @@ export default function CreateHospital() {
       const result = registerHospital(form);
       setSubmitting(false);
       if (!result.ok) { setError(result.error); return; }
-      navigate("/login", { state: { registeredUsername: form.username } });
+      navigate("/", { state: { registeredUsername: form.username } });
     }, 500);
   };
 
@@ -44,7 +44,7 @@ export default function CreateHospital() {
     <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: "#f4f6f9" }}>
       <div className="w-full max-w-md">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 mb-5">
-          <ArrowLeft size={15} /> Back to Home
+          <ArrowLeft size={15} /> Back to Login
         </Link>
 
         <div className="rounded-2xl bg-white shadow-sm border border-slate-100 p-6 sm:p-8">
@@ -106,7 +106,7 @@ export default function CreateHospital() {
             </button>
 
             <p className="text-center text-xs text-slate-400 mt-1">
-              Already registered? <Link to="/login" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>Login instead</Link>
+              Already registered? <Link to="/" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>Login instead</Link>
             </p>
           </form>
         </div>

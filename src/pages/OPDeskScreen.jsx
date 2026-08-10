@@ -15,6 +15,7 @@ import medicineList from "../data/medicines.json";
 import labTestList from "../data/labTest.json";
 import serviceList from "../data/services.json";
 import ipSubjectList from "../data/ipSubjects.json";
+import medConditionList from "../data/medConditions.json";
 import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecordStore";
 
 // IP Time-line's Medic column: the doctor assigned to the OP Desk, shown alongside
@@ -37,6 +38,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [labShowReport, setLabShowReport] = useState(false);
   const [services, setServices] = useState([]);
   const [ipEntries, setIpEntries] = useState([]);
+  const [carePlanItems, setCarePlanItems] = useState([]);
   const [saveMessage, setSaveMessage] = useState(null); // { text, key } — key forces the toast to re-fire even on repeat text
 
   // Building a new Drug/Lab Group reuses the main grid's own add-row instead of
@@ -62,6 +64,7 @@ export default function OPDeskScreen({ user, onLogout }) {
     setLabs(record?.labs || []);
     setServices(record?.services || []);
     setIpEntries(record?.ipEntries || []);
+    setCarePlanItems(record?.carePlanItems || []);
     setLabShowReport(false);
   };
 
@@ -80,7 +83,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   // memory for this session — no backend yet) and shows the "Saved" snackbar.
   const handleSaveActiveTab = () => {
     if (!selectedPatient) { alert("Please select a patient first."); return; }
-    const field = { drugs: "drugs", lab: "labs", services: "services", iptime: "ipEntries" }[activeTab];
+    const field = { drugs: "drugs", lab: "labs", services: "services", iptime: "ipEntries", carePlan: "carePlanItems" }[activeTab];
     savePatientRecord(selectedPatient.id, { [field]: activeItems });
     handleSave(`${activeConfig?.label || "Prescription"} saved successfully!`);
   };
@@ -123,7 +126,7 @@ export default function OPDeskScreen({ user, onLogout }) {
   const finishGroupDraft = () => { setGroupDraft(null); setGroupDraftItems([]); };
 
   const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
-  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, iptime: ipEntries.length };
+  const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, iptime: ipEntries.length, carePlan: carePlanItems.length };
 
   const toggleRightPanel = () => {
     setIsRightPanelExpanded(!isRightPanelExpanded);
@@ -135,7 +138,7 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const activeConfig = TAB_CONFIGS[activeTab];
   const activeEntryTabRef = useRef(null);
-  const activeItems = { drugs, lab: labs, services, iptime: ipEntries }[activeTab];
+  const activeItems = { drugs, lab: labs, services, iptime: ipEntries, carePlan: carePlanItems }[activeTab];
 
   // IP Time-line's Medic auto-populates from the session, not manual entry:
   // the logged-in doctor shows alone, but a non-doctor (e.g. a nurse covering
@@ -281,6 +284,9 @@ export default function OPDeskScreen({ user, onLogout }) {
                 )}
                 {activeTab === "iptime" && (
                   <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.iptime} items={ipEntries} setItems={setIpEntries} searchList={ipSubjectList} currentMedicName={currentMedicName} />
+                )}
+                {activeTab === "carePlan" && (
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.carePlan} items={carePlanItems} setItems={setCarePlanItems} searchList={medConditionList} />
                 )}
               </div>
             </div>

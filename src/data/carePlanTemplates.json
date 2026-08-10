@@ -1,0 +1,6 @@
+[
+  { "id": 1, "speciality": "Gynaecology", "condition": "Normal Pregnancy", "milestones": 9, "period": "280 Days" },
+  { "id": 2, "speciality": "Oncology", "condition": "Breast Cancer AC-T Protocol", "milestones": 8, "period": "60 Days" },
+  { "id": 3, "speciality": "Pulmonary", "condition": "Pulmonary TB DOTS Category", "milestones": 5, "period": "94 Days" },
+  { "id": 4, "speciality": "Nephrology", "condition": "CKD Stage-5", "milestones": 5, "period": "190 Days" }
+]

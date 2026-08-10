@@ -1,7 +1,7 @@
 // routes/Router.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Home from "../pages/Home/Home";
 import LoginPage from "../pages/LoginPage";
+import Dashboard from "../pages/Dashboard/Dashboard";
 import CreateHospital from "../pages/Home/CreateHospital";
 import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
@@ -20,7 +20,7 @@ function ProtectedRoute({ children, user, requiredRole }) {
 
 const ROUTES = {
   HOME: "/",
-  LOGIN: "/login",
+  DASHBOARD: "/dashboard",
   REGISTER: "/register",
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
@@ -31,16 +31,21 @@ export default function AppRouter({ user, onLogin, onLogout }) {
   return (
     <BrowserRouter basename="/">
       <Routes>
-        {/* Public landing page — product overview, Login / Create New Hospital entry points */}
+        {/* Login Route - Home. The very first page anyone sees. */}
         <Route
           path={ROUTES.HOME}
-          element={<Home />}
+          element={<LoginPage onLogin={onLogin} />}
         />
 
-        {/* Login Route */}
+        {/* Main menu / dashboard — where a doctor lands right after login;
+            OP Desk and everything else is reached from its top nav. */}
         <Route
-          path={ROUTES.LOGIN}
-          element={<LoginPage onLogin={onLogin} />}
+          path={ROUTES.DASHBOARD}
+          element={
+            <ProtectedRoute user={user} requiredRole="doctor">
+              <Dashboard user={user} onLogout={onLogout} />
+            </ProtectedRoute>
+          }
         />
 
         {/* Create New Hospital ("new book") Route */}

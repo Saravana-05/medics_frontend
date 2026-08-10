@@ -1,4 +1,4 @@
-import { Pill, FlaskConical, Settings as ServicesIcon, Clock } from "lucide-react";
+import { Pill, FlaskConical, Settings as ServicesIcon, Clock, ClipboardList } from "lucide-react";
 import labTestDetails from "../data/labTestDetails.json";
 import ipAdvice from "../data/ipAdvice.json";
 
@@ -282,5 +282,79 @@ export const TAB_CONFIGS = {
     searchSource: "ip_subjects",
 
     searchSource: null,
+  },
+
+  /* ══════════════════ CARE-PLAN ══════════════════ */
+  carePlan: {
+    key: "carePlan",
+    label: "Care-Plan",
+    icon: ClipboardList,
+    color: "var(--color-careplan)",
+    colorLight: "var(--color-careplan-light)",
+    colorText: "white",
+    textAccent: "var(--color-careplan)",
+
+    labels: {
+      addButton: "Add Activity",
+      searchPlaceholder: "Search or select Med. Condition",
+      searchListLabel: "Med. Conditions",
+      searchColumnLabel: "Med. Condition", // AddRow's search field is labeled "Med. Condition" here, not "Name"
+      newEntityButton: "New Activity",
+      footerFilterLabel: "Sch. Status",
+    },
+
+    filters: { typeOptions: ["Currently Live", "All"] },
+
+    fieldOptions: {
+      milestone: ["Week-8", "Week-14", "Week-20", "Week-28", "Week-36", "Cycle-1", "Cycle-2", "Cycle-3", "Month-1", "Month-3"],
+      pathwayName: ["1st AN Visit", "2nd Visit", "3rd Visit", "Induction Visit", "Follow-up Visit", "Review Visit"],
+      activityType: ["Test", "Drug", "Monitoring", "Counseling", "Follow-up"],
+      activityDescription: ["CBC, Bl.Group,HIV,HBsAg,...", "Start Folic Acid 5mg, TT1", "BP, Weight, FHS check"],
+      schStatus: ["Scheduled", "Completed", "Late Visit", "Lapsed", "Cancelled"],
+    },
+
+    // Med. Condition (searchable) → Schedule → Sch. Date (picked, like IP Time's
+    // Time field) → Milestone → Pathway Name → Activity Type → Activity
+    // Description → Sch. Status — same order the view table shows them in.
+    addRowFields: ["name", "schedule", "schDate", "milestone", "pathwayName", "activityType", "activityDescription", "schStatus", "commit"],
+
+    tableColumns: [
+      { key: "no",                  label: "No.",                 width: "w-12",   type: "index" },
+      { key: "name",                label: "Med. Condition",      width: "w-36",   type: "text" },
+      { key: "schedule",            label: "Schedule",            width: "w-16",   type: "text" },
+      { key: "schDate",             label: "Sch. Date",           width: "w-24",   type: "text" },
+      { key: "milestone",           label: "Milestone",           width: "w-20",   type: "text" },
+      { key: "pathwayName",         label: "Pathway Name",        width: "w-28",   type: "text" },
+      { key: "activityType",        label: "Activity Type",       width: "w-24",   type: "text" },
+      { key: "activityDescription", label: "Activity Description",width: "flex-1", type: "text" },
+      { key: "schStatus",           label: "Sch. Status",         width: "w-24",   type: "text" },
+      { key: "actions",             label: "Actions",             width: "w-24",   type: "actions" },
+    ],
+
+    computeRowDisplay: (draft) => ({
+      primaryLine: draft.name,
+      schedule: draft.schedule,
+      schDate: draft.schDate,
+      milestone: draft.milestone,
+      pathwayName: draft.pathwayName,
+      activityType: draft.activityType,
+      activityDescription: draft.activityDescription,
+      schStatus: draft.schStatus,
+    }),
+
+    sidePanel: {
+      // A browsable library of care-plan templates (Speciality / Med. Condition /
+      // Milestones / Period) — not a group-list of items, so it gets its own
+      // panel type rather than reusing Drug/Lab's medicine-picker shape.
+      type: "care-plan-list",
+      title: "Care-Plan Template",
+      itemLabel: "Templates Recorded",
+      columns: ["Speciality", "Med. Condition", "Milestones", "Period"],
+      newButtonLabel: "New Template",
+      listSourceLabel: "Speciality",
+      dataFile: "carePlanTemplates",
+    },
+
+    searchSource: "med_conditions",
   },
 };

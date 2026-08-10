@@ -220,11 +220,6 @@ export default function LoginUI({
               Create an account
             </Link>
           </p>
-          <p className="text-center text-xs mt-2">
-            <Link to="/" className="hover:underline" style={{ color: "var(--color-text-subtle)" }}>
-              ← Back to Home
-            </Link>
-          </p>
 
           <p className="text-center text-xs text-slate-400 mt-5">
             © {currentYear} Medix · Secure Health Platform

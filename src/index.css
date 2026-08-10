@@ -48,6 +48,9 @@
   --color-iptime-light: color-mix(in srgb, #fef1d5 55%, white);
   --color-iptime-text: #0c324a;
   /* dark text for the pale cream accent, so it stays legible */
+  --color-careplan: #0f766e;
+  /* teal   – Care-Plan     */
+  --color-careplan-light: color-mix(in srgb, #0f766e 12%, white);
   --color-info: #0ea5e9;
   /* blue   – Info/Findings */
   --color-info-light: #c8eef4;
@@ -161,6 +164,11 @@
 .tab-iptime {
   --tab-color: var(--color-iptime);
   --tab-bg: var(--color-iptime-light);
+}
+
+.tab-careplan {
+  --tab-color: var(--color-careplan);
+  --tab-bg: var(--color-careplan-light);
 }
 
 /* ─── Global Base ─────────────────────────────────────────────────────────── */

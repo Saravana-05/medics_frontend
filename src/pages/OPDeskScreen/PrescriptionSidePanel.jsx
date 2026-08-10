@@ -5,13 +5,15 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 import drugGroups from "../../data/drugGroups.json";
 import labGroups from "../../data/labGroups.json";
 import serviceFiles from "../../data/serviceFiles.json";
+import carePlanTemplatesSeed from "../../data/carePlanTemplates.json";
 import doctors from "../../data/doctors.json";
 import medicineList from "../../data/medicines.json";
 import labTestList from "../../data/labTest.json";
+import medConditionList from "../../data/medConditions.json";
 
 const GROUP_LIST_SEEDS = { drugGroups, labGroups };
 // Which real catalog backs each tab's group-list picker — keyed by config.searchSource.
-const CATALOG_SOURCES = { medicines: medicineList, lab_tests: labTestList };
+const CATALOG_SOURCES = { medicines: medicineList, lab_tests: labTestList, med_conditions: medConditionList };
 
 /* Row height (px) — matches Previous Information's / other grids' fixed row height
    so all top-level columns line up. */
@@ -610,6 +612,144 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
   );
 }
 
+/* ── "care-plan-list" panel type (Care-Plan): a browsable library of care-plan
+   templates — Speciality / Med. Condition / Milestones / Period — distinct
+   from Drug/Lab's medicine-picker group-list shape. ── */
+function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon }) {
+  const [entries, setEntries] = useState(carePlanTemplatesSeed);
+  const [specialityFilter, setSpecialityFilter] = useState("All Specialities");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [modalMode, setModalMode] = useState(null); // null | "add" | entry object
+  const [selectedId, setSelectedId] = useState(null);
+  const rowsScrollRef = useRef(null);
+
+  const specialities = [...new Set(entries.map(e => e.speciality))];
+  const bySpeciality = specialityFilter === "All Specialities" ? entries : entries.filter(e => e.speciality === specialityFilter);
+  const filtered = searchTerm.trim() ? bySpeciality.filter(e => e.condition.toLowerCase().includes(searchTerm.toLowerCase())) : bySpeciality;
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, filtered.length);
+
+  const handleSave = (speciality, condition, milestones, period) => {
+    if (modalMode === "add") {
+      setEntries(prev => [...prev, { id: Date.now(), speciality, condition, milestones, period }]);
+    } else {
+      setEntries(prev => prev.map(e => e.id === modalMode.id ? { ...e, speciality, condition, milestones, period } : e));
+    }
+    setModalMode(null);
+  };
+  const handleDelete = id => { if (window.confirm("Delete this template?")) setEntries(prev => prev.filter(e => e.id !== id)); };
+  const handleView = e => alert(`${e.condition}\nSpeciality: ${e.speciality}\nMilestones: ${e.milestones}\nPeriod: ${e.period}`);
+
+  return (
+    <>
+      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+        subtitle={`${entries.length} ${sidePanel.itemLabel}`}
+        searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+
+      <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "30px", boxSizing: "border-box" }}>
+        <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
+        <div className="w-24 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Speciality</div>
+        <div className="flex-1 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>
+        <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Milestones</div>
+        <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Period</div>
+        <div className="w-24 pl-3 pr-2 text-right" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+      </div>
+
+      <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
+        {filtered.map((e, index) => (
+          <div key={e.id} tabIndex={0} onClick={() => setSelectedId(e.id)} onFocus={() => setSelectedId(e.id)}
+            className="flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === e.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === e.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+            <div className="w-12 px-3 py-2.5 text-center"><span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>{index + 1}.</span></div>
+            <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.speciality}</span></div>
+            <div className="flex-1 px-3 py-2.5 min-w-0"><span className="text-xs font-medium truncate block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>
+            <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.milestones}</span></div>
+            <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{e.period}</span></div>
+            <div className="w-24 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
+              <button onClick={() => handleView(e)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
+              <button onClick={() => setModalMode(e)} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
+              <button onClick={() => handleDelete(e.id)} className="p-1 rounded transition-all" title="Delete" style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={11} /></button>
+            </div>
+          </div>
+        ))}
+        {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={5} />)}
+      </div>
+
+      <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>{sidePanel.listSourceLabel}:</span>
+          <select value={specialityFilter} onChange={e => setSpecialityFilter(e.target.value)}
+            className="w-36 px-2 py-1.5 rounded text-xs outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+            <option>All Specialities</option>
+            {specialities.map(s => <option key={s}>{s}</option>)}
+          </select>
+          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {bySpeciality.length} records</span>
+        </div>
+        <button onClick={() => setModalMode("add")} className="flex items-center gap-1.5 text-xs font-bold flex-shrink-0" style={{ color: textAccent || accentColor }}>
+          {sidePanel.newButtonLabel}
+          <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
+            <Plus size={12} />
+          </span>
+        </button>
+      </div>
+
+      {modalMode && (
+        <CarePlanTemplateModal
+          accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+          heading={modalMode === "add" ? sidePanel.newButtonLabel : "Modify Template"}
+          initialSpeciality={modalMode === "add" ? "" : modalMode.speciality}
+          initialCondition={modalMode === "add" ? "" : modalMode.condition}
+          initialMilestones={modalMode === "add" ? "" : modalMode.milestones}
+          initialPeriod={modalMode === "add" ? "" : modalMode.period}
+          onSave={handleSave}
+          onCancel={() => setModalMode(null)}
+        />
+      )}
+    </>
+  );
+}
+
+/* Speciality / Med. Condition / Milestones / Period — the 4 fields a care-plan template needs. */
+function CarePlanTemplateModal({ accentColor, accentLight, accentText = "white", textAccent, heading, initialSpeciality, initialCondition, initialMilestones, initialPeriod, onSave, onCancel }) {
+  const [speciality, setSpeciality] = useState(initialSpeciality);
+  const [condition, setCondition] = useState(initialCondition);
+  const [milestones, setMilestones] = useState(initialMilestones);
+  const [period, setPeriod] = useState(initialPeriod);
+
+  const canSave = speciality.trim() && condition.trim();
+  const handleSave = () => { if (canSave) onSave(speciality.trim(), condition.trim(), parseInt(milestones, 10) || 0, period.trim()); };
+
+  return (
+    <SidePanelModal title={heading} accentColor={accentColor} accentLight={accentLight} textAccent={textAccent} onCancel={onCancel}
+      footer={<>
+        <button onClick={onCancel} className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-danger)", color: "white" }}>Cancel</button>
+        <button onClick={handleSave} disabled={!canSave}
+          className="px-3 py-1.5 rounded-md text-xs font-semibold" style={{ background: "var(--color-success)", color: "white", opacity: canSave ? 1 : 0.5 }}>Save</button>
+      </>}>
+      <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Speciality</label>
+      <input autoFocus type="text" value={speciality} onChange={e => setSpeciality(e.target.value)}
+        placeholder="e.g. Gynaecology" className="w-full px-3 py-2 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+
+      <label className="text-xs font-semibold mb-1 mt-3 block" style={{ color: "var(--color-text-muted)" }}>Med. Condition</label>
+      <input type="text" value={condition} onChange={e => setCondition(e.target.value)}
+        onKeyDown={e => { if (e.key === "Enter" && canSave) handleSave(); if (e.key === "Escape") onCancel(); }}
+        placeholder="e.g. Normal Pregnancy" className="w-full px-3 py-2 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+
+      <div className="flex gap-3 mt-3">
+        <div className="flex-1 min-w-0">
+          <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Milestones</label>
+          <input type="number" min="0" value={milestones} onChange={e => setMilestones(e.target.value)}
+            className="w-full px-3 py-2 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--color-text-muted)" }}>Period</label>
+          <input type="text" value={period} onChange={e => setPeriod(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter" && canSave) handleSave(); if (e.key === "Escape") onCancel(); }}
+            placeholder="e.g. 280 Days" className="w-full px-3 py-2 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+        </div>
+      </div>
+    </SidePanelModal>
+  );
+}
+
 /* ═══════════════ MAIN GENERIC MIDDLE PANEL — one file for all 4 tabs' report/group panels ═══════════════ */
 export default function PrescriptionSidePanel({
   config, showReport = false, reportItems = [], onUpdateReportItem, onTogglePreview, mirrorItems = [], hasPatient = false, onApplyGroup, onGroupSaved,
@@ -642,6 +782,14 @@ export default function PrescriptionSidePanel({
     return (
       <div className={wrapperClass} style={wrapperStyle}>
         <EntryMirrorPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} mirrorItems={mirrorItems} />
+      </div>
+    );
+  }
+
+  if (sidePanel.type === "care-plan-list") {
+    return (
+      <div className={wrapperClass} style={wrapperStyle}>
+        <CarePlanListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} />
       </div>
     );
   }
