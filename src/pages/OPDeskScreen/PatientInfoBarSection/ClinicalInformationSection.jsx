@@ -30,7 +30,7 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
         </span>
       </div>
       <div
-        className="p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
+        className="p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
         style={{
           background: disabled ? "var(--color-surface-alt)" : "transparent",
           border: disabled ? "1px dashed var(--color-border)" : "1px solid var(--color-border)",

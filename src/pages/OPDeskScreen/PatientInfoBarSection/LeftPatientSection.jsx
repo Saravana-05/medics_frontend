@@ -9,7 +9,7 @@ function CompactRelationCard({ attendant }) {
   const value = [a.name, a.relationship, a.phone].filter(Boolean).join(" · ") || "—";
   return (
     <div
-      className="flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 md:min-w-[110px] h-full"
+      className="flex-1 min-w-[130px] lg:min-w-0 p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 md:min-w-[110px] h-full"
       style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
     >
       <div className="flex items-center gap-1 mb-4 md:mb-0">
@@ -44,7 +44,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between rounded-xl px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all shadow-sm"
+        className="w-full flex items-center justify-between rounded-none px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all shadow-sm"
         style={{
           background: "var(--color-surface)",
           border: `1px solid ${open ? "var(--color-primary)" : "var(--color-border)"}`,
@@ -52,7 +52,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
         }}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="p-1 rounded-lg flex-shrink-0" style={{ background: "var(--color-primary-muted)" }}>
+          <div className="p-1 rounded-none flex-shrink-0" style={{ background: "var(--color-primary-muted)" }}>
             <User size={14} style={{ color: "var(--color-primary)" }} />
           </div>
           <span className="text-sm font-semibold truncate" style={{ color: selectedPatient ? "var(--color-primary-dark)" : "var(--color-text-subtle)" }}>
@@ -68,7 +68,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
 
       {open && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl overflow-hidden shadow-xl animate-fade-in"
+          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-none overflow-hidden shadow-xl animate-fade-in"
           style={{ 
             background: "var(--color-surface)", 
             border: "1px solid var(--color-border)",
@@ -123,7 +123,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
                       {pt.name}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}>
+                      <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-none flex-shrink-0" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}>
                         {pt.appt}
                       </span>
                       <span className="text-[0.6rem] truncate" style={{ color: "var(--color-text-muted)" }}>{pt.slot}</span>
@@ -294,7 +294,7 @@ export default function LeftPatientSection({
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="flex items-center justify-center rounded-md flex-shrink-0 transition-all"
+              className="flex items-center justify-center rounded-none flex-shrink-0 transition-all"
               style={{ width: 16, height: 16, background: "var(--color-primary)", color: "white" }}
               title="Add new patient"
             >
@@ -315,7 +315,7 @@ export default function LeftPatientSection({
 
             {/* Sex / Age / DOB — same card styling as CompactRelationCard */}
             <div
-              className="md:w-[58%] flex-1 lg:w-auto rounded-xl px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full shadow-sm"
+              className="md:w-[58%] flex-1 lg:w-auto rounded-none px-3 py-2.5 md:px-1.5 md:py-1 lg:px-3 lg:py-2.5 h-full shadow-sm"
               style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",

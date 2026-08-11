@@ -71,7 +71,7 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
         </span>
       </div>
       <div
-        className="p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
+        className="p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
         style={{ background: cardBg || "transparent", border: `1px solid ${cardBorder || "var(--color-border)"}`, height: "60px", boxSizing: "border-box" }}
       >
         {isPeople ? (
@@ -105,7 +105,7 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
 function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, trend }) {
   return (
     <div
-      className="group relative overflow-hidden rounded-lg p-1.5 transition-all hover:scale-105 shadow-sm"
+      className="group relative overflow-hidden rounded-none p-1.5 transition-all hover:scale-105 shadow-sm"
       style={{ background: "var(--color-surface)", border: `1px solid ${tint(accent, "20%")}`, height: "58px", boxSizing: "border-box" }}
     >
       <div className="flex items-center justify-between h-full">
@@ -186,7 +186,6 @@ export default function VitalSignsSection({ patient, activeTab }) {
      and the highlighted value color are all derived from the one accent
      token so they move together if the tab color ever changes. ── */
   const IPTIME_ACCENT = "var(--color-iptime)";
-  const ipSectionBg = "var(--color-iptime-light)";
   const ipCardBg = "var(--color-surface)";
   const ipCardBorder = `color-mix(in srgb, ${IPTIME_ACCENT} 35%, white)`;
   const ipLabelColor = `color-mix(in srgb, ${IPTIME_ACCENT} 75%, black)`;
@@ -337,9 +336,8 @@ export default function VitalSignsSection({ patient, activeTab }) {
     <div
       className="px-3 border-b"
       /* Tablet/mobile: tighter vertical padding. Desktop: normal.
-         IP Admission Info gets its own amber-tinted background — everything
-         else (Vital Signs) keeps the plain grey bar. */
-      style={{ borderColor: "var(--color-border)", background: isIPTime ? ipSectionBg : "#A7B3CE" }}
+         Same background for both Vital Signs and IP Admission Info. */
+      style={{ borderColor: "var(--color-border)", background: "#A7B3CE" }}
     >
       {/* ── Tablet / Mobile ──
           • Header is HIDDEN (no ActivitySquare title row)
