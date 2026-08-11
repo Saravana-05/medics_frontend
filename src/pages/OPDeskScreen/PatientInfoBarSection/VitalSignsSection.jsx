@@ -72,7 +72,7 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
       </div>
       <div
         className="p-2 lg:p-3 rounded-lg transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
-        style={{ background: cardBg || "transparent", border: `1px solid ${cardBorder || "var(--color-border)"}`, height: "80px", boxSizing: "border-box" }}
+        style={{ background: cardBg || "transparent", border: `1px solid ${cardBorder || "var(--color-border)"}`, height: "60px", boxSizing: "border-box" }}
       >
         {isPeople ? (
           <div>
