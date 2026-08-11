@@ -2,7 +2,7 @@
 import React from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown, ListFilter, Search } from "lucide-react";
+import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
 const ROW_HEIGHT_PX = 42;
@@ -233,7 +233,11 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={onChange}
         onFocus={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="w-full px-2 py-1.5 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+        className="w-full px-2 py-1.5 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)",
+          paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
+      {options.length > 0 && (
+        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
+      )}
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
           {filtered.map((opt, i) => (
@@ -285,6 +289,102 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
           ))}
         </div>
       </PortalDropdown>
+    </div>
+  );
+}
+
+// Current system time as "HH:MM" — used to default the Time field.
+function nowHHMM() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
+/* One column (hour or minute) of the Time field's picker — a custom
+   PortalDropdown-based popup (not a native <select>) so, like every other
+   dropdown in this app, it always opens downward instead of leaving it up
+   to the browser/OS. Options past the current system time are individually
+   unclickable/disabled, not just clamped after picking. */
+function TimeColumnSelect({ value, options, disabledSet, onChange, format, width = "" }) {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const fmt = format || (n => String(n).padStart(2, "0"));
+  const select = opt => { if (disabledSet.has(opt)) return; onChange(opt); setOpen(false); };
+  return (
+    <div ref={anchorRef} className={`relative min-w-0 ${width || "flex-1"}`}>
+      <button type="button" onClick={() => setOpen(v => !v)} onBlur={() => setTimeout(() => setOpen(false), 150)}
+        className="w-full flex items-center justify-between px-1.5 py-1.5 rounded text-xs text-left"
+        style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
+        <span>{fmt(value)}</span>
+        <ChevronDown size={12} style={{ flexShrink: 0, opacity: 0.6 }} />
+      </button>
+      <PortalDropdown anchorEl={anchorRef.current} open={open}>
+        <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
+          {options.map(opt => {
+            const isDisabled = disabledSet.has(opt);
+            return (
+              <div key={opt} onMouseDown={() => select(opt)}
+                className="px-3 flex items-center text-xs"
+                style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)",
+                  cursor: isDisabled ? "not-allowed" : "pointer",
+                  color: isDisabled ? "var(--color-text-subtle)" : "var(--color-text-base)",
+                  background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
+                {fmt(opt)}
+              </div>
+            );
+          })}
+        </div>
+      </PortalDropdown>
+    </div>
+  );
+}
+
+const pad2 = n => String(n).padStart(2, "0");
+// 24h hour -> { h12: 1-12, period: "AM"|"PM" }
+function to12Hour(h24) {
+  const period = h24 >= 12 ? "PM" : "AM";
+  let h12 = h24 % 12;
+  if (h12 === 0) h12 = 12;
+  return { h12, period };
+}
+// { h12: 1-12, period } -> 24h hour
+function to24Hour(h12, period) {
+  if (period === "AM") return h12 === 12 ? 0 : h12;
+  return h12 === 12 ? 12 : h12 + 12;
+}
+
+/* Hour(1-12) + Minute + AM/PM pickers (no seconds — the field only ever
+   stores 24h "HH:MM" internally, this is just the display/entry format) for
+   IP Time-line's Time field. Each option past the current system time is
+   individually disabled, not just clamped after picking — so a future hour,
+   minute, or AM/PM can't be selected in the first place. */
+function TimeHourMinuteSelect({ dataField, value, onChange }) {
+  const now = new Date();
+  const curH = now.getHours(), curM = now.getMinutes();
+  const [h24, m] = (value || nowHHMM()).split(":").map(Number);
+  const { h12, period } = to12Hour(h24);
+
+  const hourOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+  const minuteOptions = Array.from({ length: 60 }, (_, mm) => mm);
+  const periodOptions = ["AM", "PM"];
+
+  const disabledHours = new Set(hourOptions.filter(hh => to24Hour(hh, period) > curH));
+  const disabledPeriods = new Set(periodOptions.filter(p => to24Hour(h12, p) > curH));
+  const disabledMinutes = new Set(minuteOptions.filter(mm => h24 === curH && mm > curM));
+
+  const commit = (newH24, newM) => {
+    const clampedM = newH24 === curH && newM > curM ? curM : newM;
+    onChange(`${pad2(newH24)}:${pad2(clampedM)}`);
+  };
+  const changeHour = newH12 => commit(to24Hour(newH12, period), m);
+  const changePeriod = newPeriod => commit(to24Hour(h12, newPeriod), m);
+  const changeMinute = newM => commit(h24, newM);
+
+  return (
+    <div data-field={dataField} className="flex items-center gap-1 w-full">
+      <TimeColumnSelect value={h12} options={hourOptions} disabledSet={disabledHours} onChange={changeHour} format={n => pad2(n)} />
+      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>:</span>
+      <TimeColumnSelect value={m} options={minuteOptions} disabledSet={disabledMinutes} onChange={changeMinute} />
+      <TimeColumnSelect value={period} options={periodOptions} disabledSet={disabledPeriods} onChange={changePeriod} format={p => p} width="w-14 flex-none" />
     </div>
   );
 }
@@ -408,10 +508,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "time") return (
-          <div key="time" className="w-24 flex-shrink-0 px-1 py-1.5 flex items-center">
-            <input data-field="time" type="time" value={draft.time}
-              onChange={e => onDraftChange("time")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "time")}
-              className="w-full px-1.5 py-1.5 rounded text-sm" style={{ border: "1px solid var(--color-border)" }} />
+          <div key="time" className="w-40 flex-shrink-0 px-1 py-1.5 flex items-center">
+            <TimeHourMinuteSelect dataField="time" value={draft.time} onChange={v => onDraftChange("time")(v)} />
           </div>
         );
         if (field === "schDate") return (
@@ -452,7 +550,7 @@ const ADD_ROW_FIELD_META = {
   period: { label: "Period", width: "w-20" },
   when:   { label: "When",   width: "w-28" },
   detail: { label: "Remarks", width: "flex-1" },
-  time:   { label: "Time",   width: "w-24" },
+  time:   { label: "Time",   width: "w-40" },
   schDate: { label: "Sch. Date", width: "w-28" },
 };
 
@@ -484,13 +582,13 @@ function makeFreshDraft(config, keepDays) {
     else if (field === "period") draft.period = "OD";
     else if (field === "when") draft.when = "AF";
     else if (field === "detail") draft.detail = "—";
-    else if (field === "time") draft.time = "";
+    else if (field === "time") draft.time = nowHHMM(); // defaults to current system time
     else draft[field] = ""; // generic typable fields (e.g. subject/advice/nurse/treatment)
   });
   return draft;
 }
 
-const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ config, items, setItems, searchList = [], currentMedicName }, ref) {
+const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ config, items, setItems, searchList = [], currentMedicName, visibleColOverrides = {} }, ref) {
   const persistedDaysRef = useRef("1");
   const [draft, setDraft] = useState(() => makeFreshDraft(config));
   const [editId, setEditId] = useState(null);
@@ -502,34 +600,14 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const [typeValue, setTypeValue] = useState(config.filters.typeOptions[0]);
   const [frequentOnly, setFrequentOnly] = useState(false);
 
-  // Column visibility + row search — opt-in via config.showColumnFilter (Care-Plan),
-  // same Show/Hide Columns + search pattern Previous Information uses.
-  const columnFilterKey = `${config.key}TableColumns`;
-  const [visibleColOverrides, setVisibleColOverrides] = useState(() => {
-    if (!config.showColumnFilter) return {};
-    try {
-      const saved = localStorage.getItem(columnFilterKey);
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
-  });
-  const [showColumnMenu, setShowColumnMenu] = useState(false);
-  const [gridSearchTerm, setGridSearchTerm] = useState("");
-
-  useEffect(() => {
-    if (config.showColumnFilter) localStorage.setItem(columnFilterKey, JSON.stringify(visibleColOverrides));
-  }, [visibleColOverrides, config.showColumnFilter, columnFilterKey]);
-
-  const toggleColumnVisible = key => setVisibleColOverrides(prev => ({ ...prev, [key]: prev[key] === false ? true : false }));
+  // Column visibility — opt-in via config.showColumnFilter (Care-Plan). The
+  // toggle button/dropdown itself lives in OPDeskScreen's toolbar row (where
+  // Clear/Paste/Print normally sit); this component just filters by it.
   const displayColumns = config.showColumnFilter
     ? config.tableColumns.filter(c => c.key === "no" || c.key === "actions" || visibleColOverrides[c.key] !== false)
     : config.tableColumns;
-  const toggleableColumns = config.tableColumns.filter(c => c.key !== "no" && c.key !== "actions");
-
   const addRowRef = useRef(null), rowsScrollRef = useRef(null);
-  const visibleCountForFill = config.showColumnFilter && gridSearchTerm.trim()
-    ? items.filter(it => Object.values(it.display || {}).some(v => String(v ?? "").toLowerCase().includes(gridSearchTerm.trim().toLowerCase()))).length
-    : items.length;
-  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, visibleCountForFill);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, items.length);
 
     const suggestions = query.trim() ? searchList.filter(s => s.toLowerCase().includes(query.toLowerCase())) : searchList;
     const setD = k => v => setDraft(prev => ({ ...prev, [k]: v }));
@@ -587,56 +665,13 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     clearAll: handleClearAll,
   }));
 
-  const visibleItems = config.showColumnFilter && gridSearchTerm.trim()
-    ? items.filter(it => Object.values(it.display || {}).some(v => String(v ?? "").toLowerCase().includes(gridSearchTerm.trim().toLowerCase())))
-    : items;
-
   return (
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
-          {config.showColumnFilter && (
-            <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)" }}>
-              <span className="text-[0.68rem] font-semibold" style={{ color: "var(--color-primary-dark)" }}>
-                Showing {visibleItems.length} of {items.length} records
-              </span>
-              <div className="flex items-center gap-1.5">
-                <div className="relative">
-                  <button onClick={() => setShowColumnMenu(v => !v)} className="p-1 rounded-md transition-all"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} title="Toggle Columns">
-                    <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} />
-                  </button>
-                  {showColumnMenu && (
-                    <div className="absolute right-0 top-full mt-1 w-44 rounded-lg shadow-xl z-50 animate-fade-in"
-                      style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-                      onMouseLeave={() => setShowColumnMenu(false)}>
-                      <div className="p-2 border-b" style={{ borderColor: "var(--color-border)" }}>
-                        <span className="text-xs font-semibold">Show/Hide Columns</span>
-                      </div>
-                      <div className="p-2 space-y-1">
-                        {toggleableColumns.map(col => (
-                          <label key={col.key} className="flex items-center gap-2 cursor-pointer text-[0.7rem] py-0.5 hover:bg-surface-alt px-1 rounded transition-all">
-                            <input type="checkbox" checked={visibleColOverrides[col.key] !== false}
-                              onChange={() => toggleColumnVisible(col.key)} className="w-3.5 h-3.5 rounded" style={{ accentColor: config.color }} />
-                            <span style={{ color: "var(--color-text-base)" }}>{col.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="relative">
-                  <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
-                  <input type="text" placeholder="Search entries..." value={gridSearchTerm} onChange={e => setGridSearchTerm(e.target.value)}
-                    className="pl-7 pr-2 py-1 text-[0.7rem] rounded-lg w-28 focus:w-40 transition-all duration-200 outline-none"
-                    style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }} />
-                </div>
-              </div>
-            </div>
-          )}
           <TableHeader columns={displayColumns} accentColor={config.color} />
           <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
-            {visibleItems.map((item, index) => (
+            {items.map((item, index) => (
               <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
                 isStruck={struckIds.includes(item.id)} isSelected={selectedRowId === item.id}
                 onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}

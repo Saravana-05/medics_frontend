@@ -385,7 +385,7 @@ export default function PrescriptionViewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
-      <div className="rounded-xl overflow-hidden shadow-2xl" style={{ background: "var(--color-surface)", width: "950px", height: "80vh", display: "flex", flexDirection: "column" }}>
+      <div className="rounded-xl overflow-hidden shadow-2xl" style={{ background: "var(--color-surface)", width: "950px", height: "120vh", display: "flex", flexDirection: "column" }}>
         
         {/* Header with Navigation and Actions */}
         <div className="px-4 py-3 flex justify-between items-center flex-shrink-0" style={{ background: "var(--color-primary)", color: "white" }}>
@@ -474,11 +474,11 @@ export default function PrescriptionViewModal({
           
           {/* Chief Complaint */}
           <div className="mt-2">
-            <span className="font-bold text-xs" style={{ color: "var(--color-text-muted)" }}>Chief Complaint:</span>
+            <span className=" text-xs" style={{ color: "var(--color-text-muted)" }}>Chief Complaint:</span>
             <span className="text-xs ml-1">{visit.complaint}</span>
           </div>
           
-          {/* Bottom Row: Vital Signs (Left) | Clinical Information (Right) */}
+          {/* Bottom Row: Vital Signs (Left) |  Information (Right) */}
           <div className="mt-2 pt-2 border-t grid grid-cols-2 gap-4" style={{ borderColor: "var(--color-border)" }}>
             {/* Left: Vital Signs */}
             <div>
@@ -512,27 +512,27 @@ export default function PrescriptionViewModal({
             
             {/* Right: Clinical Information */}
             <div>
-              <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="flex items-center gap-1.5 mb-1.5 w-full">
                 <Clipboard size={12} style={{ color: "var(--color-primary)" }} />
-                <span className="text-[0.8rem] font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
+                <span className="text-[0.8rem] tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex gap-1.5" style={{ height:"320px" }}>
                 {clinicalData.chiefComplaint && clinicalData.chiefComplaint !== "—" && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "var(--color-danger)18", border: "1px solid var(--color-danger)35" }}>
+                  <div className="flex items-center gap-1 px-2 py-2.5 rounded-full" style={{ background: "var(--color-danger)18", border: "1px solid var(--color-danger)35" }}>
                     <Stethoscope size={10} style={{ color: "var(--color-danger)" }} />
-                    <span className="text-xs font-bold" style={{ color: "var(--color-danger)" }}>{clinicalData.chiefComplaint}</span>
+                    <span className="text-xs " style={{ color: "var(--color-danger)" }}>{clinicalData.chiefComplaint}</span>
                   </div>
                 )}
                 {clinicalData.firstObservation && clinicalData.firstObservation !== "—" && (
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#0284c718", border: "1px solid #0284c735" }}>
                     <Eye size={10} style={{ color: "#0284c7" }} />
-                    <span className="text-xs font-bold" style={{ color: "#0284c7" }}>{clinicalData.firstObservation}</span>
+                    <span className="text-xs" style={{ color: "#0284c7" }}>{clinicalData.firstObservation}</span>
                   </div>
                 )}
                 {clinicalData.referral && clinicalData.referral !== "—" && (
                   <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#d9770618", border: "1px solid #d9770635" }}>
                     <ArrowRightLeft size={10} style={{ color: "#d97706" }} />
-                    <span className="text-xs font-bold" style={{ color: "#d97706" }}>{clinicalData.referral}</span>
+                    <span className="text-xs" style={{ color: "#d97706" }}>{clinicalData.referral}</span>
                   </div>
                 )}
               </div>

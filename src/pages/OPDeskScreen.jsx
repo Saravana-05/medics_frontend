@@ -1,5 +1,5 @@
-import { useState, useRef, useLayoutEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
 import AppBar from "../components/AppBar/AppBar";
 import PatientInfoBar from "./OPDeskScreen/PatientInfoBarSection/PatientInfoBar";
 import LeftSidebar from "./OPDeskScreen/LeftSidebar";
@@ -23,6 +23,39 @@ import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecor
 // nurse entering notes on the doctor's behalf).
 const DEFAULT_DOCTOR_NAME = "Dr. Aravind Kumar";
 
+// Sits where Clear/Paste/Preview/Save/Print normally do — Care-Plan has too many
+// columns to show all at once, so this replaces the toolbar with a Show/Hide
+// Columns control instead, same pattern Previous Information uses.
+function ColumnFilterButton({ columns, visible, onToggle, color }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
+        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text-base)" }} title="Show/Hide Columns">
+        <ListFilter size={13} /> Columns
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-44 rounded-lg shadow-xl z-50 animate-fade-in"
+          style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+          onMouseLeave={() => setOpen(false)}>
+          <div className="p-2 border-b" style={{ borderColor: "var(--color-border)" }}>
+            <span className="text-xs font-semibold">Show/Hide Columns</span>
+          </div>
+          <div className="p-2 space-y-1">
+            {columns.map(col => (
+              <label key={col.key} className="flex items-center gap-2 cursor-pointer text-[0.7rem] py-0.5 hover:bg-surface-alt px-1 rounded transition-all">
+                <input type="checkbox" checked={visible[col.key] !== false}
+                  onChange={() => onToggle(col.key)} className="w-3.5 h-3.5 rounded" style={{ accentColor: color }} />
+                <span style={{ color: "var(--color-text-base)" }}>{col.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OPDeskScreen({ user, onLogout }) {
   const [patients, setPatients] = useState(MOCK_PATIENTS);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -39,6 +72,17 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [services, setServices] = useState([]);
   const [ipEntries, setIpEntries] = useState([]);
   const [carePlanItems, setCarePlanItems] = useState([]);
+  // Care-Plan's Show/Hide Columns state — lives here (not inside PrescriptionEntryTab)
+  // since its toggle button sits in this toolbar row, not inside the grid itself.
+  const [carePlanVisibleCols, setCarePlanVisibleCols] = useState(() => {
+    try {
+      const saved = localStorage.getItem("carePlanTableColumns");
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+  useEffect(() => {
+    localStorage.setItem("carePlanTableColumns", JSON.stringify(carePlanVisibleCols));
+  }, [carePlanVisibleCols]);
   const [saveMessage, setSaveMessage] = useState(null); // { text, key } — key forces the toast to re-fire even on repeat text
 
   // Building a new Drug/Lab Group reuses the main grid's own add-row instead of
@@ -214,7 +258,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           />
         </div>
 
-        <div className="flex-shrink-0 flex mb-[8px] ml-2">
+        <div className="flex-shrink-0 flex mb-[8px] ml-0.5">
           <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>
@@ -245,7 +289,14 @@ export default function OPDeskScreen({ user, onLogout }) {
                 style={{ background: "var(--color-surface-alt)", borderBottom: "1px solid var(--color-border)" }}>
                 <PrescriptionTabs activeTab={activeTab} setActiveTab={setActiveTab} tabCount={tabCount} />
                 <div className="flex items-center flex-shrink-0 pl-3">
-                  {!["iptime", "carePlan"].includes(activeTab) && (
+                  {activeTab === "carePlan" ? (
+                    <ColumnFilterButton
+                      columns={TAB_CONFIGS.carePlan.tableColumns.filter(c => c.key !== "no" && c.key !== "actions")}
+                      visible={carePlanVisibleCols}
+                      onToggle={key => setCarePlanVisibleCols(prev => ({ ...prev, [key]: prev[key] === false ? true : false }))}
+                      color={TAB_CONFIGS.carePlan.color}
+                    />
+                  ) : activeTab !== "iptime" && (
                     <ModernToolbar
                       onClear={() => activeEntryTabRef.current?.clearAll()}
                       onSave={handleSaveActiveTab}
@@ -286,7 +337,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                   <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.iptime} items={ipEntries} setItems={setIpEntries} searchList={ipSubjectList} currentMedicName={currentMedicName} />
                 )}
                 {activeTab === "carePlan" && (
-                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.carePlan} items={carePlanItems} setItems={setCarePlanItems} searchList={medConditionList} />
+                  <PrescriptionEntryTab ref={activeEntryTabRef} config={TAB_CONFIGS.carePlan} items={carePlanItems} setItems={setCarePlanItems} searchList={medConditionList} visibleColOverrides={carePlanVisibleCols} />
                 )}
               </div>
             </div>

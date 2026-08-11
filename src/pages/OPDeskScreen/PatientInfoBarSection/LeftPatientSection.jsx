@@ -15,14 +15,14 @@ function CompactRelationCard({ attendant }) {
       <div className="flex items-center gap-1 mb-4 md:mb-0">
         <Users size={12} className="md:w-2.5 md:h-2.5" style={{ color: "var(--color-primary)" }} />
         <span
-          className="text-[0.7rem] font-bold tracking-wide truncate md:text-[0.7rem]"
+          className="text-[0.9rem] font-bold tracking-wide truncate md:text-[0.7rem]"
           style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)" }}
         >
           Attendant
         </span>
       </div>
       <div
-        className="lg:text-[0.7rem] font-medium break-words md:text-[0.6rem]"
+        className="lg:text-[0.9rem]  break-words md:text-[0.6rem]"
         style={{ color: "var(--color-primary)", fontFamily: "var(--font-inter)" }}
       >
         {value}
@@ -109,7 +109,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
               <div
                 key={pt.id}
                 onClick={() => { onSelectPatient(pt); setOpen(false); setSearchTerm(""); }}
-                className="px-3 py-1.5 cursor-pointer transition-all hover:pl-4"
+                className="px-3 py-2.5 cursor-pointer transition-all hover:pl-4"
                 style={{
                   background: selectedPatient?.id === pt.id ? "var(--color-primary-muted)" : i % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
                   borderLeft: selectedPatient?.id === pt.id ? `3px solid var(--color-primary)` : "3px solid transparent",
@@ -119,7 +119,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold truncate" style={{ color: selectedPatient?.id === pt.id ? "var(--color-primary-dark)" : "var(--color-text-base)" }}>
+                    <div className="text-sm font-semibold truncate" style={{ color: selectedPatient?.id === pt.id ? "var(--color-primary-dark)" : "var(--color-text-base)" }}>
                       {pt.name}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -332,14 +332,14 @@ export default function LeftPatientSection({
                     Sex
                   </div>
                   {/* Full word on mobile + desktop */}
-                  <div className="hidden md:hidden lg:block text-xs font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                  <div className="hidden md:hidden lg:block  text-[0.9rem]  whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                     {p.gender || "—"}
                   </div>
-                  <div className="block md:hidden text-xs font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                  <div className="block md:hidden  text-[0.9rem]  whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                     {p.gender || "—"}
                   </div>
                   {/* Abbreviation on tablet only - smaller text */}
-                  <div className="hidden md:block lg:hidden text-[0.7rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                  <div className="hidden md:block lg:hidden text-[0.9rem]  whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                     {getGenderShort(p.gender)}
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export default function LeftPatientSection({
                   >
                     Age
                   </div>
-                  <div className="text-xs md:text-[0.65rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                  <div className="text-xs md:text-[0.9rem]  whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                     {age.years !== null
                       ? `${age.years}y ${age.months}m ${age.days}d`
                       : "—"}
@@ -362,12 +362,12 @@ export default function LeftPatientSection({
                 {/* DOB */}
                 <div>
                   <div
-                    className="text-[0.6rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
+                    className="text-[0.7rem] font-bold uppercase tracking-wide mb-0.5 md:mb-0"
                     style={{ color: "var(--color-text-muted)" }}
                   >
                     DOB
                   </div>
-                  <div className="text-xs md:text-[0.65rem] font-semibold whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
+                  <div className="text-xs md:text-[0.9rem]  whitespace-nowrap" style={{ color: "var(--color-primary)" }}>
                     {p.dob || "—"}
                   </div>
                 </div>

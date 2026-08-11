@@ -244,7 +244,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   </div>
                   <div className="p-2 space-y-1">
                     {ALL_COLUMNS.map(col => (
-                      <label key={col.key} className="flex items-center gap-2 cursor-pointer text-[0.7rem] py-0.5 hover:bg-surface-alt px-1 rounded transition-all">
+                      <label key={col.key} className="flex items-center gap-2 cursor-pointer text-xs py-1 hover:bg-surface-alt px-1 rounded transition-all">
                         <input
                           type="checkbox"
                           checked={visibleColumns[col.key]}

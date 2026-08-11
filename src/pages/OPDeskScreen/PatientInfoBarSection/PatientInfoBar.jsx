@@ -51,7 +51,7 @@ export default function PatientInfoBar({
               its matching LeftSidebar tab is hovered. Desktop only.
               Absolutely positioned so its fixed height never forces the row taller
               than the Vital Signs + Clinical Information content. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[1.5px] lg:top-0 lg:bottom-[8px]" style={{ width: "1.5px" }}>
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2px] lg:top-0 lg:bottom-[8px]" style={{ width: "2px" }}>
             {LEFT_ACCENT_SEGMENTS.map((seg) => (
               <div
                 key={seg.key}
@@ -105,7 +105,7 @@ export default function PatientInfoBar({
             {/* Right accent bar — sits OUTSIDE the OP/IP List box's border (mirrors
                 the left accent bar's positioning), a segment lights up only while
                 its matching RightSidebar tab is hovered. Desktop only. */}
-            <div className="hidden lg:flex flex-col flex-shrink-0 mb-[8px]" style={{ width: "1.5px" }}>
+            <div className="hidden lg:flex flex-col flex-shrink-0 mb-[8px]" style={{ width: "2px" }}>
               {RIGHT_ACCENT_SEGMENTS.map((seg) => (
                 <div
                   key={seg.key}

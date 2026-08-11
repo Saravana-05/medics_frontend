@@ -216,8 +216,8 @@ export const TAB_CONFIGS = {
     icon: Clock,
     color: "var(--color-iptime)",
     colorLight: "var(--color-iptime-light)",
-    colorText: "var(--color-iptime-text)", // pale cream accent needs dark text to stay legible
-    textAccent: "var(--color-iptime-text)", // cream itself is unreadable as text — use the dark navy instead
+    colorText: "white",
+    textAccent: "var(--color-iptime)",
 
     labels: {
       addButton: "Add Entry",
@@ -320,6 +320,9 @@ export const TAB_CONFIGS = {
     // No manual add-row for Care-Plan — activities come from the Care-Plan
     // Template panel, not typed in one by one.
     hideAddRow: true,
+    // Care-Plan has many columns (9), so it gets the same Show/Hide Columns +
+    // search bar Previous Information uses, instead of always showing all of them.
+    showColumnFilter: true,
 
     tableColumns: [
       { key: "no",                  label: "No.",                 width: "w-12",   type: "index" },
