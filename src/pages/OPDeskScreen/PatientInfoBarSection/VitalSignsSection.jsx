@@ -339,7 +339,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
       /* Tablet/mobile: tighter vertical padding. Desktop: normal.
          IP Admission Info gets its own amber-tinted background — everything
          else (Vital Signs) keeps the plain grey bar. */
-      style={{ borderColor: "var(--color-border)", background: isIPTime ? ipSectionBg : "lightgray" }}
+      style={{ borderColor: "var(--color-border)", background: isIPTime ? ipSectionBg : "#c6bcb3" }}
     >
       {/* ── Tablet / Mobile ──
           • Header is HIDDEN (no ActivitySquare title row)
