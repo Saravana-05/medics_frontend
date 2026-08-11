@@ -160,7 +160,17 @@ export const MOCK_PATIENTS = [
       lmp: "N/A", doc: "N/A", edd: "N/A",
       pregnancies: 2, deliveries: 2, abortions: 0, livingChildren: 2,
     },
-    ipInfo: { ward: "—", bed: "—", admitDate: "—", consultant: "—" },
+    ipInfo: {
+      admitDate: "05/08/2026", admitTime: "02:15 PM",
+      treatment: "Total Knee Replacement - Bilateral",
+      attenderName: "Sri.Mohan", attenderPhone: "9444556677", attenderRelation: "Husband",
+      ward: "Ortho", room: "12", bed: "2/1",
+      currentWard: "Ortho Ward", currentRoom: "12", currentBed: "2/1",
+      consultant: "Dr.Elango 9884512367", consultant2: "Dr.Meenakshi 9994412378",
+      nurse1: "C.Nurse: Kalaivani 9843321156",
+      nurse2: "C.Nurse: Revathi 9788112245",
+      dischargeDate: "12/08/2026",
+    },
     chronicAllergy: [
       { type: "Chronic", name: "Osteoarthritis", since: "2019", severity: "High" },
       { type: "Chronic", name: "Diabetes Type 2", since: "2018", severity: "High" },

@@ -197,6 +197,10 @@ export default function OPDeskScreen({ user, onLogout }) {
   // panels stay on their static widths — only the left panel is dynamic here.
   const firstObservationCardRef = useRef(null);
   const leftPanelRef = useRef(null);
+  // Top edge of the Prescription Tabs row — the Appointments patient dropdown
+  // measures this so its open popup's height stops exactly there instead of
+  // overlapping the tabs below.
+  const prescriptionTabsRowRef = useRef(null);
 
   useLayoutEffect(() => {
     const syncLeftPanelAlignment = () => {
@@ -253,6 +257,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             onFinalize={() => handleSave()}
             highlightedTab={highlightedTab}
             leftHighlightedTab={leftHighlightedTab}
+            tabsRowRef={prescriptionTabsRowRef}
             firstObservationCardRef={firstObservationCardRef}
             activeTab={activeTab}
           />
@@ -285,7 +290,7 @@ export default function OPDeskScreen({ user, onLogout }) {
               {/* Tabs + toolbar share one row — tab buttons on the left, action
                   buttons (Clear/Paste/Preview/Save/Print) right-aligned on the right,
                   matching the reference ribbon-tab layout. */}
-              <div className="flex-shrink-0 flex items-stretch justify-between px-2"
+              <div ref={prescriptionTabsRowRef} className="flex-shrink-0 flex items-stretch justify-between px-2"
                 style={{ background: "var(--color-surface-alt)", borderBottom: "1px solid var(--color-border)" }}>
                 <PrescriptionTabs activeTab={activeTab} setActiveTab={setActiveTab} tabCount={tabCount} />
                 <div className="flex items-center flex-shrink-0 pl-3">
@@ -404,6 +409,7 @@ export default function OPDeskScreen({ user, onLogout }) {
               style={{
                 background: "#ffffff",
                 border: isTabletView && !isRightPanelExpanded ? "none" : "1px solid var(--color-border)",
+                marginLeft: isTabletView ? undefined : "12px",
               }}
             >
               <PreviousVisitsTable visits={visits} />

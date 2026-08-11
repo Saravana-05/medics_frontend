@@ -57,10 +57,19 @@ function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
    All rows show at once now (no expand/collapse) — Medic's 4 rows just make
    that card taller than the others, which is fine since the row uses
    default flex stretch alignment. ── */
+// Font-size classes for IPInfoCard content — SIZE_NORMAL is the current/default
+// size; SIZE_SMALL kicks in only on the Medic card, only when a row has 2+
+// people sharing it (e.g. both nurses on one line) — every other card
+// (IP Info, Attender, Room) always stays at SIZE_NORMAL.
+const IP_SIZE_NORMAL = "lg:text-[0.8rem] md:text-[0.6rem]";
+const IP_SIZE_SMALL = "lg:text-[0.65rem] md:text-[0.5rem]";
+
 function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardBg, cardBorder, labelColor, valueColor }) {
   const visibleLines = (lines || []).filter(Boolean);
   const isPeople = !!people;
-  const items = isPeople ? (people.length ? people : [{ name: "—", phone: "" }]) : (visibleLines.length ? visibleLines : ["—"]);
+  // people is an array of ROWS (e.g. [[nurse1, nurse2], [doctor1, doctor2]]) —
+  // each row renders on its own line, its people joined inline within it.
+  const items = isPeople ? (people.length ? people : [[{ name: "—", phone: "" }]]) : (visibleLines.length ? visibleLines : ["—"]);
 
   return (
     <div className="flex-1 min-w-[150px] lg:min-w-0">
@@ -71,24 +80,33 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
         </span>
       </div>
       <div
-        className="p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 overflow-y-auto"
+        className={`p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 ${isPeople ? "overflow-hidden" : "overflow-y-auto"}`}
         style={{ background: cardBg || "transparent", border: `1px solid ${cardBorder || "var(--color-border)"}`, height: "60px", boxSizing: "border-box" }}
       >
         {isPeople ? (
           <div>
-            {items.map((p, i) => (
-              <div key={i} className="flex items-center justify-between gap-2">
-                <span className="lg:text-[0.8rem] font-semibold truncate md:text-[0.6rem] text-left" style={{ color: "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>{p.name || "—"}</span>
-                {p.phone && (
-                  <span className="lg:text-[0.8rem] font-semibold flex-shrink-0 md:text-[0.6rem]" style={{ color: valueColor || VALUE_COLOR, fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>{p.phone}</span>
-                )}
-              </div>
-            ))}
+            {items.map((row, i) => {
+              // 2+ nurses (or 2+ doctors) sharing one row need to shrink to
+              // both fit — a single name on its own row stays full-size.
+              const rowSizeClass = row.length > 1 ? IP_SIZE_SMALL : IP_SIZE_NORMAL;
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  {row.map((p, j) => (
+                    <span key={j} className="flex items-center gap-1 flex-1 min-w-0" title={p.name ? `${p.name}${p.phone ? " - " + p.phone : ""}` : ""}>
+                      <span className={`${rowSizeClass} font-semibold truncate text-left min-w-0`} style={{ color: "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>{p.name || "—"}</span>
+                      {p.phone && (
+                        <span className={`${rowSizeClass} font-semibold truncate flex-shrink-0`} style={{ color: valueColor || VALUE_COLOR, fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>- {p.phone}</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div>
             {items.map((line, i) => (
-              <div key={i} className="lg:text-[0.8rem] font-semibold text-left md:text-[0.6rem]" style={{ color: textColor || "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }} title={line}>
+              <div key={i} className={`${IP_SIZE_NORMAL} font-semibold text-left`} style={{ color: textColor || "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }} title={line}>
                 {line}
               </div>
             ))}
@@ -231,7 +249,12 @@ export default function VitalSignsSection({ patient, activeTab }) {
       icon: Users,
       label: "Medic",
       accent: ipIconShades[3],
-      people: [ip.nurse1, ip.nurse2, ip.consultant, ip.consultant2].map(parseNamePhone).filter(Boolean),
+      // Grouped into two rows — both nurses together on one line, both
+      // doctors together on the next — instead of one row per person.
+      people: [
+        [ip.nurse1, ip.nurse2].map(parseNamePhone).filter(Boolean),
+        [ip.consultant, ip.consultant2].map(parseNamePhone).filter(Boolean),
+      ].filter(row => row.length > 0),
     },
   ];
 

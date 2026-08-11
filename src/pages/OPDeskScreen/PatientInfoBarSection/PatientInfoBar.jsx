@@ -33,6 +33,7 @@ export default function PatientInfoBar({
   leftHighlightedTab, // comes from OPDeskScreen (via LeftSidebar's onHoverChange)
   firstObservationCardRef, // ref OPDeskScreen uses to measure First Observation's right edge
   activeTab, // which prescription tab is active — swaps Vital Signs for IP Admission Info on "iptime"
+  tabsRowRef, // ref to the Prescription Tabs row — Appointments dropdown caps its open height there
 }) {
   const [open, setOpen] = useState(false);
   const [opList, setOpList] = useState(false);
@@ -73,6 +74,7 @@ export default function PatientInfoBar({
             onAddPatient={onAddPatient}
             open={open}
             setOpen={setOpen}
+            tabsRowRef={tabsRowRef}
           />
 
           {/* ── Right Panel ── */}

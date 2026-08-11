@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import {
-  ClipboardList, User, Users, ChevronDown, Search, Plus, X
+  ClipboardList, User, Users, ChevronDown, Plus, X
 } from "lucide-react";
 
 /* ── Attendant Card — same layout as ClinicalCard (icon + title + data) ── */
@@ -32,16 +32,30 @@ function CompactRelationCard({ attendant }) {
 }
 
 /* ── Patient Dropdown Component ── */
-function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, setOpen }) {
-  const [searchTerm, setSearchTerm] = useState("");
+function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, setOpen, tabsRowRef }) {
+  const wrapRef = useRef(null);
+  // Caps the open popup's height so it ends exactly at the top of the
+  // Prescription Tabs row below, instead of a fixed value that could
+  // overlap it (or leave a gap short of it).
+  const [maxHeight, setMaxHeight] = useState(480);
 
-  const filteredPatients = patients.filter(pt =>
-    pt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pt.appt.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useLayoutEffect(() => {
+    if (!open) return;
+    const computeMaxHeight = () => {
+      const wrapEl = wrapRef.current;
+      const tabsEl = tabsRowRef?.current;
+      if (!wrapEl || !tabsEl) return;
+      const wrapBottom = wrapEl.getBoundingClientRect().bottom;
+      const tabsTop = tabsEl.getBoundingClientRect().top;
+      setMaxHeight(Math.max(160, tabsTop - wrapBottom - 8));
+    };
+    computeMaxHeight();
+    window.addEventListener("resize", computeMaxHeight);
+    return () => window.removeEventListener("resize", computeMaxHeight);
+  }, [open, tabsRowRef]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={wrapRef}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between rounded-none px-3 mb-1 py-1 md:px-2 md:py-1.5 lg:px-3 lg:py-2.5 text-left transition-all shadow-sm"
@@ -56,7 +70,7 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
             <User size={14} style={{ color: "var(--color-primary)" }} />
           </div>
           <span className="text-sm font-semibold truncate" style={{ color: selectedPatient ? "var(--color-primary-dark)" : "var(--color-text-subtle)" }}>
-            {selectedPatient ? selectedPatient.name : "Select patient..."}
+            {selectedPatient ? selectedPatient.name : "None"}
           </span>
         </div>
         <ChevronDown
@@ -68,48 +82,19 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
 
       {open && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-none overflow-hidden shadow-xl animate-fade-in"
-          style={{ 
-            background: "var(--color-surface)", 
+          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-none overflow-hidden shadow-xl animate-fade-in flex flex-col"
+          style={{
+            background: "var(--color-surface)",
             border: "1px solid var(--color-border)",
-            maxHeight: "480px",
+            maxHeight: `${maxHeight}px`,
           }}
         >
-          <div className="p-2 border-b" style={{ borderColor: "var(--color-border)", background: "var(--color-primary-muted)" }}>
-            <div className="flex items-center gap-2 px-2">
-              <Search size={12} style={{ color: "var(--color-primary)" }} />
-              <input
-                type="text"
-                placeholder="Search patients..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 bg-transparent text-xs outline-none"
-                style={{ color: "var(--color-text-base)" }}
-                autoFocus
-              />
-            </div>
-          </div>
-          <div className="max-h-120 overflow-y-auto">
-            <div
-              onClick={() => { onSelectPatient(null); setOpen(false); setSearchTerm(""); }}
-              className="px-3 py-1.5 cursor-pointer transition-all hover:pl-4 border-b"
-              style={{
-                background: !selectedPatient ? "var(--color-primary-muted)" : "var(--color-surface)",
-                borderLeft: !selectedPatient ? `3px solid var(--color-primary)` : "3px solid transparent",
-                borderColor: "var(--color-border)",
-              }}
-              onMouseEnter={e => { if (selectedPatient) e.currentTarget.style.background = "var(--color-primary-muted)"; }}
-              onMouseLeave={e => { if (selectedPatient) e.currentTarget.style.background = "var(--color-surface)"; }}
-            >
-              <span className="text-xs font-semibold italic" style={{ color: !selectedPatient ? "var(--color-primary-dark)" : "var(--color-text-subtle)" }}>
-                None
-              </span>
-            </div>
-            {filteredPatients.map((pt, i) => (
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {patients.map((pt, i) => (
               <div
                 key={pt.id}
-                onClick={() => { onSelectPatient(pt); setOpen(false); setSearchTerm(""); }}
-                className="px-3 py-2.5 cursor-pointer transition-all hover:pl-4"
+                onClick={() => { onSelectPatient(pt); setOpen(false); }}
+                className="px-3 py-1.5 cursor-pointer transition-all hover:pl-4"
                 style={{
                   background: selectedPatient?.id === pt.id ? "var(--color-primary-muted)" : i % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
                   borderLeft: selectedPatient?.id === pt.id ? `3px solid var(--color-primary)` : "3px solid transparent",
@@ -117,23 +102,21 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
                 onMouseEnter={e => { if (selectedPatient?.id !== pt.id) e.currentTarget.style.background = "var(--color-primary-muted)"; }}
                 onMouseLeave={e => { if (selectedPatient?.id !== pt.id) e.currentTarget.style.background = i % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)"; }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate" style={{ color: selectedPatient?.id === pt.id ? "var(--color-primary-dark)" : "var(--color-text-base)" }}>
-                      {pt.name}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-none flex-shrink-0" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}>
-                        {pt.appt}
-                      </span>
-                      <span className="text-[0.6rem] truncate" style={{ color: "var(--color-text-muted)" }}>{pt.slot}</span>
-                    </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold truncate flex-1 min-w-0" style={{ color: selectedPatient?.id === pt.id ? "var(--color-primary-dark)" : "var(--color-text-base)" }}>
+                    {pt.name}
+                  </span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-none flex-shrink-0" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}>
+                      {pt.appt}
+                    </span>
+                    <span className="text-[0.6rem] whitespace-nowrap" style={{ color: "var(--color-text-muted)" }}>{pt.slot}</span>
+                    <ChevronDown size={12} style={{ color: "var(--color-text-muted)" }} className="flex-shrink-0" />
                   </div>
-                  <ChevronDown size={12} style={{ color: "var(--color-text-muted)" }} className="flex-shrink-0" />
                 </div>
               </div>
             ))}
-            {filteredPatients.length === 0 && (
+            {patients.length === 0 && (
               <div className="px-3 py-4 text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
                 No patients found
               </div>
@@ -228,7 +211,8 @@ export default function LeftPatientSection({
   onSelectPatient,
   onAddPatient,
   open,
-  setOpen
+  setOpen,
+  tabsRowRef
 }) {
   const p = selectedPatient || {};
   const [showAddModal, setShowAddModal] = useState(false);
@@ -307,6 +291,7 @@ export default function LeftPatientSection({
             onSelectPatient={onSelectPatient}
             open={open}
             setOpen={setOpen}
+            tabsRowRef={tabsRowRef}
           />
         </div>
 
