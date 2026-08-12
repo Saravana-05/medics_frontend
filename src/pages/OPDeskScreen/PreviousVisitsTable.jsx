@@ -491,25 +491,25 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div className="flex-shrink-0 px-4 border-t flex justify-between items-center" style={{
           height: "48px",
           boxSizing: "border-box",
-          background: "var(--color-surface-alt)",
+          background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-primary)" }} />
-              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>OP Visit</span>
+              <span style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>OP Visit</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-lab)" }} />
-              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>IP Visit</span>
+              <span style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>IP Visit</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-drugs)" }} />
-              <span className="text-[0.6rem]" style={{ color: "var(--color-text-muted)" }}>Report Ready</span>
+              <span style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>Report Ready</span>
             </div>
           </div>
-          <div className="text-[0.6rem] font-medium" style={{ color: "var(--color-text-muted)" }}>
-            Showing {filteredVisits.length} of {visits.length} records
+          <div style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>
+            Showing {filteredVisits.length}/{visits.length}
           </div>
         </div>
       </div>

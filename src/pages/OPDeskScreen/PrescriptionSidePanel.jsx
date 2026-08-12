@@ -217,7 +217,7 @@ function GroupListPanel({
         </div>
       )}
 
-      <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <div className="side-panel-footer flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>{sidePanel.listSourceLabel}:</span>
           <select value={doctorFilter} onChange={e => setDoctorFilter(e.target.value)}
@@ -225,7 +225,7 @@ function GroupListPanel({
             <option>All Doctors</option>
             {doctors.map(d => <option key={d}>{d}</option>)}
           </select>
-          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {byDoctor.length} records</span>
+          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length}/{byDoctor.length}</span>
         </div>
         {!hasPatient && !draftActive && (
           <button onClick={() => setModalMode("add")} className="flex items-center gap-1.5 text-xs font-bold flex-shrink-0" style={{ color: textAccent || accentColor }}>
@@ -491,7 +491,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
         {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={2 + sidePanel.columns.length + 1} />)}
       </div>
 
-      <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <div className="side-panel-footer flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>Entry Type:</span>
           <select value={entryTypeFilter} onChange={e => setEntryTypeFilter(e.target.value)}
@@ -499,7 +499,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
             <option>All Types</option>
             {entryTypes.map(t => <option key={t}>{t}</option>)}
           </select>
-          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {mirrorItems.length} records</span>
+          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length}/{mirrorItems.length}</span>
         </div>
       </div>
     </>
@@ -580,7 +580,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
         {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={6} />)}
       </div>
 
-      <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <div className="side-panel-footer flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>File Type:</span>
           <select value={fileTypeFilter} onChange={e => setFileTypeFilter(e.target.value)}
@@ -588,7 +588,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
             <option>All Types</option>
             {fileTypes.map(t => <option key={t}>{t}</option>)}
           </select>
-          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {files.length} records</span>
+          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length}/{files.length}</span>
         </div>
         <button onClick={() => setShowUpload(true)} className="flex items-center gap-1.5 text-xs font-bold flex-shrink-0" style={{ color: textAccent || accentColor }}>
           {sidePanel.newButtonLabel}
@@ -695,7 +695,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
         {Array.from({ length: fillRowCount }).map((_, i) => <EmptyPanelRow key={`empty-${i}`} columnCount={5} />)}
       </div>
 
-      <div className="flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+      <div className="side-panel-footer flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>{sidePanel.listSourceLabel}:</span>
           <select value={specialityFilter} onChange={e => setSpecialityFilter(e.target.value)}
@@ -703,7 +703,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
             <option>All Specialities</option>
             {specialities.map(s => <option key={s}>{s}</option>)}
           </select>
-          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length} of {bySpeciality.length} records</span>
+          <span className="text-[0.65rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {filtered.length}/{bySpeciality.length}</span>
         </div>
         <button onClick={() => setModalMode("add")} className="flex items-center gap-1.5 text-xs font-bold flex-shrink-0" style={{ color: textAccent || accentColor }}>
           {sidePanel.newButtonLabel}

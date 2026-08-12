@@ -70,12 +70,12 @@ function EntryFooterBar({
   frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
 }) {
   return (
-    <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)", fontSize: "13px" }}>
+    <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-primary-muted)", borderColor: "var(--color-border)", fontSize: "13px" }}>
       <div className="ml-10 mr-2 flex min-w-0 flex-shrink items-center gap-2 overflow-hidden">
         <span className="flex-shrink-0 whitespace-nowrap" style={{ color: "var(--color-text-base)", fontSize: "13px", fontWeight: "400" }}>{filterLabel}:</span>
         <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
-            className="w-40 max-w-full flex-shrink px-2 py-1 outline-none"
+            className="w-32 max-w-full flex-shrink px-2 py-1 outline-none"
             style={{ fontSize: "13px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
             {typeOptions.map(opt => <option key={opt} style={{ fontSize: "13px" }}>{opt}</option>)}
           </select>
@@ -83,10 +83,10 @@ function EntryFooterBar({
         </div>
       </div>
 
-      <div className="flex items-center gap-4" style={{ marginLeft: "57px" }}>
+      <div className="flex items-center" style={{ marginLeft: "97px", gap: "4px" }}>
         <SearchModeCheckbox checked={searchMode === "alpha"} onClick={() => onSearchModeChange("alpha")} label="Alphabet" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
         <SearchModeCheckbox checked={searchMode === "embedded"} onClick={() => onSearchModeChange("embedded")} label="Embedded" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
-        <div style={{ marginLeft: "70px" }}>
+        <div>
           <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
         </div>
       </div>
@@ -272,7 +272,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
    step the value directly without opening the list, matching the old behavior. */
 const OPTION_ROW_PX = 33;
 
-function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {} }) {
+function ArrowSelect({ dataField, value, options, onChange, onNavigate, placeholder = "Select", style: extraStyle = {} }) {
   const idx = options.indexOf(value);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -290,7 +290,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         className="prescription-entry-control w-full flex items-center justify-between px-2 text-[1rem] text-left"
         style={{ border: "1px solid var(--color-border)", background: open ? "var(--color-primary-muted)" : "var(--color-surface)", ...extraStyle }}>
-        <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{value}</span>
+        <span className={`min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${value ? "" : "prescription-dropdown-placeholder"}`} style={{ fontSize: value ? "1rem" : "0.8rem" }}>{value || placeholder}</span>
         <ChevronDown size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
       <PortalDropdown anchorEl={anchorRef.current} open={open}>
@@ -503,17 +503,17 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
         );
         if (field === "intake") return (
           <div key="intake" className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
-            <ArrowSelect dataField="intake" value={draft.intake} options={config.fieldOptions.intake} onChange={v => onDraftChange("intake")(v)} onNavigate={e => handleFieldKeyDown(e, "intake")} />
+            <ArrowSelect dataField="intake" value={draft.intake} options={config.fieldOptions.intake} placeholder="Dosage" onChange={v => onDraftChange("intake")(v)} onNavigate={e => handleFieldKeyDown(e, "intake")} />
           </div>
         );
         if (field === "period") return (
           <div key="period" className="w-20 flex-shrink-0 px-1 py-1.5 flex items-center">
-            <ArrowSelect dataField="period" value={draft.period} options={config.fieldOptions.period} onChange={v => onDraftChange("period")(v)} onNavigate={e => handleFieldKeyDown(e, "period")} style={{ color: "var(--color-primary)", fontWeight: 700 }} />
+            <ArrowSelect dataField="period" value={draft.period} options={config.fieldOptions.period} placeholder="Period" onChange={v => onDraftChange("period")(v)} onNavigate={e => handleFieldKeyDown(e, "period")} style={{ color: "var(--color-primary)", fontWeight: 700 }} />
           </div>
         );
         if (field === "when") return (
           <div key="when" className="w-40 flex-shrink-0 px-1 py-1.5 flex items-center">
-            <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
+            <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} placeholder="When" onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
           </div>
         );
         if (field === "detail") return (
@@ -599,10 +599,10 @@ function makeFreshDraft(config, keepDays) {
   const draft = { name: "" };
   (config.addRowFields || []).forEach(field => {
     if (field === "commit") return;
-    if (field === "days") draft.days = keepDays ?? "1";
-    else if (field === "intake") draft.intake = "1";
-    else if (field === "period") draft.period = "OD";
-    else if (field === "when") draft.when = "After Food";
+    if (field === "days") draft.days = config.key === "drugs" ? "" : (keepDays ?? "1");
+    else if (field === "intake") draft.intake = config.key === "drugs" ? "" : "1";
+    else if (field === "period") draft.period = config.key === "drugs" ? "" : "OD";
+    else if (field === "when") draft.when = config.key === "drugs" ? "" : "After Food";
     else if (field === "detail") draft.detail = "—";
     else if (field === "time") draft.time = nowHHMM(); // defaults to current system time
     else draft[field] = ""; // generic typable fields (e.g. subject/advice/nurse/treatment)

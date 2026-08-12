@@ -268,9 +268,34 @@ body {
   opacity: 0.8;
 }
 
+.prescription-dropdown-placeholder {
+  color: #a7b3c0;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
 /* Data values in Drug Group, Lab groups/report, Service files, and IP panels. */
 .side-panel-data-row .text-xs {
   font-size: 1rem;
+}
+
+.side-panel-footer,
+.side-panel-footer .text-xs,
+.side-panel-footer .text-\[0\.68rem\],
+.side-panel-footer .text-\[0\.65rem\],
+.side-panel-footer select,
+.side-panel-footer option,
+.side-panel-footer button {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.side-panel-footer {
+  background: var(--color-primary-muted) !important;
+}
+
+.side-panel-footer * {
+  font-weight: 400 !important;
 }
 
 /* Data values in the Previous Information grid. */
