@@ -260,6 +260,14 @@ body {
   outline: none;
 }
 
+.prescription-entry-placeholder::placeholder,
+.prescription-entry-control::placeholder {
+  color: #a7b3c0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
 /* Data values in Drug Group, Lab groups/report, Service files, and IP panels. */
 .side-panel-data-row .text-xs {
   font-size: 1rem;

@@ -121,7 +121,7 @@ export const TAB_CONFIGS = {
 
     labels: {
       addButton: "Add Test",
-      searchPlaceholder: "Search or select Lab Test",
+      searchPlaceholder: "Lab Test Search",
       searchListLabel: "Lab Tests",
       newEntityButton: "New Test",
       footerFilterLabel: "Test Type",
@@ -187,7 +187,7 @@ export const TAB_CONFIGS = {
 
     labels: {
       addButton: "Add Service",
-      searchPlaceholder: "Search or select Service",
+      searchPlaceholder: "Service Search",
       searchListLabel: "Services",
       newEntityButton: "New Service",
       footerFilterLabel: "Service Type",
@@ -221,7 +221,7 @@ export const TAB_CONFIGS = {
 
     labels: {
       addButton: "Add Entry",
-      searchPlaceholder: "Search or select Subject",
+      searchPlaceholder: "Subject",
       searchListLabel: "IP Subjects",
       searchColumnLabel: "Subject", // AddRow's search field is labeled "Subject" here, not "Name"
       newEntityButton: "New Entry",

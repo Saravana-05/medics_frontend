@@ -53,7 +53,7 @@ function ActionButton({ onClick, label, bg, hoverBg, textColor = "white" }) {
 function SearchModeCheckbox({ checked, onClick, label, accentColor, textAccent, accentText = "white" }) {
   return (
     <label className="flex items-center gap-1.5 cursor-pointer select-none"
-      style={{ fontSize: "0.72rem", fontWeight: checked ? "700" : "500", color: checked ? (textAccent || accentColor) : "var(--color-text-muted)" }}>
+      style={{ fontSize: "13px", fontWeight: "400", color: checked ? (textAccent || accentColor) : "var(--color-text-muted)" }}>
       <span onClick={onClick} className="flex items-center justify-center rounded transition-all"
         style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer", border: `2px solid ${checked ? accentColor : "var(--color-border)"}`, background: checked ? accentColor : "var(--color-surface)" }}>
         {checked && <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,7 7.5,2" stroke={accentText} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
@@ -70,16 +70,16 @@ function EntryFooterBar({
   frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
 }) {
   return (
-    <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+    <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)", fontSize: "13px" }}>
       <div className="ml-10 mr-2 flex min-w-0 flex-shrink items-center gap-2 overflow-hidden">
-        <span className="flex-shrink-0 whitespace-nowrap text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{filterLabel}:</span>
+        <span className="flex-shrink-0 whitespace-nowrap" style={{ color: "var(--color-text-base)", fontSize: "13px", fontWeight: "400" }}>{filterLabel}:</span>
         <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
-            className="w-40 max-w-full flex-shrink px-2 py-1 text-[1rem] outline-none"
-            style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
-            {typeOptions.map(opt => <option key={opt} style={{ fontSize: "1rem" }}>{opt}</option>)}
+            className="w-40 max-w-full flex-shrink px-2 py-1 outline-none"
+            style={{ fontSize: "13px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+            {typeOptions.map(opt => <option key={opt} style={{ fontSize: "13px" }}>{opt}</option>)}
           </select>
-          <span className="flex-shrink-0 whitespace-nowrap text-[0.68rem]" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount}</span>
+          <span className="flex-shrink-0 whitespace-nowrap" style={{ color: "var(--color-text-subtle)", fontSize: "13px" }}>Showing {recordCount}/{recordCount}</span>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ function EntryFooterBar({
       </div>
 
       {!hideNewButton && (
-        <button onClick={onNewEntity} className="mr-5 flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
+        <button onClick={onNewEntity} className="ml-auto flex flex-shrink-0 items-center gap-1.5" style={{ color: textAccent || accentColor, fontSize: "13px", fontWeight: "400" }}>
           {newEntityButton}
           <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
             <Plus size={12} />
@@ -464,14 +464,14 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
         if (field === "name") {
           if (config.hasSearchField === false) return null;
           return (
-            <div key="name" className={`${config.key === "iptime" ? "w-[180px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
+            <div key="name" className={`${config.key === "iptime" ? "w-[170px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
                 onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
                 placeholder={config.labels.searchPlaceholder}
-                className="prescription-entry-control w-full text-[1rem] font-medium outline-none"
+                className="prescription-entry-control prescription-entry-placeholder w-full text-[1rem] font-medium outline-none"
                 style={{ fontSize: "1rem", border: selected ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)",
                   background: selected ? "var(--color-primary-muted)" : "var(--color-surface)", color: config.textAccent || config.color,
                   paddingLeft: "0.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
@@ -498,7 +498,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="days" type="number" min="1" max="365" value={draft.days}
               onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-              className="prescription-entry-control w-full px-2 text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} placeholder="Days" />
+              className="prescription-entry-control prescription-entry-placeholder w-full px-2 text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} placeholder="Days" />
           </div>
         );
         if (field === "intake") return (
@@ -528,16 +528,16 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "entryType") return (
-          <div key="entryType" className="flex-shrink-0 px-1 py-1.5 flex items-center" style={{ width: "180px" }}>
+          <div key="entryType" className="flex-shrink-0 px-1 py-1.5 flex items-center" style={{ width: "170px" }}>
             <TypableInput dataField="entryType" value={draft.entryType ?? ""} options={config.fieldOptions?.entryType || []}
-              placeholder="Type" onChange={e => onDraftChange("entryType")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "entryType")} />
+              placeholder="Entry Type" onChange={e => onDraftChange("entryType")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "entryType")} />
           </div>
         );
         if (field === "schDate") return (
           <div key="schDate" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="schDate" type="date" value={draft.schDate}
               onChange={e => onDraftChange("schDate")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "schDate")}
-              className="prescription-entry-control w-full px-1.5 outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} />
+              className="prescription-entry-control prescription-entry-placeholder w-full px-1.5 outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} />
           </div>
         );
 
@@ -572,7 +572,7 @@ const ADD_ROW_FIELD_META = {
   when:   { label: "When",   width: "w-40" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-48" },
-  entryType: { label: "Entry Type", width: "w-[180px]" },
+  entryType: { label: "Entry Type", width: "w-[170px]" },
   schDate: { label: "Sch. Date", width: "w-28" },
 };
 
@@ -582,7 +582,7 @@ function buildAddRowColumns(config) {
     if (field === "commit") return;
     if (field === "name") {
       if (config.hasSearchField === false) return;
-      cols.push({ key: "name", label: config.labels.searchColumnLabel || "Name", width: config.key === "iptime" ? "w-[180px]" : "w-80" });
+      cols.push({ key: "name", label: config.labels.searchColumnLabel || "Name", width: config.key === "iptime" ? "w-[170px]" : "w-80" });
       return;
     }
     const meta = ADD_ROW_FIELD_META[field];
