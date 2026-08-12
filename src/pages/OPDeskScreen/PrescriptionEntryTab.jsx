@@ -8,26 +8,28 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 const ROW_HEIGHT_PX = 42;
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
-// EntryFooterBar's fixed height (see its own height: "48px") — every dropdown
-// opened from within the entry section must end above it, never over it.
-const ENTRY_FOOTER_HEIGHT_PX = 48;
+// Every dropdown opened from the entry section extends to the footer's bottom edge.
 
 function PortalDropdown({ anchorEl, open, children }) {
   if (!open || !anchorEl) return null;
 
   const rect = anchorEl.getBoundingClientRect();
-  const spaceBelow = window.innerHeight - rect.bottom;
+  const footerBottom = document.querySelector("[data-prescription-entry-footer]")?.getBoundingClientRect().bottom
+    ?? window.innerHeight;
+  const availableHeight = Math.max(0, footerBottom - rect.bottom - 2);
   const style = {
     position: "fixed",
     top: rect.bottom + 2,
     left: rect.left,
     width: rect.width,
-    maxHeight: spaceBelow - 8 - ENTRY_FOOTER_HEIGHT_PX,
+    height: availableHeight,
+    maxHeight: availableHeight,
+    boxSizing: "border-box",
     zIndex: 99999,
   };
 
   return ReactDOM.createPortal(
-    <div className="dropdown-thin-scrollbar" style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
+    <div className="dropdown-thin-scrollbar" style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 0, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>, document.body
   );
@@ -68,15 +70,17 @@ function EntryFooterBar({
   frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
 }) {
   return (
-    <div className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
+    <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
       <div className="flex items-center gap-3">
         <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{filterLabel}:</span>
-        <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
-          className="w-36 px-2 py-1.5 rounded text-xs outline-none"
-          style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
-          {typeOptions.map(opt => <option key={opt}>{opt}</option>)}
-        </select>
-        <span className="text-[0.68rem]" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount} of {recordCount} records</span>
+        <div className="flex items-center gap-2">
+          <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
+            className="w-36 px-2 py-1 text-[1rem] outline-none"
+            style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+            {typeOptions.map(opt => <option key={opt} style={{ fontSize: "1rem" }}>{opt}</option>)}
+          </select>
+          <span className="text-[0.68rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount} records</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
@@ -237,7 +241,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={onChange}
         onFocus={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="w-full px-2 py-1.5 rounded text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)",
+        className="w-full px-2 py-1.5 text-[1rem] outline-none" style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
       {options.length > 0 && (
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
@@ -245,8 +249,8 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
           {filtered.map((opt, i) => (
-            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-[1rem]"
-              style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
+            <div key={opt} onMouseDown={() => select(opt)} className="prescription-dropdown-option cursor-pointer"
+              style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}>{opt}</div>
           ))}
         </PortalDropdown>
@@ -258,8 +262,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
 /* Custom dropdown (not a native <select>) so we control the popup: opens downward
    only, shows ~5 options at a time, and scrolls for the rest. Arrow keys still
    step the value directly without opening the list, matching the old behavior. */
-const VISIBLE_OPTION_COUNT = 5;
-const OPTION_ROW_PX = 26;
+const OPTION_ROW_PX = 34;
 
 function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {} }) {
   const idx = options.indexOf(value);
@@ -277,17 +280,17 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
     <div ref={anchorRef} className="relative w-full">
       <button type="button" data-field={dataField} onClick={() => setOpen(v => !v)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="w-full flex items-center justify-between px-2 py-1 rounded text-xs text-left"
+        className="w-full flex items-center justify-between px-2 py-1 text-[1rem] text-left"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", ...extraStyle }}>
-        <span>{value}</span>
+        <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{value}</span>
         <ChevronDown size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
       <PortalDropdown anchorEl={anchorRef.current} open={open}>
-        <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
+        <div>
           {options.map(opt => (
             <div key={opt} onMouseDown={() => select(opt)}
-              className="px-3 flex items-center cursor-pointer text-[1rem]"
-              style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
+              className="prescription-dropdown-option cursor-pointer"
+              style={{ height: OPTION_ROW_PX, fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
               {opt}
             </div>
           ))}
@@ -316,19 +319,19 @@ function TimeColumnSelect({ value, options, disabledSet, onChange, format, width
   return (
     <div ref={anchorRef} className={`relative min-w-0 ${width || "flex-1"}`}>
       <button type="button" onClick={() => setOpen(v => !v)} onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="w-full flex items-center justify-between px-1.5 py-1.5 rounded text-xs text-left"
+        className="w-full flex items-center justify-between px-1.5 py-1.5 text-[1rem] text-left"
         style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
-        <span>{fmt(value)}</span>
+        <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{fmt(value)}</span>
         <ChevronDown size={12} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
       <PortalDropdown anchorEl={anchorRef.current} open={open}>
-        <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
+        <div>
           {options.map(opt => {
             const isDisabled = disabledSet.has(opt);
             return (
               <div key={opt} onMouseDown={() => select(opt)}
-                className="px-3 flex items-center text-[1rem]"
-                style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)",
+                className="prescription-dropdown-option"
+                style={{ height: OPTION_ROW_PX, fontSize: "1rem", borderBottom: "1px solid var(--color-border)",
                   cursor: isDisabled ? "not-allowed" : "pointer",
                   color: isDisabled ? "var(--color-text-subtle)" : "var(--color-text-base)",
                   background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
@@ -460,8 +463,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
                 placeholder={config.labels.searchPlaceholder}
-                className="w-full py-1.5 rounded text-sm font-medium"
-                style={{ border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
+                className="w-full py-1.5 text-[1rem] font-medium"
+                style={{ fontSize: "1rem", border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
                   background: selected ? config.colorLight : "var(--color-surface)", color: config.textAccent || config.color,
                   paddingLeft: "1.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
               {selected && (
@@ -473,8 +476,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                 onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
               <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
                 {dropdownItems.map((item, i) => (
-                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-1.5 cursor-pointer text-[1rem]"
-                    style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
+                  <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
+                    style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
                     {item}
                   </div>
                 ))}
@@ -501,7 +504,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "when") return (
-          <div key="when" className="w-44 flex-shrink-0 px-1 py-1.5 flex items-center">
+          <div key="when" className="w-48 flex-shrink-0 px-1 py-1.5 flex items-center">
             <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
           </div>
         );
@@ -552,7 +555,7 @@ const ADD_ROW_FIELD_META = {
   days:   { label: "Days",   width: "w-16" },
   intake: { label: "Dosage", width: "w-20" },
   period: { label: "Period", width: "w-20" },
-  when:   { label: "When",   width: "w-44" },
+  when:   { label: "When",   width: "w-48" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-40" },
   schDate: { label: "Sch. Date", width: "w-28" },
@@ -584,7 +587,7 @@ function makeFreshDraft(config, keepDays) {
     if (field === "days") draft.days = keepDays ?? "1";
     else if (field === "intake") draft.intake = "1";
     else if (field === "period") draft.period = "OD";
-    else if (field === "when") draft.when = "After food";
+    else if (field === "when") draft.when = "After Food";
     else if (field === "detail") draft.detail = "—";
     else if (field === "time") draft.time = nowHHMM(); // defaults to current system time
     else draft[field] = ""; // generic typable fields (e.g. subject/advice/nurse/treatment)

@@ -78,8 +78,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
         // Demo data for existing visits
         loadedPrescriptions[visit.sl] = {
           drugs: [
-            { name: "Paracetamol 500mg", form: "Tab", intake: "1", period: "TDS", when: "AF", detail: "After meals", days: 5 },
-            { name: "Amoxicillin 250mg", form: "Cap", intake: "1", period: "BD", when: "BF", detail: "Before meals", days: 7 }
+            { name: "Paracetamol 500mg", form: "Tab", intake: "1", period: "TDS", when: "After Food", detail: "After meals", days: 5 },
+            { name: "Amoxicillin 250mg", form: "Cap", intake: "1", period: "BD", when: "Before Food", detail: "Before meals", days: 7 }
           ],
           labs: [
             { name: "Complete Blood Count (CBC)", detail: "Fasting" },

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, Eye, EyeOff, Stethoscope, UserRound } from "lucide-react";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlineOutlined";
+import StethoscopeHandDrawn from "../../assets/stethoscope_HandDrawn.png";
 
 export default function LoginUI({
   username,
@@ -19,6 +20,8 @@ export default function LoginUI({
   return (
     <main className="medix-login-page">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Sacramento&display=swap');
+
         @keyframes medix-spin { to { transform: rotate(360deg); } }
         @keyframes medix-pop { from { transform: scale(.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes medix-pulse { 50% { transform: scale(1.1) rotate(5deg); } }
@@ -28,14 +31,14 @@ export default function LoginUI({
           min-height: 100vh;
           display: grid;
           place-items: center;
-          padding: clamp(24px, 7vh, 74px) clamp(20px, 3.5vw, 58px);
+          padding: 60px;
           background:
             radial-gradient(circle at 50% 47%, rgba(255,255,255,.96), rgba(239,239,239,.88) 56%, #d4d4d4 100%);
           color: #fff;
         }
         .medix-login-shell {
-          width: min(1560px, 100%);
-          min-height: min(790px, calc(100vh - clamp(48px, 14vh, 148px)));
+          width: 100%;
+          min-height: calc(100vh - 120px);
           display: grid;
           grid-template-columns: 1fr 1fr;
           overflow: hidden;
@@ -70,31 +73,33 @@ export default function LoginUI({
           white-space: nowrap;
         }
         .medix-brand-name {
-          font-family: "Segoe Script", "Brush Script MT", cursive;
-          font-size: clamp(72px, 8.2vw, 132px);
+          font-family: "Sacramento", "Segoe Script", "Brush Script MT", cursive;
+          font-size: clamp(50px, 5.74vw, 92px);
           font-weight: 400;
+          font-style: italic;
+          transform: translateY(125px);
           line-height: .9;
-          letter-spacing: -8px;
+          letter-spacing: 2px;
           color: #fff;
           text-shadow: 0 7px 5px rgba(0,75,77,.35);
         }
         .medix-brand-tagline {
-          color: #051515;
-          font-family: Georgia, serif;
-          font-size: clamp(18px, 1.65vw, 27px);
-          font-style: italic;
+          color: #6b7280;
+          font-family: "Inter", sans-serif;
+          font-size: clamp(15px, 1.65vw, 24px);
+          font-style: normal;
+          font-weight: 400;
+          transform: translateY(145px);
         }
-        .medix-brand-tagline strong { font-family: inherit; font-style: normal; font-weight: 800; }
         .medix-hero-icon {
           position: relative;
           z-index: 1;
-          width: clamp(245px, 26vw, 385px);
-          height: clamp(245px, 26vw, 385px);
-          margin-top: 18px;
-          color: #fff;
+          width: clamp(270px, 28.6vw, 424px);
+          height: clamp(270px, 28.6vw, 424px);
+          margin-top: 118px;
+          object-fit: contain;
+          mix-blend-mode: screen;
           filter: drop-shadow(9px 12px 4px rgba(5,83,86,.38));
-          transform: rotate(-11deg);
-          stroke-width: 1.35;
         }
         .medix-login-panel {
           position: relative;
@@ -261,18 +266,18 @@ export default function LoginUI({
           .medix-login-page { padding: 0; place-items: stretch; background: #151616; }
           .medix-login-shell { min-height: 100vh; grid-template-columns: 1fr; }
           .medix-login-hero { min-height: 330px; padding: 55px 24px 25px; }
-          .medix-brand-name { font-size: clamp(62px, 18vw, 94px); }
-          .medix-brand-tagline { font-size: clamp(16px, 4.2vw, 22px); }
-          .medix-hero-icon { width: 165px; height: 165px; margin-top: 10px; }
+          .medix-brand-name { font-size: clamp(43px, 12.6vw, 66px); }
+          .medix-brand-tagline { font-size: clamp(13px, 4.2vw, 19px); }
+          .medix-hero-icon { width: 182px; height: 182px; margin-top: 110px; }
           .medix-login-panel { min-height: 570px; padding: 112px 27px 58px; }
           .medix-register { top: 32px; right: 28px; }
         }
         @media (max-width: 480px) {
           .medix-login-hero { min-height: 275px; padding-top: 43px; }
           .medix-brand { gap: 11px; }
-          .medix-brand-name { font-size: 59px; letter-spacing: -5px; }
-          .medix-brand-tagline { font-size: 14px; }
-          .medix-hero-icon { width: 130px; height: 130px; }
+          .medix-brand-name { font-size: 41px; letter-spacing: 2px; }
+          .medix-brand-tagline { font-size: 11px; }
+          .medix-hero-icon { width: 143px; height: 143px; }
           .medix-login-panel { padding-inline: 22px; }
           .medix-register-copy strong { font-size: 18px; }
           .medix-register-copy span { font-size: 14px; }
@@ -283,10 +288,10 @@ export default function LoginUI({
       <section className="medix-login-shell" aria-label="Medix sign in">
         <div className="medix-login-hero" aria-hidden="true">
           <div className="medix-brand">
-            <span className="medix-brand-name">Medix</span>
-            <span className="medix-brand-tagline">... for <strong>Doctors</strong></span>
+            <span className="medix-brand-name">E-Medics</span>
+            <span className="medix-brand-tagline">... for Doctors</span>
           </div>
-          <Stethoscope className="medix-hero-icon" />
+          <img className="medix-hero-icon" src={StethoscopeHandDrawn} alt="" />
         </div>
 
         <div className="medix-login-panel">
