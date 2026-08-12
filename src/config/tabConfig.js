@@ -238,7 +238,7 @@ export const TAB_CONFIGS = {
     // Medic isn't typed — it's derived from who's logged in (see computeRowDisplay's
     // context arg), so it has no addRowFields entry. Time is now a picked field
     // instead of an auto-stamp, so it must be chosen before an entry can be added.
-    addRowFields: ["time", "name", "notes", "entryType", "commit"],
+    addRowFields: ["time", "entryType", "name", "notes", "commit"],
     // Subject stays required (primary identifying field, like every other tab);
     // Time must also be chosen before an entry can be added.
     requiredFields: ["name", "time"],
@@ -247,9 +247,9 @@ export const TAB_CONFIGS = {
       { key: "no",        label: "No.",         width: "w-12",   type: "index" },
       { key: "medic",      label: "Medic",       width: "w-28",   type: "text" },
       { key: "time",       label: "Time",        width: "w-24",   type: "text" },
+      { key: "entryType",  label: "Entry Type",  width: "w-24",   type: "text" },
       { key: "name",       label: "Subject",     width: "flex-1", type: "text", align: "center" },
       { key: "notes",      label: "Notes",       width: "flex-1", type: "text" },
-      { key: "entryType",  label: "Entry Type",  width: "w-24",   type: "text" },
       { key: "actions",    label: "Actions",     width: "w-24",   type: "actions" },
     ],
 
