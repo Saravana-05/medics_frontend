@@ -337,7 +337,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                     <tr
                       key={visit.sl}
                       tabIndex={0}
-                      className="transition-all duration-150 hover:shadow-sm hover:bg-primary-muted/30 cursor-pointer outline-none group"
+                      className="previous-info-data-row transition-all duration-150 hover:shadow-sm hover:bg-primary-muted/30 cursor-pointer outline-none group"
                       style={{
                         borderBottom: "1px solid var(--color-border)",
                         background: selectedRowSl === visit.sl ? "var(--color-primary-muted)" : "var(--color-surface)",

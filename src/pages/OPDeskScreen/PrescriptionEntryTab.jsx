@@ -71,7 +71,7 @@ function EntryFooterBar({
 }) {
   return (
     <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      <div className="flex min-w-0 flex-shrink items-center gap-2 overflow-hidden">
+      <div className="ml-10 mr-2 flex min-w-0 flex-shrink items-center gap-2 overflow-hidden">
         <span className="flex-shrink-0 whitespace-nowrap text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{filterLabel}:</span>
         <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
@@ -79,19 +79,20 @@ function EntryFooterBar({
             style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
             {typeOptions.map(opt => <option key={opt} style={{ fontSize: "1rem" }}>{opt}</option>)}
           </select>
-          <span className="flex-shrink-0 whitespace-nowrap text-[0.68rem]" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount} records</span>
+          <span className="flex-shrink-0 whitespace-nowrap text-[0.68rem]" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount}</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>Search:</span>
+      <div className="flex items-center gap-4" style={{ marginLeft: "57px" }}>
         <SearchModeCheckbox checked={searchMode === "alpha"} onClick={() => onSearchModeChange("alpha")} label="Alphabet" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
         <SearchModeCheckbox checked={searchMode === "embedded"} onClick={() => onSearchModeChange("embedded")} label="Embedded" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
-        <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
+        <div style={{ marginLeft: "70px" }}>
+          <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
+        </div>
       </div>
 
       {!hideNewButton && (
-        <button onClick={onNewEntity} className="flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
+        <button onClick={onNewEntity} className="mr-5 flex items-center gap-1.5 text-xs font-bold" style={{ color: textAccent || accentColor }}>
           {newEntityButton}
           <span className="flex items-center justify-center w-5 h-5 rounded-full" style={{ background: accentColor, color: accentText }}>
             <Plus size={12} />
@@ -161,7 +162,7 @@ function EmptyRow({ columns }) {
 }
 
 /* ── Data row — renders whatever fields config.computeRowDisplay produced ── */
-function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, accentColor, accentLight }) {
+function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, accentColor, accentLight, dataFontSize }) {
   return (
     <div tabIndex={0} data-row-id={item.id} onClick={onSelect} onFocus={onSelect}
       onKeyDown={e => {
@@ -177,16 +178,16 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
       {columns.map(col => {
         if (col.key === "no") return (
           <div key="no" className="w-12 px-2 py-1 text-left">
-            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}</span>
+            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>{index + 1}</span>
           </div>
         );
         if (col.key === "name") return (
           <div key="name" className={`${col.width} min-w-0 px-2 py-1 text-left`}>
-            <div className="font-normal text-xs truncate" style={{ color: "var(--color-text-base)" }}>
+            <div className="font-normal text-xs truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>
               {item.display.primaryLine ?? item.name}
             </div>
             {item.display.secondaryLine && (
-              <div className="text-xs mt-0.5 font-normal truncate" style={{ color: "var(--color-text-base)" }}>{item.display.secondaryLine}</div>
+              <div className="text-xs mt-0.5 font-normal truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>{item.display.secondaryLine}</div>
             )}
           </div>
         );
@@ -202,7 +203,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         );
         if (col.type === "computed") return (
           <div key={col.key} className={`${col.width} px-0.5 py-1 text-left`}>
-            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
+            <span className="text-xs font-normal" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>
               {item.display[col.key] ?? ""}
             </span>
           </div>
@@ -210,7 +211,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         // plain text columns (when/detail/etc.)
         return (
           <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 text-left`}>
-            <span className="text-xs font-normal block truncate" style={{ color: "var(--color-text-base)" }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
+            <span className="text-xs font-normal block truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
           </div>
         );
       })}
@@ -221,17 +222,23 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
 /* ── Typable remarks input w/ optional dropdown suggestions ── */
 function TypableInput({ value, options = [], onChange, onKeyDown, dataField, placeholder }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showAllOptions, setShowAllOptions] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const inputRef = useRef(null);
   const anchorRef = useRef(null);
+  const hasValue = value !== "â€”" && String(value ?? "").trim() !== "";
   const filtered = options.filter(o => o !== "—" && o.toLowerCase().includes((value === "—" ? "" : value).toLowerCase()));
 
-  const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
+  const displayedOptions = showAllOptions
+    ? options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))))
+    : filtered;
+  const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setShowAllOptions(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
   const handleKeyDown = e => {
-    if (showDropdown && filtered.length > 0) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, filtered.length - 1)); return; }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) setShowAllOptions(false);
+    if (showDropdown && displayedOptions.length > 0) {
+      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, displayedOptions.length - 1)); return; }
       if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
-      if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); select(filtered[highlightedIdx]); return; }
+      if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); select(displayedOptions[highlightedIdx]); return; }
       if (e.key === "Escape") { setShowDropdown(false); setHighlightedIdx(-1); return; }
     }
     onKeyDown?.(e);
@@ -239,18 +246,19 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   return (
     <div ref={anchorRef} className="relative w-full">
       <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={onChange}
-        onFocus={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
+        onFocus={() => { setShowAllOptions(hasValue); setShowDropdown(options.length > 0); }}
+        onClick={() => { setShowAllOptions(hasValue); setShowDropdown(options.length > 0); }} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)",
+        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)", background: hasValue ? "var(--color-primary-muted)" : "var(--color-surface)",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
       {options.length > 0 && (
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
       )}
       {options.length > 0 && (
-        <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
-          {filtered.map((opt, i) => (
+        <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && displayedOptions.length > 0}>
+          {displayedOptions.map((opt, i) => (
             <div key={opt} onMouseDown={() => select(opt)} className="prescription-dropdown-option cursor-pointer"
-              style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
+              style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || opt === value ? "var(--color-primary-muted)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}>{opt}</div>
           ))}
         </PortalDropdown>
@@ -262,7 +270,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
 /* Custom dropdown (not a native <select>) so we control the popup: opens downward
    only, shows ~5 options at a time, and scrolls for the rest. Arrow keys still
    step the value directly without opening the list, matching the old behavior. */
-const OPTION_ROW_PX = 34;
+const OPTION_ROW_PX = 33;
 
 function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: extraStyle = {} }) {
   const idx = options.indexOf(value);
@@ -397,11 +405,12 @@ function TimeHourMinuteSelect({ dataField, value, onChange }) {
 }
 
 /* ── Add row: renders only the fields listed in config.addRowFields ── */
-const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query, setQuery, suggestions, onCancel, rowNumber, searchMode }, ref) => {
+const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query, setQuery, suggestions, allSuggestions, onCancel, rowNumber, searchMode }, ref) => {
   const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [selected, setSelected] = useState(() => !!query);
+  const [showAllItems, setShowAllItems] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -414,7 +423,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
 
   useEffect(() => { setSelected(!!query.trim()); }, [query]);
 
-  const dropdownItems = suggestions.slice(0, 8);
+  const dropdownItems = (showAllItems || selected) ? allSuggestions : suggestions.slice(0, 8);
   const fieldOrder = config.addRowFields;
 
   const focusField = k => rowRef.current?.querySelector(`[data-field="${k}"]`)?.focus();
@@ -435,9 +444,9 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     if (e.key === "Enter" && (field !== "name" || !showDropdown)) { e.preventDefault(); onCommit(); }
   };
   const handleSelect = item => {
-    setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setHighlightedIdx(-1); inputRef.current?.focus();
+    setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
   };
-  const handleClear = () => { setQuery(""); onDraftChange("name")(""); setSelected(false); setTimeout(() => inputRef.current?.focus(), 0); };
+  const handleClear = () => { setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
 
   return (
     <div ref={rowRef} data-add-row="true" className="flex items-stretch border-b relative"
@@ -445,7 +454,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       onBlur={e => { if (rowRef.current && !rowRef.current.contains(e.relatedTarget)) { setShowDropdown(false); setHighlightedIdx(-1); } }}>
 
       <div className="w-12 px-2 py-2 flex items-center justify-center flex-shrink-0">
-        <span className="text-sm font-semibold" style={{ color: config.textAccent || config.color }}>{rowNumber}</span>
+        <span className="font-semibold" style={{ color: config.textAccent || config.color, fontSize: "1rem" }}>{rowNumber}</span>
       </div>
 
       {/* Fields render in config.addRowFields order (so e.g. IP Time-line can put
@@ -457,14 +466,14 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           return (
             <div key="name" className="w-80 flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
-                onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowDropdown(true); setHighlightedIdx(-1); }}
+                onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
                 placeholder={config.labels.searchPlaceholder}
                 className="prescription-entry-control w-full text-[1rem] font-medium outline-none"
-                style={{ fontSize: "1rem", border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
-                  background: selected ? config.colorLight : "var(--color-surface)", color: config.textAccent || config.color,
+                style={{ fontSize: "1rem", border: selected ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)",
+                  background: selected ? "var(--color-primary-muted)" : "var(--color-surface)", color: config.textAccent || config.color,
                   paddingLeft: "0.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
               {selected && (
                 <button type="button" onMouseDown={e => { e.preventDefault(); handleClear(); }} title="Clear"
@@ -472,11 +481,11 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                   style={{ right: "1.5rem", width: 16, height: 16, background: "var(--color-danger)", color: "white" }}><X size={10} strokeWidth={3} /></button>
               )}
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
-                onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
+                onMouseDown={e => { e.preventDefault(); setShowAllItems(true); setShowDropdown(v => !v); setHighlightedIdx(-1); }} />
               <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}>
                 {dropdownItems.map((item, i) => (
                   <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
-                    style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}>
+                    style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || item === query ? "var(--color-primary-muted)" : "transparent" }}>
                     {item}
                   </div>
                 ))}
@@ -489,7 +498,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="days" type="number" min="1" max="365" value={draft.days}
               onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-              className="prescription-entry-control w-full px-2 text-sm text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} placeholder="Days" />
+              className="prescription-entry-control w-full px-2 text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} placeholder="Days" />
           </div>
         );
         if (field === "intake") return (
@@ -522,7 +531,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="schDate" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="schDate" type="date" value={draft.schDate}
               onChange={e => onDraftChange("schDate")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "schDate")}
-              className="prescription-entry-control w-full px-1.5 text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
+              className="prescription-entry-control w-full px-1.5 outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} />
           </div>
         );
 
@@ -682,7 +691,8 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
                 isStruck={struckIds.includes(item.id)} isSelected={selectedRowId === item.id}
                 onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
                 onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
-                onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight} />
+                onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight}
+                dataFontSize="1rem" />
             ))}
             {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
           </div>
@@ -693,7 +703,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
             <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.colorText} />
             {showAddRow ? (
               <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
-                query={query} setQuery={setQuery} suggestions={suggestions} rowNumber={items.length + 1} searchMode={searchMode} />
+                query={query} setQuery={setQuery} suggestions={suggestions} allSuggestions={searchList} rowNumber={items.length + 1} searchMode={searchMode} />
             ) : (
               <div className="flex items-center justify-center py-3 border-t cursor-pointer" style={{ background: config.colorLight, borderColor: config.color }} onClick={handleAddNew}>
                 <button className="px-4 py-1.5 rounded-md text-sm font-bold flex items-center gap-2" style={{ background: config.color, color: config.colorText || "white" }}>

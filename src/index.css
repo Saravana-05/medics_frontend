@@ -229,7 +229,9 @@ body {
 
 /* One shared geometry for every Prescription Entry dropdown option. */
 .prescription-dropdown-option {
-  min-height: 34px;
+  height: 33px;
+  min-height: 33px;
+  max-height: 33px;
   padding: 0 12px;
   display: flex;
   align-items: center;
@@ -256,6 +258,16 @@ body {
   background: var(--color-primary-muted) !important;
   border-color: var(--color-primary) !important;
   outline: none;
+}
+
+/* Data values in Drug Group, Lab groups/report, Service files, and IP panels. */
+.side-panel-data-row .text-xs {
+  font-size: 1rem;
+}
+
+/* Data values in the Previous Information grid. */
+.previous-info-data-row .text-xs {
+  font-size: 1rem;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
