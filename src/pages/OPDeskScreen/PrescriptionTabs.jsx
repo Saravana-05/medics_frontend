@@ -9,7 +9,7 @@ const PRESCRIPTION_TABS = [
   { key: "lab",      label: "Lab",      icon: TAB_CONFIGS.lab.icon,      color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText,      textAccent: TAB_CONFIGS.lab.textAccent },
   { key: "services", label: "Service",  icon: TAB_CONFIGS.services.icon, color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText, textAccent: TAB_CONFIGS.services.textAccent },
   { key: "carePlan", label: "Care-Plan", icon: TAB_CONFIGS.carePlan.icon, color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText, textAccent: TAB_CONFIGS.carePlan.textAccent },
-  { key: "iptime",   label: "IP Time-line", icon: TAB_CONFIGS.iptime.icon, color: TAB_CONFIGS.iptime.color, textColor: TAB_CONFIGS.iptime.colorText, textAccent: TAB_CONFIGS.iptime.textAccent },
+  { key: "iptime",   label: "IP Timeline", icon: TAB_CONFIGS.iptime.icon, color: TAB_CONFIGS.iptime.color, textColor: TAB_CONFIGS.iptime.colorText, textAccent: TAB_CONFIGS.iptime.textAccent },
 ];
 
 const GRAY_DARK = "#6b7280";

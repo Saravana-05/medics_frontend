@@ -430,7 +430,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
           <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
             className="side-panel-data-row flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || item.name || "—"}</span></div>
-            <div className="w-28 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.observedValue || "—"}</span></div>
+            <div className="w-28 px-3 py-2.5 truncate text-center"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.observedValue || "—"}</span></div>
             <div className="w-20 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.unit || "—"}</span></div>
             <div className="w-48 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.bioRef || "—"}</span></div>
             <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.specimen || "—"}</span></div>

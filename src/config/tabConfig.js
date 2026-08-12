@@ -212,7 +212,7 @@ export const TAB_CONFIGS = {
   /* ══════════════════ IP TIME ══════════════════ */
   iptime: {
     key: "iptime",
-    label: "IP Time-line",
+    label: "IP Timeline",
     icon: Clock,
     color: "var(--color-iptime)",
     colorLight: "var(--color-iptime-light)",

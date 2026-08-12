@@ -366,7 +366,7 @@ body {
   align-items: center;
   justify-content: flex-end;
   text-align: right;
-  padding-right: 18px !important;
+  padding-right: 26px !important;
 }
 
 /* Center only serial-number data in every table view. */
