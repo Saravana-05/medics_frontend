@@ -71,15 +71,15 @@ function EntryFooterBar({
 }) {
   return (
     <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-      <div className="flex items-center gap-3">
-        <span className="text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{filterLabel}:</span>
-        <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-shrink items-center gap-2 overflow-hidden">
+        <span className="flex-shrink-0 whitespace-nowrap text-[0.72rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{filterLabel}:</span>
+        <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
-            className="w-36 px-2 py-1 text-[1rem] outline-none"
+            className="w-40 max-w-full flex-shrink px-2 py-1 text-[1rem] outline-none"
             style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
             {typeOptions.map(opt => <option key={opt} style={{ fontSize: "1rem" }}>{opt}</option>)}
           </select>
-          <span className="text-[0.68rem] whitespace-nowrap" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount} records</span>
+          <span className="flex-shrink-0 whitespace-nowrap text-[0.68rem]" style={{ color: "var(--color-text-subtle)" }}>Showing {recordCount}/{recordCount} records</span>
         </div>
       </div>
 
@@ -241,7 +241,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={onChange}
         onFocus={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="w-full px-2 py-1.5 text-[1rem] outline-none" style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)",
+        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: "1px solid var(--color-border)", background: "var(--color-surface)",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
       {options.length > 0 && (
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
@@ -280,8 +280,8 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
     <div ref={anchorRef} className="relative w-full">
       <button type="button" data-field={dataField} onClick={() => setOpen(v => !v)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="w-full flex items-center justify-between px-2 py-1 text-[1rem] text-left"
-        style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", ...extraStyle }}>
+        className="prescription-entry-control w-full flex items-center justify-between px-2 text-[1rem] text-left"
+        style={{ border: "1px solid var(--color-border)", background: open ? "var(--color-primary-muted)" : "var(--color-surface)", ...extraStyle }}>
         <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{value}</span>
         <ChevronDown size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
@@ -319,8 +319,8 @@ function TimeColumnSelect({ value, options, disabledSet, onChange, format, width
   return (
     <div ref={anchorRef} className={`relative min-w-0 ${width || "flex-1"}`}>
       <button type="button" onClick={() => setOpen(v => !v)} onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="w-full flex items-center justify-between px-1.5 py-1.5 text-[1rem] text-left"
-        style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
+        className="prescription-entry-control w-full flex items-center justify-between px-1.5 text-[1rem] text-left"
+        style={{ border: "1px solid var(--color-border)", background: open ? "var(--color-primary-muted)" : "var(--color-surface)" }}>
         <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{fmt(value)}</span>
         <ChevronDown size={12} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
@@ -456,17 +456,16 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           if (config.hasSearchField === false) return null;
           return (
             <div key="name" className="w-80 flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center" ref={nameWrapRef}>
-              <config.icon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: config.textAccent || config.color }} />
               <input data-field="name" ref={inputRef} value={query}
                 onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
                 placeholder={config.labels.searchPlaceholder}
-                className="w-full py-1.5 text-[1rem] font-medium"
+                className="prescription-entry-control w-full text-[1rem] font-medium outline-none"
                 style={{ fontSize: "1rem", border: selected ? `1.5px solid ${config.color}` : "1px solid var(--color-border)",
                   background: selected ? config.colorLight : "var(--color-surface)", color: config.textAccent || config.color,
-                  paddingLeft: "1.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
+                  paddingLeft: "0.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
               {selected && (
                 <button type="button" onMouseDown={e => { e.preventDefault(); handleClear(); }} title="Clear"
                   className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full"
@@ -474,10 +473,10 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               )}
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
                 onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
-              <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
+              <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}>
                 {dropdownItems.map((item, i) => (
                   <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
-                    style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
+                    style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}>
                     {item}
                   </div>
                 ))}
@@ -490,7 +489,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="days" type="number" min="1" max="365" value={draft.days}
               onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-              className="w-full px-2 py-1.5 rounded text-sm text-left font-semibold" style={{ border: "1px solid var(--color-border)" }} placeholder="Days" />
+              className="prescription-entry-control w-full px-2 text-sm text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} placeholder="Days" />
           </div>
         );
         if (field === "intake") return (
@@ -504,7 +503,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "when") return (
-          <div key="when" className="w-48 flex-shrink-0 px-1 py-1.5 flex items-center">
+          <div key="when" className="w-40 flex-shrink-0 px-1 py-1.5 flex items-center">
             <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
           </div>
         );
@@ -523,7 +522,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="schDate" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="schDate" type="date" value={draft.schDate}
               onChange={e => onDraftChange("schDate")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "schDate")}
-              className="w-full px-1.5 py-1.5 rounded text-sm" style={{ border: "1px solid var(--color-border)" }} />
+              className="prescription-entry-control w-full px-1.5 text-sm outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)" }} />
           </div>
         );
 
@@ -555,7 +554,7 @@ const ADD_ROW_FIELD_META = {
   days:   { label: "Days",   width: "w-16" },
   intake: { label: "Dosage", width: "w-20" },
   period: { label: "Period", width: "w-20" },
-  when:   { label: "When",   width: "w-48" },
+  when:   { label: "When",   width: "w-40" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-40" },
   schDate: { label: "Sch. Date", width: "w-28" },

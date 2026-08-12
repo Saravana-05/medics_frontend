@@ -242,6 +242,21 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* Uniform height and focus treatment for every Prescription Entry control. */
+.prescription-entry-control {
+  height: 34px;
+  min-height: 34px;
+  box-sizing: border-box;
+  background: var(--color-surface);
+}
+
+.prescription-entry-control:focus,
+.prescription-entry-control:focus-visible {
+  background: var(--color-primary-muted) !important;
+  border-color: var(--color-primary) !important;
+  outline: none;
+}
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;

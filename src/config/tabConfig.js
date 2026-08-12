@@ -41,7 +41,7 @@ export const TAB_CONFIGS = {
 
     labels: {
       addButton: "Add Medicine",
-      searchPlaceholder: "Search or select medicine (A–Z)...",
+      searchPlaceholder: "Drug Search",
       searchListLabel: "Medicines",
       newEntityButton: "New Drug",
       footerFilterLabel: "Drug Type",
@@ -52,7 +52,7 @@ export const TAB_CONFIGS = {
     fieldOptions: {
       intake: ["¼","½","¾","1","1½","2","3","4","1Ts","2Ts","3Ts","4Ts","5ml","10ml"],
       period: ["OD","BD","TDS","QID","HS","SOS","Stat","Weekly","Monthly"],
-      when:   ["After Food","Before Food","Before & After Food","Any Time","Empty Stomach","With Milk","Before Sleep"],
+      when:   ["After Food","Before Food","Any Time","Empty Stomach","With Milk","Before Sleep"],
       detail: ["—","On Time","Only If Required","Discontinue Any Time","Continue","Reduce Dose","Increase Dose","Take with Water"],
     },
 
