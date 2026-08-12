@@ -204,6 +204,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
         
         {/* Header Section with FULL background color */}
         <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{
+          height: "48px",
+          boxSizing: "border-box",
           background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
@@ -283,7 +285,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
-              <tr style={{ background: "var(--color-primary-muted)", height: "30px", boxSizing: "border-box" }}>
+              <tr style={{ background: "var(--color-primary-muted)", height: "40px", boxSizing: "border-box" }}>
                 {visibleColumnsList.map(col => (
                   <th
                     key={col.key}

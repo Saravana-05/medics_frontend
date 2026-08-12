@@ -22,7 +22,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
   const [hoveredKey, setHoveredKey] = useState(null);
 
   return (
-    <div className="flex-1 min-w-0 flex items-stretch" style={{ height: 40,marginLeft: -8 }}>
+    <div className="flex-1 min-w-0 flex items-stretch" style={{ height: 48, marginLeft: -8 }}>
       {PRESCRIPTION_TABS.map((tab, i) => {
         const isActive = activeTab === tab.key;
         const isHovered = hoveredKey === tab.key;
@@ -39,7 +39,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
         const clipPath = isFirst
           ? `polygon(0 0, calc(100% - ${SLANT}px) 0, 100% 100%, 0 100%)`
           : isLast
-            ? `polygon(0 0, 100% 0, 100% 100%, ${SLANT}px 100%)`
+            ? `polygon(0 0, calc(100% - ${SLANT}px) 0, 100% 100%, ${SLANT}px 100%)`
             : `polygon(0 0, calc(100% - ${SLANT}px) 0, 100% 100%, ${SLANT}px 100%)`;
 
         return (
