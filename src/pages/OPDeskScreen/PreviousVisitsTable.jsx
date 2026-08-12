@@ -26,7 +26,7 @@ export function getPrescriptionForVisit(visitSl) {
 
 // Column configuration with visibility toggle option
 const ALL_COLUMNS = [
-  { key: "sl", label: "SL", width: "w-12", align: "left", defaultVisible: true, sortable: true },
+  { key: "sl", label: "No.", width: "w-12", align: "left", defaultVisible: true, sortable: true },
   { key: "entryDt", label: "Entry", width: "w-28", align: "left", defaultVisible: true, sortable: true },
   { key: "docModule", label: "Module", width: "w-32", align: "left", defaultVisible: true, sortable: true },
   { key: "reportDt", label: "Report", width: "w-28", align: "left", defaultVisible: false, sortable: true },
@@ -103,9 +103,9 @@ export default function PreviousVisitsTable({ visits = [] }) {
   }, [visits]);
 
   const moduleColor = (mod) => {
-    if (mod.includes("OP")) return { bg: "var(--color-primary-muted)", text: "var(--color-primary)", badge: "OP" };
-    if (mod.includes("IP")) return { bg: "var(--color-lab-light)", text: "var(--color-lab)", badge: "IP" };
-    return { bg: "#f0f0f0", text: "#5a5a5a", badge: "OT" };
+    if (mod.includes("OP")) return { bg: "var(--color-primary-muted)", text: "var(--color-primary)", dot: "var(--color-primary)", badge: "OP" };
+    if (mod.includes("IP")) return { bg: "var(--color-lab-light)", text: "var(--color-lab)", dot: "var(--color-lab)", badge: "IP" };
+    return { bg: "#f0f0f0", text: "#5a5a5a", dot: "var(--color-drugs)", badge: "OT" };
   };
 
   const getVitalsDisplay = (vitals) => {
@@ -290,7 +290,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                   <th
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
-                    className={`${col.width} px-3 py-1 text-center ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
+                    className={`${col.width} px-3 py-1 text-left ${col.sortable ? 'cursor-pointer hover:bg-opacity-80' : ''} transition-all select-none`}
                     style={{
                       borderBottom: "1px solid var(--color-border)",
                       fontSize: "0.62rem",
@@ -298,10 +298,10 @@ export default function PreviousVisitsTable({ visits = [] }) {
                       letterSpacing: "0.03em",
                       lineHeight: 1,
                       color: "var(--color-primary-dark)",
-                      textTransform: "uppercase"
+                      textTransform: "none"
                     }}
                   >
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-start gap-1">
                       {col.label}
                       {col.sortable && <SortIcon field={col.key} />}
                     </div>
@@ -356,7 +356,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         if (col.key === "docModule") {
                           return (
                             <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
-                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-normal" style={{ background: module.bg, color: "var(--color-text-base)" }}>
+                              <span className="inline-flex items-center text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                 {value}
                               </span>
                             </td>
@@ -443,7 +443,10 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         return (
                           <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                             {col.key === "sl" ? (
-                              <span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{value}</span>
+                              <span className="inline-flex items-center gap-1.5 text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
+                                <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: module.dot }} />
+                                {value}
+                              </span>
                             ) : col.key === "entryDt" ? (
                               <div className="flex items-center gap-1.5">
                                 {/* <Calendar size={11} style={{ color: "var(--color-text-muted)" }} /> */}
@@ -504,10 +507,6 @@ export default function PreviousVisitsTable({ visits = [] }) {
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-lab)" }} />
               <span style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>IP Visit</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-drugs)" }} />
-              <span style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>Report Ready</span>
             </div>
           </div>
           <div style={{ color: "var(--color-text-muted)", fontSize: "13px", fontWeight: 400 }}>

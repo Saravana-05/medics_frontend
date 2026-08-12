@@ -279,6 +279,10 @@ body {
   font-size: 1rem;
 }
 
+.service-panel-data-row .text-xs {
+  font-size: 12px;
+}
+
 .side-panel-footer,
 .side-panel-footer .text-xs,
 .side-panel-footer .text-\[0\.68rem\],

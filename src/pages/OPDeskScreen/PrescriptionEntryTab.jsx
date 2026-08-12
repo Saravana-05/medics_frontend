@@ -6,6 +6,7 @@ import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown } from "lucide-reac
 import useFillRowCount from "../../hooks/useFillRowCount";
 
 const ROW_HEIGHT_PX = 42;
+const NONE_OPTION = "<None>";
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
 // Every dropdown opened from the entry section extends to the footer's bottom edge.
@@ -229,9 +230,8 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   const hasValue = value !== "â€”" && String(value ?? "").trim() !== "";
   const filtered = options.filter(o => o !== "—" && o.toLowerCase().includes((value === "—" ? "" : value).toLowerCase()));
 
-  const displayedOptions = showAllOptions
-    ? options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))))
-    : filtered;
+  const visibleOptions = options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))));
+  const displayedOptions = showAllOptions ? [NONE_OPTION, ...visibleOptions] : [NONE_OPTION, ...filtered];
   const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setShowAllOptions(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
   const handleKeyDown = e => {
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) setShowAllOptions(false);
@@ -273,12 +273,13 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
 const OPTION_ROW_PX = 33;
 
 function ArrowSelect({ dataField, value, options, onChange, onNavigate, placeholder = "Select", style: extraStyle = {} }) {
-  const idx = options.indexOf(value);
+  const dropdownOptions = [NONE_OPTION, ...options];
+  const idx = dropdownOptions.indexOf(value);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const handleKeyDown = e => {
-    if (e.key === "ArrowDown") { e.preventDefault(); onChange(options[Math.min(idx + 1, options.length - 1)]); return; }
-    if (e.key === "ArrowUp") { e.preventDefault(); onChange(options[Math.max(idx - 1, 0)]); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); onChange(dropdownOptions[Math.min(idx + 1, dropdownOptions.length - 1)]); return; }
+    if (e.key === "ArrowUp") { e.preventDefault(); onChange(dropdownOptions[Math.max(idx - 1, 0)]); return; }
     if (e.key === " ") { e.preventDefault(); setOpen(v => !v); return; }
     if (e.key === "Escape" && open) { e.preventDefault(); setOpen(false); return; }
     if (["ArrowLeft", "ArrowRight", "Enter", "Escape", "Tab"].includes(e.key)) { e.preventDefault(); onNavigate?.(e); }
@@ -295,7 +296,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, placehol
       </button>
       <PortalDropdown anchorEl={anchorRef.current} open={open}>
         <div>
-          {options.map(opt => (
+          {dropdownOptions.map(opt => (
             <div key={opt} onMouseDown={() => select(opt)}
               className="prescription-dropdown-option cursor-pointer"
               style={{ height: OPTION_ROW_PX, fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
@@ -423,7 +424,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
 
   useEffect(() => { setSelected(!!query.trim()); }, [query]);
 
-  const dropdownItems = (showAllItems || selected) ? allSuggestions : suggestions.slice(0, 8);
+  const dropdownItems = [NONE_OPTION, ...((showAllItems || selected) ? allSuggestions : suggestions.slice(0, 8))];
   const fieldOrder = config.addRowFields;
 
   const focusField = k => rowRef.current?.querySelector(`[data-field="${k}"]`)?.focus();
