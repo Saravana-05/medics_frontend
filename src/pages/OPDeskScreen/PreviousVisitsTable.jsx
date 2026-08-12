@@ -285,7 +285,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
-              <tr style={{ background: "var(--color-primary-muted)", height: "40px", boxSizing: "border-box" }}>
+              <tr className="table-header-text" style={{ background: "var(--color-primary-muted)", height: "40px", boxSizing: "border-box" }}>
                 {visibleColumnsList.map(col => (
                   <th
                     key={col.key}

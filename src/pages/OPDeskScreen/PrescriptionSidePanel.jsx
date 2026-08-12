@@ -147,7 +147,7 @@ function GroupListPanel({
         subtitle={`${entries.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+      <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {sidePanel.columns.map((col, i) => (
           <div key={col} className={i === 0 ? "flex-1 px-3 text-center" : "w-16 px-3 text-center"}
@@ -418,7 +418,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
           </div>
         } />
 
-      <div className="flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX + 10}px`, boxSizing: "border-box", overflow: "hidden" }}>
+      <div className="table-header-text flex border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX + 10}px`, boxSizing: "border-box", overflow: "hidden" }}>
         {sidePanel.reportView.columns.map((col, i) => (
           <div key={col} className={`${i === 0 ? "flex-1" : i === 1 ? "w-28" : i === 2 ? "w-20" : i === 3 ? "w-48" : "w-24"} px-3 py-2.5 truncate text-center`}
             style={{ fontSize: "0.7rem", fontWeight: "800", letterSpacing: "0.05em", color: accentColor, whiteSpace: "nowrap" }}>{col}</div>
@@ -466,7 +466,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
         subtitle={`${mirrorItems.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+      <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {sidePanel.columns.map((col, i) => (
           <div key={col} className={i !== 1 ? "w-24 px-3 text-center" : "flex-1 px-3 text-center"}
@@ -549,7 +549,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
         subtitle={`${files.length} File${files.length !== 1 ? "s" : ""}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+      <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>File Name</div>
         <div className="w-14 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Type</div>
@@ -667,7 +667,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
           </div>}
         </div>} />
 
-      <div className="flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+      <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {visibleColumns.speciality && <div className="w-24 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Speciality</div>}
         {visibleColumns.condition && <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>}

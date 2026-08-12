@@ -302,6 +302,13 @@ body {
 .previous-info-data-row .text-xs {
   font-size: 1rem;
 }
+
+/* Shared table headers across Prescription, middle panel, and Previous Info. */
+.table-header-text,
+.table-header-text * {
+  font-size: 12px !important;
+  letter-spacing: 1px !important;
+}
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;

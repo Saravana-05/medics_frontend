@@ -128,7 +128,7 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 /* ── Table headers built from config.tableColumns ── */
 function TableHeader({ columns, accentColor }) {
   return (
-    <div className="flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} min-w-0 ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
@@ -142,7 +142,7 @@ function TableHeader({ columns, accentColor }) {
 
 function AddTableHeader({ columns, accentColor, accentText = "white" }) {
   return (
-    <div className="flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "40px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "40px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 flex items-center justify-center text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: accentText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
