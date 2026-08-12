@@ -221,7 +221,7 @@ function GroupListPanel({
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>{sidePanel.listSourceLabel}:</span>
           <select value={doctorFilter} onChange={e => setDoctorFilter(e.target.value)}
-            className="w-36 px-2 py-1.5 rounded text-xs outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+            className="px-2 py-1.5 rounded text-xs outline-none" style={{ width: "156px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
             <option>All Doctors</option>
             {doctors.map(d => <option key={d}>{d}</option>)}
           </select>
@@ -582,7 +582,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
       <div className="side-panel-footer flex-shrink-0 flex items-center justify-between gap-4 px-4 border-t" style={{ height: "48px", boxSizing: "border-box", background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>File Type:</span>
+          <span className="text-[0.68rem] font-semibold flex-shrink-0" style={{ color: "var(--color-text-base)" }}>Service File Type:</span>
           <select value={fileTypeFilter} onChange={e => setFileTypeFilter(e.target.value)}
             className="w-36 px-2 py-1.5 rounded text-xs outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
             <option>All Types</option>

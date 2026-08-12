@@ -464,7 +464,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
         if (field === "name") {
           if (config.hasSearchField === false) return null;
           return (
-            <div key="name" className={`${config.key === "iptime" ? "w-[170px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
+            <div key="name" className={`${config.key === "iptime" ? "w-[150px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
                 onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
@@ -528,7 +528,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "entryType") return (
-          <div key="entryType" className="flex-shrink-0 px-1 py-1.5 flex items-center" style={{ width: "170px" }}>
+          <div key="entryType" className="flex-shrink-0 px-1 py-1.5 flex items-center" style={{ width: "150px" }}>
             <TypableInput dataField="entryType" value={draft.entryType ?? ""} options={config.fieldOptions?.entryType || []}
               placeholder="Entry Type" onChange={e => onDraftChange("entryType")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "entryType")} />
           </div>
@@ -572,7 +572,7 @@ const ADD_ROW_FIELD_META = {
   when:   { label: "When",   width: "w-40" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-48" },
-  entryType: { label: "Entry Type", width: "w-[170px]" },
+  entryType: { label: "Entry Type", width: "w-[150px]" },
   schDate: { label: "Sch. Date", width: "w-28" },
 };
 
@@ -582,7 +582,7 @@ function buildAddRowColumns(config) {
     if (field === "commit") return;
     if (field === "name") {
       if (config.hasSearchField === false) return;
-      cols.push({ key: "name", label: config.labels.searchColumnLabel || "Name", width: config.key === "iptime" ? "w-[170px]" : "w-80" });
+      cols.push({ key: "name", label: config.labels.searchColumnLabel || "Name", width: config.key === "iptime" ? "w-[150px]" : "w-80" });
       return;
     }
     const meta = ADD_ROW_FIELD_META[field];
