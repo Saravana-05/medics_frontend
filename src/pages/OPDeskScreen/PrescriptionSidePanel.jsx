@@ -153,7 +153,7 @@ function GroupListPanel({
           <div key={col} className={i === 0 ? "flex-1 px-3 text-center" : "w-16 px-3 text-center"}
             style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{col}</div>
         ))}
-        <div className="w-40 pl-3 pr-2 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="side-panel-actions-header w-40 pl-3 pr-2" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
@@ -171,7 +171,7 @@ function GroupListPanel({
               {e.remarks && <div className="text-xs font-normal truncate" style={{ color: "var(--color-text-base)" }}>{e.remarks}</div>}
             </div>
             {metricsFor(e).map((m, i) => (
-              <div key={i} className="w-16 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{m}</span></div>
+              <div key={i} className="w-16 px-3 py-2.5 text-center"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{m}</span></div>
             ))}
             <div className="w-40 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
               {onApplyGroup && sidePanel.applyLabel && (
@@ -457,6 +457,9 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
     : byType;
   const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, filtered.length);
   const entryTypes = [...new Set(mirrorItems.map(it => it.entryType).filter(Boolean))];
+  const handleLoad = item => alert(`Loaded: ${item.display?.primaryLine || item.entryType || "Entry"}`);
+  const handleEdit = item => alert(`Edit: ${item.display?.primaryLine || item.entryType || "Entry"}`);
+  const handleDelete = item => alert(`Delete: ${item.display?.primaryLine || item.entryType || "Entry"}`);
 
   const handleView = item => alert(`${item.entryType || "—"}\nSubject: ${item.display?.primaryLine || "—"}\nNotes: ${item.notes || "—"}`);
 
@@ -466,25 +469,28 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
         subtitle={`${mirrorItems.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+      <div className="ip-mirror-header table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {sidePanel.columns.map((col, i) => (
           <div key={col} className={i !== 1 ? "w-24 px-3 text-center" : "flex-1 px-3 text-center"}
-            style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{col}</div>
+            style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>{i === 0 ? "Entry" : col}</div>
         ))}
-        <div className="w-16 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="side-panel-actions-header ip-mirror-actions w-28 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
         {filtered.map((item, index) => (
           <div key={item.id} tabIndex={0} onClick={() => setSelectedId(item.id)} onFocus={() => setSelectedId(item.id)}
-            className="side-panel-data-row flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
+            className="ip-mirror-row side-panel-data-row flex border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === item.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === item.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}</span></div>
             <div className="w-24 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.entryType || "—"}</span></div>
             <div className="flex-1 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.display?.primaryLine || "—"}</span></div>
             <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{item.notes || "—"}</span></div>
-            <div className="w-16 px-3 py-2.5 flex items-center justify-center">
+            <div className="ip-mirror-actions w-28 px-3 py-2.5 flex items-center justify-center gap-1.5">
+              <button onClick={() => handleLoad(item)} className="p-1 rounded transition-all" title="Load" style={{ background: accentLight, color: textAccent || accentColor }}><ArrowRightCircle size={11} /></button>
               <button onClick={() => handleView(item)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
+              <button onClick={() => handleEdit(item)} className="p-1 rounded transition-all" title="Edit" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>
+              <button onClick={() => handleDelete(item)} className="p-1 rounded transition-all" title="Delete" style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={11} /></button>
             </div>
           </div>
         ))}
@@ -561,7 +567,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
         <div className="w-14 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Type</div>
         <div className="w-16 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Size</div>
         <div className="w-32 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Dt-Time</div>
-        <div className="w-28 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="side-panel-actions-header w-28 px-3" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
@@ -576,7 +582,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
               </span>
             </div>
             <div className="w-14 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{f.type}</span></div>
-            <div className="w-16 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{f.size}</span></div>
+            <div className="w-16 px-3 py-2.5 text-center"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{f.size}</span></div>
             <div className="w-32 px-3 py-2.5 text-left"><span className="text-xs font-normal whitespace-nowrap" style={{ color: "var(--color-text-base)" }}>{f.dtTime}</span></div>
             <div className="w-28 px-3 py-2.5 flex items-center justify-center gap-1.5">
               <button onClick={event => { event.stopPropagation(); handleLoadFile(f); }} className="p-1 rounded transition-all" title="Load" style={{ background: accentLight, color: textAccent || accentColor }}><ArrowRightCircle size={11} /></button>
@@ -682,7 +688,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
         {visibleColumns.condition && <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>}
         {visibleColumns.milestones && <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Milestones</div>}
         {visibleColumns.period && <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Period</div>}
-        <div className="w-24 pl-3 pr-2 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
+        <div className="side-panel-actions-header w-24 pl-3 pr-2" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
 
       <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
@@ -692,8 +698,8 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
             <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}</span></div>
             {visibleColumns.speciality && <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.speciality}</span></div>}
             {visibleColumns.condition && <div className="flex-1 px-3 py-2.5 min-w-0"><span className="text-xs font-normal truncate block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>}
-            {visibleColumns.milestones && <div className="w-20 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.milestones}</span></div>}
-            {visibleColumns.period && <div className="w-20 px-3 py-2.5 text-left"><span className="font-normal" style={{ color: "var(--color-text-base)", fontSize: "calc(0.8rem - 1px)" }}>{e.period}</span></div>}
+            {visibleColumns.milestones && <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.milestones}</span></div>}
+            {visibleColumns.period && <div className="w-20 px-3 py-2.5 text-center"><span className="font-normal" style={{ color: "var(--color-text-base)", fontSize: "calc(0.8rem - 1px)" }}>{e.period}</span></div>}
             <div className="w-24 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">
               <button onClick={() => handleView(e)} className="p-1 rounded transition-all" title="View" style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Eye size={11} /></button>
               <button onClick={() => setModalMode(e)} className="p-1 rounded transition-all" title="Modify" style={{ background: accentLight, color: textAccent || accentColor }}><Edit2 size={11} /></button>

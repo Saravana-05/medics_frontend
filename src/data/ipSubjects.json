@@ -1,12 +1,12 @@
 [
   "General Check",
-  "Vital Signs Monitoring",
-  "Medication Administration",
+  "Vital Signs",
+  "Medication",
   "Wound Dressing",
   "IV Fluids",
-  "Blood Transfusion",
+  "Blood Test",
   "Lab Tests",
   "Consultation",
-  "Emergency Care",
-  "Discharge Planning"
+  "Emergency ",
+  "Discharge "
 ]

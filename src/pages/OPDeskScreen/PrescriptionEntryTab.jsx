@@ -178,7 +178,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         opacity: isStruck ? 0.6 : 1, boxShadow: isSelected ? `inset 0 0 0 2px ${accentColor}` : "none" }}>
       {columns.map(col => {
         if (col.key === "no") return (
-          <div key="no" className="w-12 px-2 py-1 text-left">
+          <div key="no" className="w-12 px-2 py-1 text-center">
             <span className="text-xs font-normal" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>{index + 1}</span>
           </div>
         );
@@ -203,7 +203,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
           </div>
         );
         if (col.type === "computed") return (
-          <div key={col.key} className={`${col.width} px-0.5 py-1 text-left`}>
+          <div key={col.key} className={`${col.width} px-0.5 py-1 text-center`}>
             <span className="text-xs font-normal" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>
               {item.display[col.key] ?? ""}
             </span>

@@ -279,8 +279,106 @@ body {
   font-size: 1rem;
 }
 
+.side-panel-data-row > :first-child,
+.service-panel-data-row > :first-child,
+.ip-mirror-row > :first-child {
+  text-align: center !important;
+}
+
 .service-panel-data-row .text-xs {
   font-size: 12px;
+}
+
+/* IP Time-line mirror: Entry Type and Subject fit 15 characters; Notes expands. */
+.ip-mirror-header > :nth-child(2),
+.ip-mirror-row > :nth-child(2) {
+  width: 5.5rem !important;
+  flex: 0 0 5.5rem !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.ip-mirror-header > :nth-child(3),
+.ip-mirror-row > :nth-child(3) {
+  width: 6.5rem !important;
+  flex: 0 0 6.5rem !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.ip-mirror-header > :nth-child(4),
+.ip-mirror-row > :nth-child(4) {
+  width: auto !important;
+  flex: 1 1 0% !important;
+  min-width: 0;
+  text-align: left;
+}
+
+.ip-mirror-row > :nth-child(2) *,
+.ip-mirror-row > :nth-child(3) *,
+.ip-mirror-row > :nth-child(4) * {
+  display: block;
+  width: 100%;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+
+.ip-mirror-actions {
+  width: 7rem !important;
+  flex: 0 0 7rem !important;
+}
+
+.ip-mirror-row {
+  align-items: center;
+}
+
+.ip-mirror-row > * {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.ip-mirror-row > :first-child {
+  transform: translateX(4px);
+}
+
+.ip-mirror-row > :nth-child(2) {
+  padding-left: 6px !important;
+}
+
+.ip-mirror-header > :nth-child(2) {
+  transform: translateX(-4px);
+}
+
+/* Keep only middle-panel Actions header text centered. */
+.table-header-text > :last-child {
+  text-align: center !important;
+}
+
+.side-panel-actions-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  padding-right: 18px !important;
+}
+
+/* Center only serial-number data in every table view. */
+.side-panel-data-row > :first-child,
+.service-panel-data-row > :first-child,
+.ip-mirror-row > :first-child {
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+.ip-mirror-header > * {
+  text-align: center !important;
 }
 
 .side-panel-footer,
