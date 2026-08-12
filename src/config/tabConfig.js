@@ -52,7 +52,7 @@ export const TAB_CONFIGS = {
     fieldOptions: {
       intake: ["¼","½","¾","1","1½","2","3","4","1Ts","2Ts","3Ts","4Ts","5ml","10ml"],
       period: ["OD","BD","TDS","QID","HS","SOS","Stat","Weekly","Monthly"],
-      when:   ["AF","BF","BF&AF","Any Time","Empty Stomach","With Milk","Before Sleep"],
+      when:   ["After food","Before food","Before & After food","Any Time","Empty Stomach","With Milk","Before Sleep"],
       detail: ["—","On Time","Only If Required","Discontinue Any Time","Continue","Reduce Dose","Increase Dose","Take with Water"],
     },
 
@@ -66,7 +66,7 @@ export const TAB_CONFIGS = {
       { key: "noon",    label: "A",      width: "w-7",    type: "computed" },
       { key: "eve",     label: "E",      width: "w-7",    type: "computed" },
       { key: "night",   label: "N",      width: "w-7",    type: "computed" },
-      { key: "when",    label: "When",   width: "w-20",   type: "text" },
+      { key: "when",    label: "When",   width: "w-36",   type: "text" },
       { key: "detail",  label: "Remarks",width: "flex-1", type: "text" },
       { key: "actions", label: "Actions",width: "w-24",   type: "actions" },
     ],

@@ -215,6 +215,16 @@ body {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+/* Even thinner than the global 3px bar — used on the Prescription Entry
+   tab's dropdown popups (PortalDropdown) only. */
+.dropdown-thin-scrollbar {
+  scrollbar-width: thin;
+}
+.dropdown-thin-scrollbar::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;

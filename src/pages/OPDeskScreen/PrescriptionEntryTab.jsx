@@ -8,6 +8,10 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 const ROW_HEIGHT_PX = 42;
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
+// EntryFooterBar's fixed height (see its own height: "48px") — every dropdown
+// opened from within the entry section must end above it, never over it.
+const ENTRY_FOOTER_HEIGHT_PX = 48;
+
 function PortalDropdown({ anchorEl, open, children }) {
   if (!open || !anchorEl) return null;
 
@@ -18,12 +22,12 @@ function PortalDropdown({ anchorEl, open, children }) {
     top: rect.bottom + 2,
     left: rect.left,
     width: rect.width,
-    maxHeight: spaceBelow - 8,
+    maxHeight: spaceBelow - 8 - ENTRY_FOOTER_HEIGHT_PX,
     zIndex: 99999,
   };
 
   return ReactDOM.createPortal(
-    <div style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
+    <div className="dropdown-thin-scrollbar" style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>, document.body
   );
@@ -241,7 +245,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
           {filtered.map((opt, i) => (
-            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-[0.88rem]"
+            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-[1rem]"
               style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}>{opt}</div>
           ))}
@@ -282,7 +286,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
         <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
           {options.map(opt => (
             <div key={opt} onMouseDown={() => select(opt)}
-              className="px-3 flex items-center cursor-pointer text-sm"
+              className="px-3 flex items-center cursor-pointer text-[1rem]"
               style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
               {opt}
             </div>
@@ -323,7 +327,7 @@ function TimeColumnSelect({ value, options, disabledSet, onChange, format, width
             const isDisabled = disabledSet.has(opt);
             return (
               <div key={opt} onMouseDown={() => select(opt)}
-                className="px-3 flex items-center text-[0.88rem]"
+                className="px-3 flex items-center text-[1rem]"
                 style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)",
                   cursor: isDisabled ? "not-allowed" : "pointer",
                   color: isDisabled ? "var(--color-text-subtle)" : "var(--color-text-base)",
@@ -497,7 +501,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           </div>
         );
         if (field === "when") return (
-          <div key="when" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
+          <div key="when" className="w-44 flex-shrink-0 px-1 py-1.5 flex items-center">
             <ArrowSelect dataField="when" value={draft.when} options={config.fieldOptions.when} onChange={v => onDraftChange("when")(v)} onNavigate={e => handleFieldKeyDown(e, "when")} />
           </div>
         );
@@ -548,7 +552,7 @@ const ADD_ROW_FIELD_META = {
   days:   { label: "Days",   width: "w-16" },
   intake: { label: "Dosage", width: "w-20" },
   period: { label: "Period", width: "w-20" },
-  when:   { label: "When",   width: "w-28" },
+  when:   { label: "When",   width: "w-44" },
   detail: { label: "Remarks", width: "flex-1" },
   time:   { label: "Time",   width: "w-40" },
   schDate: { label: "Sch. Date", width: "w-28" },
@@ -580,7 +584,7 @@ function makeFreshDraft(config, keepDays) {
     if (field === "days") draft.days = keepDays ?? "1";
     else if (field === "intake") draft.intake = "1";
     else if (field === "period") draft.period = "OD";
-    else if (field === "when") draft.when = "AF";
+    else if (field === "when") draft.when = "After food";
     else if (field === "detail") draft.detail = "—";
     else if (field === "time") draft.time = nowHHMM(); // defaults to current system time
     else draft[field] = ""; // generic typable fields (e.g. subject/advice/nurse/treatment)

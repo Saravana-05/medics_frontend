@@ -148,7 +148,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       return;
     }
     const draftBase = activeTab === "drugs"
-      ? { days: String(entry.days || 1), intake: "1", period: "OD", when: "AF", detail: "—" }
+      ? { days: String(entry.days || 1), intake: "1", period: "OD", when: "After food", detail: "—" }
       : { detail: "—" };
     const newItems = (entry.medicines || []).map(name => {
       const draft = { name, ...draftBase };
