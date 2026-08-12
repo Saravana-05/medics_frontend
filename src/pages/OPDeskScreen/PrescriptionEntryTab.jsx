@@ -241,7 +241,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && filtered.length > 0}>
           {filtered.map((opt, i) => (
-            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-xs"
+            <div key={opt} onMouseDown={() => select(opt)} className="px-3 py-1.5 cursor-pointer text-[0.88rem]"
               style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? "var(--color-primary-muted)" : "transparent" }}
               onMouseEnter={() => setHighlightedIdx(i)}>{opt}</div>
           ))}
@@ -282,7 +282,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, style: e
         <div style={{ maxHeight: VISIBLE_OPTION_COUNT * OPTION_ROW_PX }} className="overflow-y-auto">
           {options.map(opt => (
             <div key={opt} onMouseDown={() => select(opt)}
-              className="px-3 flex items-center cursor-pointer text-xs"
+              className="px-3 flex items-center cursor-pointer text-sm"
               style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)", background: opt === value ? "var(--color-primary-muted)" : "transparent" }}>
               {opt}
             </div>
@@ -323,7 +323,7 @@ function TimeColumnSelect({ value, options, disabledSet, onChange, format, width
             const isDisabled = disabledSet.has(opt);
             return (
               <div key={opt} onMouseDown={() => select(opt)}
-                className="px-3 flex items-center text-xs"
+                className="px-3 flex items-center text-[0.88rem]"
                 style={{ height: OPTION_ROW_PX, borderBottom: "1px solid var(--color-border)",
                   cursor: isDisabled ? "not-allowed" : "pointer",
                   color: isDisabled ? "var(--color-text-subtle)" : "var(--color-text-base)",
@@ -469,7 +469,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                 onMouseDown={e => { e.preventDefault(); if (selected) handleClear(); else setShowDropdown(v => !v); }} />
               <PortalDropdown anchorEl={nameWrapRef.current} open={showDropdown && dropdownItems.length > 0}>
                 {dropdownItems.map((item, i) => (
-                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-1.5 cursor-pointer text-xs"
+                  <div key={item} onMouseDown={() => handleSelect(item)} className="px-4 py-1.5 cursor-pointer text-[1rem]"
                     style={{ borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i ? config.colorLight : "transparent" }}>
                     {item}
                   </div>

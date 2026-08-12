@@ -373,7 +373,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {activeConfig?.sidePanel && !isTabletView && (
               <div
                 className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] shadow-sm"
-                style={{ width: "27%", minWidth: "420px", marginRight: "2px", background: "#ffffff", border: "1px solid var(--color-border)" }}
+                style={{ width: "27.5%", minWidth: "420px", marginRight: "2px", background: "#ffffff", border: "1px solid var(--color-border)" }}
               >
                 <PrescriptionSidePanel
                   config={activeConfig}
@@ -404,12 +404,12 @@ export default function OPDeskScreen({ user, onLogout }) {
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
                     : 'w-0 overflow-hidden border-none shadow-none'
-                  : 'w-[438px] flex-none'
+                  : 'w-[445px] flex-none'
               }`}
               style={{
                 background: "#ffffff",
                 border: isTabletView && !isRightPanelExpanded ? "none" : "1px solid var(--color-border)",
-                marginLeft: isTabletView ? undefined : "12px",
+                marginLeft: isTabletView ? undefined : "-4px",
               }}
             >
               <PreviousVisitsTable visits={visits} />
