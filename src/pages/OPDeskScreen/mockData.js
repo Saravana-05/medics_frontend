@@ -1,3 +1,37 @@
+const CARE_PLAN_ROWS = [
+  ["10-06-2026", "Week-8",  "1st AN Visit",  "Test",       "CBC, Bl.gp, HIV, HBsAg, RBS, Urine, USG dating", "Lapsed",      "No",  "Confirm pregnancy, baseline"],
+  ["10-06-2026", "Week-8",  "1st AN Visit",  "Drug",       "Start Folic Acid 5mg, TT1",                       "Late Visit",  "Yes", "Prophylaxis and nutrition"],
+  ["22-07-2026", "Week-14", "2nd Visit",     "Monitoring", "BP, Weight, FHS check",                           "Complete",    "Yes", "Maternal-fetal well being"],
+  ["22-07-2026", "Week-14", "2nd Visit",     "Drug",       "TT2",                                             "In Progress", "No",  "Tetanus prophylaxis"],
+  ["02-09-2026", "Week-20", "Anomaly Scan",  "Test",       "Targeted USG, Hemoglobin",                        "To Do",       "Yes", "Anomaly screening"],
+  ["30-09-2026", "Week-24", "GDM Screening", "Test",       "OGTT 75g, Repeat CBC",                            "To Do",       "Yes", "Screen for GDM"],
+  ["11-11-2026", "Week-30", "Growth Scan",   "Test",       "USG for growth, AFI, Doppler",                    "To Do",       "Yes", "Fetal growth assessment"],
+  ["23-12-2026", "Week-36", "Weekly Visit",  "Monitoring", "NST, BP, Weight, PV exam",                        "To Do",       "Yes", "Birth preparedness"],
+  ["20-01-2027", "Week-40", "Delivery",      "Procedure",  "Labor monitoring with Partograph",                "To Do",       "Yes", "Safe delivery"],
+];
+
+export const CARE_PLAN_VIEW_DATA = CARE_PLAN_ROWS.map(([
+  schDate, milestone, pathwayName, activityType, activityDescription,
+  schStatus, linkedStatus, activityResult,
+], index) => {
+  const row = {
+    id: `care-plan-${index + 1}`,
+    name: "Normal Pregnancy",
+    schDate,
+    milestone,
+    pathwayName,
+    activityType,
+    activityDescription,
+    schStatus,
+    linkedStatus,
+    activityResult,
+    messageDoctor: "Yes",
+    messagePatient: "Yes",
+    messageAttendant: "Yes",
+  };
+  return { ...row, display: { primaryLine: row.name, ...row } };
+});
+
 export const MOCK_PATIENTS = [
   {
     id: "PID-1042", docNo: "OP: 3902",

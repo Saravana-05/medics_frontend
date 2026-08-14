@@ -75,7 +75,7 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
     <div className="flex-1 min-w-[150px] lg:min-w-0">
       <div className="flex items-center gap-1.5 mb-1">
         <Icon size={12} style={{ color: accent, flexShrink: 0 }} />
-        <span className="text-[0.7rem] font-bold tracking-wide uppercase truncate" style={{ color: labelColor || "var(--color-text-muted)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
+        <span className="text-[0.7rem] font-bold tracking-wide truncate" style={{ color: labelColor || "var(--color-text-muted)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
           {label}
         </span>
       </div>
@@ -220,7 +220,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
   const ipGroups = [
     {
       icon: CalendarDays,
-      label: "IP Info",
+      label: "Ip info",
       accent: ipIconShades[0],
       lines: [
         [ip.admitDate, ip.admitTime].filter(Boolean).join(" · "),
@@ -229,7 +229,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
     },
     {
       icon: UserRound,
-      label: "Attender",
+      label: "Attendant",
       accent: ipIconShades[1],
       textColor: ipValueColor,
       lines: [

@@ -311,6 +311,7 @@ export const TAB_CONFIGS = {
       activityType: ["Test", "Drug", "Monitoring", "Counseling", "Follow-up"],
       activityDescription: ["CBC, Bl.Group,HIV,HBsAg,...", "Start Folic Acid 5mg, TT1", "BP, Weight, FHS check"],
       schStatus: ["Scheduled", "Completed", "Late Visit", "Lapsed", "Cancelled"],
+      linkedStatus: ["Linked", "Not Linked"],
     },
 
     // Med. Condition (searchable) → Schedule → Sch. Date (picked, like IP Time's
@@ -326,14 +327,18 @@ export const TAB_CONFIGS = {
 
     tableColumns: [
       { key: "no",                  label: "No.",                 width: "w-12",   type: "index" },
-      { key: "name",                label: "Med. Condition",      width: "w-36",   type: "text" },
-      { key: "schedule",            label: "Schedule",            width: "w-16",   type: "text" },
-      { key: "schDate",             label: "Sch. Date",           width: "w-24",   type: "text" },
+      { key: "name",                label: "Medical Condition",      width: "w-36",   type: "text" },
+      { key: "schDate",             label: "Schedule Date",       width: "w-24",   type: "text" },
       { key: "milestone",           label: "Milestone",           width: "w-20",   type: "text" },
       { key: "pathwayName",         label: "Pathway Name",        width: "w-28",   type: "text" },
       { key: "activityType",        label: "Activity Type",       width: "w-24",   type: "text" },
-      { key: "activityDescription", label: "Activity Description",width: "flex-1", type: "text" },
-      { key: "schStatus",           label: "Sch. Status",         width: "w-24",   type: "text" },
+      { key: "activityDescription", label: "Activity\nDescription", width: "flex-1", type: "text" },
+      { key: "schStatus",           label: "Schedule Status",         width: "w-24",   type: "text" },
+      { key: "linkedStatus",        label: "Linked Status",           width: "w-24",   type: "text" },
+      { key: "activityResult",      label: "Activity Result",         width: "w-28",   type: "text" },
+      { key: "messageDoctor",       label: "Message Doctor",          width: "w-28",   type: "text" },
+      { key: "messagePatient",      label: "Message Patient",         width: "w-28",   type: "text" },
+      { key: "messageAttendant",    label: "Message Attendant",       width: "w-28",   type: "text" },
       { key: "actions",             label: "Actions",             width: "w-24",   type: "actions" },
     ],
 
@@ -346,6 +351,11 @@ export const TAB_CONFIGS = {
       activityType: draft.activityType,
       activityDescription: draft.activityDescription,
       schStatus: draft.schStatus,
+      linkedStatus: draft.linkedStatus,
+      activityResult: draft.activityResult,
+      messageDoctor: draft.messageDoctor,
+      messagePatient: draft.messagePatient,
+      messageAttendant: draft.messageAttendant,
     }),
 
     sidePanel: {

@@ -645,7 +645,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
   const filtered = searchTerm.trim() ? bySpeciality.filter(e => e.condition.toLowerCase().includes(searchTerm.toLowerCase())) : bySpeciality;
   const carePlanColumns = [
     { key: "speciality", label: "Speciality" },
-    { key: "condition", label: "Med. Condition" },
+    { key: "condition", label: "Medical Condition" },
     { key: "milestones", label: "Milestones" },
     { key: "period", label: "Period" },
   ];
@@ -685,8 +685,8 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
       <div className="table-header-text flex items-center border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
         <div className="w-12 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>No.</div>
         {visibleColumns.speciality && <div className="w-24 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Speciality</div>}
-        {visibleColumns.condition && <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Med. Condition</div>}
-        {visibleColumns.milestones && <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Milestones</div>}
+        {visibleColumns.condition && <div className="flex-1 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Medical<br />Condition</div>}
+        {visibleColumns.milestones && <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Mile-<br />stone</div>}
         {visibleColumns.period && <div className="w-20 px-3 text-center" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Period</div>}
         <div className="side-panel-actions-header w-24 pl-3 pr-2" style={{ fontSize: "0.65rem", fontWeight: "800", letterSpacing: "0.03em", lineHeight: 1, color: "var(--color-primary-dark)" }}>Actions</div>
       </div>
@@ -696,8 +696,8 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
           <div key={e.id} tabIndex={0} onClick={() => setSelectedId(e.id)} onFocus={() => setSelectedId(e.id)}
             className="side-panel-data-row flex items-center border-b outline-none cursor-pointer" style={{ borderColor: "var(--color-border)", background: selectedId === e.id ? accentLight : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)", boxShadow: selectedId === e.id ? `inset 0 0 0 2px ${accentColor}` : "none", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
             <div className="w-12 px-3 py-2.5 text-left"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{index + 1}</span></div>
-            {visibleColumns.speciality && <div className="w-24 px-3 py-2.5 truncate"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.speciality}</span></div>}
-            {visibleColumns.condition && <div className="flex-1 px-3 py-2.5 min-w-0"><span className="text-xs font-normal truncate block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>}
+            {visibleColumns.speciality && <div className="w-24 px-3 py-1 min-w-0"><span className="text-xs font-normal whitespace-normal break-words leading-tight block" style={{ color: "var(--color-text-base)" }}>{e.speciality}</span></div>}
+            {visibleColumns.condition && <div className="flex-1 px-3 py-1 min-w-0"><span className="text-xs font-normal whitespace-normal break-words leading-tight block" style={{ color: "var(--color-text-base)" }}>{e.condition}</span></div>}
             {visibleColumns.milestones && <div className="w-20 px-3 py-2.5 text-center"><span className="text-xs font-normal" style={{ color: "var(--color-text-base)" }}>{e.milestones}</span></div>}
             {visibleColumns.period && <div className="w-20 px-3 py-2.5 text-center"><span className="font-normal" style={{ color: "var(--color-text-base)", fontSize: "calc(0.8rem - 1px)" }}>{e.period}</span></div>}
             <div className="w-24 pl-3 pr-2 py-2.5 flex items-center justify-end gap-1.5">

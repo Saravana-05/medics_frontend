@@ -127,13 +127,15 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 }
 
 /* ── Table headers built from config.tableColumns ── */
-function TableHeader({ columns, accentColor }) {
+function TableHeader({ columns, accentColor, wrapLabels = false }) {
   return (
     <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} min-w-0 ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
-            ...(col.vertical ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" } : { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }) }}>
+            ...(col.vertical
+              ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" }
+              : { overflow: "hidden", textOverflow: wrapLabels ? "clip" : "ellipsis", whiteSpace: wrapLabels ? "pre-line" : "nowrap" }) }}>
           {col.label}
         </div>
       ))}
@@ -163,7 +165,7 @@ function EmptyRow({ columns }) {
 }
 
 /* ── Data row — renders whatever fields config.computeRowDisplay produced ── */
-function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, accentColor, accentLight, dataFontSize }) {
+function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDelete, onStrike, onEdit, onArrowNav, accentColor, accentLight, dataFontSize, preserveFullText = false }) {
   return (
     <div tabIndex={0} data-row-id={item.id} onClick={onSelect} onFocus={onSelect}
       onKeyDown={e => {
@@ -184,11 +186,11 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         );
         if (col.key === "name") return (
           <div key="name" className={`${col.width} min-w-0 px-2 py-1 text-left`}>
-            <div className="font-normal text-xs truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>
+            <div className={`font-normal text-xs ${preserveFullText ? "whitespace-nowrap" : "truncate"}`} style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>
               {item.display.primaryLine ?? item.name}
             </div>
             {item.display.secondaryLine && (
-              <div className="text-xs mt-0.5 font-normal truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>{item.display.secondaryLine}</div>
+              <div className={`text-xs mt-0.5 font-normal ${preserveFullText ? "whitespace-nowrap" : "truncate"}`} style={{ color: "var(--color-text-base)", fontSize: dataFontSize }}>{item.display.secondaryLine}</div>
             )}
           </div>
         );
@@ -212,7 +214,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         // plain text columns (when/detail/etc.)
         return (
           <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 text-left`}>
-            <span className="text-xs font-normal block truncate" style={{ color: "var(--color-text-base)", fontSize: dataFontSize }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
+            <span className={`text-xs font-normal block ${preserveFullText ? "whitespace-nowrap" : "truncate"}`} style={{ color: "var(--color-text-base)", fontSize: dataFontSize }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
           </div>
         );
       })}
@@ -688,11 +690,21 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     clearAll: handleClearAll,
   }));
 
+  const carePlanOptionalColumnCount = displayColumns.filter(col =>
+    ["name", "schStatus", "linkedStatus", "activityResult", "messageDoctor", "messagePatient", "messageAttendant"].includes(col.key)
+  ).length;
+  const carePlanGridMinWidth = carePlanOptionalColumnCount > 0
+    ? `${930 + carePlanOptionalColumnCount * 120}px`
+    : "100%";
+
   return (
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <TableHeader columns={displayColumns} accentColor={config.color} />
+      <div className={`flex-1 ${config.key === "carePlan" ? "care-plan-horizontal-scroll overflow-x-auto overflow-y-hidden" : "flex flex-col overflow-hidden"}`}>
+        <div
+          className="h-full flex flex-col overflow-hidden"
+          style={{ minWidth: config.key === "carePlan" ? carePlanGridMinWidth : undefined }}
+        >
+          <TableHeader columns={displayColumns} accentColor={config.color} wrapLabels={config.key === "carePlan"} />
           <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
             {items.map((item, index) => (
               <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
@@ -700,7 +712,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
                 onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
                 onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
                 onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight}
-                dataFontSize="1rem" />
+                dataFontSize="1rem" preserveFullText={config.key === "carePlan"} />
             ))}
             {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
           </div>

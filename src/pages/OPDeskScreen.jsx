@@ -9,7 +9,7 @@ import PrescriptionEntryTab, { ModernToolbar } from "./OPDeskScreen/Prescription
 import PrescriptionSidePanel from "./OPDeskScreen/PrescriptionSidePanel";
 import { TAB_CONFIGS } from "../config/tabConfig";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
-import { MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
+import { CARE_PLAN_VIEW_DATA, MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
 import Divider from "@mui/material/Divider";
 import medicineList from "../data/medicines.json";
 import labTestList from "../data/labTest.json";
@@ -22,6 +22,16 @@ import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecor
 // whoever is actually logged in when that's someone other than the doctor (e.g. a
 // nurse entering notes on the doctor's behalf).
 const DEFAULT_DOCTOR_NAME = "Dr. Aravind Kumar";
+
+const CARE_PLAN_HIDDEN_COLUMN_DEFAULTS = {
+  name: false,
+  schStatus: false,
+  linkedStatus: false,
+  activityResult: false,
+  messageDoctor: false,
+  messagePatient: false,
+  messageAttendant: false,
+};
 
 // Sits where Clear/Paste/Preview/Save/Print normally do — Care-Plan has too many
 // columns to show all at once, so this replaces the toolbar with a Show/Hide
@@ -71,14 +81,14 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [labShowReport, setLabShowReport] = useState(false);
   const [services, setServices] = useState([]);
   const [ipEntries, setIpEntries] = useState([]);
-  const [carePlanItems, setCarePlanItems] = useState([]);
+  const [carePlanItems, setCarePlanItems] = useState(CARE_PLAN_VIEW_DATA);
   // Care-Plan's Show/Hide Columns state — lives here (not inside PrescriptionEntryTab)
   // since its toggle button sits in this toolbar row, not inside the grid itself.
   const [carePlanVisibleCols, setCarePlanVisibleCols] = useState(() => {
     try {
       const saved = localStorage.getItem("carePlanTableColumns");
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
+      return { ...CARE_PLAN_HIDDEN_COLUMN_DEFAULTS, ...(saved ? JSON.parse(saved) : {}) };
+    } catch { return { ...CARE_PLAN_HIDDEN_COLUMN_DEFAULTS }; }
   });
   useEffect(() => {
     localStorage.setItem("carePlanTableColumns", JSON.stringify(carePlanVisibleCols));
@@ -108,7 +118,7 @@ export default function OPDeskScreen({ user, onLogout }) {
     setLabs(record?.labs || []);
     setServices(record?.services || []);
     setIpEntries(record?.ipEntries || []);
-    setCarePlanItems(record?.carePlanItems || []);
+    setCarePlanItems(record?.carePlanItems || CARE_PLAN_VIEW_DATA);
     setLabShowReport(false);
   };
 

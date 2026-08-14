@@ -6,6 +6,25 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
   const p = patient;
   const [followUpDate, setFollowUpDate] = useState("");
   const [showOPList, setShowOPList] = useState(false);
+  const [activeTab, setActiveTab] = useState(null);
+
+  const tabStyle = (tab, background, borderColor) => ({
+    borderRadius: 0,
+    background,
+    color: "white",
+    textShadow: "0 1px 2px rgba(0,0,0,0.4)",
+    border: "none",
+    outline: `1px solid ${activeTab === tab ? borderColor : "transparent"}`,
+    outlineOffset: "2px",
+  });
+
+  const showTabBorder = (event, borderColor) => {
+    event.currentTarget.style.outlineColor = borderColor;
+  };
+
+  const restoreTabBorder = (event, tab, borderColor) => {
+    event.currentTarget.style.outlineColor = activeTab === tab ? borderColor : "transparent";
+  };
 
   return (
     <>
@@ -23,45 +42,86 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
             {/* ── BUTTONS: all in one row, equal size (Park) & equal spacing ── */}
             <div className="flex flex-row gap-2 mb-2">
               <button
-                onClick={() => setShowOPList(true)}
+                onClick={() => {
+                  setActiveTab("op-list");
+                  setShowOPList(true);
+                }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={{ borderRadius: 0, background: "var(--color-primary)", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--color-primary-light)"}
-                onMouseLeave={e => e.currentTarget.style.background = "var(--color-primary)"}
+                style={tabStyle("op-list", "var(--color-primary)", "var(--color-primary-light)")}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "var(--color-primary-light)";
+                  showTabBorder(e, "var(--color-primary-light)");
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "var(--color-primary)";
+                  restoreTabBorder(e, "op-list", "var(--color-primary-light)");
+                }}
               >
                 OP List
               </button>
               <button
-                onClick={onIPList}
+                onClick={() => {
+                  setActiveTab("ip-list");
+                  onIPList?.();
+                }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={{ borderRadius: 0, background: "var(--color-danger)", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#b91c1c"}
-                onMouseLeave={e => e.currentTarget.style.background = "var(--color-danger)"}
+                style={tabStyle("ip-list", "var(--color-danger)", "#7f1d1d")}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "#b91c1c";
+                  showTabBorder(e, "#7f1d1d");
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "var(--color-danger)";
+                  restoreTabBorder(e, "ip-list", "#7f1d1d");
+                }}
               >
                 IP List
               </button>
               <button
-                onClick={onPark}
+                onClick={() => {
+                  setActiveTab("all-patients");
+                  onPark?.();
+                }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={{ borderRadius: 0, background: "#656D78", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
+                style={tabStyle("all-patients", "#656D78", "#374151")}
+                onMouseEnter={e => showTabBorder(e, "#374151")}
+                onMouseLeave={e => restoreTabBorder(e, "all-patients", "#374151")}
               >
                 All Patients
               </button>
               <button
-                onClick={onPark}
+                onClick={() => {
+                  setActiveTab("park");
+                  onPark?.();
+                }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all shadow-sm hover:shadow-md"
-                style={{ borderRadius: 0, background: "#fbbf24", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--color-warning)"}
-                onMouseLeave={e => e.currentTarget.style.background = "#fbbf24"}
+                style={tabStyle("park", "#fbbf24", "#b45309")}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "var(--color-warning)";
+                  showTabBorder(e, "#b45309");
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "#fbbf24";
+                  restoreTabBorder(e, "park", "#b45309");
+                }}
               >
                 Park
               </button>
               <button
-                onClick={onFinalize}
+                onClick={() => {
+                  setActiveTab("finalize");
+                  onFinalize?.();
+                }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={{ borderRadius: 0, background: "#16a34a", color: "white", textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#15803d"}
-                onMouseLeave={e => e.currentTarget.style.background = "#16a34a"}
+                style={tabStyle("finalize", "#16a34a", "#14532d")}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "#15803d";
+                  showTabBorder(e, "#14532d");
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "#16a34a";
+                  restoreTabBorder(e, "finalize", "#14532d");
+                }}
               >
                 Finalize
               </button>
