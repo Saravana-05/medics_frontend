@@ -378,7 +378,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {/* Middle "report/group" panel — one generic column driven by the active tab's
                 config.sidePanel, own top-level column so its top aligns with Previous
                 Information (both start right after the divider), independent of the
-                Drug/Lab/Service/IP-Time tabs row height. Hidden on tablet per the
+                Drug/Lab/Service/IP-Time tabs row. Hidden on tablet per the
                 "small screen: hide, don't restructure" requirement. */}
             {activeConfig?.sidePanel && !isTabletView && (
               <div
