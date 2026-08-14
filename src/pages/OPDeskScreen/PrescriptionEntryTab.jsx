@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
-const ROW_HEIGHT_PX = 42;
+const ROW_HEIGHT_PX = 32;
 const NONE_OPTION = "<None>";
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
@@ -51,24 +51,11 @@ function ActionButton({ onClick, label, bg, hoverBg, textColor = "white" }) {
   );
 }
 
-function SearchModeCheckbox({ checked, onClick, label, accentColor, textAccent, accentText = "white" }) {
-  return (
-    <label className="flex items-center gap-1.5 cursor-pointer select-none"
-      style={{ fontSize: "13px", fontWeight: "400", color: checked ? (textAccent || accentColor) : "var(--color-text-muted)" }}>
-      <span onClick={onClick} className="flex items-center justify-center rounded transition-all"
-        style={{ width: 15, height: 15, flexShrink: 0, cursor: "pointer", border: `2px solid ${checked ? accentColor : "var(--color-border)"}`, background: checked ? accentColor : "var(--color-surface)" }}>
-        {checked && <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,7 7.5,2" stroke={accentText} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-      </span>
-      <span onClick={onClick}>{label}</span>
-    </label>
-  );
-}
-
 /* ── Bottom footer bar: entity-type filter + record count + Alphabet/Embedded/Frequent
    search mode + "New X" button — sits below the add-row (config-driven labels). ── */
 function EntryFooterBar({
   searchMode, onSearchModeChange, typeValue, onTypeChange, typeOptions, filterLabel,
-  frequentOnly, onFrequentOnlyChange, accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
+  accentColor, accentText = "white", textAccent, recordCount, newEntityButton, onNewEntity, hideNewButton = false, className = "",
 }) {
   return (
     <div data-prescription-entry-footer className={`flex items-center justify-between gap-4 px-4 flex-shrink-0 border-t ${className}`} style={{ height: "48px", boxSizing: "border-box", background: "var(--color-primary-muted)", borderColor: "var(--color-border)", fontSize: "13px" }}>
@@ -77,19 +64,21 @@ function EntryFooterBar({
         <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           <select value={typeValue} onChange={e => onTypeChange(e.target.value)}
             className="w-32 max-w-full flex-shrink px-2 py-1 outline-none"
-            style={{ fontSize: "13px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+            style={{ fontSize: "13px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)", textAlign: "left", paddingLeft: "2px" }}>
             {typeOptions.map(opt => <option key={opt} style={{ fontSize: "13px" }}>{opt}</option>)}
           </select>
           <span className="flex-shrink-0 whitespace-nowrap" style={{ color: "var(--color-text-subtle)", fontSize: "13px" }}>Showing {recordCount}/{recordCount}</span>
         </div>
       </div>
 
-      <div className="flex items-center" style={{ marginLeft: "97px", gap: "4px" }}>
-        <SearchModeCheckbox checked={searchMode === "alpha"} onClick={() => onSearchModeChange("alpha")} label="Alphabet" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
-        <SearchModeCheckbox checked={searchMode === "embedded"} onClick={() => onSearchModeChange("embedded")} label="Embedded" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
-        <div>
-          <SearchModeCheckbox checked={frequentOnly} onClick={() => onFrequentOnlyChange(!frequentOnly)} label="Frequent" accentColor={accentColor} textAccent={textAccent} accentText={accentText} />
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="whitespace-nowrap" style={{ color: "var(--color-text-base)", fontSize: "13px", fontWeight: "400" }}>Search By:</span>
+        <select value={searchMode} onChange={e => onSearchModeChange(e.target.value)}
+          className="w-28 px-2 py-1 outline-none"
+          style={{ fontSize: "13px", border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}>
+          <option value="alpha">Alphabet</option>
+          <option value="embedded">Embedded</option>
+        </select>
       </div>
 
       {!hideNewButton && (
@@ -148,7 +137,7 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 /* ── Table headers built from config.tableColumns ── */
 function TableHeader({ columns, accentColor, wrapLabels = false }) {
   return (
-    <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "34px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} ${wrapLabels ? "" : "min-w-0"} ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
@@ -164,7 +153,7 @@ function TableHeader({ columns, accentColor, wrapLabels = false }) {
 
 function AddTableHeader({ columns, accentColor, accentText = "white" }) {
   return (
-    <div className="table-header-text flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "40px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "34px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 flex items-center justify-center text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: accentText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -196,7 +185,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
       className="flex items-center border-b transition-all duration-150 outline-none cursor-pointer overflow-hidden"
       style={{ borderColor: "var(--color-border)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box",
         background: isSelected ? accentLight : isStruck ? "var(--color-surface-alt)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
-        opacity: isStruck ? 0.6 : 1, boxShadow: isSelected ? `inset 0 0 0 2px ${accentColor}` : "none" }}>
+        opacity: isStruck ? 0.6 : 1, boxShadow: isSelected ? `inset 0 0 0 1px ${accentColor}` : "none" }}>
       {columns.map(col => {
         if (col.key === "no") return (
           <div key="no" className="w-12 px-2 py-1 text-center">
@@ -642,7 +631,6 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [searchMode, setSearchMode] = useState("alpha");
   const [typeValue, setTypeValue] = useState(config.filters.typeOptions[0]);
-  const [frequentOnly, setFrequentOnly] = useState(false);
 
   // Column visibility — opt-in via config.showColumnFilter (Care-Plan). The
   // toggle button/dropdown itself lives in OPDeskScreen's toolbar row (where
@@ -758,7 +746,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
 
         <EntryFooterBar searchMode={searchMode} onSearchModeChange={setSearchMode}
           typeValue={typeValue} onTypeChange={setTypeValue} typeOptions={config.filters.typeOptions}
-          filterLabel={config.labels.footerFilterLabel} frequentOnly={frequentOnly} onFrequentOnlyChange={setFrequentOnly}
+          filterLabel={config.labels.footerFilterLabel}
           accentColor={config.color} accentText={config.colorText} textAccent={config.textAccent} recordCount={items.length} newEntityButton={config.labels.newEntityButton || config.labels.addButton}
           onNewEntity={handleAddNew} hideNewButton={config.hideAddRow} />
       </div>

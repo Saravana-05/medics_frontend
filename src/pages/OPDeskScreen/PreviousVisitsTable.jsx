@@ -38,7 +38,7 @@ const ALL_COLUMNS = [
 
 /* Fixed row height (px) used to compute how many blank rows fill the remaining
    visible space — see useFillRowCount. */
-const ROW_HEIGHT_PX = 42;
+const ROW_HEIGHT_PX = 32;
 
 export default function PreviousVisitsTable({ visits = [] }) {
   const [sortField, setSortField] = useState(null);
@@ -285,7 +285,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
-              <tr className="table-header-text" style={{ background: "var(--color-primary-muted)", height: "40px", boxSizing: "border-box" }}>
+              <tr className="table-header-text" style={{ background: "var(--color-primary-muted)", height: "34px", boxSizing: "border-box" }}>
                 {visibleColumnsList.map(col => (
                   <th
                     key={col.key}
@@ -343,7 +343,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                       style={{
                         borderBottom: "1px solid var(--color-border)",
                         background: selectedRowSl === visit.sl ? "var(--color-primary-muted)" : "var(--color-surface)",
-                        boxShadow: selectedRowSl === visit.sl ? "inset 0 0 0 2px var(--color-primary)" : "none",
+                        boxShadow: selectedRowSl === visit.sl ? "inset 0 0 0 1px var(--color-primary)" : "none",
                         height: `${ROW_HEIGHT_PX}px`,
                         boxSizing: "border-box",
                       }}
@@ -355,7 +355,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         
                         if (col.key === "docModule") {
                           return (
-                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            <td key={col.key} className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               <span className="inline-flex items-center text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                 {value}
                               </span>
@@ -365,7 +365,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
 
                         if (col.key === "reportDt") {
                           return (
-                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            <td key={col.key} className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value ? (
                                 <div className="flex items-center gap-1.5">
 
@@ -382,7 +382,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
 
                         if (col.key === "vitals") {
                           return (
-                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            <td key={col.key} className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-col">
                                   <div className="flex items-center gap-1">
@@ -408,7 +408,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
 
                         if (col.key === "nextVisit") {
                           return (
-                            <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                            <td key={col.key} className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                               {value && value !== "<None>" ? (
                                 <div className="flex items-center gap-1.5">
                                   {/* <CalendarDays size={11} style={{ color: "var(--color-success)" }} /> */}
@@ -425,7 +425,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         
                         if (col.key === "actions") {
                           return (
-                            <td key={col.key} className="w-8 px-2 py-2.5 text-center">
+                            <td key={col.key} className="w-8 px-2 py-1 text-center">
                               <button
                                 className="p-1.5 rounded-lg transition-all opacity-60 group-hover:opacity-100"
                                 style={{ 
@@ -441,7 +441,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                         }
                         
                         return (
-                          <td key={col.key} className={`${col.width} px-3 py-2.5 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
+                          <td key={col.key} className={`${col.width} px-3 py-1 ${col.align === 'right' ? 'text-right' : 'text-left'}`}>
                             {col.key === "sl" ? (
                               <span className="inline-flex items-center gap-1.5 text-xs font-normal" style={{ color: "var(--color-text-base)" }}>
                                 <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: module.dot }} />
@@ -480,7 +480,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                 {Array.from({ length: fillRowCount }).map((_, index) => (
                   <tr key={`empty-${index}`} style={{ borderBottom: "1px solid var(--color-border)", background: "var(--color-surface)", height: `${ROW_HEIGHT_PX}px`, boxSizing: "border-box" }}>
                     {visibleColumnsList.map(col => (
-                      <td key={col.key} className={`${col.width} px-3 py-2.5`}>&nbsp;</td>
+                      <td key={col.key} className={`${col.width} px-3 py-1`}>&nbsp;</td>
                     ))}
                   </tr>
                 ))}

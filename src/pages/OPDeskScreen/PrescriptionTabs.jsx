@@ -61,12 +61,12 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
           >
             <span className="whitespace-nowrap">{tab.label}</span>
             {count > 0 && (
-              <span
+              <sup
                 className="inline-flex items-center justify-center text-center font-bold leading-none"
-                style={{ fontSize: "calc(0.65rem + 8px)", color: showColor ? (tab.textColor || "white") : "white" }}
+                style={{ fontSize: "12px", color: showColor ? (tab.textColor || "white") : "white", transform: "translateY(-0.45em)" }}
               >
                 {count}
-              </span>
+              </sup>
             )}
           </button>
         );
