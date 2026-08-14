@@ -247,8 +247,8 @@ body {
 
 /* Uniform height and focus treatment for every Prescription Entry control. */
 .prescription-entry-control {
-  height: 34px;
-  min-height: 34px;
+  height: 30px;
+  min-height: 30px;
   box-sizing: border-box;
   background: var(--color-surface);
 }
@@ -281,6 +281,11 @@ body {
 
 .side-panel-data-row > div > span {
   font-size: 14px !important;
+}
+
+.care-plan-panel-data-row .text-xs,
+.care-plan-panel-data-row > div > span {
+  font-size: 13px !important;
 }
 
 .side-panel-data-row > :first-child,
@@ -438,6 +443,23 @@ body {
   background: var(--color-text-muted);
   border: 3px solid var(--color-surface-alt);
   border-radius: 7px;
+}
+
+.care-plan-react-data-table,
+.care-plan-react-data-table .rdt_wrapper,
+.care-plan-react-data-table .rdt_table {
+  height: 100% !important;
+  min-height: 100% !important;
+  background: var(--color-surface);
+}
+
+.care-plan-react-data-table {
+  box-sizing: border-box;
+  overflow-x: auto !important;
+}
+
+.care-plan-react-data-table::-webkit-scrollbar:horizontal {
+  height: 0;
 }
 
 /* ─── Utility helpers (complement Tailwind) ───────────────────────────────── */

@@ -2,7 +2,8 @@
 import React from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown } from "lucide-react";
+import DataTable from "react-data-table-component";
+import { Plus, X, Edit2, MinusCircle, RotateCcw, ChevronDown, ChevronUp, ArrowUpDown } from "lucide-react";
 import useFillRowCount from "../../hooks/useFillRowCount";
 
 const ROW_HEIGHT_PX = 32;
@@ -153,7 +154,7 @@ function TableHeader({ columns, accentColor, wrapLabels = false }) {
 
 function AddTableHeader({ columns, accentColor, accentText = "white" }) {
   return (
-    <div className="table-header-text flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "34px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "30px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 flex items-center justify-center text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: accentText, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -226,6 +227,169 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function CarePlanDataTable({ columns, items, fillRowCount, selectedRowId, onSelect, onEdit, onStrike, onDelete, struckIds, accentColor, accentLight }) {
+  const rows = items.map((item, index) => ({ ...item, _rowIndex: index }));
+  const [columnWidths, setColumnWidths] = useState({});
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const tableHostRef = useRef(null);
+  const bottomScrollRef = useRef(null);
+
+  const valueFor = (row, key) => {
+    if (key === "no") return String(row._rowIndex + 1);
+    if (key === "name") return String(row.display?.primaryLine ?? row.name ?? "");
+    return String(row.display?.[key] ?? row[key] ?? "");
+  };
+  const defaultWidthFor = key => key === "activityDescription" ? 380 : key === "no" ? 80 : key === "actions" ? 104 : 150;
+  const startResize = (event, key) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startWidth = columnWidths[key] || defaultWidthFor(key);
+    const handleMove = moveEvent => setColumnWidths(current => ({ ...current, [key]: Math.max(60, startWidth + moveEvent.clientX - startX) }));
+    const handleUp = () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleUp);
+  };
+  const toggleSort = key => setSortConfig(current => ({
+    key,
+    direction: current.key === key && current.direction === "asc" ? "desc" : "asc",
+  }));
+  const sortedRows = [...rows].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    const key = sortConfig.key;
+    let left = valueFor(a, key);
+    let right = valueFor(b, key);
+    if (key === "no") {
+      left = Number(left);
+      right = Number(right);
+    } else if (key === "schDate") {
+      const toTime = value => {
+        const [day, month, year] = value.split("-").map(Number);
+        return new Date(year, month - 1, day).getTime();
+      };
+      left = toTime(left);
+      right = toTime(right);
+    } else {
+      left = left.toLowerCase();
+      right = right.toLowerCase();
+    }
+    const comparison = left < right ? -1 : left > right ? 1 : 0;
+    return sortConfig.direction === "asc" ? comparison : -comparison;
+  });
+  const tableColumns = columns.map((col, columnIndex) => {
+    const width = columnWidths[col.key] || defaultWidthFor(col.key);
+    const header = (
+      <div className="relative flex h-full w-full items-center justify-center gap-1 pr-2" onClick={event => event.stopPropagation()}>
+        <span className={`${col.key === "no" ? "whitespace-nowrap" : "truncate"} text-center font-bold`} title={col.label.replace("\n", " ")}>{col.label.replace("\n", " ")}</span>
+        {col.key !== "actions" && (
+          <button type="button" onClick={() => toggleSort(col.key)} className="flex-shrink-0 p-0.5" title={`Sort ${col.label.replace("\n", " ")}`} style={{ color: "var(--color-primary)" }}>
+            {sortConfig.key !== col.key ? <ArrowUpDown size={11} /> : sortConfig.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </button>
+        )}
+        {columnIndex < columns.length - 1 && (
+          <span
+            role="separator"
+            aria-label={`Resize ${col.label.replace("\n", " ")} column`}
+            onMouseDown={event => startResize(event, col.key)}
+            className="absolute right-0 top-0 z-10 h-full w-2 cursor-col-resize"
+            style={{ borderRight: "1px solid var(--color-border)", background: "transparent" }}
+          />
+        )}
+      </div>
+    );
+    const common = {
+      name: header,
+      width: `${width}px`,
+      minWidth: `${width}px`,
+      maxWidth: `${width}px`,
+      grow: 0,
+      center: col.align === "center" || col.key === "no" || col.key === "actions",
+      sortable: false,
+    };
+    if (col.key === "no") return { ...common, cell: row => row._placeholder ? "" : row._rowIndex + 1 };
+    if (col.key === "name") return { ...common, cell: row => row._placeholder ? "" : row.display?.primaryLine ?? row.name ?? "" };
+    if (col.key === "actions") return {
+      ...common,
+      cell: row => row._placeholder ? null : (
+        <div className="flex items-center justify-center gap-1">
+          <button onClick={event => { event.stopPropagation(); onEdit(row); }} className="p-1 rounded" title="Edit"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}><Edit2 size={12} /></button>
+          <button onClick={event => { event.stopPropagation(); onStrike(row.id); }} className="p-1 rounded" title="Strike"
+            style={{ background: "var(--color-lab-light)", color: "var(--color-lab)" }}>{struckIds.includes(row.id) ? <RotateCcw size={12} /> : <MinusCircle size={12} />}</button>
+          <button onClick={event => { event.stopPropagation(); onDelete(row.id); }} className="p-1 rounded" title="Delete"
+            style={{ background: "#fee2e2", color: "var(--color-danger)" }}><X size={12} /></button>
+        </div>
+      ),
+    };
+    return { ...common, cell: row => <span className="whitespace-nowrap">{row._placeholder ? "" : row.display?.[col.key] ?? row[col.key] ?? ""}</span> };
+  });
+
+  const customStyles = {
+    table: { style: { backgroundColor: "var(--color-surface)" } },
+    tableWrapper: { style: { height: "100%", minHeight: "100%" } },
+    responsiveWrapper: { style: { height: "100%", minHeight: "100%" } },
+    headRow: { style: { minHeight: "34px", height: "34px", backgroundColor: "var(--color-primary-muted)", borderBottom: "1px solid var(--color-border)" } },
+    headCells: { style: { paddingLeft: "8px", paddingRight: "8px", color: "var(--color-primary-dark)", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", justifyContent: "center" } },
+    rows: { style: { minHeight: "32px", height: "32px", fontSize: "14px", color: "var(--color-text-base)", borderBottom: "1px solid var(--color-border)" } },
+    cells: { style: { paddingLeft: "8px", paddingRight: "8px", overflow: "visible" } },
+  };
+  const conditionalRowStyles = [
+    { when: row => row.id === selectedRowId, style: { backgroundColor: accentLight, boxShadow: `inset 0 0 0 1px ${accentColor}` } },
+    { when: row => struckIds.includes(row.id), style: { opacity: 0.6 } },
+    { when: row => row._rowIndex % 2 === 1 && row.id !== selectedRowId, style: { backgroundColor: "var(--color-surface-alt)" } },
+  ];
+  const displayedRows = [
+    ...sortedRows,
+    ...Array.from({ length: fillRowCount }, (_, index) => ({ id: `care-plan-empty-${index}`, _placeholder: true, _rowIndex: rows.length + index })),
+  ];
+  const totalTableWidth = columns.reduce((total, col) => total + (columnWidths[col.key] || defaultWidthFor(col.key)), 0);
+
+  useEffect(() => {
+    const tableScroller = tableHostRef.current?.querySelector(".care-plan-react-data-table");
+    const bottomScroller = bottomScrollRef.current;
+    if (!tableScroller || !bottomScroller) return;
+    const syncTable = () => { tableScroller.scrollLeft = bottomScroller.scrollLeft; };
+    const syncBottom = () => { bottomScroller.scrollLeft = tableScroller.scrollLeft; };
+    bottomScroller.addEventListener("scroll", syncTable);
+    tableScroller.addEventListener("scroll", syncBottom);
+    return () => {
+      bottomScroller.removeEventListener("scroll", syncTable);
+      tableScroller.removeEventListener("scroll", syncBottom);
+    };
+  }, [columnWidths, columns]);
+
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div ref={tableHostRef} className="min-h-0 flex-1 overflow-hidden">
+        <DataTable
+          className="care-plan-react-data-table"
+          columns={tableColumns}
+          data={displayedRows}
+          customStyles={customStyles}
+          conditionalRowStyles={conditionalRowStyles}
+          onRowClicked={row => { if (!row._placeholder) onSelect(row.id); }}
+          highlightOnHover
+          responsive
+          fixedHeader
+          fixedHeaderScrollHeight="100%"
+          persistTableHead
+          noDataComponent="No Care Plan activities"
+        />
+      </div>
+      <div ref={bottomScrollRef} className="care-plan-horizontal-scroll flex-shrink-0 overflow-x-scroll overflow-y-hidden" style={{ height: "14px" }}>
+        <div style={{ width: `${totalTableWidth}px`, height: "1px" }} />
+      </div>
     </div>
   );
 }
@@ -639,7 +803,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     ? config.tableColumns.filter(c => c.key === "no" || c.key === "actions" || visibleColOverrides[c.key] !== false)
     : config.tableColumns;
   const addRowRef = useRef(null), rowsScrollRef = useRef(null);
-  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, items.length);
+  const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, items.length, config.key === "carePlan" ? 44 : 0);
 
     const suggestions = query.trim() ? searchList.filter(s => s.toLowerCase().includes(query.toLowerCase())) : searchList;
     const setD = k => v => setDraft(prev => ({ ...prev, [k]: v }));
@@ -697,30 +861,44 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     clearAll: handleClearAll,
   }));
 
-  const carePlanOptionalColumnCount = displayColumns.filter(col =>
-    ["name", "schStatus", "linkedStatus", "activityResult", "messageDoctor", "messagePatient", "messageAttendant"].includes(col.key)
-  ).length;
-  const carePlanGridMinWidth = `${1160 + carePlanOptionalColumnCount * 140}px`;
-
   return (
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
-      <div className={`flex-1 ${config.key === "carePlan" ? "care-plan-horizontal-scroll overflow-x-auto overflow-y-hidden" : "flex flex-col overflow-hidden"}`}>
+      <div className="flex-1 flex flex-col overflow-hidden">
         <div
           className="h-full flex flex-col overflow-hidden"
-          style={{ minWidth: config.key === "carePlan" ? carePlanGridMinWidth : undefined }}
         >
-          <TableHeader columns={displayColumns} accentColor={config.color} wrapLabels={config.key === "carePlan"} />
-          <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
-            {items.map((item, index) => (
-              <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
-                isStruck={struckIds.includes(item.id)} isSelected={selectedRowId === item.id}
-                onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
-                onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
-                onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight}
-                dataFontSize="14px" preserveFullText={config.key === "carePlan"} />
-            ))}
-            {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
-          </div>
+          {config.key === "carePlan" ? (
+            <div ref={rowsScrollRef} className="flex-1 min-h-0 overflow-hidden">
+              <CarePlanDataTable
+                columns={displayColumns}
+                items={items}
+                fillRowCount={fillRowCount}
+                selectedRowId={selectedRowId}
+                onSelect={setSelectedRowId}
+                onEdit={startEdit}
+                onStrike={toggleStrike}
+                onDelete={deleteItem}
+                struckIds={struckIds}
+                accentColor={config.color}
+                accentLight={config.colorLight}
+              />
+            </div>
+          ) : (
+            <>
+              <TableHeader columns={displayColumns} accentColor={config.color} />
+              <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
+                {items.map((item, index) => (
+                  <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
+                    isStruck={struckIds.includes(item.id)} isSelected={selectedRowId === item.id}
+                    onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
+                    onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
+                    onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight}
+                    dataFontSize="14px" />
+                ))}
+                {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
+              </div>
+            </>
+          )}
         </div>
 
         {!config.hideAddRow && (

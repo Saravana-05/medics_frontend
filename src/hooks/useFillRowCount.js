@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
  * data rows are already rendered. Re-measures on container resize so the grid
  * always fills whatever space is available — no hardcoded row count.
  */
-export default function useFillRowCount(containerRef, rowHeightPx, dataLength) {
+export default function useFillRowCount(containerRef, rowHeightPx, dataLength, reservedHeightPx = 0) {
   const [fillCount, setFillCount] = useState(0);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export default function useFillRowCount(containerRef, rowHeightPx, dataLength) {
     if (!el) return;
 
     const compute = () => {
-      const available = el.clientHeight;
+      const available = Math.max(0, el.clientHeight - reservedHeightPx);
       const needed = Math.max(0, Math.ceil(available / rowHeightPx) - dataLength);
       setFillCount(needed);
     };
@@ -23,7 +23,7 @@ export default function useFillRowCount(containerRef, rowHeightPx, dataLength) {
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [containerRef, rowHeightPx, dataLength]);
+  }, [containerRef, rowHeightPx, dataLength, reservedHeightPx]);
 
   return fillCount;
 }
