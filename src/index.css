@@ -36,19 +36,19 @@
      each tab having its own unrelated hue. */
   --color-drugs: #0c324a;
   /* navy   – Drugs         */
-  --color-drugs-light: color-mix(in srgb, #0c324a 12%, white);
+  --color-drugs-light: #e2e7e9;
   --color-lab: #c11720;
   /* red    – Lab           */
-  --color-lab-light: color-mix(in srgb, #c11720 12%, white);
+  --color-lab-light: #f7e3e4;
   --color-services: #679cbc;
   /* blue   – Services      */
-  --color-services-light: color-mix(in srgb, #679cbc 20%, white);
+  --color-services-light: #e1ebf2;
   --color-iptime: #d97706;
   /* amber  – IP Time-line  */
-  --color-iptime-light: color-mix(in srgb, #d97706 12%, white);
+  --color-iptime-light: #faedda;
   --color-careplan: #0f766e;
   /* teal   – Care-Plan     */
-  --color-careplan-light: color-mix(in srgb, #0f766e 12%, white);
+  --color-careplan-light: #e2eeed;
   --color-info: #0ea5e9;
   /* blue   – Info/Findings */
   --color-info-light: #c8eef4;
@@ -276,7 +276,11 @@ body {
 
 /* Data values in Drug Group, Lab groups/report, Service files, and IP panels. */
 .side-panel-data-row .text-xs {
-  font-size: 1rem;
+  font-size: 14px;
+}
+
+.side-panel-data-row > div > span {
+  font-size: 14px !important;
 }
 
 .side-panel-data-row > :first-child,
@@ -286,7 +290,7 @@ body {
 }
 
 .service-panel-data-row .text-xs {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* IP Time-line mirror: Entry Type and Subject fit 15 characters; Notes expands. */

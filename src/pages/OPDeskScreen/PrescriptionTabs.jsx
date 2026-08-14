@@ -3,13 +3,12 @@ import { TAB_CONFIGS } from "../../config/tabConfig";
 
 // Same color each tab's table header (AddTableHeader) uses — TAB_CONFIGS.<tab>.color —
 // so the tab bar and the medicine/lab/service/IP-time list header always match.
-const TAB_ICON_SIZE = 15;
 const PRESCRIPTION_TABS = [
-  { key: "drugs",    label: "Drug",     icon: TAB_CONFIGS.drugs.icon,    color: TAB_CONFIGS.drugs.color,    textColor: TAB_CONFIGS.drugs.colorText,    textAccent: TAB_CONFIGS.drugs.textAccent },
-  { key: "lab",      label: "Lab",      icon: TAB_CONFIGS.lab.icon,      color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText,      textAccent: TAB_CONFIGS.lab.textAccent },
-  { key: "services", label: "Service",  icon: TAB_CONFIGS.services.icon, color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText, textAccent: TAB_CONFIGS.services.textAccent },
-  { key: "carePlan", label: "Care-Plan", icon: TAB_CONFIGS.carePlan.icon, color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText, textAccent: TAB_CONFIGS.carePlan.textAccent },
-  { key: "iptime",   label: "IP Timeline", icon: TAB_CONFIGS.iptime.icon, color: TAB_CONFIGS.iptime.color, textColor: TAB_CONFIGS.iptime.colorText, textAccent: TAB_CONFIGS.iptime.textAccent },
+  { key: "drugs",    label: "Drug",        color: TAB_CONFIGS.drugs.color,    textColor: TAB_CONFIGS.drugs.colorText,    textAccent: TAB_CONFIGS.drugs.textAccent },
+  { key: "lab",      label: "Lab-Test",    color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText,      textAccent: TAB_CONFIGS.lab.textAccent },
+  { key: "services", label: "Service",     color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText, textAccent: TAB_CONFIGS.services.textAccent },
+  { key: "carePlan", label: "Care-Plan",   color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText, textAccent: TAB_CONFIGS.carePlan.textAccent },
+  { key: "iptime",   label: "IP Timeline", color: TAB_CONFIGS.iptime.color,   textColor: TAB_CONFIGS.iptime.colorText,   textAccent: TAB_CONFIGS.iptime.textAccent },
 ];
 
 const GRAY_DARK = "#6b7280";
@@ -30,7 +29,6 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
         const showColor = isActive || isHovered;
         const isLast = i === PRESCRIPTION_TABS.length - 1;
         const isFirst = i === 0;
-        const Icon = tab.icon;
         const count = tabCount?.[tab.key];
 
         // Each tab is a slanted parallelogram — flat top/bottom, "\" diagonal
@@ -61,12 +59,11 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
               color: showColor ? (tab.textColor || "white") : "white",
             }}
           >
-            <Icon size={TAB_ICON_SIZE} style={{ color: showColor ? (tab.textColor || "white") : "white", opacity: showColor ? 1 : 0.9 }} />
             <span className="whitespace-nowrap">{tab.label}</span>
             {count > 0 && (
               <span
-                className="flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full text-[0.55rem] font-bold leading-none"
-                style={{ background: "white", color: showColor ? (tab.textAccent || tab.color) : GRAY_DARK }}
+                className="inline-flex items-center justify-center text-center font-bold leading-none"
+                style={{ fontSize: "calc(0.65rem + 8px)", color: showColor ? (tab.textColor || "white") : "white" }}
               >
                 {count}
               </span>

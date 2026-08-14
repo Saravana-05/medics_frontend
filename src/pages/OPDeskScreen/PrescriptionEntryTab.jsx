@@ -105,15 +105,34 @@ function EntryFooterBar({
 }
 
 export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentLight, accentText }) {
-  const color = accentColor || "var(--color-primary)";
   const darkText = accentText || "white";
   // Five distinct shades of the active tab's own accent color, lightest to
   // darkest — one per button, not just a 3-tier split.
-  const shade = pct => pct <= 100
-    ? `color-mix(in srgb, ${color} ${pct}%, white)`
-    : `color-mix(in srgb, ${color} ${200 - pct}%, black)`;
-  const shades = [shade(30), shade(50), shade(70), shade(100), shade(120)];
-  const hoverShades = [shade(45), shade(65), shade(85), shade(110), shade(135)];
+  const toolbarPalettes = {
+    "var(--color-drugs)": {
+      normal: ["#b6c2c8", "#8699a5", "#566f80", "#0c324a", "#0a283b"],
+      hover: ["#93a5af", "#667e8d", "#304f62", "#0b2d43", "#08202f"],
+    },
+    "var(--color-lab)": {
+      normal: ["#edb9bc", "#e08b90", "#d15d64", "#c11720", "#9a121a"],
+      hover: ["#e49a9f", "#d36a70", "#c93b43", "#ae151d", "#7d0f15"],
+    },
+    "var(--color-services)": {
+      normal: ["#d1e1e9", "#b3cedd", "#8eb6ca", "#679cbc", "#527d96"],
+      hover: ["#bfd5e1", "#9fc1d2", "#7aa8c0", "#5d8ca9", "#426478"],
+    },
+    "var(--color-careplan)": {
+      normal: ["#b7d6d4", "#87bbb7", "#579f9a", "#0f766e", "#0c5e58"],
+      hover: ["#99c7c3", "#67aaa5", "#339087", "#0e6a63", "#094c47"],
+    },
+    "var(--color-primary)": {
+      normal: ["#b7d3eb", "#87b5de", "#5797d0", "#0f6cbd", "#0c5697"],
+      hover: ["#99c2e5", "#679fd4", "#337fc6", "#0e61aa", "#094579"],
+    },
+  };
+  const palette = toolbarPalettes[accentColor] || toolbarPalettes["var(--color-primary)"];
+  const shades = palette.normal;
+  const hoverShades = palette.hover;
 
   return (
     <div className="flex items-center overflow-hidden rounded-md">
@@ -131,7 +150,7 @@ function TableHeader({ columns, accentColor, wrapLabels = false }) {
   return (
     <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "40px", boxSizing: "border-box" }}>
       {columns.map(col => (
-        <div key={col.key} className={`${col.width} min-w-0 ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
+        <div key={col.key} className={`${col.width} ${wrapLabels ? "" : "min-w-0"} ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
           style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
             ...(col.vertical
               ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" }
@@ -213,7 +232,7 @@ function EntryRow({ item, index, columns, isStruck, isSelected, onSelect, onDele
         );
         // plain text columns (when/detail/etc.)
         return (
-          <div key={col.key} className={`${col.width} min-w-0 px-2 py-1 text-left`}>
+          <div key={col.key} className={`${col.width} ${preserveFullText ? "" : "min-w-0"} px-2 py-1 ${col.align === "center" ? "text-center" : "text-left"}`}>
             <span className={`text-xs font-normal block ${preserveFullText ? "whitespace-nowrap" : "truncate"}`} style={{ color: "var(--color-text-base)", fontSize: dataFontSize }} title={item.display[col.key] || ""}>{item.display[col.key] ?? ""}</span>
           </div>
         );
@@ -693,9 +712,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const carePlanOptionalColumnCount = displayColumns.filter(col =>
     ["name", "schStatus", "linkedStatus", "activityResult", "messageDoctor", "messagePatient", "messageAttendant"].includes(col.key)
   ).length;
-  const carePlanGridMinWidth = carePlanOptionalColumnCount > 0
-    ? `${930 + carePlanOptionalColumnCount * 120}px`
-    : "100%";
+  const carePlanGridMinWidth = `${1160 + carePlanOptionalColumnCount * 140}px`;
 
   return (
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
@@ -712,7 +729,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
                 onSelect={() => setSelectedRowId(item.id)} onDelete={() => deleteItem(item.id)}
                 onStrike={() => toggleStrike(item.id)} onEdit={() => startEdit(item)}
                 onArrowNav={dir => handleRowArrowNav(item.id, dir)} accentColor={config.color} accentLight={config.colorLight}
-                dataFontSize="1rem" preserveFullText={config.key === "carePlan"} />
+                dataFontSize="14px" preserveFullText={config.key === "carePlan"} />
             ))}
             {Array.from({ length: fillRowCount }).map((_, i) => <EmptyRow key={`empty-${i}`} columns={displayColumns} />)}
           </div>

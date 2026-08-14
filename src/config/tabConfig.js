@@ -112,7 +112,7 @@ export const TAB_CONFIGS = {
   /* ══════════════════ LAB ══════════════════ */
   lab: {
     key: "lab",
-    label: "Lab",
+    label: "Lab-Test",
     icon: FlaskConical,
     color: "var(--color-lab)",
     colorLight: "var(--color-lab-light)",
@@ -328,11 +328,11 @@ export const TAB_CONFIGS = {
     tableColumns: [
       { key: "no",                  label: "No.",                 width: "w-12",   type: "index" },
       { key: "name",                label: "Medical Condition",      width: "w-36",   type: "text" },
-      { key: "schDate",             label: "Schedule Date",       width: "w-24",   type: "text" },
-      { key: "milestone",           label: "Milestone",           width: "w-20",   type: "text" },
-      { key: "pathwayName",         label: "Pathway Name",        width: "w-28",   type: "text" },
-      { key: "activityType",        label: "Activity Type",       width: "w-24",   type: "text" },
-      { key: "activityDescription", label: "Activity\nDescription", width: "flex-1", type: "text" },
+      { key: "schDate",             label: "Schedule Date",       width: "flex-1 min-w-[140px]", type: "text", align: "center" },
+      { key: "milestone",           label: "Milestone",           width: "flex-1 min-w-[140px]", type: "text", align: "center" },
+      { key: "pathwayName",         label: "Pathway Name",        width: "flex-1 min-w-[140px]", type: "text" },
+      { key: "activityType",        label: "Activity Type",       width: "flex-1 min-w-[140px]", type: "text", align: "center" },
+      { key: "activityDescription", label: "Activity\nDescription", width: "flex-1 min-w-[380px]", type: "text" },
       { key: "schStatus",           label: "Schedule Status",         width: "w-24",   type: "text" },
       { key: "linkedStatus",        label: "Linked Status",           width: "w-24",   type: "text" },
       { key: "activityResult",      label: "Activity Result",         width: "w-28",   type: "text" },
