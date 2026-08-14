@@ -48,11 +48,10 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
   return (
     <>
       <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", background: accentLight, borderColor: "var(--color-border)" }}>
-        <div className="flex items-center gap-2">
-          <div className="p-1 rounded-md" style={{ background: accentColor, color: accentText }}><Icon size={12} /></div>
-          <div>
-            <h3 className="text-xs font-bold leading-tight" style={{ color: textAccent || accentColor }}>{title}</h3>
-            <p className="text-[0.58rem] font-medium leading-tight" style={{ color: "var(--color-text-muted)" }}>{subtitle}</p>
+        <div className="flex items-center">
+          <div className="flex flex-col gap-1">
+            <h3 className="font-bold leading-tight" style={{ color: textAccent || accentColor, fontSize: "12.5px" }}>{title}</h3>
+            <p className="text-[0.58rem] font-normal leading-tight" style={{ color: "var(--color-text-muted)" }}>{subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">

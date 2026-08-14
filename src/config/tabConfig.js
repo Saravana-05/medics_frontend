@@ -150,7 +150,7 @@ export const TAB_CONFIGS = {
       // Lab's panel has two states — a prescription list, and a results/report view.
       // The report view is toggled by the tab's own "Preview" toolbar button (see OPDeskScreen.jsx).
       type: "group-list",
-      title: "Test Group Prescription",
+      title: "Lab-Test Group Prescription",
       itemLabel: "Prescriptions Recorded",
       columns: ["Prescription Title", "Tests"],
       newButtonLabel: "New Group",

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   
-  ChevronDown, ChevronUp, History, 
+  ChevronDown, ChevronUp,
   ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
 import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
@@ -209,15 +209,12 @@ export default function PreviousVisitsTable({ visits = [] }) {
           background: "var(--color-primary-muted)",
           borderColor: "var(--color-border)"
         }}>
-          <div className="flex items-center gap-2">
-            <div className="p-1 rounded-md" style={{ background: "var(--color-primary)", color: "white" }}>
-              <History size={12} />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold leading-tight" style={{ color: "var(--color-primary-dark)" }}>
+          <div className="flex items-center">
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold leading-tight" style={{ color: "var(--color-primary-dark)", fontSize: "12.5px" }}>
                 Previous Information
               </h3>
-              <p className="text-[0.58rem] font-medium leading-tight" style={{ color: "var(--color-text-muted)" }}>
+              <p className="text-[0.58rem] font-normal leading-tight" style={{ color: "var(--color-text-muted)" }}>
                 {visits.length} Entries{visits.length !== 1 ? 's' : ''} Recorded
               </p>
             </div>
