@@ -409,6 +409,23 @@ body {
   font-weight: 400 !important;
 }
 
+.side-panel-footer select {
+  border-radius: 0 !important;
+}
+
+/* Square outer shells for the OP Desk left/right drawers. */
+.opdesk-drawer-shell > :first-child {
+  border-radius: 0 !important;
+}
+
+/* Modal containers are direct children of their full-screen backdrops. Keep
+   inner form controls and cards unchanged while squaring the popup itself. */
+.fixed.inset-0 > .rounded-lg,
+.fixed.inset-0 > .rounded-xl,
+.fixed.inset-0 > .rounded-2xl {
+  border-radius: 0 !important;
+}
+
 /* Data values in the Previous Information grid. */
 .previous-info-data-row .text-xs {
   font-size: 1rem;

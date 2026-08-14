@@ -47,7 +47,7 @@ function EmptyPanelRow({ columnCount }) {
 function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, accentText = "white", textAccent, onAdd, addLabel, searchTerm, onSearchChange, actions }) {
   return (
     <>
-      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", background: accentLight, borderColor: "var(--color-border)" }}>
+      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: accentLight, backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.035))", borderColor: "var(--color-border)" }}>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h3 className="font-bold leading-tight" style={{ color: textAccent || accentColor, fontSize: "12.5px" }}>{title}</h3>
@@ -65,7 +65,7 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
             <div className="relative">
               <Search size={11} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
               <input type="text" placeholder="Search..." value={searchTerm} onChange={e => onSearchChange(e.target.value)}
-                className="pl-7 pr-2 py-1 text-[0.7rem] rounded-lg w-28 focus:w-40 transition-all duration-200 outline-none"
+                className="pl-7 pr-2 py-1 text-[0.7rem] w-28 focus:w-40 transition-all duration-200 outline-none"
                 style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }} />
             </div>
           )}
@@ -667,7 +667,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
         subtitle={`${entries.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm}
         actions={<div className="relative">
-          <button onClick={() => setShowColumnMenu(open => !open)} className="p-1 rounded-md" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} title="Toggle Columns">
+          <button onClick={() => setShowColumnMenu(open => !open)} className="p-1" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} title="Toggle Columns">
             <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} />
           </button>
           {showColumnMenu && <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg shadow-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} onMouseLeave={() => setShowColumnMenu(false)}>

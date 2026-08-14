@@ -206,7 +206,8 @@ export default function PreviousVisitsTable({ visits = [] }) {
         <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{
           height: "48px",
           boxSizing: "border-box",
-          background: "var(--color-primary-muted)",
+          backgroundColor: "var(--color-primary-muted)",
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.035))",
           borderColor: "var(--color-border)"
         }}>
           <div className="flex items-center">
@@ -225,7 +226,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
             <div className="relative">
               <button
                 onClick={() => setShowColumnMenu(!showColumnMenu)}
-                className="p-1 rounded-md transition-all"
+                className="p-1 transition-all"
                 style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
                 title="Toggle Columns"
               >
@@ -267,7 +268,7 @@ export default function PreviousVisitsTable({ visits = [] }) {
                 placeholder="Search Entries..."
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
-                className="pl-7 pr-2 py-1 text-[0.7rem] rounded-lg w-28 focus:w-40 transition-all duration-200 outline-none"
+                className="pl-7 pr-2 py-1 text-[0.7rem] w-28 focus:w-40 transition-all duration-200 outline-none"
                 style={{
                   border: "1px solid var(--color-border)",
                   background: "var(--color-surface)",

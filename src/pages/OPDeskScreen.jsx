@@ -40,7 +40,7 @@ function ColumnFilterButton({ columns, visible, onToggle, color }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
+      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all"
         style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text-base)" }} title="Show/Hide Columns">
         <ListFilter size={13} /> Filter
       </button>

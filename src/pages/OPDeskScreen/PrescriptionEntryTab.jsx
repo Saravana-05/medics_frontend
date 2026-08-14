@@ -125,7 +125,7 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
   const hoverShades = palette.hover;
 
   return (
-    <div className="flex items-center overflow-hidden rounded-md">
+    <div className="flex items-center overflow-hidden">
       <ActionButton label="Clear" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
       <ActionButton label="Paste" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
       <ActionButton label="Preview" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />
@@ -729,8 +729,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
 
       <div className="w-16 flex-shrink-0 px-1 py-1.5 flex gap-1 items-center justify-center">
         <button data-field="commit" onClick={onCommit} onKeyDown={e => handleFieldKeyDown(e, "commit")}
-          className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: "var(--color-success)", color: "white" }} title="Add (Enter)"><Plus size={16} /></button>
-        <button onClick={onCancel} className="p-1.5 rounded-md inline-flex items-center justify-center" style={{ background: "var(--color-danger)", color: "white" }} title="Cancel (Esc)"><X size={16} /></button>
+          className="p-1.5 inline-flex items-center justify-center" style={{ background: "var(--color-success)", color: "white" }} title="Add (Enter)"><Plus size={16} /></button>
+        <button onClick={onCancel} className="p-1.5 inline-flex items-center justify-center" style={{ background: "var(--color-danger)", color: "white" }} title="Cancel (Esc)"><X size={16} /></button>
       </div>
     </div>
   );

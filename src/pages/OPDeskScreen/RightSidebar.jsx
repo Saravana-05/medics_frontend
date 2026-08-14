@@ -133,7 +133,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
     }
 
     return (
-      <div ref={popupRef} style={wrapperStyle}>
+      <div ref={popupRef} className="opdesk-drawer-shell" style={wrapperStyle}>
         {content}
         <button
           onClick={() => onPanelChange(null)}
