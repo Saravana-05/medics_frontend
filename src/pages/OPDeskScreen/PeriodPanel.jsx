@@ -196,11 +196,12 @@ function PeriodPanel({ patient, panelHeight }) {
             <div className="text-xs font-semibold" style={{ color: "var(--color-text-base)" }}>
               {currentVisits.length} Visit{currentVisits.length !== 1 ? 's' : ''} Found
             </div>
-            <button className="text-[0.6rem] flex items-center gap-1 px-2 py-1 rounded"
-              style={{ background: "var(--color-surface-alt)" }}>
+            <button className="text-[0.7rem] font-normal flex items-center gap-1 px-2 rounded"
+              style={{ background: "var(--color-surface-alt)", height: "26px", boxSizing: "border-box" }}>
               <Filter size={10} /> Filter
             </button>
           </div>
+
 
           {/* Visit List */}
           {currentVisits.length === 0 ? (

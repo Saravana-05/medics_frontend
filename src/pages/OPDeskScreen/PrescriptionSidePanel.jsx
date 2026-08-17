@@ -66,7 +66,7 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
               <Search size={11} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
               <input type="text" placeholder="Search..." value={searchTerm} onChange={e => onSearchChange(e.target.value)}
                 className="pl-7 pr-2 py-1 text-[0.7rem] w-28 focus:w-40 transition-all duration-200 outline-none"
-                style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }} />
+                style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)", height: "26px", boxSizing: "border-box" }} />
             </div>
           )}
         </div>
@@ -667,8 +667,8 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
         subtitle={`${entries.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm}
         actions={<div className="relative">
-          <button onClick={() => setShowColumnMenu(open => !open)} className="p-1" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} title="Toggle Columns">
-            <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} />
+          <button onClick={() => setShowColumnMenu(open => !open)} className="flex items-center gap-1.5 px-2 text-[0.7rem] font-normal" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", height: "26px", boxSizing: "border-box" }} title="Toggle Columns">
+            <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} /> Filter
           </button>
           {showColumnMenu && <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg shadow-xl" style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }} onMouseLeave={() => setShowColumnMenu(false)}>
             <div className="border-b p-2 text-xs font-semibold" style={{ borderColor: "var(--color-border)" }}>Show/Hide Columns</div>

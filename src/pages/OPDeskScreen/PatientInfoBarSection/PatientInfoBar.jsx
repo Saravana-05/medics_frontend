@@ -46,13 +46,13 @@ export default function PatientInfoBar({
         {/* ── Main Content Area ── */}
         {/* Stacks vertically on tablet/mobile, side-by-side from lg up.
             Height is driven by flex stretch (matches the sidebars) — no hardcoded height. */}
-        <div className="flex-1 flex flex-col lg:flex-row lg:relative lg:items-stretch">
+        <div className="flex-1 flex flex-col lg:flex-row lg:relative lg:items-stretch lg:gap-[5px]">
 
           {/* Left accent bar — mirrors the right one; a segment shows only while
               its matching LeftSidebar tab is hovered. Desktop only.
               Absolutely positioned so its fixed height never forces the row taller
               than the Vital Signs + Clinical Information content. */}
-          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-[2px] lg:top-0 lg:bottom-[8px]" style={{ width: "2px" }}>
+          <div className="hidden lg:flex flex-col flex-shrink-0 lg:absolute lg:left-0 lg:top-0 lg:bottom-[8px]" style={{ width: "2px" }}>
             {LEFT_ACCENT_SEGMENTS.map((seg) => (
               <div
                 key={seg.key}
@@ -78,7 +78,7 @@ export default function PatientInfoBar({
           />
 
           {/* ── Right Panel ── */}
-          <div className="flex-1 flex flex-col lg:flex-row min-w-0 lg:gap-2" style={{ height: "100%" }}>
+          <div className="flex-1 flex flex-col lg:flex-row min-w-0 lg:gap-[5px]" style={{ height: "100%" }}>
             
             {/* Left side - Vital Signs + Clinical Information (one bordered section) */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden box-border border mb-[8px]" style={{ borderColor: "var(--color-border)", boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)", background: "var(--color-surface-alt)" }}>

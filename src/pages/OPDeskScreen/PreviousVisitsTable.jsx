@@ -310,11 +310,11 @@ export default function PreviousVisitsTable({ visits = [] }) {
             <div className="relative">
               <button
                 onClick={() => setShowColumnMenu(!showColumnMenu)}
-                className="p-1 transition-all"
-                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                className="flex items-center gap-1.5 px-2 text-[0.7rem] font-normal transition-all"
+                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", height: "26px", boxSizing: "border-box" }}
                 title="Toggle Columns"
               >
-                <ListFilter  size={12} style={{ color: "var(--color-text-muted)" }} />
+                <ListFilter size={12} style={{ color: "var(--color-text-muted)" }} /> Filter
               </button>
 
               {showColumnMenu && (
@@ -356,7 +356,9 @@ export default function PreviousVisitsTable({ visits = [] }) {
                 style={{
                   border: "1px solid var(--color-border)",
                   background: "var(--color-surface)",
-                  color: "var(--color-text-base)"
+                  color: "var(--color-text-base)",
+                  height: "26px",
+                  boxSizing: "border-box"
                 }}
               />
             </div>

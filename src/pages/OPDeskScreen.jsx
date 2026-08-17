@@ -40,8 +40,8 @@ function ColumnFilterButton({ columns, visible, onToggle, color }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all"
-        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text-base)" }} title="Show/Hide Columns">
+      <button onClick={() => setOpen(v => !v)} className="flex items-center gap-1.5 px-3 text-[0.7rem] font-normal transition-all"
+        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", color: "var(--color-text-base)", height: "26px", boxSizing: "border-box" }} title="Show/Hide Columns">
         <ListFilter size={13} /> Filter
       </button>
       {open && (
@@ -250,7 +250,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       {/* ── Second Row: LeftSidebar + PatientInfoBar + RightSidebar ── */}
       {/* On tablet/mobile this row is capped at 50% of viewport height and scrolls
           internally, so the main workspace below always keeps usable space. */}
-      <div className="flex-shrink-0 flex items-stretch max-h-screen overflow-y-auto md:max-h-none lg:overflow-visible">
+      <div className="flex-shrink-0 flex items-stretch gap-[5px] max-h-screen overflow-y-auto md:max-h-none lg:overflow-visible">
         <div className="flex-shrink-0 flex mb-[8px]">
           <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} />
         </div>
@@ -273,7 +273,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           />
         </div>
 
-        <div className="flex-shrink-0 flex mb-[8px] ml-0.5">
+        <div className="flex-shrink-0 flex mb-[8px]">
           <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>

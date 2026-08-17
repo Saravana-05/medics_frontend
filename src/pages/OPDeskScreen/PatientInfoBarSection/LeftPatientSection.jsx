@@ -258,8 +258,8 @@ export default function LeftPatientSection({
     borderColor: "var(--color-border)",
     background: "var(--color-surface-alt)",
     width: "calc(20% - 40px)",
-    marginLeft: "10px",
-    marginRight: "10px",
+    marginLeft: "0",
+    marginRight: "0",
     marginBottom: "8px",
     boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)",
   }}
