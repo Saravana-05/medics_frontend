@@ -295,7 +295,7 @@ body {
 }
 
 .service-panel-data-row .text-xs {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* IP Time-line mirror: Entry Type and Subject fit 15 characters; Notes expands. */
@@ -428,7 +428,7 @@ body {
 
 /* Data values in the Previous Information grid. */
 .previous-info-data-row .text-xs {
-  font-size: 1rem;
+  font-size: 13px;
 }
 
 /* Shared table headers across Prescription, middle panel, and Previous Info. */
@@ -464,18 +464,23 @@ body {
 
 .care-plan-react-data-table,
 .care-plan-react-data-table .rdt_wrapper,
-.care-plan-react-data-table .rdt_table {
+.care-plan-react-data-table .rdt_table,
+.previous-info-react-data-table,
+.previous-info-react-data-table .rdt_wrapper,
+.previous-info-react-data-table .rdt_table {
   height: 100% !important;
   min-height: 100% !important;
   background: var(--color-surface);
 }
 
-.care-plan-react-data-table {
+.care-plan-react-data-table,
+.previous-info-react-data-table {
   box-sizing: border-box;
   overflow-x: auto !important;
 }
 
-.care-plan-react-data-table::-webkit-scrollbar:horizontal {
+.care-plan-react-data-table::-webkit-scrollbar:horizontal,
+.previous-info-react-data-table::-webkit-scrollbar:horizontal {
   height: 0;
 }
 

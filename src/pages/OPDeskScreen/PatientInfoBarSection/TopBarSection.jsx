@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { FileText as FileIcon, Calendar, CalendarDays } from "lucide-react";
 import OPListModal from "../../../modal/Oplistmodal";
 
 export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient }) {
   const p = patient;
-  const [followUpDate, setFollowUpDate] = useState("");
+  const [followUpDate, setFollowUpDate] = useState(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  });
   const [showOPList, setShowOPList] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
 
@@ -135,14 +140,13 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
 
               {/* Follow-up Date */}
               <div className="flex-1 lg:flex-none mb-0">
-                <div className="text-[0.55rem] font-bold uppercase mb-0.5" style={{ color: "var(--color-text-muted)" }}>Follow-up Date</div>
+                <div className="text-[0.7rem] font-bold mb-0.5" style={{ color: "var(--color-text-muted)" }}>Follow-up Date</div>
                 <div className="relative">
-                  <CalendarDays size={14} className="absolute left-2.5 top-1/2 transform -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
                   <input
                     type="date"
                     value={followUpDate}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="w-full pl-8 pr-2 py-2.5 text-sm border outline-none shadow-sm"
+                    className="w-full px-2 py-2.5 text-sm border outline-none shadow-sm"
                     style={{
                       borderRadius: 0,
                       background: "var(--color-surface)",
@@ -158,25 +162,25 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
 
               {/* Doc No */}
               <div className="flex-1 lg:flex-none">
-                <div className="text-[0.55rem] font-bold uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
+                <div className="text-[0.9rem] font-regular uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
                 <div className="flex items-center justify-between gap-1.5 px-2 py-2.5 h-full md:h-auto shadow-sm" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
                   <div className="flex items-center gap-1.5">
-                    <FileIcon size={12} style={{ color: "var(--color-primary)" }} />
-                    <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc No</div>
+                    
+                    <div className="text-[0.9rem] font-regular lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc.No</div>
                   </div>
-                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docNo || "—"}</div>
+                  <div className="text-[0.9rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docNo || "—"}</div>
                 </div>
               </div>
 
               {/* Doc Date */}
               <div className="flex-1 lg:flex-none">
-                <div className="text-[0.55rem] font-bold uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>
+                <div className="text-[0.rem] font-bold uppercase mb-0.5 md:block lg:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>
                 <div className="flex items-center justify-between gap-1.5 px-2 py-2.5 h-full md:h-auto shadow-sm" style={{ background: "var(--color-surface)", border: "0.5px solid var(--color-border)" }}>
                   <div className="flex items-center gap-1.5">
-                    <Calendar size={12} style={{ color: "var(--color-primary)" }} />
-                    <div className="text-[0.5rem] font-bold uppercase lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc Date</div>
+                    
+                    <div className="text-[0.9rem] font-regular lg:block md:hidden" style={{ color: "var(--color-text-muted)" }}>Doc.Date</div>
                   </div>
-                  <div className="text-[0.7rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docDate || "—"}</div>
+                  <div className="text-[0.9rem] font-semibold" style={{ color: "var(--color-text-base)" }}>{p?.docDate || "—"}</div>
                 </div>
               </div>
 

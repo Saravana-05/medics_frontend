@@ -42,7 +42,7 @@ export const MOCK_PATIENTS = [
     chiefComplaint: "Allergy, Anxiety , rashes, disturbed sleep, high pressure, giddiness, vomitting, ",
     firstObservation: "Rashes, Weak, No sleep",
     nextVisitDue: "05/02/2024", referral: "Dr.Sheela (From)",
-    slot: "09:30", dept: "General Medicine", appt: "APT-001",
+    slot: "09:30", dept: "General Medicine", appt: "APT-001", appointmentStatus: "completed",
     docDate: "03/02/2024 14:02",
     photo: "https://randomuser.me/api/portraits/women/68.jpg",
 
@@ -108,7 +108,7 @@ export const MOCK_PATIENTS = [
     chiefComplaint: "Fever, Headache",
     firstObservation: "High fever since 2 days, body pain",
     nextVisitDue: "10/02/2024", referral: "Self",
-    slot: "10:00", dept: "General Medicine", appt: "APT-002",
+    slot: "10:00", dept: "General Medicine", appt: "APT-002", appointmentStatus: "completed",
     docDate: "03/02/2024 10:12",
     photo: "https://randomuser.me/api/portraits/men/32.jpg",
 
@@ -157,7 +157,7 @@ export const MOCK_PATIENTS = [
     chiefComplaint: "Knee Pain, Swelling",
     firstObservation: "Bilateral knee pain, difficulty walking",
     nextVisitDue: "17/02/2024", referral: "Dr.Arun (From)",
-    slot: "10:30", dept: "General Medicine", appt: "APT-003",
+    slot: "10:30", dept: "General Medicine", appt: "APT-003", appointmentStatus: "completed",
     docDate: "03/02/2024 10:35",
     photo: "https://randomuser.me/api/portraits/women/45.jpg",
 
@@ -214,8 +214,8 @@ export const MOCK_PATIENTS = [
   {
     id: "PID-4456", docNo: "OP: 3905",
     name: "Mr. Rajesh Kumar", relation: "S/o. Sri.Ramesh",
-    age: 45, dob: "12/08/1979", gender: "Male", weight: "78KG",
-    height: '172"', bpSystolic: 135, bpDiastolic: 85, pulse: 72, temp: "98.4",
+    age: 45, dob: "12/08/1979", gender: "Male", weight: "65.5[144.4]",
+    height: `181 [5'-11"]`, bpSystolic: 135, bpDiastolic: 85, pulse: 72, temp: "98°/37°  ",
     bloodGroup: "AB+", pregnancy: "N/A", oxygenLevel: "97",
     chiefComplaint: "Chest Pain, Shortness of breath",
     firstObservation: "Sharp chest pain radiating to left arm",

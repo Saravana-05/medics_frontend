@@ -9,6 +9,24 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 const ROW_HEIGHT_PX = 32;
 const NONE_OPTION = "<None>";
 
+const normalizeSearchText = value => String(value ?? "").trim().toLocaleLowerCase();
+
+function filterSearchSuggestions(searchList, query, searchMode) {
+  const normalizedQuery = normalizeSearchText(query);
+  const sortedList = [...searchList].sort((a, b) =>
+    String(a).localeCompare(String(b), undefined, { sensitivity: "base", numeric: true })
+  );
+
+  if (!normalizedQuery) return sortedList;
+
+  return sortedList.filter(item => {
+    const normalizedItem = normalizeSearchText(item);
+    return searchMode === "embedded"
+      ? normalizedItem.includes(normalizedQuery)
+      : normalizedItem.startsWith(normalizedQuery);
+  });
+}
+
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
 // Every dropdown opened from the entry section extends to the footer's bottom edge.
 
@@ -598,7 +616,9 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
 
   useEffect(() => { setSelected(!!query.trim()); }, [query]);
 
-  const dropdownItems = [NONE_OPTION, ...((showAllItems || selected) ? allSuggestions : suggestions.slice(0, 8))];
+  // Typing must always use the active Alphabet/Embedded filter. Only an
+  // explicit click on the chevron should temporarily expose the full catalog.
+  const dropdownItems = [NONE_OPTION, ...(showAllItems ? allSuggestions : suggestions.slice(0, 8))];
   const fieldOrder = config.addRowFields;
 
   const focusField = k => rowRef.current?.querySelector(`[data-field="${k}"]`)?.focus();
@@ -805,7 +825,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
   const addRowRef = useRef(null), rowsScrollRef = useRef(null);
   const fillRowCount = useFillRowCount(rowsScrollRef, ROW_HEIGHT_PX, items.length, config.key === "carePlan" ? 44 : 0);
 
-    const suggestions = query.trim() ? searchList.filter(s => s.toLowerCase().includes(query.toLowerCase())) : searchList;
+    const suggestions = filterSearchSuggestions(searchList, query, searchMode);
     const setD = k => v => setDraft(prev => ({ ...prev, [k]: v }));
 
   const requiredFields = config.requiredFields || [config.requiredField || "name"];

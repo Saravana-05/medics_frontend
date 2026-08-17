@@ -35,6 +35,9 @@ importers:
       react:
         specifier: ^19.2.5
         version: 19.2.8
+      react-data-table-component:
+        specifier: ^8.8.0
+        version: 8.8.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react-dom:
         specifier: ^19.2.5
         version: 19.2.8(react@19.2.8)
@@ -1522,6 +1525,12 @@ packages:
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
+
+  react-data-table-component@8.8.0:
+    resolution: {integrity: sha512-DmQL6LMDvIYSnZHMLMsCMlwgRDWLQRUeK6YjQMWwfd09EdJ+NvPViPOQMKadhWxEQJ/jJjRryCTBz0DVOW1UPA==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   react-dom@19.2.8:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
@@ -3247,6 +3256,11 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
     optional: true
+
+  react-data-table-component@8.8.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
 
   react-dom@19.2.8(react@19.2.8):
     dependencies:

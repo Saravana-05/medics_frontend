@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, History,
   ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
 import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
 import useFillRowCount from "../../hooks/useFillRowCount";
+import DataTable from "react-data-table-component";
+import { ArrowUpDown } from "lucide-react";
 
 // Store prescription history locally (in real app, this would come from an API/DB)
 let globalPrescriptionHistory = {};
@@ -39,6 +41,88 @@ const ALL_COLUMNS = [
 /* Fixed row height (px) used to compute how many blank rows fill the remaining
    visible space — see useFillRowCount. */
 const ROW_HEIGHT_PX = 32;
+
+function PreviousInfoDataTable({ columns, rows, fillRowCount, selectedRowSl, onOpen }) {
+  const [columnWidths, setColumnWidths] = useState({});
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const tableHostRef = useRef(null);
+  const bottomScrollRef = useRef(null);
+  const defaultWidthFor = key => key === "sl" ? 80 : key === "complaint" || key === "vitals" ? 180 : 150;
+  const startResize = (event, key) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startWidth = columnWidths[key] || defaultWidthFor(key);
+    const move = moveEvent => setColumnWidths(current => ({ ...current, [key]: Math.max(60, startWidth + moveEvent.clientX - startX) }));
+    const up = () => {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", up);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
+  };
+  const toggleSort = key => setSortConfig(current => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
+  const valueFor = (row, key) => String(row[key] ?? "");
+  const sortedRows = [...rows].sort((leftRow, rightRow) => {
+    if (!sortConfig.key) return 0;
+    let left = valueFor(leftRow, sortConfig.key);
+    let right = valueFor(rightRow, sortConfig.key);
+    if (sortConfig.key === "sl") { left = Number(left); right = Number(right); }
+    else { left = left.toLowerCase(); right = right.toLowerCase(); }
+    const result = left < right ? -1 : left > right ? 1 : 0;
+    return sortConfig.direction === "asc" ? result : -result;
+  });
+  const tableColumns = columns.map((col, index) => {
+    const width = columnWidths[col.key] || defaultWidthFor(col.key);
+    return {
+      name: (
+        <div className="relative flex h-full w-full items-center justify-center gap-1 pr-2" onClick={event => event.stopPropagation()}>
+          <span className="whitespace-nowrap text-center font-bold">{col.label}</span>
+          {col.sortable && <button type="button" onClick={() => toggleSort(col.key)} className="p-0.5" style={{ color: "var(--color-primary)" }} title={`Sort ${col.label}`}>
+            {sortConfig.key !== col.key ? <ArrowUpDown size={11} /> : sortConfig.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </button>}
+          {index < columns.length - 1 && <span role="separator" aria-label={`Resize ${col.label} column`} onMouseDown={event => startResize(event, col.key)} className="absolute right-0 top-0 z-10 h-full w-2 cursor-col-resize" style={{ borderRight: "1px solid var(--color-border)" }} />}
+        </div>
+      ),
+      width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`, grow: 0, sortable: false,
+      center: col.key === "sl",
+      cell: row => row._placeholder ? "" : <span className="whitespace-nowrap">{col.key === "nextVisit" && (!row[col.key] || row[col.key] === "<None>") ? "No follow-up" : row[col.key] || "—"}</span>,
+    };
+  });
+  const displayedRows = [...sortedRows, ...Array.from({ length: fillRowCount }, (_, index) => ({ sl: `previous-empty-${index}`, _placeholder: true }))];
+  const totalWidth = columns.reduce((sum, col) => sum + (columnWidths[col.key] || defaultWidthFor(col.key)), 0);
+  useEffect(() => {
+    const tableScroller = tableHostRef.current?.querySelector(".previous-info-react-data-table");
+    const bottomScroller = bottomScrollRef.current;
+    if (!tableScroller || !bottomScroller) return;
+    const syncTable = () => { tableScroller.scrollLeft = bottomScroller.scrollLeft; };
+    const syncBottom = () => { bottomScroller.scrollLeft = tableScroller.scrollLeft; };
+    bottomScroller.addEventListener("scroll", syncTable);
+    tableScroller.addEventListener("scroll", syncBottom);
+    return () => { bottomScroller.removeEventListener("scroll", syncTable); tableScroller.removeEventListener("scroll", syncBottom); };
+  }, [columnWidths, columns]);
+  const customStyles = {
+    table: { style: { backgroundColor: "var(--color-surface)" } },
+    tableWrapper: { style: { height: "100%", minHeight: "100%" } },
+    responsiveWrapper: { style: { height: "100%", minHeight: "100%" } },
+    headRow: { style: { minHeight: "34px", height: "34px", backgroundColor: "var(--color-primary-muted)", borderBottom: "1px solid var(--color-border)" } },
+    headCells: { style: { paddingLeft: "8px", paddingRight: "8px", color: "var(--color-primary-dark)", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", justifyContent: "center" } },
+    rows: { style: { minHeight: "32px", height: "32px", fontSize: "13px", color: "var(--color-text-base)", borderBottom: "1px solid var(--color-border)" } },
+    cells: { style: { paddingLeft: "8px", paddingRight: "8px", overflow: "visible" } },
+  };
+  return <div className="flex h-full min-h-0 flex-col">
+    <div ref={tableHostRef} className="min-h-0 flex-1 overflow-hidden">
+      <DataTable className="previous-info-react-data-table" columns={tableColumns} data={displayedRows} customStyles={customStyles}
+        conditionalRowStyles={[{ when: row => row.sl === selectedRowSl, style: { backgroundColor: "var(--color-primary-muted)", boxShadow: "inset 0 0 0 1px var(--color-primary)" } }]}
+        onRowClicked={row => { if (!row._placeholder) onOpen(row); }} highlightOnHover responsive fixedHeader fixedHeaderScrollHeight="100%" persistTableHead noDataComponent="No previous visits" />
+    </div>
+    <div ref={bottomScrollRef} className="care-plan-horizontal-scroll flex-shrink-0 overflow-x-scroll overflow-y-hidden" style={{ height: "14px" }}><div style={{ width: `${totalWidth}px`, height: "1px" }} /></div>
+  </div>;
+}
 
 export default function PreviousVisitsTable({ visits = [] }) {
   const [sortField, setSortField] = useState(null);
@@ -280,7 +364,16 @@ export default function PreviousVisitsTable({ visits = [] }) {
         </div>
 
         {/* Table Container */}
-        <div ref={rowsScrollRef} className="flex-1 overflow-auto min-h-0 no-scrollbar">
+        <div ref={rowsScrollRef} className="flex-1 min-h-0 overflow-hidden">
+          <PreviousInfoDataTable
+            columns={visibleColumnsList}
+            rows={filteredVisits}
+            fillRowCount={fillRowCount}
+            selectedRowSl={selectedRowSl}
+            onOpen={visit => handleViewRow(visit, filteredVisits.findIndex(item => item.sl === visit.sl))}
+          />
+        </div>
+        <div className="hidden">
           <table className="w-full border-collapse text-xs">
             <thead className="sticky top-0 z-10">
               <tr className="table-header-text" style={{ background: "var(--color-primary-muted)", height: "34px", boxSizing: "border-box" }}>

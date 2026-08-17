@@ -216,6 +216,7 @@ export default function LeftPatientSection({
 }) {
   const p = selectedPatient || {};
   const [showAddModal, setShowAddModal] = useState(false);
+  const completedAppointmentCount = patients.filter(patient => patient.appointmentStatus === "completed").length;
 
   // Calculate age in years, months, days from DOB
   const calculateAge = (dob) => {
@@ -274,7 +275,7 @@ export default function LeftPatientSection({
         {/* Patient Selection */}
         <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">
           <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center justify-between md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
-            <span className="flex items-center gap-1"><User size={12} /> Appointments</span>
+            <span className="flex items-center gap-1"><User size={12} /> Appointments ({completedAppointmentCount}/{patients.length})</span>
             <button
               type="button"
               onClick={() => setShowAddModal(true)}

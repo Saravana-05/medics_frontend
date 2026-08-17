@@ -129,14 +129,14 @@ function VitalSignCard({ icon: Icon, value, label, accent, valueColor, unit, tre
       <div className="flex items-center justify-between h-full">
         <div className="min-w-0 flex-1">
           <div
-            className="text-[0.58rem] uppercase tracking-wide mb-0.5 truncate"
+            className="text-[0.58rem]  tracking-wide mb-0.5 truncate"
             style={{ color: "darkslategray",fontWeight: "600", letterSpacing: "0.1em", fontFamily: "var(--font-inter)" }}
           >
             {label}
           </div>
           <div
             className="text-sm font-black leading-tight truncate"
-            style={{ color: valueColor,letterSpacing: "0.05em", fontWeight: "600", fontFamily: "var(--font-inter)" }}
+            style={{ color: valueColor,letterSpacing: "0.05em", fontWeight: "400", fontFamily: "var(--font-inter)" }}
             title={value || ""}
           >
             {value || "—"}
@@ -296,10 +296,10 @@ export default function VitalSignsSection({ patient, activeTab }) {
     {
       icon: Thermometer,
       value: p.temp || "—",
-      label: "Temp",
+      label: "Temp.",
       accent: VITAL_ACCENTS.temp,
       valueColor: VALUE_COLOR,
-      unit: "°F",
+      unit: "Far./Cel.",
     },
     {
       icon: Heart,
@@ -323,7 +323,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
       label: "Blood",
       accent: VITAL_ACCENTS.blood,
       valueColor: VALUE_COLOR,
-      unit: "blood ",
+      unit: "Group ",
     },
     {
       icon: Ruler,
@@ -331,7 +331,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
       label: "Height",
       accent: VITAL_ACCENTS.height,
       valueColor: VALUE_COLOR,
-      unit: "cm",
+      unit: "Cm [Ft-In]",
     },
     {
       icon: Weight,
@@ -339,7 +339,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
       label: "Weight",
       accent: VITAL_ACCENTS.weight,
       valueColor: VALUE_COLOR,
-      unit: "kg",
+      unit: "Kgs [Lbs]",
     },
     {
       icon: Calculator,
@@ -347,7 +347,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
       label: "BMI",
       accent: bmiCategory.color.startsWith("var(") ? "#6b7280" : bmiCategory.color,
       valueColor: VALUE_COLOR,
-      unit: bmiCategory.label,
+      unit: "Kg/m²",
     },
   ];
 
