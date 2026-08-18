@@ -413,21 +413,69 @@ function CarePlanDataTable({ columns, items, fillRowCount, selectedRowId, onSele
 /* ── Typable remarks input w/ optional dropdown suggestions ── */
 function TypableInput({ value, options = [], onChange, onKeyDown, dataField, placeholder }) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showAllOptions, setShowAllOptions] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const inputRef = useRef(null);
   const anchorRef = useRef(null);
   const hasValue = value !== "â€”" && String(value ?? "").trim() !== "";
-  const filtered = options.filter(o => o !== "—" && o.toLowerCase().includes((value === "—" ? "" : value).toLowerCase()));
-
   const visibleOptions = options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))));
-  const displayedOptions = showAllOptions ? [NONE_OPTION, ...visibleOptions] : [NONE_OPTION, ...filtered];
-  const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setShowAllOptions(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
+  const displayedOptions = [NONE_OPTION, ...visibleOptions];
+  const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
+
+  useEffect(() => {
+    const searchText = value === "—" ? "" : normalizeSearchText(value);
+    if (!showDropdown || !searchText) return;
+    const matchIndex = visibleOptions.findIndex(option => normalizeSearchText(option).includes(searchText));
+    if (matchIndex < 0) return;
+    const focusIndex = matchIndex + 1;
+    setHighlightedIdx(focusIndex);
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
+    });
+  }, [options, showDropdown, value]);
+
+  const previewOption = index => {
+    const option = displayedOptions[index];
+    if (option === undefined) return;
+    setHighlightedIdx(index);
+    onChange({ target: { value: option } });
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const handleInputChange = event => {
+    const nextValue = event.target.value;
+    onChange(event);
+    setShowDropdown(options.length > 0);
+
+    const searchText = normalizeSearchText(nextValue);
+    if (!searchText) {
+      setHighlightedIdx(-1);
+      return;
+    }
+
+    const matchIndex = visibleOptions.findIndex(option => normalizeSearchText(option).includes(searchText));
+    const focusIndex = matchIndex >= 0 ? matchIndex + 1 : -1;
+    setHighlightedIdx(focusIndex);
+    if (focusIndex >= 0) {
+      requestAnimationFrame(() => {
+        document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
+      });
+    }
+  };
+
   const handleKeyDown = e => {
-    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) setShowAllOptions(false);
     if (showDropdown && displayedOptions.length > 0) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, displayedOptions.length - 1)); return; }
-      if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        previewOption(highlightedIdx < 0 ? Math.min(1, displayedOptions.length - 1) : Math.min(highlightedIdx + 1, displayedOptions.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        previewOption(highlightedIdx < 0 ? displayedOptions.length - 1 : Math.max(highlightedIdx - 1, 0));
+        return;
+      }
       if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); select(displayedOptions[highlightedIdx]); return; }
       if (e.key === "Escape") { setShowDropdown(false); setHighlightedIdx(-1); return; }
     }
@@ -435,9 +483,9 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   };
   return (
     <div ref={anchorRef} className="relative w-full">
-      <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={onChange}
-        onFocus={() => { setShowAllOptions(hasValue); setShowDropdown(options.length > 0); }}
-        onClick={() => { setShowAllOptions(hasValue); setShowDropdown(options.length > 0); }} onKeyDown={handleKeyDown}
+      <input data-field={dataField} ref={inputRef} type="text" value={value === "—" ? "" : value} onChange={handleInputChange}
+        onFocus={() => setShowDropdown(options.length > 0)}
+        onClick={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
         className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)", background: hasValue ? "var(--color-primary-muted)" : "var(--color-surface)",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
@@ -445,7 +493,8 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
       )}
       {options.length > 0 && (
-        <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && displayedOptions.length > 0}>
+        <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && displayedOptions.length > 0}
+          maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar">
           {displayedOptions.map((opt, i) => (
             <div key={opt} onMouseDown={() => select(opt)} className="prescription-dropdown-option cursor-pointer"
               style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || opt === value ? "var(--color-primary-muted)" : "transparent" }}
@@ -640,7 +689,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     }
     setHighlightedIdx(focusIndex);
     requestAnimationFrame(() => {
-      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "nearest" });
+      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
     });
   }, [suggestions, query, searchMode, showDropdown]);
 
