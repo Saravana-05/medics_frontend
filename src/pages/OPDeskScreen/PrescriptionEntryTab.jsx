@@ -9,70 +9,45 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 const ROW_HEIGHT_PX = 32;
 const NONE_OPTION = "<None>";
 const DROPDOWN_PAGE_SIZE = 6;
+const DROPDOWN_OPTION_HEIGHT_PX = 33;
 
 const normalizeSearchText = value => String(value ?? "").trim().toLocaleLowerCase();
 
 function filterSearchSuggestions(searchList, query, searchMode) {
-  const normalizedQuery = normalizeSearchText(query);
   const sortedList = [...searchList].sort((a, b) =>
     String(a).localeCompare(String(b), undefined, { sensitivity: "base", numeric: true })
   );
-
-  if (!normalizedQuery) return sortedList;
-
-  // Embedded search remains an exact substring search across the full value,
-  // including numbers and spaces.
-  if (searchMode === "embedded") {
-    return sortedList.filter(item => normalizeSearchText(item).includes(normalizedQuery));
-  }
-
-  // Alphabet search uses alphabetic input only and expands from the most
-  // specific prefix to progressively broader prefix levels.
-  const alphabetQuery = normalizedQuery.replace(/[^a-z]/g, "");
-  if (!alphabetQuery) return [];
-
-  const prefixes = Array.from(
-    { length: alphabetQuery.length },
-    (_, index) => alphabetQuery.slice(0, alphabetQuery.length - index)
-  );
-  const seen = new Set();
-  const matches = [];
-
-  prefixes.forEach(prefix => {
-    sortedList.forEach(item => {
-      if (normalizeSearchText(item).startsWith(prefix) && !seen.has(item)) {
-        seen.add(item);
-        matches.push(item);
-      }
-    });
-  });
-
-  return matches;
+  // Searching never removes or reorders catalogue records. The active search
+  // mode is used only to locate and focus a row in this complete sorted list.
+  return sortedList;
 }
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
 // Every dropdown opened from the entry section extends to the footer's bottom edge.
 
-function PortalDropdown({ anchorEl, open, children }) {
+function PortalDropdown({ anchorEl, open, children, maxVisibleRows, scrollbarClassName = "" }) {
   if (!open || !anchorEl) return null;
 
   const rect = anchorEl.getBoundingClientRect();
   const footerBottom = document.querySelector("[data-prescription-entry-footer]")?.getBoundingClientRect().bottom
     ?? window.innerHeight;
   const availableHeight = Math.max(0, footerBottom - rect.bottom - 2);
+  const dropdownHeight = maxVisibleRows
+    ? Math.min(Math.max(0, window.innerHeight - rect.bottom - 2), maxVisibleRows * DROPDOWN_OPTION_HEIGHT_PX + 2)
+    : availableHeight;
   const style = {
     position: "fixed",
     top: rect.bottom + 2,
     left: rect.left,
     width: rect.width,
-    height: availableHeight,
-    maxHeight: availableHeight,
+    height: dropdownHeight,
+    maxHeight: dropdownHeight,
     boxSizing: "border-box",
     zIndex: 99999,
   };
 
   return ReactDOM.createPortal(
-    <div className="dropdown-thin-scrollbar" style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 0, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
+    <div className={`dropdown-thin-scrollbar ${scrollbarClassName}`} style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 0, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>, document.body
   );
@@ -643,6 +618,32 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     setHighlightedIdx(-1);
   }, [searchMode]);
 
+  // While typing, focus the complete first matching record without replacing
+  // the user's query. Keyboard navigation can then continue from this row.
+  useEffect(() => {
+    if (navigationItemsRef.current || !showDropdown || !query.trim()) return;
+    let focusIndex = suggestions.length > 0 ? 1 : 0;
+    if (searchMode === "alphabet" || searchMode === "alpha") {
+      const alphabetQuery = normalizeSearchText(query).replace(/[^a-z]/g, "");
+      for (let length = alphabetQuery.length; length > 0; length -= 1) {
+        const prefix = alphabetQuery.slice(0, length);
+        const prefixIndex = suggestions.findIndex(item => normalizeSearchText(item).startsWith(prefix));
+        if (prefixIndex >= 0) {
+          focusIndex = prefixIndex + 1;
+          break;
+        }
+      }
+    } else if (searchMode === "embedded") {
+      const embeddedQuery = normalizeSearchText(query);
+      const embeddedIndex = suggestions.findIndex(item => normalizeSearchText(item).includes(embeddedQuery));
+      if (embeddedIndex >= 0) focusIndex = embeddedIndex + 1;
+    }
+    setHighlightedIdx(focusIndex);
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "nearest" });
+    });
+  }, [suggestions, query, searchMode, showDropdown]);
+
   // Typing must always use the active Alphabet/Embedded filter. Only an
   // explicit click on the chevron should temporarily expose the full catalog.
   const dropdownItems = navigationItemsRef.current
@@ -666,7 +667,21 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     });
   };
   const handleFieldKeyDown = (e, field) => {
-    if (e.key === "Escape") { onCancel(); return; }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      if (field === "name") {
+        navigationItemsRef.current = null;
+        setQuery("");
+        onDraftChange("name")("");
+        setSelected(false);
+        setShowDropdown(false);
+        setShowAllItems(false);
+        setHighlightedIdx(-1);
+        return;
+      }
+      onCancel();
+      return;
+    }
     if (field === "name" && showDropdown && dropdownItems.length > 0) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -743,7 +758,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               )}
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
                 onMouseDown={e => { e.preventDefault(); navigationItemsRef.current = null; setShowAllItems(true); setShowDropdown(v => !v); setHighlightedIdx(-1); }} />
-              <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}>
+              <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}
+                maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar">
                 {dropdownItems.map((item, i) => (
                   <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
                     style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || item === query ? "var(--color-primary-muted)" : "transparent" }}>

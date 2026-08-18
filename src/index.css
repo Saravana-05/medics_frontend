@@ -227,6 +227,20 @@ body {
   height: 0.04px;
 }
 
+/* Medicine/lab/service search keeps every result available while showing six
+   rows at a time, so its scrollbar remains clearly usable. */
+.search-results-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-subtle) transparent;
+}
+.search-results-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.search-results-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-text-subtle);
+  border-radius: 999px;
+}
+
 /* One shared geometry for every Prescription Entry dropdown option. */
 .prescription-dropdown-option {
   height: 33px;
