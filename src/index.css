@@ -498,6 +498,29 @@ body {
   height: 0;
 }
 
+/* Previous Information keeps its header fixed and scrolls large row sets
+   vertically inside the available panel height. */
+.previous-info-react-data-table .rdt_TableBody {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-text-muted) var(--color-surface-alt);
+}
+
+.previous-info-react-data-table .rdt_TableBody::-webkit-scrollbar {
+  width: 10px;
+}
+
+.previous-info-react-data-table .rdt_TableBody::-webkit-scrollbar-track {
+  background: var(--color-surface-alt);
+}
+
+.previous-info-react-data-table .rdt_TableBody::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border: 2px solid var(--color-surface-alt);
+  border-radius: 0;
+}
+
 /* ─── Utility helpers (complement Tailwind) ───────────────────────────────── */
 .card {
   background: var(--color-surface);
@@ -626,6 +649,16 @@ body {
 
 .animate-slide-in {
   animation: slide-in 0.3s ease-out;
+}
+
+/* OP/IP patient-list modals use a flat, icon-free visual language. */
+.list-modal-flat,
+.list-modal-flat * {
+  border-radius: 0 !important;
+}
+
+.list-modal-flat svg {
+  display: none !important;
 }
 
 /* ##f7cbca - light red

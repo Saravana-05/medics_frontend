@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import {
-  ClipboardList, User, Users, ChevronDown, Plus, X
+  Users, ChevronDown, X
 } from "lucide-react";
 
 /* ── Attendant Card — same layout as ClinicalCard (icon + title + data) ── */
@@ -47,7 +47,9 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
       if (!wrapEl || !tabsEl) return;
       const wrapBottom = wrapEl.getBoundingClientRect().bottom;
       const tabsTop = tabsEl.getBoundingClientRect().top;
-      setMaxHeight(Math.max(160, tabsTop - wrapBottom - 8));
+      // Account for the popup's 6px top margin and 2px border while allowing
+      // the list to shrink and scroll instead of overlapping the next section.
+      setMaxHeight(Math.max(80, tabsTop - wrapBottom - 8));
     };
     computeMaxHeight();
     window.addEventListener("resize", computeMaxHeight);
@@ -66,9 +68,6 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
         }}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="p-1 rounded-none flex-shrink-0" style={{ background: "var(--color-primary-muted)" }}>
-            <User size={14} style={{ color: "var(--color-primary)" }} />
-          </div>
           <span className="text-sm font-semibold truncate" style={{ color: selectedPatient ? "var(--color-primary-dark)" : "var(--color-text-subtle)" }}>
             {selectedPatient ? selectedPatient.name : "None"}
           </span>
@@ -82,17 +81,17 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
 
       {open && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 z-50 rounded-none overflow-hidden shadow-xl animate-fade-in flex flex-col"
+          className="absolute top-full left-0 right-0 mt-[6px] z-50 rounded-none overflow-hidden shadow-xl animate-fade-in flex flex-col"
           style={{
             background: "var(--color-surface)",
             border: "1px solid var(--color-border)",
             maxHeight: `${maxHeight}px`,
           }}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
             <div
               onClick={() => { onSelectPatient(null); setOpen(false); }}
-              className="px-3 py-1.5 cursor-pointer transition-all hover:pl-4"
+              className="h-[30px] px-3 flex items-center cursor-pointer transition-all hover:pl-4"
               style={{
                 background: !selectedPatient ? "var(--color-primary-muted)" : "var(--color-surface)",
                 borderLeft: !selectedPatient ? "3px solid var(--color-primary)" : "3px solid transparent",
@@ -289,16 +288,7 @@ export default function LeftPatientSection({
         {/* Patient Selection */}
         <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">
           <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center justify-between md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
-            <span className="flex items-center gap-1"><User size={12} /> Appointments ({completedAppointmentCount}/{patients.length})</span>
-            <button
-              type="button"
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center justify-center rounded-none flex-shrink-0 transition-all"
-              style={{ width: 16, height: 16, background: "var(--color-primary)", color: "white" }}
-              title="Add new patient"
-            >
-              <Plus size={11} />
-            </button>
+            <span>Appointments ({completedAppointmentCount}/{patients.length})</span>
           </div>
           <PatientDropdown
             patients={patients}

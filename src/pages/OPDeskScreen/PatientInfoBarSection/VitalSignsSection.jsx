@@ -1,5 +1,5 @@
 
-import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet, BedDouble, CalendarDays, UserRound, Users } from "lucide-react";
+import { ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet } from "lucide-react";
 
 /* Fonts (Inter) are loaded globally in index.html + registered in the Tailwind
    theme (index.css). Colors below come from the shared design tokens. */
@@ -64,7 +64,7 @@ function VitalBadge({ icon: Icon, value, accent, valueColor, unit }) {
 const IP_SIZE_NORMAL = "lg:text-[0.8rem] md:text-[0.6rem]";
 const IP_SIZE_SMALL = "lg:text-[0.65rem] md:text-[0.5rem]";
 
-function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardBg, cardBorder, labelColor, valueColor }) {
+function IPInfoCard({ label, lines, people, textColor, cardBg, cardBorder, labelColor, valueColor }) {
   const visibleLines = (lines || []).filter(Boolean);
   const isPeople = !!people;
   // people is an array of ROWS (e.g. [[nurse1, nurse2], [doctor1, doctor2]]) —
@@ -73,15 +73,14 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
 
   return (
     <div className="flex-1 min-w-[150px] lg:min-w-0">
-      <div className="flex items-center gap-1.5 mb-1">
-        <Icon size={12} style={{ color: accent, flexShrink: 0 }} />
+      <div className="flex items-center mb-1">
         <span className="text-[0.7rem] font-bold tracking-wide truncate" style={{ color: labelColor || "var(--color-text-muted)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
           {label}
         </span>
       </div>
       <div
         className={`p-2 lg:p-3 rounded-none transition-all shadow-sm hover:shadow-md md:p-1 ${isPeople ? "overflow-hidden" : "overflow-y-auto"}`}
-        style={{ background: cardBg || "transparent", border: `1px solid ${cardBorder || "var(--color-border)"}`, height: "60px", boxSizing: "border-box" }}
+        style={{ background: cardBg || "transparent", border: "none", height: "60px", boxSizing: "border-box" }}
       >
         {isPeople ? (
           <div>
@@ -93,9 +92,9 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
                 <div key={i} className="flex items-center gap-2">
                   {row.map((p, j) => (
                     <span key={j} className="flex items-center gap-1 flex-1 min-w-0" title={p.name ? `${p.name}${p.phone ? " - " + p.phone : ""}` : ""}>
-                      <span className={`${rowSizeClass} font-semibold truncate text-left min-w-0`} style={{ color: "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>{p.name || "—"}</span>
+                      <span className={`${rowSizeClass} font-normal truncate text-left min-w-0`} style={{ color: valueColor || "#0284c7", fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>{p.name || "—"}</span>
                       {p.phone && (
-                        <span className={`${rowSizeClass} font-semibold truncate flex-shrink-0`} style={{ color: valueColor || VALUE_COLOR, fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>- {p.phone}</span>
+                        <span className={`${rowSizeClass} font-normal truncate flex-shrink-0`} style={{ color: valueColor || VALUE_COLOR, fontFamily: "var(--font-inter)", lineHeight: 1.3 }}>- {p.phone}</span>
                       )}
                     </span>
                   ))}
@@ -106,7 +105,7 @@ function IPInfoCard({ icon: Icon, label, accent, lines, people, textColor, cardB
         ) : (
           <div>
             {items.map((line, i) => (
-              <div key={i} className={`${IP_SIZE_NORMAL} font-semibold text-left`} style={{ color: textColor || "var(--color-text-base)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }} title={line}>
+              <div key={i} className={`${IP_SIZE_NORMAL} font-normal text-left`} style={{ color: textColor || valueColor || "#0284c7", fontFamily: "var(--font-inter)", lineHeight: 1.6 }} title={line}>
                 {line}
               </div>
             ))}
@@ -206,8 +205,9 @@ export default function VitalSignsSection({ patient, activeTab }) {
   const IPTIME_ACCENT = "var(--color-iptime)";
   const ipCardBg = "var(--color-surface)";
   const ipCardBorder = `color-mix(in srgb, ${IPTIME_ACCENT} 35%, white)`;
-  const ipLabelColor = `color-mix(in srgb, ${IPTIME_ACCENT} 75%, black)`;
-  const ipValueColor = `color-mix(in srgb, ${IPTIME_ACCENT} 85%, black)`;
+  const ipLabelColor = "#000000";
+  // Match the Clinical Information cards' active data color.
+  const ipValueColor = "#0284c7";
   // 4 shades of the same accent (lightest→darkest) so the columns stay
   // visually distinct without leaving the amber family.
   const ipIconShades = [
@@ -219,8 +219,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
 
   const ipGroups = [
     {
-      icon: CalendarDays,
-      label: "Ip info",
+      label: "IP Admission",
       accent: ipIconShades[0],
       lines: [
         [ip.admitDate, ip.admitTime].filter(Boolean).join(" · "),
@@ -228,7 +227,6 @@ export default function VitalSignsSection({ patient, activeTab }) {
       ],
     },
     {
-      icon: UserRound,
       label: "Attendant",
       accent: ipIconShades[1],
       textColor: ipValueColor,
@@ -237,7 +235,6 @@ export default function VitalSignsSection({ patient, activeTab }) {
       ],
     },
     {
-      icon: BedDouble,
       label: "Room",
       accent: ipIconShades[2],
       lines: [
@@ -246,7 +243,6 @@ export default function VitalSignsSection({ patient, activeTab }) {
       ],
     },
     {
-      icon: Users,
       label: "Medic",
       accent: ipIconShades[3],
       // Grouped into two rows — both nurses together on one line, both
@@ -352,7 +348,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
   ];
 
   const cards = vitals;
-  const HeaderIcon = isIPTime ? BedDouble : ActivitySquare;
+  const HeaderIcon = ActivitySquare;
   const headerLabel = isIPTime ? "IP Admission Info" : "Vital Signs";
 
   return (
@@ -368,7 +364,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
           • IP Admission Info: same boxed group cards as desktop, scrolled   */}
       <div className="flex lg:hidden items-center gap-2 overflow-x-auto py-1">
         {isIPTime
-          ? ipGroups.map((g) => <IPInfoCard key={g.label} icon={g.icon} label={g.label} accent={g.accent} lines={g.lines} people={g.people} textColor={g.textColor} cardBg={ipCardBg} cardBorder={ipCardBorder} labelColor={ipLabelColor} valueColor={ipValueColor} />)
+          ? ipGroups.map((g) => <IPInfoCard key={g.label} label={g.label} lines={g.lines} people={g.people} textColor={g.textColor} cardBg={ipCardBg} cardBorder={ipCardBorder} labelColor={ipLabelColor} valueColor={ipValueColor} />)
           : cards.map((v) => (
               <VitalBadge
                 key={v.label}
@@ -402,7 +398,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
 
         {isIPTime ? (
           <div className="flex gap-2">
-            {ipGroups.map((g) => <IPInfoCard key={g.label} icon={g.icon} label={g.label} accent={g.accent} lines={g.lines} people={g.people} textColor={g.textColor} cardBg={ipCardBg} cardBorder={ipCardBorder} labelColor={ipLabelColor} valueColor={ipValueColor} />)}
+            {ipGroups.map((g) => <IPInfoCard key={g.label} label={g.label} lines={g.lines} people={g.people} textColor={g.textColor} cardBg={ipCardBg} cardBorder={ipCardBorder} labelColor={ipLabelColor} valueColor={ipValueColor} />)}
           </div>
         ) : (
           <div className="grid grid-cols-8 gap-1.5">

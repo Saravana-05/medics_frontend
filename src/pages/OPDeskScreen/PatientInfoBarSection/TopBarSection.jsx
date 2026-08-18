@@ -1,5 +1,6 @@
 import { useState } from "react";
 import OPListModal from "../../../modal/Oplistmodal";
+import IPListModal from "../../../modal/IPListModal";
 
 export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient }) {
   const p = patient;
@@ -11,24 +12,22 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
     return `${year}-${month}-${day}`;
   });
   const [showOPList, setShowOPList] = useState(false);
+  const [showIPList, setShowIPList] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
+  const [hoveredTab, setHoveredTab] = useState(null);
 
-  const tabStyle = (tab, background, borderColor) => ({
-    borderRadius: 0,
-    background,
-    color: "white",
-    textShadow: "0 1px 2px rgba(0,0,0,0.4)",
-    border: "none",
-    outline: `1px solid ${activeTab === tab ? borderColor : "transparent"}`,
-    outlineOffset: "2px",
-  });
-
-  const showTabBorder = (event, borderColor) => {
-    event.currentTarget.style.outlineColor = borderColor;
-  };
-
-  const restoreTabBorder = (event, tab, borderColor) => {
-    event.currentTarget.style.outlineColor = activeTab === tab ? borderColor : "transparent";
+  const tabStyle = (tab, background, hoverBackground = background) => {
+    const isHovered = hoveredTab === tab;
+    const visibleBackground = isHovered ? hoverBackground : background;
+    return {
+      borderRadius: 0,
+      background: visibleBackground,
+      color: "white",
+      textShadow: "0 1px 2px rgba(0,0,0,0.4)",
+      border: "none",
+      outline: `1px solid ${isHovered ? visibleBackground : "transparent"}`,
+      outlineOffset: "2px",
+    };
   };
 
   return (
@@ -53,32 +52,21 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
                 style={tabStyle("op-list", "var(--color-primary)", "var(--color-primary-light)")}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "var(--color-primary-light)";
-                  showTabBorder(e, "var(--color-primary-light)");
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "var(--color-primary)";
-                  restoreTabBorder(e, "op-list", "var(--color-primary-light)");
-                }}
+                onMouseEnter={() => setHoveredTab("op-list")}
+                onMouseLeave={() => setHoveredTab(null)}
               >
                 OP List
               </button>
               <button
                 onClick={() => {
                   setActiveTab("ip-list");
+                  setShowIPList(true);
                   onIPList?.();
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={tabStyle("ip-list", "var(--color-danger)", "#7f1d1d")}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "#b91c1c";
-                  showTabBorder(e, "#7f1d1d");
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "var(--color-danger)";
-                  restoreTabBorder(e, "ip-list", "#7f1d1d");
-                }}
+                style={tabStyle("ip-list", "var(--color-danger)", "#b91c1c")}
+                onMouseEnter={() => setHoveredTab("ip-list")}
+                onMouseLeave={() => setHoveredTab(null)}
               >
                 IP List
               </button>
@@ -88,9 +76,9 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                   onPark?.();
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={tabStyle("all-patients", "#656D78", "#374151")}
-                onMouseEnter={e => showTabBorder(e, "#374151")}
-                onMouseLeave={e => restoreTabBorder(e, "all-patients", "#374151")}
+                style={tabStyle("all-patients", "#656D78")}
+                onMouseEnter={() => setHoveredTab("all-patients")}
+                onMouseLeave={() => setHoveredTab(null)}
               >
                 All Patients
               </button>
@@ -100,15 +88,9 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                   onPark?.();
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-semibold transition-all shadow-sm hover:shadow-md"
-                style={tabStyle("park", "#fbbf24", "#b45309")}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "var(--color-warning)";
-                  showTabBorder(e, "#b45309");
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "#fbbf24";
-                  restoreTabBorder(e, "park", "#b45309");
-                }}
+                style={tabStyle("park", "#fbbf24", "var(--color-warning)")}
+                onMouseEnter={() => setHoveredTab("park")}
+                onMouseLeave={() => setHoveredTab(null)}
               >
                 Park
               </button>
@@ -118,15 +100,9 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                   onFinalize?.();
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
-                style={tabStyle("finalize", "#16a34a", "#14532d")}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "#15803d";
-                  showTabBorder(e, "#14532d");
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "#16a34a";
-                  restoreTabBorder(e, "finalize", "#14532d");
-                }}
+                style={tabStyle("finalize", "#16a34a", "#15803d")}
+                onMouseEnter={() => setHoveredTab("finalize")}
+                onMouseLeave={() => setHoveredTab(null)}
               >
                 Finalize
               </button>
@@ -200,6 +176,12 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
           doctor={p?.doctor || "Dr. Chandra Sekar"}
           date={p?.docDate || "03/02/2024"}
           time={p?.time || "10:00"}
+        />
+      )}
+      {showIPList && (
+        <IPListModal
+          onClose={() => setShowIPList(false)}
+          onSelectPatient={onSelectPatient}
         />
       )}
     </>

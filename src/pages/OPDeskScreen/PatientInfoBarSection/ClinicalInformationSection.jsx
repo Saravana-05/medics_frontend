@@ -1,10 +1,8 @@
-import { Stethoscope, Eye, Baby, ArrowRightLeft } from "lucide-react";
-
 /* Fonts (Inter) are loaded globally in index.html + registered in the Tailwind
    theme (index.css). Use var(--font-inter) / the `font-sans` utility anywhere. */
 
 /* ── Clinical Card Component (compact, single-row friendly) ── */
-function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
+function ClinicalCard({ label, value, variant, disabled = false }) {
   const variants = {
     danger: { color: "#dc2626" },
     info: { color: "#0284c7" },
@@ -13,15 +11,12 @@ function ClinicalCard({ icon: Icon, label, value, variant, disabled = false }) {
     muted: { color: "#9ca3af" },
   };
 
-  // For disabled state, use muted text but keep the icon color from the variant
+  // For disabled state, use muted text.
   const textStyle = disabled ? variants.muted : (variant ? variants[variant] : { color: "var(--color-text-base)" });
-  // Icon color - use the variant color even when disabled
-  const iconColor = variant ? variants[variant]?.color || "var(--color-text-muted)" : "var(--color-text-muted)";
 
   return (
     <div className={`flex-1 min-w-[130px] lg:min-w-0 md:min-w-[110px] ${disabled ? 'opacity-70' : ''}`}>
-      <div className="flex items-center gap-1.5 mb-1">
-        <Icon size={12} className="md:w-2.5 md:h-2.5" style={{ color: iconColor }} />
+      <div className="flex items-center mb-1">
         <span
           className="text-[0.7rem] font-bold tracking-wide truncate md:text-[0.7rem]"
           style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}
@@ -55,13 +50,11 @@ export default function ClinicalInformationSection({ patient, isInline = false, 
   // Define clinical cards
   const clinicalCards = [
     {
-      icon: Stethoscope,
       label: "Chief Complaint",
       value: p.chiefComplaint || "",
       variant: "info"
     },
     {
-      icon: Eye,
       label: "First Observation",
       value: p.firstObservation || "",
       variant: "info"
@@ -71,7 +64,6 @@ export default function ClinicalInformationSection({ patient, isInline = false, 
   // Pregnancy Status - Show for all genders, but disabled for males
   const isMale = p.gender === "M" || p.gender === "Male";
   clinicalCards.push({
-    icon: Baby,
     label: "Pregnancy Status",
     value: isMale ? "N/A" : (p.pregnancy || ""),
     variant: "info",  // Always use purple for the icon
@@ -79,7 +71,6 @@ export default function ClinicalInformationSection({ patient, isInline = false, 
   });
 
   clinicalCards.push({
-    icon: ArrowRightLeft,
     label: "Referral",
     value: p.referral || "",
     variant: "info"
@@ -96,7 +87,6 @@ export default function ClinicalInformationSection({ patient, isInline = false, 
           return (
             <div key={index} ref={cardRef} className="flex-1 min-w-[130px] lg:min-w-0 md:min-w-[110px]">
               <ClinicalCard
-                icon={card.icon}
                 label={card.label}
                 value={card.value}
                 variant={card.variant}

@@ -237,6 +237,7 @@ function ColHeader() {
 export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00" }) {
   const [filter, setFilter] = useState("");
   const [activeSection, setActiveSection] = useState("all");
+  const [hoveredSection, setHoveredSection] = useState(null);
 
   const applyFilter = (rows) => {
     if (!filter.trim()) return rows;
@@ -257,10 +258,10 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   };
 
   const sections = [
-    { key: "all", label: "All", icon: Users, count: apt.length + pkd.length + trtd.length },
-    { key: "appointment", label: "Appointments", icon: Calendar, count: apt.length },
-    { key: "parked", label: "Parked", icon: ParkingCircle, count: pkd.length },
-    { key: "treated", label: "Treated", icon: CheckCircle, count: trtd.length },
+    { key: "all", label: "All", icon: Users, count: apt.length + pkd.length + trtd.length, color: "var(--color-primary)" },
+    { key: "appointment", label: "Appointments", icon: Calendar, count: apt.length, color: "#60a5fa" },
+    { key: "parked", label: "Parked", icon: ParkingCircle, count: pkd.length, color: "#d97706" },
+    { key: "treated", label: "Treated", icon: CheckCircle, count: trtd.length, color: "#059669" },
   ];
 
   const totalPatients = apt.length + pkd.length + trtd.length;
@@ -273,7 +274,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="flex flex-col rounded-xl shadow-2xl animate-slide-up"
+        className="list-modal-flat flex flex-col shadow-2xl animate-slide-up"
         style={{
           width: "min(95vw, 1400px)",
           maxHeight: "90vh",
@@ -314,12 +315,11 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
 
               {/* Search */}
               <div className="relative">
-                <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2" style={{ color: "rgba(255,255,255,0.6)" }} />
                 <input
                   value={filter}
                   onChange={e => setFilter(e.target.value)}
                   placeholder="Search by name, token, complaint..."
-                  className="pl-7 pr-3 py-1.5 rounded-lg text-sm"
+                  className="px-3 py-1.5 text-sm"
                   style={{
                     background: "rgba(255,255,255,0.15)",
                     border: "1px solid rgba(255,255,255,0.3)",
@@ -332,30 +332,41 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg transition-all hover:bg-white/10"
+                className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10"
               >
-                <X size={18} style={{ color: "white" }} />
+                Close
               </button>
             </div>
           </div>
 
           {/* Section Tabs */}
-          <div className="px-5 flex gap-1">
-            {sections.map(section => (
-              <button
-                key={section.key}
-                onClick={() => setActiveSection(section.key)}
-                className="px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all flex items-center gap-1"
-                style={{
-                  background: activeSection === section.key ? "var(--color-surface)" : "transparent",
-                  color: activeSection === section.key ? "var(--color-primary)" : "rgba(255,255,255,0.7)",
-                }}
-              >
-                <section.icon size={12} />
-                {section.label}
-                <span className="ml-1 text-[0.6rem]">({section.count})</span>
-              </button>
-            ))}
+          <div className="flex items-stretch px-5" style={{ height: 34 }}>
+            {sections.map((section, index) => {
+              const showColor = activeSection === section.key || hoveredSection === section.key;
+              const slant = 12;
+              return (
+                <button
+                  key={section.key}
+                  onClick={() => setActiveSection(section.key)}
+                  onMouseEnter={() => setHoveredSection(section.key)}
+                  onMouseLeave={() => setHoveredSection(null)}
+                  className="relative flex w-36 items-center justify-center text-xs font-bold transition-all"
+                  style={{
+                    marginLeft: index === 0 ? 0 : -slant,
+                    zIndex: activeSection === section.key ? sections.length + 1 : sections.length - index,
+                    clipPath: index === 0
+                      ? `polygon(0 0, calc(100% - ${slant}px) 0, 100% 100%, 0 100%)`
+                      : `polygon(0 0, calc(100% - ${slant}px) 0, 100% 100%, ${slant}px 100%)`,
+                    background: showColor ? section.color : "#6b7280",
+                    color: "white",
+                    boxShadow: activeSection === section.key ? "inset 0 1px 4px rgba(0,0,0,0.3)" : "none",
+                  }}
+                >
+                  <span className="whitespace-nowrap">{section.label}</span>
+                  <sup className="ml-1 text-[0.6rem]">{section.count}</sup>
+                </button>
+              );
+            })}
           </div>
         </div>
 
