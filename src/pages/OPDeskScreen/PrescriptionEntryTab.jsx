@@ -17,15 +17,40 @@ function filterSearchSuggestions(searchList, query, searchMode) {
   const sortedList = [...searchList].sort((a, b) =>
     String(a).localeCompare(String(b), undefined, { sensitivity: "base", numeric: true })
   );
-  // Searching never removes or reorders catalogue records. The active search
-  // mode is used only to locate and focus a row in this complete sorted list.
+  const normalizedQuery = normalizeSearchText(query);
+
+  // Embedded mode keeps every catalogue record, but groups all exact contains
+  // matches first so repeated values such as "10S" remain together and visible.
+  if (searchMode === "embedded" && normalizedQuery) {
+    const matches = [];
+    const remaining = [];
+    sortedList.forEach(item => {
+      (normalizeSearchText(item).includes(normalizedQuery) ? matches : remaining).push(item);
+    });
+    return [...matches, ...remaining];
+  }
+
+  // Alphabet mode groups the most-specific start-prefix matches first. If the
+  // full prefix has no result, progressively shorten it until a level matches.
+  if ((searchMode === "alphabet" || searchMode === "alpha") && normalizedQuery) {
+    for (let length = normalizedQuery.length; length > 0; length -= 1) {
+      const prefix = normalizedQuery.slice(0, length).trimEnd();
+      if (!prefix) continue;
+      const matches = sortedList.filter(item => normalizeSearchText(item).startsWith(prefix));
+      if (matches.length > 0) {
+        const matchSet = new Set(matches);
+        return [...matches, ...sortedList.filter(item => !matchSet.has(item))];
+      }
+    }
+  }
+
   return sortedList;
 }
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
 // Every dropdown opened from the entry section extends to the footer's bottom edge.
 
-function PortalDropdown({ anchorEl, open, children, maxVisibleRows, scrollbarClassName = "" }) {
+function PortalDropdown({ anchorEl, open, children, maxVisibleRows, scrollbarClassName = "", containerRef }) {
   if (!open || !anchorEl) return null;
 
   const rect = anchorEl.getBoundingClientRect();
@@ -47,7 +72,7 @@ function PortalDropdown({ anchorEl, open, children, maxVisibleRows, scrollbarCla
   };
 
   return ReactDOM.createPortal(
-    <div className={`dropdown-thin-scrollbar ${scrollbarClassName}`} style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 0, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
+    <div ref={containerRef} className={`dropdown-thin-scrollbar ${scrollbarClassName}`} style={{ ...style, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 0, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", overflowY: "auto" }}>
       {children}
     </div>, document.body
   );
@@ -415,6 +440,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const anchorRef = useRef(null);
   const hasValue = value !== "â€”" && String(value ?? "").trim() !== "";
   const visibleOptions = options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))));
@@ -423,13 +449,18 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
 
   useEffect(() => {
     const searchText = value === "—" ? "" : normalizeSearchText(value);
-    if (!showDropdown || !searchText) return;
+    if (!showDropdown) return;
+    if (!searchText) {
+      setHighlightedIdx(-1);
+      if (dropdownRef.current) dropdownRef.current.scrollTop = 0;
+      return;
+    }
     const matchIndex = visibleOptions.findIndex(option => normalizeSearchText(option).includes(searchText));
     if (matchIndex < 0) return;
     const focusIndex = matchIndex;
     setHighlightedIdx(focusIndex);
     requestAnimationFrame(() => {
-      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
+      dropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
     });
   }, [options, showDropdown, value]);
 
@@ -439,7 +470,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
     setHighlightedIdx(index);
     onChange({ target: { value: option } });
     requestAnimationFrame(() => {
-      document.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
+      dropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
     });
   };
 
@@ -451,6 +482,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
     const searchText = normalizeSearchText(nextValue);
     if (!searchText) {
       setHighlightedIdx(-1);
+      requestAnimationFrame(() => dropdownRef.current?.scrollTo({ top: 0 }));
       return;
     }
 
@@ -459,7 +491,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
     setHighlightedIdx(focusIndex);
     if (focusIndex >= 0) {
       requestAnimationFrame(() => {
-        document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
+        dropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
       });
     }
   };
@@ -500,7 +532,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
       )}
       {options.length > 0 && (
         <PortalDropdown anchorEl={anchorRef.current} open={showDropdown && displayedOptions.length > 0}
-          maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar">
+          maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar" containerRef={dropdownRef}>
           {displayedOptions.map((opt, i) => (
             <div key={opt} onMouseDown={() => select(opt)} className="prescription-dropdown-option cursor-pointer"
               style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || opt === value ? "var(--color-primary-muted)" : "transparent" }}
@@ -652,7 +684,7 @@ function TimeHourMinuteSelect({ dataField, value, onChange }) {
 
 /* ── Add row: renders only the fields listed in config.addRowFields ── */
 const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query, setQuery, suggestions, allSuggestions, onCancel, rowNumber, searchMode }, ref) => {
-  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null), navigationItemsRef = useRef(null), lastSearchIndexRef = useRef(-1);
+  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null), navigationItemsRef = useRef(null), lastSearchIndexRef = useRef(-1), searchDropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [selected, setSelected] = useState(() => !!query);
@@ -677,12 +709,22 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   // While typing, focus the complete first matching record without replacing
   // the user's query. Keyboard navigation can then continue from this row.
   useEffect(() => {
-    if (navigationItemsRef.current || !showDropdown || !query.trim()) return;
-    let focusIndex = 0;
+    if (navigationItemsRef.current || !showDropdown) return;
+    if (!query.trim()) {
+      setHighlightedIdx(-1);
+      lastSearchIndexRef.current = -1;
+      if (searchDropdownRef.current) searchDropdownRef.current.scrollTop = 0;
+      return;
+    }
+    let focusIndex = -1;
     if (searchMode === "alphabet" || searchMode === "alpha") {
-      const alphabetQuery = normalizeSearchText(query).replace(/[^a-z]/g, "");
+      // Preserve the complete entered value, including strengths and pack
+      // numbers (for example "aciloc 300"), while progressively falling back
+      // through shorter start-prefix levels if the full value has no match.
+      const alphabetQuery = normalizeSearchText(query);
       for (let length = alphabetQuery.length; length > 0; length -= 1) {
-        const prefix = alphabetQuery.slice(0, length);
+        const prefix = alphabetQuery.slice(0, length).trimEnd();
+        if (!prefix) continue;
         const prefixIndex = suggestions.findIndex(item => normalizeSearchText(item).startsWith(prefix));
         if (prefixIndex >= 0) {
           focusIndex = prefixIndex;
@@ -692,13 +734,15 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     } else if (searchMode === "embedded") {
       const embeddedQuery = normalizeSearchText(query);
       const embeddedIndex = suggestions.findIndex(item => normalizeSearchText(item).includes(embeddedQuery));
-      if (embeddedIndex >= 0) focusIndex = embeddedIndex;
+      focusIndex = embeddedIndex;
     }
     setHighlightedIdx(focusIndex);
     lastSearchIndexRef.current = focusIndex;
-    requestAnimationFrame(() => {
-      document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
-    });
+    if (focusIndex >= 0) {
+      requestAnimationFrame(() => {
+        searchDropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
+      });
+    }
   }, [suggestions, query, searchMode, showDropdown]);
 
   // Typing must always use the active Alphabet/Embedded filter. Only an
@@ -721,7 +765,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     setQuery(item);
     onDraftChange("name")(item);
     requestAnimationFrame(() => {
-      document.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
+      searchDropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
     });
   };
   const handleFieldKeyDown = (e, field) => {
@@ -751,7 +795,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
         setHighlightedIdx(lastSearchIndexRef.current);
         setShowDropdown(true);
         requestAnimationFrame(() => {
-          document.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
+          searchDropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
         });
       }
       return;
@@ -761,7 +805,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       setHighlightedIdx(lastSearchIndexRef.current);
       setShowDropdown(true);
       requestAnimationFrame(() => {
-        document.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
+        searchDropdownRef.current?.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
       });
       return;
     }
@@ -811,7 +855,18 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   const handleSelect = item => {
     lastSearchIndexRef.current = dropdownItems.indexOf(item); navigationItemsRef.current = null; setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
   };
-  const handleClear = () => { navigationItemsRef.current = null; lastSearchIndexRef.current = -1; setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
+  const handleClear = () => {
+    navigationItemsRef.current = null;
+    lastSearchIndexRef.current = -1;
+    setQuery("");
+    onDraftChange("name")("");
+    setSelected(false);
+    setShowAllItems(false);
+    setShowDropdown(true);
+    setHighlightedIdx(-1);
+    requestAnimationFrame(() => searchDropdownRef.current?.scrollTo({ top: 0 }));
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
 
   return (
     <div ref={rowRef} data-add-row="true" className="flex items-stretch border-b relative"
@@ -831,7 +886,17 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           return (
             <div key="name" className={`${config.key === "iptime" ? "w-[150px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
-                onChange={e => { navigationItemsRef.current = null; lastSearchIndexRef.current = -1; setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
+                onChange={e => {
+                  const nextValue = e.target.value;
+                  navigationItemsRef.current = null;
+                  lastSearchIndexRef.current = -1;
+                  setQuery(nextValue);
+                  onDraftChange("name")(nextValue);
+                  setShowAllItems(false);
+                  setShowDropdown(true);
+                  setHighlightedIdx(-1);
+                  if (!nextValue.trim()) requestAnimationFrame(() => searchDropdownRef.current?.scrollTo({ top: 0 }));
+                }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
@@ -848,7 +913,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
                 onMouseDown={e => { e.preventDefault(); navigationItemsRef.current = null; setShowAllItems(true); setShowDropdown(v => !v); setHighlightedIdx(-1); }} />
               <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}
-                maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar">
+                maxVisibleRows={DROPDOWN_PAGE_SIZE} scrollbarClassName="search-results-scrollbar" containerRef={searchDropdownRef}>
                 {dropdownItems.map((item, i) => (
                   <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
                     style={{ fontSize: "1rem", borderBottom: "1px solid var(--color-border)", background: highlightedIdx === i || item === query ? "var(--color-primary-muted)" : "transparent" }}>
