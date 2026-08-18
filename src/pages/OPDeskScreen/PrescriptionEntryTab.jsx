@@ -8,6 +8,7 @@ import useFillRowCount from "../../hooks/useFillRowCount";
 
 const ROW_HEIGHT_PX = 32;
 const NONE_OPTION = "<None>";
+const DROPDOWN_PAGE_SIZE = 6;
 
 const normalizeSearchText = value => String(value ?? "").trim().toLocaleLowerCase();
 
@@ -19,12 +20,34 @@ function filterSearchSuggestions(searchList, query, searchMode) {
 
   if (!normalizedQuery) return sortedList;
 
-  return sortedList.filter(item => {
-    const normalizedItem = normalizeSearchText(item);
-    return searchMode === "embedded"
-      ? normalizedItem.includes(normalizedQuery)
-      : normalizedItem.startsWith(normalizedQuery);
+  // Embedded search remains an exact substring search across the full value,
+  // including numbers and spaces.
+  if (searchMode === "embedded") {
+    return sortedList.filter(item => normalizeSearchText(item).includes(normalizedQuery));
+  }
+
+  // Alphabet search uses alphabetic input only and expands from the most
+  // specific prefix to progressively broader prefix levels.
+  const alphabetQuery = normalizedQuery.replace(/[^a-z]/g, "");
+  if (!alphabetQuery) return [];
+
+  const prefixes = Array.from(
+    { length: alphabetQuery.length },
+    (_, index) => alphabetQuery.slice(0, alphabetQuery.length - index)
+  );
+  const seen = new Set();
+  const matches = [];
+
+  prefixes.forEach(prefix => {
+    sortedList.forEach(item => {
+      if (normalizeSearchText(item).startsWith(prefix) && !seen.has(item)) {
+        seen.add(item);
+        matches.push(item);
+      }
+    });
   });
+
+  return matches;
 }
 
 /* ── Portal Dropdown (unchanged from DrugTab) ── */
@@ -599,7 +622,7 @@ function TimeHourMinuteSelect({ dataField, value, onChange }) {
 
 /* ── Add row: renders only the fields listed in config.addRowFields ── */
 const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query, setQuery, suggestions, allSuggestions, onCancel, rowNumber, searchMode }, ref) => {
-  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null);
+  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null), navigationItemsRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [selected, setSelected] = useState(() => !!query);
@@ -615,10 +638,15 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   }));
 
   useEffect(() => { setSelected(!!query.trim()); }, [query]);
+  useEffect(() => {
+    navigationItemsRef.current = null;
+    setHighlightedIdx(-1);
+  }, [searchMode]);
 
   // Typing must always use the active Alphabet/Embedded filter. Only an
   // explicit click on the chevron should temporarily expose the full catalog.
-  const dropdownItems = [NONE_OPTION, ...(showAllItems ? allSuggestions : suggestions.slice(0, 8))];
+  const dropdownItems = navigationItemsRef.current
+    || [NONE_OPTION, ...(showAllItems ? allSuggestions : suggestions)];
   const fieldOrder = config.addRowFields;
 
   const focusField = k => rowRef.current?.querySelector(`[data-field="${k}"]`)?.focus();
@@ -627,11 +655,49 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     if (dir === "right" && i < fieldOrder.length - 1) focusField(fieldOrder[i + 1]);
     else if (dir === "left" && i > 0) focusField(fieldOrder[i - 1]);
   };
+  const previewDropdownItem = index => {
+    const item = dropdownItems[index];
+    if (item === undefined) return;
+    setHighlightedIdx(index);
+    setQuery(item);
+    onDraftChange("name")(item);
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".prescription-dropdown-option")[index]?.scrollIntoView({ block: "nearest" });
+    });
+  };
   const handleFieldKeyDown = (e, field) => {
     if (e.key === "Escape") { onCancel(); return; }
     if (field === "name" && showDropdown && dropdownItems.length > 0) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setHighlightedIdx(i => Math.min(i + 1, dropdownItems.length - 1)); return; }
-      if (e.key === "ArrowUp") { e.preventDefault(); setHighlightedIdx(i => Math.max(i - 1, 0)); return; }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
+        const nextIndex = highlightedIdx < 0 ? Math.min(1, dropdownItems.length - 1) : Math.min(highlightedIdx + 1, dropdownItems.length - 1);
+        previewDropdownItem(nextIndex);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
+        const nextIndex = highlightedIdx < 0 ? dropdownItems.length - 1 : Math.max(highlightedIdx - 1, 0);
+        previewDropdownItem(nextIndex);
+        return;
+      }
+      if (e.key === "PageDown") {
+        e.preventDefault();
+        if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
+        const nextIndex = highlightedIdx < 1
+          ? Math.min(DROPDOWN_PAGE_SIZE, dropdownItems.length - 1)
+          : Math.min(highlightedIdx + DROPDOWN_PAGE_SIZE, dropdownItems.length - 1);
+        previewDropdownItem(nextIndex);
+        return;
+      }
+      if (e.key === "PageUp") {
+        e.preventDefault();
+        if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
+        const nextIndex = highlightedIdx < 1 ? Math.min(1, dropdownItems.length - 1) : Math.max(1, highlightedIdx - DROPDOWN_PAGE_SIZE);
+        previewDropdownItem(nextIndex);
+        return;
+      }
       if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelect(dropdownItems[highlightedIdx]); return; }
     }
     if (e.key === "ArrowRight") { e.preventDefault(); navigate(field, "right"); return; }
@@ -639,9 +705,9 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     if (e.key === "Enter" && (field !== "name" || !showDropdown)) { e.preventDefault(); onCommit(); }
   };
   const handleSelect = item => {
-    setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
+    navigationItemsRef.current = null; setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
   };
-  const handleClear = () => { setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
+  const handleClear = () => { navigationItemsRef.current = null; setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
 
   return (
     <div ref={rowRef} data-add-row="true" className="flex items-stretch border-b relative"
@@ -661,7 +727,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           return (
             <div key="name" className={`${config.key === "iptime" ? "w-[150px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
-                onChange={e => { setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
+                onChange={e => { navigationItemsRef.current = null; setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
@@ -676,7 +742,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                   style={{ right: "1.5rem", width: 16, height: 16, background: "var(--color-danger)", color: "white" }}><X size={10} strokeWidth={3} /></button>
               )}
               <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: "var(--color-text-muted)" }}
-                onMouseDown={e => { e.preventDefault(); setShowAllItems(true); setShowDropdown(v => !v); setHighlightedIdx(-1); }} />
+                onMouseDown={e => { e.preventDefault(); navigationItemsRef.current = null; setShowAllItems(true); setShowDropdown(v => !v); setHighlightedIdx(-1); }} />
               <PortalDropdown anchorEl={inputRef.current} open={showDropdown && dropdownItems.length > 0}>
                 {dropdownItems.map((item, i) => (
                   <div key={item} onMouseDown={() => handleSelect(item)} className="prescription-dropdown-option cursor-pointer"
