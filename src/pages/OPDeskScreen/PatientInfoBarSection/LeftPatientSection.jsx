@@ -90,6 +90,20 @@ function PatientDropdown({ patients, selectedPatient, onSelectPatient, open, set
           }}
         >
           <div className="flex-1 min-h-0 overflow-y-auto">
+            <div
+              onClick={() => { onSelectPatient(null); setOpen(false); }}
+              className="px-3 py-1.5 cursor-pointer transition-all hover:pl-4"
+              style={{
+                background: !selectedPatient ? "var(--color-primary-muted)" : "var(--color-surface)",
+                borderLeft: !selectedPatient ? "3px solid var(--color-primary)" : "3px solid transparent",
+              }}
+              onMouseEnter={e => { if (selectedPatient) e.currentTarget.style.background = "var(--color-primary-muted)"; }}
+              onMouseLeave={e => { if (selectedPatient) e.currentTarget.style.background = "var(--color-surface)"; }}
+            >
+              <span className="text-sm font-semibold" style={{ color: !selectedPatient ? "var(--color-primary-dark)" : "var(--color-text-subtle)" }}>
+                None
+              </span>
+            </div>
             {patients.map((pt, i) => (
               <div
                 key={pt.id}
