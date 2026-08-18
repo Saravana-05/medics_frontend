@@ -418,7 +418,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   const anchorRef = useRef(null);
   const hasValue = value !== "â€”" && String(value ?? "").trim() !== "";
   const visibleOptions = options.filter(option => !(String(option).length === 1 && !/[a-z0-9]/i.test(String(option))));
-  const displayedOptions = [NONE_OPTION, ...visibleOptions];
+  const displayedOptions = visibleOptions;
   const select = opt => { onChange({ target: { value: opt } }); setShowDropdown(false); setHighlightedIdx(-1); inputRef.current?.focus(); };
 
   useEffect(() => {
@@ -426,7 +426,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
     if (!showDropdown || !searchText) return;
     const matchIndex = visibleOptions.findIndex(option => normalizeSearchText(option).includes(searchText));
     if (matchIndex < 0) return;
-    const focusIndex = matchIndex + 1;
+    const focusIndex = matchIndex;
     setHighlightedIdx(focusIndex);
     requestAnimationFrame(() => {
       document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
@@ -455,7 +455,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
     }
 
     const matchIndex = visibleOptions.findIndex(option => normalizeSearchText(option).includes(searchText));
-    const focusIndex = matchIndex >= 0 ? matchIndex + 1 : -1;
+    const focusIndex = matchIndex;
     setHighlightedIdx(focusIndex);
     if (focusIndex >= 0) {
       requestAnimationFrame(() => {
@@ -465,10 +465,16 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
   };
 
   const handleKeyDown = e => {
+    if ((e.key === "Home" || e.key === "End") && displayedOptions.length > 0) {
+      e.preventDefault();
+      setShowDropdown(true);
+      previewOption(e.key === "Home" ? 0 : displayedOptions.length - 1);
+      return;
+    }
     if (showDropdown && displayedOptions.length > 0) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        previewOption(highlightedIdx < 0 ? Math.min(1, displayedOptions.length - 1) : Math.min(highlightedIdx + 1, displayedOptions.length - 1));
+        previewOption(highlightedIdx < 0 ? 0 : Math.min(highlightedIdx + 1, displayedOptions.length - 1));
         return;
       }
       if (e.key === "ArrowUp") {
@@ -646,7 +652,7 @@ function TimeHourMinuteSelect({ dataField, value, onChange }) {
 
 /* ── Add row: renders only the fields listed in config.addRowFields ── */
 const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query, setQuery, suggestions, allSuggestions, onCancel, rowNumber, searchMode }, ref) => {
-  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null), navigationItemsRef = useRef(null);
+  const inputRef = useRef(null), rowRef = useRef(null), nameWrapRef = useRef(null), navigationItemsRef = useRef(null), lastSearchIndexRef = useRef(-1);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIdx, setHighlightedIdx] = useState(-1);
   const [selected, setSelected] = useState(() => !!query);
@@ -664,6 +670,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   useEffect(() => { setSelected(!!query.trim()); }, [query]);
   useEffect(() => {
     navigationItemsRef.current = null;
+    lastSearchIndexRef.current = -1;
     setHighlightedIdx(-1);
   }, [searchMode]);
 
@@ -671,23 +678,24 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   // the user's query. Keyboard navigation can then continue from this row.
   useEffect(() => {
     if (navigationItemsRef.current || !showDropdown || !query.trim()) return;
-    let focusIndex = suggestions.length > 0 ? 1 : 0;
+    let focusIndex = 0;
     if (searchMode === "alphabet" || searchMode === "alpha") {
       const alphabetQuery = normalizeSearchText(query).replace(/[^a-z]/g, "");
       for (let length = alphabetQuery.length; length > 0; length -= 1) {
         const prefix = alphabetQuery.slice(0, length);
         const prefixIndex = suggestions.findIndex(item => normalizeSearchText(item).startsWith(prefix));
         if (prefixIndex >= 0) {
-          focusIndex = prefixIndex + 1;
+          focusIndex = prefixIndex;
           break;
         }
       }
     } else if (searchMode === "embedded") {
       const embeddedQuery = normalizeSearchText(query);
       const embeddedIndex = suggestions.findIndex(item => normalizeSearchText(item).includes(embeddedQuery));
-      if (embeddedIndex >= 0) focusIndex = embeddedIndex + 1;
+      if (embeddedIndex >= 0) focusIndex = embeddedIndex;
     }
     setHighlightedIdx(focusIndex);
+    lastSearchIndexRef.current = focusIndex;
     requestAnimationFrame(() => {
       document.querySelectorAll(".prescription-dropdown-option")[focusIndex]?.scrollIntoView({ block: "start" });
     });
@@ -696,7 +704,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
   // Typing must always use the active Alphabet/Embedded filter. Only an
   // explicit click on the chevron should temporarily expose the full catalog.
   const dropdownItems = navigationItemsRef.current
-    || [NONE_OPTION, ...(showAllItems ? allSuggestions : suggestions)];
+    || (showAllItems ? allSuggestions : suggestions);
   const fieldOrder = config.addRowFields;
 
   const focusField = k => rowRef.current?.querySelector(`[data-field="${k}"]`)?.focus();
@@ -709,6 +717,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
     const item = dropdownItems[index];
     if (item === undefined) return;
     setHighlightedIdx(index);
+    lastSearchIndexRef.current = index;
     setQuery(item);
     onDraftChange("name")(item);
     requestAnimationFrame(() => {
@@ -720,6 +729,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       e.preventDefault();
       if (field === "name") {
         navigationItemsRef.current = null;
+        lastSearchIndexRef.current = -1;
         setQuery("");
         onDraftChange("name")("");
         setSelected(false);
@@ -731,11 +741,42 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       onCancel();
       return;
     }
+    // Enter in the catalogue search can select/focus a suggestion, but must
+    // never commit the entire prescription entry.
+    if (field === "name" && e.key === "Enter") {
+      e.preventDefault();
+      if (showDropdown && highlightedIdx >= 0 && dropdownItems[highlightedIdx] !== undefined) {
+        handleSelect(dropdownItems[highlightedIdx]);
+      } else {
+        setHighlightedIdx(lastSearchIndexRef.current);
+        setShowDropdown(true);
+        requestAnimationFrame(() => {
+          document.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
+        });
+      }
+      return;
+    }
+    if (field === "name" && (e.key === "ArrowDown" || e.key === "ArrowUp") && !showDropdown) {
+      e.preventDefault();
+      setHighlightedIdx(lastSearchIndexRef.current);
+      setShowDropdown(true);
+      requestAnimationFrame(() => {
+        document.querySelectorAll(".prescription-dropdown-option")[lastSearchIndexRef.current]?.scrollIntoView({ block: "nearest" });
+      });
+      return;
+    }
+    if (field === "name" && (e.key === "Home" || e.key === "End") && dropdownItems.length > 0) {
+      e.preventDefault();
+      if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
+      setShowDropdown(true);
+      previewDropdownItem(e.key === "Home" ? 0 : dropdownItems.length - 1);
+      return;
+    }
     if (field === "name" && showDropdown && dropdownItems.length > 0) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
-        const nextIndex = highlightedIdx < 0 ? Math.min(1, dropdownItems.length - 1) : Math.min(highlightedIdx + 1, dropdownItems.length - 1);
+        const nextIndex = highlightedIdx < 0 ? 0 : Math.min(highlightedIdx + 1, dropdownItems.length - 1);
         previewDropdownItem(nextIndex);
         return;
       }
@@ -749,8 +790,8 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       if (e.key === "PageDown") {
         e.preventDefault();
         if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
-        const nextIndex = highlightedIdx < 1
-          ? Math.min(DROPDOWN_PAGE_SIZE, dropdownItems.length - 1)
+        const nextIndex = highlightedIdx < 0
+          ? Math.min(DROPDOWN_PAGE_SIZE - 1, dropdownItems.length - 1)
           : Math.min(highlightedIdx + DROPDOWN_PAGE_SIZE, dropdownItems.length - 1);
         previewDropdownItem(nextIndex);
         return;
@@ -758,20 +799,19 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
       if (e.key === "PageUp") {
         e.preventDefault();
         if (!navigationItemsRef.current) navigationItemsRef.current = dropdownItems;
-        const nextIndex = highlightedIdx < 1 ? Math.min(1, dropdownItems.length - 1) : Math.max(1, highlightedIdx - DROPDOWN_PAGE_SIZE);
+        const nextIndex = highlightedIdx < 0 ? 0 : Math.max(0, highlightedIdx - DROPDOWN_PAGE_SIZE);
         previewDropdownItem(nextIndex);
         return;
       }
-      if (e.key === "Enter" && highlightedIdx >= 0) { e.preventDefault(); handleSelect(dropdownItems[highlightedIdx]); return; }
     }
     if (e.key === "ArrowRight") { e.preventDefault(); navigate(field, "right"); return; }
     if (e.key === "ArrowLeft") { e.preventDefault(); navigate(field, "left"); return; }
     if (e.key === "Enter" && (field !== "name" || !showDropdown)) { e.preventDefault(); onCommit(); }
   };
   const handleSelect = item => {
-    navigationItemsRef.current = null; setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
+    lastSearchIndexRef.current = dropdownItems.indexOf(item); navigationItemsRef.current = null; setQuery(item); onDraftChange("name")(item); setSelected(true); setShowDropdown(false); setShowAllItems(false); setHighlightedIdx(-1); inputRef.current?.focus();
   };
-  const handleClear = () => { navigationItemsRef.current = null; setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
+  const handleClear = () => { navigationItemsRef.current = null; lastSearchIndexRef.current = -1; setQuery(""); onDraftChange("name")(""); setSelected(false); setShowAllItems(false); setTimeout(() => inputRef.current?.focus(), 0); };
 
   return (
     <div ref={rowRef} data-add-row="true" className="flex items-stretch border-b relative"
@@ -791,7 +831,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           return (
             <div key="name" className={`${config.key === "iptime" ? "w-[150px]" : "w-80"} flex-shrink-0 relative min-w-0 px-1 py-1.5 flex items-center`} ref={nameWrapRef}>
               <input data-field="name" ref={inputRef} value={query}
-                onChange={e => { navigationItemsRef.current = null; setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
+                onChange={e => { navigationItemsRef.current = null; lastSearchIndexRef.current = -1; setQuery(e.target.value); onDraftChange("name")(e.target.value); setShowAllItems(false); setShowDropdown(true); setHighlightedIdx(-1); }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => { setShowDropdown(false); if (query.trim()) setSelected(true); }, 200)}
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
