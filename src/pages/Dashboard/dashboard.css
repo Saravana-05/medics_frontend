@@ -1,0 +1,23 @@
+.em-main-menu { display:flex; min-height:100vh; min-height:100dvh; flex-direction:column; overflow:hidden; background:#ccc; font-family:"Segoe UI",Arial,sans-serif; }
+.em-title-bar { position:relative; z-index:80; display:flex; height:43px; flex:0 0 43px; align-items:center; padding:0 22px; background:#000; user-select:none; }
+.em-title { color:#63cec4; font-size:clamp(1.35rem,1.7vw,2rem); font-weight:600; letter-spacing:.2px; text-shadow:2px 0 1px rgb(255 255 255 / 22%),4px 0 4px rgb(99 206 196 / 18%); }
+.em-window-controls { display:flex; height:100%; align-items:center; gap:30px; margin-left:auto; color:#fff; font-size:1.5rem; }
+.em-menu-bar { position:relative; z-index:70; display:flex; min-height:44px; flex:0 0 44px; align-items:stretch; padding-left:14px; border-bottom:1px solid #d8d8d8; background:#3f3f3f; user-select:none; }
+.em-menu { position:relative; }
+.em-menu-trigger { height:100%; border:0; background:transparent; padding:0 16px; color:#fff; font:inherit; font-size:1.0625rem; cursor:pointer; }
+.em-menu-trigger:hover,.em-menu-trigger:focus-visible,.em-menu.is-open .em-menu-trigger { background:#555; outline:none; }
+.em-dropdown,.em-submenu { position:absolute; z-index:90; width:max-content; min-width:230px; padding:8px 0; border:1px solid #d8d8d8; background:#fff; box-shadow:0 4px 12px rgb(0 0 0 / 14%); }
+.em-dropdown { top:100%; left:0; }
+.em-submenu { top:-8px; left:100%; display:none; }
+.em-menu-item-host { position:relative; }
+.em-menu-item-host:hover>.em-submenu,.em-menu-item-host:focus-within>.em-submenu { display:block; }
+.em-menu-item { display:flex; width:100%; align-items:center; justify-content:space-between; gap:24px; border:0; background:#fff; padding:6px 18px; color:#1f2937; font:inherit; font-size:1rem; text-align:left; white-space:nowrap; cursor:pointer; }
+.em-menu-item:hover,.em-menu-item:focus-visible { background:#eef7f6; outline:none; }
+.em-menu-separator { height:1px; margin:4px 12px; background:#d0d0d0; }
+.em-workspace { position:relative; min-height:0; flex:1; overflow:hidden; background:#ccc; }
+.em-vertical-brand { position:absolute; bottom:11%; left:10.5%; z-index:2; transform:rotate(-90deg); transform-origin:left bottom; color:#555; font-family:"Segoe Script","Brush Script MT",cursive; font-size:clamp(2.75rem,4vw,4.5rem); letter-spacing:1px; white-space:nowrap; }
+.em-medical-team { position:absolute; bottom:9%; left:23.5%; z-index:3; width:min(34vw,640px); height:min(56vh,610px); object-fit:contain; object-position:bottom; filter:grayscale(1) contrast(.9) brightness(1.08); mix-blend-mode:multiply; opacity:.82; }
+.em-ladder-grid { position:absolute; right:7.3%; bottom:9%; z-index:1; display:grid; width:min(31.25vw,600px); aspect-ratio:1; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+.em-block-1 { grid-area:1/3; background:#a9a9a9; }.em-block-2 { grid-area:2/2; background:#8a8a8a; }.em-block-3 { grid-area:2/3; background:#686868; }.em-block-4 { grid-area:3/1; background:#777; }.em-block-5 { grid-area:3/2; background:#4d4d4d; }.em-block-6 { grid-area:3/3; background:#242424; }
+@media (max-width:900px) { .em-menu-bar{overflow-x:auto;padding-left:0}.em-menu-trigger{padding:0 12px;font-size:.9rem;white-space:nowrap}.em-vertical-brand{left:14%}.em-medical-team{left:20%;width:48vw}.em-ladder-grid{right:2%;width:42vw} }
+@media (max-width:600px) { .em-window-controls{gap:18px;font-size:1.15rem}.em-vertical-brand{bottom:auto;top:8%;left:6%;transform:none}.em-medical-team{bottom:7%;left:4%;width:68vw;height:62vh}.em-ladder-grid{right:-10%;bottom:7%;width:64vw} }

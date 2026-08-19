@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
-import { Bed, CheckCircle, Eye, LogOut, ParkingCircle, Search, Users, X } from "lucide-react";
+import { Bed, Calendar, CheckCircle, Clock, Eye, LogOut, ParkingCircle, Stethoscope, Users } from "lucide-react";
+import DataTable from "react-data-table-component";
 
-const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor"];
+const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
+const DUTY_NURSES = ["Niveditha", "Soundarya", "Rajalakshmi"];
 
 const IP_SECTIONS = [
   {
@@ -49,25 +51,69 @@ const IP_SECTIONS = [
   },
 ];
 
-const GRID_COLUMNS = "92px 74px 145px 145px minmax(150px,1fr) minmax(165px,1fr) 90px 110px";
+const GRID_COLUMNS = "92px 74px 145px 145px minmax(150px,1fr) minmax(165px,1fr) 90px 110px 110px";
 
-export default function IPListModal({ onClose, onSelectPatient }) {
+const FILTER_OPTIONS = {
+  ward: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[0])))],
+  complaint: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[5])))],
+  priority: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[6])))],
+  dutyDoctor: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[7])))],
+};
+
+function HighlightedRoom({ room }) {
+  const markerStyles = {
+    "*": { background: "#dbeafe", color: "#1d4ed8" },
+    "#": { background: "#fef3c7", color: "#b45309" },
+    "@": { background: "#f3e8ff", color: "#7e22ce" },
+  };
+
+  return room.split("").map((character, index) => {
+    const markerStyle = markerStyles[character];
+    return markerStyle ? (
+      <strong key={index} className="mx-px rounded px-1 font-extrabold" style={markerStyle}>
+        {character}
+      </strong>
+    ) : character;
+  });
+}
+
+function FilterSelect({ label, value, options, onChange }) {
+  return (
+    <label className="flex items-center gap-1.5 text-xs font-bold">
+      <span>{label}</span>
+      <select value={value} onChange={event => onChange(event.target.value)} className="border px-2 py-1 text-xs font-normal outline-none" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+        <option value="All">All</option>
+        {options.map(option => <option key={option} value={option}>{option}</option>)}
+      </select>
+    </label>
+  );
+}
+
+export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03-02-2024", time = "10:00" }) {
   const [filter, setFilter] = useState("");
   const [ward, setWard] = useState("All");
+  const [complaint, setComplaint] = useState("All");
+  const [priority, setPriority] = useState("All");
+  const [dutyDoctor, setDutyDoctor] = useState("All");
   const [activeSection, setActiveSection] = useState("all");
   const [hoveredSection, setHoveredSection] = useState(null);
   const normalizedFilter = filter.trim().toLowerCase();
 
-  const sections = useMemo(() => IP_SECTIONS.map(section => ({
+  const sections = useMemo(() => IP_SECTIONS.map((section, sectionIndex) => ({
     ...section,
-    rows: section.rows.filter(row =>
-      (ward === "All" || row[0] === ward) &&
-      (!normalizedFilter || row.some(value => value.toLowerCase().includes(normalizedFilter)))
-    ),
-  })), [normalizedFilter, ward]);
+    rows: section.rows
+      .map((row, rowIndex) => [...row, DUTY_NURSES[(sectionIndex + rowIndex) % DUTY_NURSES.length]])
+      .filter(row =>
+        (ward === "All" || row[0] === ward) &&
+        (complaint === "All" || row[5] === complaint) &&
+        (priority === "All" || row[6] === priority) &&
+        (dutyDoctor === "All" || row[7] === dutyDoctor) &&
+        (!normalizedFilter || row.some(value => value.toLowerCase().includes(normalizedFilter)))
+      ),
+  })), [complaint, dutyDoctor, normalizedFilter, priority, ward]);
 
   const handleSelect = row => {
-    onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6] });
+    onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8] });
     onClose?.();
   };
 
@@ -89,20 +135,49 @@ export default function IPListModal({ onClose, onSelectPatient }) {
     : sections.filter(section => section.key === activeSection);
   const totalPatients = sections.reduce((total, section) => total + section.rows.length, 0);
 
+  const tableColumns = [
+    { name: "Ward", selector: row => row[0], width: "92px" },
+    { name: "Room#", selector: row => row[1], cell: row => <HighlightedRoom room={row[1]} />, width: "74px" },
+    { name: "Patient's Doctor", selector: row => row[2], width: "145px" },
+    { name: "Queue Status", selector: row => row[3], width: "145px" },
+    { name: "Patient Name", selector: row => row[4], minWidth: "150px", grow: 1 },
+    { name: "Chief Complaint", selector: row => row[5], minWidth: "165px", grow: 1 },
+    { name: "Priority", selector: row => row[6], width: "90px" },
+    { name: "Duty Doctor", selector: row => row[7], width: "110px" },
+    { name: "Duty Nurse", selector: row => row[8], width: "110px" },
+  ];
+
+  const tableStyles = {
+    table: { style: { backgroundColor: "var(--color-surface)" } },
+    rows: {
+      style: {
+        minHeight: "29px",
+        fontSize: "0.75rem",
+        color: "var(--color-text)",
+        borderBottom: "1px solid var(--color-border)",
+      },
+      stripedStyle: { backgroundColor: "var(--color-surface-alt)" },
+      highlightOnHoverStyle: { backgroundColor: "#eff6ff", cursor: "pointer" },
+    },
+    cells: {
+      style: {
+        paddingLeft: "8px",
+        paddingRight: "8px",
+        borderRight: "1px solid var(--color-border)",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      },
+    },
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }} onClick={onClose}>
       <div className="list-modal-flat flex w-[min(96vw,1400px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <div>
-              <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Bed size={20} />IP Patient List</h2>
-              <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-xs text-white/80">
-                <span>Date: 03-02-2024</span><span>Time: 10:00</span>
-                <span>Nurse-1: Niveditha</span><span>Nurse-2: Soundarya</span><span>Nurse-3: Rajalakshmi</span>
-              </div>
-            </div>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Bed size={20} />IP Patient List</h2>
             <div className="flex items-center gap-3">
-              <div className="hidden gap-3 text-[0.6rem] font-semibold text-white/70 md:flex"><span># Corporate</span><span>* Insurance</span><span>@ Referral</span></div>
               <div className="relative">
                 <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[220px] border border-white/30 bg-white/15 px-3 py-1.5 text-sm text-white outline-none placeholder:text-white/60" />
               </div>
@@ -110,7 +185,7 @@ export default function IPListModal({ onClose, onSelectPatient }) {
             </div>
           </div>
 
-          <div className="flex items-stretch px-5" style={{ height: 34 }}>
+          <div className="flex items-stretch" style={{ height: 34 }}>
             {tabConfig.map((tab, index) => {
               const showColor = activeSection === tab.key || hoveredSection === tab.key;
               const slant = 12;
@@ -130,14 +205,25 @@ export default function IPListModal({ onClose, onSelectPatient }) {
                 </button>
               );
             })}
+            <div className="ml-4 flex items-center gap-2 whitespace-nowrap text-xs">
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
+                <Stethoscope size={12} /><span className="font-semibold">Doctor:</span><span>{doctor}</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
+                <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
+                <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-shrink-0 items-center gap-2 border-b px-4 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
-          <label className="text-xs font-bold">Ward (All/Select)</label>
-          <select value={ward} onChange={event => setWard(event.target.value)} className="border px-2 py-1 text-xs outline-none" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-            <option>All</option><option>Gynacology</option><option>Surgery-1</option><option>Ward-B1</option><option>Dialysis</option>
-          </select>
+        <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
+          <FilterSelect label="Ward" value={ward} options={FILTER_OPTIONS.ward} onChange={setWard} />
+          <FilterSelect label="Chief Complaint" value={complaint} options={FILTER_OPTIONS.complaint} onChange={setComplaint} />
+          <FilterSelect label="Priority" value={priority} options={FILTER_OPTIONS.priority} onChange={setPriority} />
+          <FilterSelect label="Duty Doctor" value={dutyDoctor} options={FILTER_OPTIONS.dutyDoctor} onChange={setDutyDoctor} />
           <span className="ml-auto text-xs" style={{ color: "var(--color-text-muted)" }}>{totalPatients} patients</span>
         </div>
 
@@ -152,20 +238,27 @@ export default function IPListModal({ onClose, onSelectPatient }) {
                 <span className="text-xs font-extrabold uppercase tracking-wide">{section.label}</span>
                 <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[0.6rem] font-bold">{section.rows.length}</span>
               </div>
-              {section.rows.map((row, rowIndex) => (
-                <button key={`${section.key}-${rowIndex}`} type="button" onClick={() => handleSelect(row)} className="grid w-full text-left text-xs transition-colors hover:bg-blue-50" style={{ gridTemplateColumns: GRID_COLUMNS, background: rowIndex % 2 ? "var(--color-surface-alt)" : "var(--color-surface)" }}>
-                  {row.map((value, cellIndex) => <span key={cellIndex} className="truncate border-b border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "var(--color-border)" }} title={value}>{value}</span>)}
-                </button>
-              ))}
-              {section.rows.length === 0 && <div className="border-b px-4 py-8 text-center text-sm" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>No matching patients</div>}
+              <DataTable
+                columns={tableColumns}
+                data={section.rows}
+                noTableHead
+                striped
+                highlightOnHover
+                pointerOnHover
+                dense
+                customStyles={tableStyles}
+                onRowClicked={handleSelect}
+                noDataComponent={<div className="px-4 py-8 text-sm" style={{ color: "var(--color-text-muted)" }}>No matching patients</div>}
+              />
             </div>
           ))}
         </div>
 
         <div className="flex flex-shrink-0 items-center justify-between border-t px-5 py-3" style={{ background: "var(--color-surface-alt)", borderColor: "var(--color-border)" }}>
-          <div className="flex gap-4 text-xs">
-            {IP_SECTIONS.map(section => <div key={section.key} className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: section.color }} /><span style={{ color: "var(--color-text-muted)" }}>{section.label.replace("IP-", "").replace(" List", "")}:</span><b>{sections.find(item => item.key === section.key)?.rows.length || 0}</b></div>)}
-            <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: "var(--color-primary)" }} /><span style={{ color: "var(--color-text-muted)" }}>Total:</span><b style={{ color: "var(--color-primary)" }}>{totalPatients}</b></div>
+          <div className="flex gap-2 text-xs font-semibold">
+            <span className="rounded px-2 py-1" style={{ background: "#dbeafe", color: "#1d4ed8" }}>* Insurance</span>
+            <span className="rounded px-2 py-1" style={{ background: "#fef3c7", color: "#b45309" }}># Corporate</span>
+            <span className="rounded px-2 py-1" style={{ background: "#f3e8ff", color: "#7e22ce" }}>@ Referral</span>
           </div>
           <div className="flex items-center gap-1 text-xs italic" style={{ color: "var(--color-text-muted)" }}><Eye size={12} />Click any row to load patient</div>
         </div>

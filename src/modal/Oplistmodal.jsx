@@ -4,7 +4,7 @@ import {
   Users, ParkingCircle, CheckCircle, TrendingUp, Filter,
   Download, Printer, ChevronDown, ChevronUp, Star, StarOff,
   Activity, Heart, Stethoscope, Pill, Syringe, ClipboardList,
-  Tag, DollarSign, Phone, Mail, MapPin, CalendarDays, Eye
+  Tag, Phone, Mail, MapPin, CalendarDays, Eye
 } from "lucide-react";
 
 /* ══════════════════════════════════════════════════════════
@@ -89,108 +89,49 @@ function StatusBadge({ status }) {
   );
 }
 
-function PatientRow({ row, index, onSelect, section }) {
-  const [hovered, setHovered] = useState(false);
+function HighlightedToken({ token }) {
+  const markerStyles = {
+    "*": { background: "#dbeafe", color: "#1d4ed8" },
+    "#": { background: "#fef3c7", color: "#b45309" },
+    "@": { background: "#f3e8ff", color: "#7e22ce" },
+  };
 
+  return token.split("").map((character, index) => {
+    const markerStyle = markerStyles[character];
+    return markerStyle ? (
+      <strong key={index} className="mx-px rounded px-1 font-extrabold" style={markerStyle}>
+        {character}
+      </strong>
+    ) : character;
+  });
+}
+
+function PatientRow({ row, index, onSelect, section }) {
+  const values = [row.token, row.sched, row.status, row.docNo || "—", row.name, row.complaint, row.priority, row.need];
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onSelect && onSelect(row)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="grid gap-0 border-b transition-all duration-150 cursor-pointer group"
+      className="grid w-full text-left text-xs transition-colors hover:bg-blue-50"
       style={{
         gridTemplateColumns: "70px 70px 140px 65px 1fr 1fr 100px 100px",
-        background: hovered ? "var(--color-primary-muted)" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
-        borderColor: "var(--color-border)",
-        transform: hovered ? "scale(1.001)" : "scale(1)",
+        background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
       }}
     >
-      {/* Token */}
-      <div className="px-3 py-2 flex items-center gap-1">
-        <span className="text-sm font-bold" style={{ color: row.token.startsWith("@") ? "#9333ea" : "var(--color-primary)" }}>
-          {row.token}
+      {values.map((value, cellIndex) => (
+        <span key={cellIndex} className="truncate border-b border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "var(--color-border)" }} title={String(value)}>
+          {cellIndex === 0 ? <HighlightedToken token={String(value)} /> : value}
         </span>
-        {row.token.includes("*") && <Star size={10} style={{ color: "var(--color-warning)" }} title="Insurance" />}
-        {row.token.includes("#") && <DollarSign size={10} style={{ color: "#10b981" }} title="Corporate" />}
-        {row.token.includes("@") && <Tag size={10} style={{ color: "#9333ea" }} title="Referral" />}
-      </div>
-
-      {/* Scheduled */}
-      <div className="px-3 py-2 flex items-center gap-1">
-        <Clock size={12} style={{ color: "var(--color-text-muted)" }} />
-        <span className="text-xs font-mono">{row.sched}</span>
-      </div>
-
-      {/* Queue Status */}
-      <div className="px-3 py-2 flex items-center">
-        <StatusBadge status={row.status} />
-      </div>
-
-      {/* Doc# */}
-      <div className="px-3 py-2 flex items-center">
-        <span className="text-xs" style={{ color: row.docNo ? "var(--color-primary)" : "var(--color-text-subtle)" }}>
-          {row.docNo || "—"}
-        </span>
-      </div>
-
-      {/* Patient Name */}
-      <div className="px-3 py-2">
-        <div className="font-semibold text-sm" style={{ color: "var(--color-text-base)" }}>{row.name}</div>
-        <div className="text-[0.6rem] flex items-center gap-1 mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-          <User size={10} /> {row.age}y · {row.gender}
-        </div>
-      </div>
-
-      {/* Chief Complaint */}
-      <div className="px-3 py-2 flex items-center">
-        <div className="flex items-center gap-1">
-          <Activity size={12} style={{ color: "var(--color-danger)" }} />
-          <span className="text-xs" style={{ color: "var(--color-text-base)" }}>{row.complaint}</span>
-        </div>
-      </div>
-
-      {/* Priority */}
-      <div className="px-3 py-2 flex items-center">
-        <PriorityBadge priority={row.priority} />
-      </div>
-
-      {/* Today's Need */}
-      <div className="px-3 py-2 flex items-center">
-        <NeedBadge need={row.need} />
-      </div>
-
-      {/* Hover Actions */}
-      {hovered && (
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
-          <button className="p-1 rounded bg-white shadow-md" title="Quick View">
-            <Eye size={12} style={{ color: "var(--color-primary)" }} />
-          </button>
-        </div>
-      )}
-    </div>
+      ))}
+    </button>
   );
 }
 
 function SectionHeader({ label, count, color, icon: Icon, note }) {
   return (
-    <div className="sticky top-0 z-10" style={{ top: "40px" }}>
-      <div className="flex items-center justify-between px-4 py-2 border-y" style={{ background: color, borderColor: `${color}80` }}>
-        <div className="flex items-center gap-2">
-          {Icon && <Icon size={14} style={{ color: "var(--color-text-base)" }} />}
-          <span className="text-xs font-extrabold uppercase tracking-wide" style={{ color: "var(--color-text-base)" }}>
-            {label}
-          </span>
-          <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(0,0,0,0.1)", color: "var(--color-text-base)" }}>
-            {count}
-          </span>
-        </div>
-        {note && (
-          <div className="text-[0.6rem] italic flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-            <AlertCircle size={10} />
-            {note}
-          </div>
-        )}
-      </div>
+    <div className="sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2" style={{ background: color, borderColor: "var(--color-border)" }}>
+      <span className="text-xs font-extrabold uppercase tracking-wide">{label}</span>
+      <span className="bg-black/10 px-1.5 py-0.5 text-[0.6rem] font-bold">{count}</span>
     </div>
   );
 }
@@ -269,15 +210,13 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-start justify-center animate-fade-in"
-      style={{ background: "rgba(0,0,0,0.5)", paddingTop: "2rem" }}
+      className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.5)" }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="list-modal-flat flex flex-col shadow-2xl animate-slide-up"
+        className="list-modal-flat flex w-[min(96vw,1400px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
         style={{
-          width: "min(95vw, 1400px)",
-          maxHeight: "90vh",
           background: "var(--color-surface)",
         }}
       >
@@ -289,30 +228,9 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 <ClipboardList size={20} />
                 OP Patient List
               </h2>
-              <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>
-                <div className="flex items-center gap-1">
-                  <Stethoscope size={12} />
-                  <span>{doctor}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar size={12} />
-                  <span>{date}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock size={12} />
-                  <span>{time}</span>
-                </div>
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Legend */}
-              <div className="hidden md:flex gap-3 text-[0.6rem] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>
-                <span className="flex items-center gap-1"><Star size={10} /> Insurance</span>
-                <span className="flex items-center gap-1"><DollarSign size={10} /> Corporate</span>
-                <span className="flex items-center gap-1"><Tag size={10} /> Referral</span>
-              </div>
-
               {/* Search */}
               <div className="relative">
                 <input
@@ -340,7 +258,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           </div>
 
           {/* Section Tabs */}
-          <div className="flex items-stretch px-5" style={{ height: 34 }}>
+          <div className="flex items-stretch" style={{ height: 34 }}>
             {sections.map((section, index) => {
               const showColor = activeSection === section.key || hoveredSection === section.key;
               const slant = 12;
@@ -367,6 +285,23 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 </button>
               );
             })}
+            <div className="ml-4 flex items-center gap-2 whitespace-nowrap text-xs">
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
+                <Stethoscope size={12} />
+                <span className="font-semibold">Doctor:</span>
+                <span>{doctor}</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
+                <Calendar size={12} />
+                <span className="font-semibold">Date:</span>
+                <span>{date}</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
+                <Clock size={12} />
+                <span className="font-semibold">Time:</span>
+                <span>{time}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -440,27 +375,16 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
 
         {/* Footer */}
         <div className="flex-shrink-0 px-5 py-3 border-t flex items-center justify-between" style={{ background: "var(--color-surface-alt)", borderColor: "var(--color-border)" }}>
-          <div className="flex gap-4 text-xs">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-value)" }} />
-              <span style={{ color: "var(--color-text-muted)" }}>Appointments:</span>
-              <span className="font-bold" style={{ color: "var(--color-value)" }}>{MOCK_OP_LIST.appointment.length}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#d97706" }} />
-              <span style={{ color: "var(--color-text-muted)" }}>Parked:</span>
-              <span className="font-bold" style={{ color: "#d97706" }}>{MOCK_OP_LIST.parked.length}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: "#059669" }} />
-              <span style={{ color: "var(--color-text-muted)" }}>Treated:</span>
-              <span className="font-bold" style={{ color: "#059669" }}>{MOCK_OP_LIST.treated.length}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-primary)" }} />
-              <span style={{ color: "var(--color-text-muted)" }}>Total:</span>
-              <span className="font-bold" style={{ color: "var(--color-primary)" }}>{totalPatients}</span>
-            </div>
+          <div className="flex gap-2 text-xs font-semibold">
+            <span className="rounded px-2 py-1" style={{ background: "#dbeafe", color: "#1d4ed8" }}>
+              * Insurance
+            </span>
+            <span className="rounded px-2 py-1" style={{ background: "#fef3c7", color: "#b45309" }}>
+              # Corporate
+            </span>
+            <span className="rounded px-2 py-1" style={{ background: "#f3e8ff", color: "#7e22ce" }}>
+              @ Referral
+            </span>
           </div>
           <div className="text-xs italic flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
             <Eye size={12} />
