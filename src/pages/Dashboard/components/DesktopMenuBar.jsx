@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Stethoscope } from "lucide-react";
 import { mainMenuItems } from "../mainMenuData";
 
 function MenuItems({ items, onSelect, submenu = false }) {
@@ -58,6 +58,10 @@ export default function DesktopMenuBar({ onLogout }) {
           {openMenu === menu.label && <MenuItems items={menu.items} onSelect={handleSelect} />}
         </div>
       ))}
+      <button type="button" className="em-op-desk-button" onClick={() => navigate("/opdesk")}>
+        <Stethoscope size={17} aria-hidden="true" />
+        <span>OP Desk</span>
+      </button>
     </nav>
   );
 }
