@@ -30,14 +30,14 @@ export const TAB_CONFIGS = {
     key: "drugs",
     label: "Drug",
     icon: Pill,
-    color: "var(--color-drugs)",
-    colorLight: "var(--color-drugs-light)",
+    color: "var(--color-services)",
+    colorLight: "var(--color-services-light)",
     colorText: "white",
     // Used wherever the accent is rendered as TEXT/icon color on a white or
     // near-white background (not as a solid background needing colorText on
     // top of it). For the 3 saturated tabs this is just `color` itself; IP
     // Time-line's pale cream isn't legible as text, so it uses colorText (navy) instead.
-    textAccent: "var(--color-drugs)",
+    textAccent: "var(--color-services)",
 
     labels: {
       addButton: "Add Medicine",
@@ -114,10 +114,10 @@ export const TAB_CONFIGS = {
     key: "lab",
     label: "Lab-Test",
     icon: FlaskConical,
-    color: "var(--color-lab)",
-    colorLight: "var(--color-lab-light)",
-    colorText: "white",
-    textAccent: "var(--color-lab)",
+    color: "#d67d7d",
+    colorLight: "#f8e5e5",
+    colorText: "#111827",
+    textAccent: "#9b3535",
 
     labels: {
       addButton: "Add Test",
@@ -180,10 +180,10 @@ export const TAB_CONFIGS = {
     key: "services",
     label: "Service",
     icon: ServicesIcon,
-    color: "var(--color-services)",
-    colorLight: "var(--color-services-light)",
-    colorText: "white",
-    textAccent: "var(--color-services)",
+    color: "#a9cb77",
+    colorLight: "#eef5e3",
+    colorText: "#111827",
+    textAccent: "#567228",
 
     labels: {
       addButton: "Add Service",
@@ -214,10 +214,10 @@ export const TAB_CONFIGS = {
     key: "iptime",
     label: "IP Timeline",
     icon: Clock,
-    color: "var(--color-iptime)",
-    colorLight: "var(--color-iptime-light)",
-    colorText: "white",
-    textAccent: "var(--color-iptime)",
+    color: "#f0a866",
+    colorLight: "#fff1e1",
+    colorText: "#111827",
+    textAccent: "#9a4e16",
 
     labels: {
       addButton: "Add Entry",
@@ -289,10 +289,10 @@ export const TAB_CONFIGS = {
     key: "carePlan",
     label: "Care-Plan",
     icon: ClipboardList,
-    color: "var(--color-careplan)",
-    colorLight: "var(--color-careplan-light)",
+    color: "var(--color-primary)",
+    colorLight: "var(--color-primary-muted)",
     colorText: "white",
-    textAccent: "var(--color-careplan)",
+    textAccent: "var(--color-primary)",
 
     labels: {
       addButton: "Add Activity",

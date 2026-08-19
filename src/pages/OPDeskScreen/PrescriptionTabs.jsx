@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { TAB_CONFIGS } from "../../config/tabConfig";
 
-// Same color each tab's table header (AddTableHeader) uses — TAB_CONFIGS.<tab>.color —
-// so the tab bar and the medicine/lab/service/IP-time list header always match.
+// All prescription UI surfaces derive their palette from TAB_CONFIGS.
 const PRESCRIPTION_TABS = [
-  { key: "drugs",    label: "Drug",        color: TAB_CONFIGS.drugs.color,    textColor: TAB_CONFIGS.drugs.colorText,    textAccent: TAB_CONFIGS.drugs.textAccent },
-  { key: "lab",      label: "Lab-Test",    color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText,      textAccent: TAB_CONFIGS.lab.textAccent },
-  { key: "services", label: "Service",     color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText, textAccent: TAB_CONFIGS.services.textAccent },
-  { key: "carePlan", label: "Care-Plan",   color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText, textAccent: TAB_CONFIGS.carePlan.textAccent },
-  { key: "iptime",   label: "IP Timeline", color: TAB_CONFIGS.iptime.color,   textColor: TAB_CONFIGS.iptime.colorText,   textAccent: TAB_CONFIGS.iptime.textAccent },
+  { key: "drugs",    label: "Drug",        color: TAB_CONFIGS.drugs.color,    textColor: TAB_CONFIGS.drugs.colorText },
+  { key: "lab",      label: "Lab-Test",    color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText },
+  { key: "services", label: "Service",     color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText },
+  { key: "carePlan", label: "Care-Plan",   color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText },
+  { key: "iptime",   label: "IP Timeline", color: TAB_CONFIGS.iptime.color,   textColor: TAB_CONFIGS.iptime.colorText },
 ];
 
 const GRAY_DARK = "#6b7280";

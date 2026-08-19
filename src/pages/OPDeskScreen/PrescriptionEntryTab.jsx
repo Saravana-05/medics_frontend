@@ -160,6 +160,18 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
       normal: ["#b7d3eb", "#87b5de", "#5797d0", "#0f6cbd", "#0c5697"],
       hover: ["#99c2e5", "#679fd4", "#337fc6", "#0e61aa", "#094579"],
     },
+    "#d67d7d": {
+      normal: ["#f3d9d9", "#e9baba", "#df9b9b", "#c86262", "#a94444"],
+      hover: ["#edc9c9", "#e2a8a8", "#d88686", "#b85353", "#913939"],
+    },
+    "#a9cb77": {
+      normal: ["#e8f0dc", "#d4e3bd", "#bfd69e", "#86ad4d", "#668b31"],
+      hover: ["#dce8ca", "#c6d9aa", "#afca88", "#769b43", "#557728"],
+    },
+    "#f0a866": {
+      normal: ["#fbe8d6", "#f7d2b0", "#f3bc89", "#df8738", "#bd6720"],
+      hover: ["#f8dcc5", "#f3c49b", "#eeaa70", "#cb762d", "#a95619"],
+    },
   };
   const palette = toolbarPalettes[accentColor] || toolbarPalettes["var(--color-primary)"];
   const shades = palette.normal;
@@ -177,12 +189,12 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentL
 }
 
 /* ── Table headers built from config.tableColumns ── */
-function TableHeader({ columns, accentColor, wrapLabels = false }) {
+function TableHeader({ columns, accentColor, accentText = "white", wrapLabels = false }) {
   return (
-    <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: "var(--color-primary-muted)", borderColor: "var(--color-border)", height: "34px", boxSizing: "border-box" }}>
+    <div className="table-header-text flex items-stretch border-b flex-shrink-0" style={{ background: accentColor, borderColor: accentColor, height: "34px", boxSizing: "border-box" }}>
       {columns.map(col => (
         <div key={col.key} className={`${col.width} ${wrapLabels ? "" : "min-w-0"} ${col.vertical ? "px-0.5 py-0.5 flex items-center justify-center" : "px-2 py-1 flex items-center justify-center"} text-center`}
-          style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: "var(--color-primary-dark)",
+          style={{ fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.02em", lineHeight: 1, color: accentText,
             ...(col.vertical
               ? { writingMode: "vertical-rl", transform: "rotate(180deg)", whiteSpace: "nowrap" }
               : { overflow: "hidden", textOverflow: wrapLabels ? "clip" : "ellipsis", whiteSpace: wrapLabels ? "pre-line" : "nowrap" }) }}>
@@ -1141,7 +1153,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
             </div>
           ) : (
             <>
-              <TableHeader columns={displayColumns} accentColor={config.color} />
+              <TableHeader columns={displayColumns} accentColor={config.color} accentText={config.colorText} />
               <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
                 {items.map((item, index) => (
                   <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
