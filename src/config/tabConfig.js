@@ -33,6 +33,7 @@ export const TAB_CONFIGS = {
     color: "var(--color-services)",
     colorLight: "var(--color-services-light)",
     colorText: "white",
+    tableHeaderText: "#111827",
     // Used wherever the accent is rendered as TEXT/icon color on a white or
     // near-white background (not as a solid background needing colorText on
     // top of it). For the 3 saturated tabs this is just `color` itself; IP

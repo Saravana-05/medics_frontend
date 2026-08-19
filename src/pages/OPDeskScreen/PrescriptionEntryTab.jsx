@@ -1153,7 +1153,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
             </div>
           ) : (
             <>
-              <TableHeader columns={displayColumns} accentColor={config.color} accentText={config.colorText} />
+              <TableHeader columns={displayColumns} accentColor={config.color} accentText={config.tableHeaderText || config.colorText} />
               <div ref={rowsScrollRef} className="overflow-y-auto flex-1 no-scrollbar">
                 {items.map((item, index) => (
                   <EntryRow key={item.id} item={item} index={index} columns={displayColumns}
@@ -1171,7 +1171,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
 
         {!config.hideAddRow && (
           <div className="flex-shrink-0 mt-3">
-            <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.colorText} />
+            <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.tableHeaderText || config.colorText} />
             {showAddRow ? (
               <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
                 query={query} setQuery={setQuery} suggestions={suggestions} allSuggestions={searchList} rowNumber={items.length + 1} searchMode={searchMode} />

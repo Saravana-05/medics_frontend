@@ -13,7 +13,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
   });
   const [showOPList, setShowOPList] = useState(false);
   const [showIPList, setShowIPList] = useState(false);
-  const [activeTab, setActiveTab] = useState(null);
+  const [, setActiveTab] = useState(null);
   const [hoveredTab, setHoveredTab] = useState(null);
 
   const tabStyle = (tab, background, hoverBackground = background) => {

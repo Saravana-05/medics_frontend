@@ -77,7 +77,7 @@ function HighlightedRoom({ room }) {
   });
 }
 
-function HeaderFilter({ label, value, options, onChange }) {
+function HeaderFilter({ label, value, options, onChange, textColor }) {
   const [open, setOpen] = useState(false);
   const filterRef = useRef(null);
   const allSelected = value.length === options.length;
@@ -96,9 +96,9 @@ function HeaderFilter({ label, value, options, onChange }) {
 
   return (
     <div ref={filterRef} className="relative flex min-w-0 flex-1 flex-col gap-1">
-      <span className="truncate">{label}</span>
-      <button type="button" onClick={() => setOpen(current => !current)} className="flex min-w-0 items-center gap-1 border-b border-white/50 px-0.5 py-0.5 text-left text-[0.65rem] font-normal text-white/70 hover:text-white" aria-label={`Filter by ${label}`} aria-expanded={open}>
-        <Funnel size={10} className={value.length ? "text-cyan-300" : "text-white/50"} />
+      <span className="truncate" style={{ color: textColor }}>{label}</span>
+      <button type="button" onClick={() => setOpen(current => !current)} className="flex min-w-0 items-center gap-1 border-b px-0.5 py-0.5 text-left text-[0.65rem] font-normal" style={{ color: textColor, borderColor: textColor === "white" ? "rgba(255,255,255,0.5)" : `${textColor}80` }} aria-label={`Filter by ${label}`} aria-expanded={open}>
+        <Funnel size={10} style={{ color: value.length ? "#22d3ee" : textColor, opacity: value.length ? 1 : 0.6 }} />
         <span className="min-w-0 flex-1 truncate">{value.length ? `${value.length} selected` : "Filter by..."}</span>
         <ChevronDown size={10} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
@@ -208,19 +208,23 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     Priority: { value: priorityFilters, options: FILTER_OPTIONS.priority, onChange: setPriorityFilters },
     "Duty Doctor": { value: dutyDoctorFilters, options: FILTER_OPTIONS.dutyDoctor, onChange: setDutyDoctorFilters },
   };
-
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-      <div className="list-modal-flat flex w-[min(96vw,1146px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
-        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
+      <div className="list-modal-flat flex h-[90vh] w-[min(96vw,1146px)] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
+        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, #991b1b 0%, var(--color-danger) 100%)" }}>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
-            <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Bed size={20} />IP Patient List</h2>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[220px] border border-white/30 bg-white/15 px-3 py-1.5 text-sm text-white outline-none placeholder:text-white/60" />
+            <div className="flex items-center gap-4">
+              <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold text-white"><Bed size={20} />In Patient List</h2>
+              <div className="flex items-center gap-2 whitespace-nowrap text-xs">
+                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
+                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
+                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
+                </div>
               </div>
-              <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10" title="Close">Close</button>
             </div>
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10" title="Close">Close</button>
           </div>
 
           <div className="flex items-stretch" style={{ height: 34 }}>
@@ -243,26 +247,23 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 </button>
               );
             })}
-            <div className="ml-4 flex items-center gap-2 whitespace-nowrap text-xs">
+            <div className="relative ml-3 flex items-center">
+              <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[205px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
+            </div>
+            <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
               <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
                 <Stethoscope size={12} /><span className="font-semibold">Doctor:</span><span>{doctor}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
-                <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
-                <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: "var(--color-primary-dark)", borderColor: "var(--color-border)" }}>
+        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: "#b91c1c", borderColor: "var(--color-border)" }}>
           {COLUMNS.map(column => {
             const filterConfig = headerFilters[column];
             return (
               <div key={column} className="flex min-w-0 items-start border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
-                {filterConfig ? <HeaderFilter label={column} {...filterConfig} /> : <span className="truncate py-1">{column}</span>}
+                {filterConfig ? <HeaderFilter label={column} {...filterConfig} textColor="white" /> : <span className="truncate py-1">{column}</span>}
               </div>
             );
           })}

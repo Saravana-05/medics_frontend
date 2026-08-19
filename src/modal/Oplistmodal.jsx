@@ -66,7 +66,7 @@ function PatientRow({ row, index, onSelect }) {
       onClick={() => onSelect && onSelect(row)}
       className="grid w-full text-left text-xs transition-colors hover:bg-blue-50"
       style={{
-        gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px 100px",
+        gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px minmax(100px, 1fr)",
         background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
       }}
     >
@@ -155,7 +155,7 @@ function ColHeader({ filters }) {
 
   return (
     <div className="relative z-30 grid border-b" style={{
-      gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px 100px",
+      gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px minmax(100px, 1fr)",
       background: "var(--color-primary-dark)",
       borderColor: "var(--color-border)"
     }}>
@@ -233,7 +233,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="list-modal-flat flex w-[min(96vw,925px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
+        className="list-modal-flat flex h-[90vh] w-[min(96vw,1146px)] flex-col overflow-hidden shadow-2xl animate-slide-up"
         style={{
           background: "var(--color-surface)",
         }}
@@ -241,38 +241,21 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         {/* Header */}
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
           <div className="px-5 py-3 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2 whitespace-nowrap">
                 <ClipboardList size={20} />
-                OP Patient List
+                Out Patient List
               </h2>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="relative">
-                <input
-                  value={filter}
-                  onChange={e => setFilter(e.target.value)}
-                  placeholder="Search by name, token, complaint..."
-                  className="px-3 py-1.5 text-sm"
-                  style={{
-                    background: "rgba(255,255,255,0.15)",
-                    border: "1px solid rgba(255,255,255,0.3)",
-                    color: "white",
-                    width: "220px"
-                  }}
-                />
+              <div className="flex items-center gap-2 whitespace-nowrap text-xs">
+                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
+                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
+                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
+                </div>
               </div>
-
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10"
-              >
-                Close
-              </button>
             </div>
+            <button onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10">Close</button>
           </div>
 
           {/* Section Tabs */}
@@ -303,21 +286,14 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 </button>
               );
             })}
-            <div className="ml-4 flex items-center gap-2 whitespace-nowrap text-xs">
+            <div className="relative ml-3 flex items-center">
+              <input value={filter} onChange={e => setFilter(e.target.value)} placeholder="Search by name, token, complaint..." className="w-[210px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
+            </div>
+            <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
               <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
                 <Stethoscope size={12} />
                 <span className="font-semibold">Doctor:</span>
                 <span>{doctor}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
-                <Calendar size={12} />
-                <span className="font-semibold">Date:</span>
-                <span>{date}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
-                <Clock size={12} />
-                <span className="font-semibold">Time:</span>
-                <span>{time}</span>
               </div>
             </div>
           </div>
