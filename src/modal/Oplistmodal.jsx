@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  X, Search, Calendar, Clock, User, FileText, AlertCircle,
-  Users, ParkingCircle, CheckCircle, TrendingUp, Filter,
-  Download, Printer, ChevronDown, ChevronUp, Star, StarOff,
-  Activity, Heart, Stethoscope, Pill, Syringe, ClipboardList,
-  Tag, Phone, Mail, MapPin, CalendarDays, Eye
+  Calendar, Clock, User, FileText, AlertCircle, Users,
+  ParkingCircle, CheckCircle, Filter, ChevronDown, Star,
+  Activity, Stethoscope, ClipboardList, Tag, Eye
 } from "lucide-react";
 
 /* ══════════════════════════════════════════════════════════
@@ -36,58 +34,12 @@ const MOCK_OP_LIST = {
   ],
 };
 
-function PriorityBadge({ priority }) {
-  const getStyle = () => {
-    const p = priority?.toLowerCase() || "";
-    if (p.includes("emergency")) return { bg: "#fee2e2", color: "var(--color-danger)", icon: AlertCircle };
-    if (p.includes("urgent")) return { bg: "#fff7ed", color: "#ea580c", icon: AlertCircle };
-    if (p.includes("important")) return { bg: "#fefce8", color: "#ca8a04", icon: Star };
-    return { bg: "#f0fdf4", color: "#16a34a", icon: CheckCircle };
-  };
-  const style = getStyle();
-  const Icon = style.icon;
-
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6rem] font-bold">
-      <Icon size={10} />
-      {priority}
-    </span>
-  );
-}
-
-function NeedBadge({ need }) {
-  const getStyle = () => {
-    if (need === "Referral") return { bg: "#f3e8ff", color: "#9333ea" };
-    if (need === "Follow-up") return { bg: "#eff6ff", color: "var(--color-value)" };
-    if (need === "New Patient") return { bg: "#ecfdf5", color: "#059669" };
-    return { bg: "#f9fafb", color: "#6b7280" };
-  };
-  const style = getStyle();
-
-  return (
-    <span className="inline-flex px-2 py-0.5 rounded-full text-[0.6rem] font-bold" style={{ background: style.bg, color: style.color }}>
-      {need}
-    </span>
-  );
-}
-
-function StatusBadge({ status }) {
-  const getStyle = () => {
-    if (status.includes("Waiting")) return { bg: "#dbeafe", color: "var(--color-value)", icon: Clock };
-    if (status.includes("Parked")) return { bg: "#fef3c7", color: "#d97706", icon: ParkingCircle };
-    if (status.includes("Treated")) return { bg: "#d1fae5", color: "#059669", icon: CheckCircle };
-    return { bg: "#f3f4f6", color: "#6b7280", icon: FileText };
-  };
-  const style = getStyle();
-  const Icon = style.icon;
-
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.6rem] font-semibold" style={{ background: style.bg, color: style.color }}>
-      <Icon size={10} />
-      {status}
-    </span>
-  );
-}
+const ALL_OP_ROWS = Object.values(MOCK_OP_LIST).flat();
+const OP_FILTER_OPTIONS = {
+  status: [...new Set(ALL_OP_ROWS.map(row => row.status))],
+  complaint: [...new Set(ALL_OP_ROWS.map(row => row.complaint))],
+  priority: [...new Set(ALL_OP_ROWS.map(row => row.priority))],
+};
 
 function HighlightedToken({ token }) {
   const markerStyles = {
@@ -106,7 +58,7 @@ function HighlightedToken({ token }) {
   });
 }
 
-function PatientRow({ row, index, onSelect, section }) {
+function PatientRow({ row, index, onSelect }) {
   const values = [row.token, row.sched, row.status, row.docNo || "—", row.name, row.complaint, row.priority, row.need];
   return (
     <button
@@ -114,7 +66,7 @@ function PatientRow({ row, index, onSelect, section }) {
       onClick={() => onSelect && onSelect(row)}
       className="grid w-full text-left text-xs transition-colors hover:bg-blue-50"
       style={{
-        gridTemplateColumns: "70px 70px 140px 65px 1fr 1fr 100px 100px",
+        gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px 100px",
         background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
       }}
     >
@@ -127,10 +79,10 @@ function PatientRow({ row, index, onSelect, section }) {
   );
 }
 
-function SectionHeader({ label, count, color, icon: Icon, note }) {
+function SectionHeader({ label, count, color }) {
   return (
     <div className="sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2" style={{ background: color, borderColor: "var(--color-border)" }}>
-      <span className="text-xs font-extrabold uppercase tracking-wide">{label}</span>
+      <span className="text-xs font-extrabold tracking-wide">{label}</span>
       <span className="bg-black/10 px-1.5 py-0.5 text-[0.6rem] font-bold">{count}</span>
     </div>
   );
@@ -145,7 +97,51 @@ function EmptyState({ message, icon: Icon }) {
   );
 }
 
-function ColHeader() {
+function OPHeaderFilter({ label, value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  const filterRef = useRef(null);
+  const allSelected = value.length === options.length;
+
+  useEffect(() => {
+    const closeOnOutsideClick = event => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, []);
+
+  const toggleOption = option => {
+    onChange(value.includes(option) ? value.filter(item => item !== option) : [...value, option]);
+  };
+
+  return (
+    <div ref={filterRef} className="relative flex min-w-0 flex-1 flex-col gap-1">
+      <span className="truncate text-[11.25px] font-bold tracking-wide text-white">{label}</span>
+      <button type="button" onClick={() => setOpen(current => !current)} className="flex min-w-0 items-center gap-1 border-b border-white/50 px-0.5 py-0.5 text-left text-[0.65rem] font-normal text-white/70 hover:text-white" aria-label={`Filter by ${label}`} aria-expanded={open}>
+        <Filter size={10} className={value.length ? "text-cyan-300" : "text-white/50"} />
+        <span className="min-w-0 flex-1 truncate">{value.length ? `${value.length} selected` : "Filter by..."}</span>
+        <ChevronDown size={10} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 min-w-[190px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
+          <label className="flex cursor-pointer items-center gap-2 border-b border-slate-200 px-1 py-1.5 text-xs font-semibold">
+            <input type="checkbox" checked={allSelected} onChange={() => onChange(allSelected ? [] : [...options])} className="h-3.5 w-3.5 accent-blue-600" />
+            <span>Select All</span>
+          </label>
+          {options.map(option => (
+            <label key={option} className="flex cursor-pointer items-center gap-2 px-1 py-1.5 text-xs font-normal hover:bg-blue-50">
+              <input type="checkbox" checked={value.includes(option)} onChange={() => toggleOption(option)} className="h-3.5 w-3.5 flex-shrink-0 accent-blue-600" />
+              <span className="whitespace-nowrap">{option}</span>
+            </label>
+          ))}
+          {value.length > 0 && <button type="button" onClick={() => onChange([])} className="mt-1 w-full border-t border-slate-200 px-1 pt-2 text-left text-xs font-semibold text-blue-700 hover:text-blue-900">Clear filter</button>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ColHeader({ filters }) {
   const columns = [
     { label: "Token", icon: Tag, width: 70 },
     { label: "Time", icon: Clock, width: 70 },
@@ -158,25 +154,31 @@ function ColHeader() {
   ];
 
   return (
-    <div className="sticky top-0 z-10 grid border-b" style={{
-      gridTemplateColumns: "70px 70px 140px 65px 1fr 1fr 100px 100px",
+    <div className="relative z-30 grid border-b" style={{
+      gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px 100px",
       background: "var(--color-primary-dark)",
       borderColor: "var(--color-border)"
     }}>
-      {columns.map(col => (
-        <div key={col.label} className="px-3 py-2 flex items-center gap-1">
-          {col.icon && <col.icon size={10} style={{ color: "rgba(255,255,255,0.7)" }} />}
-          <span className="text-[0.6rem] font-bold uppercase tracking-wide text-white">
-            {col.label}
-          </span>
-        </div>
-      ))}
+      {columns.map(col => {
+        const filterConfig = filters[col.label];
+        return (
+          <div key={col.label} className="flex min-w-0 items-start gap-1 px-2 py-1.5">
+            {filterConfig ? <OPHeaderFilter label={col.label} {...filterConfig} /> : <>
+              {col.icon && <col.icon size={10} className="mt-1" style={{ color: "rgba(255,255,255,0.7)" }} />}
+              <span className="truncate py-0.5 text-[11.25px] font-bold tracking-wide text-white">{col.label}</span>
+            </>}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00" }) {
   const [filter, setFilter] = useState("");
+  const [statusFilters, setStatusFilters] = useState([]);
+  const [complaintFilters, setComplaintFilters] = useState([]);
+  const [priorityFilters, setPriorityFilters] = useState([]);
   const [activeSection, setActiveSection] = useState("all");
   const [hoveredSection, setHoveredSection] = useState(null);
 
@@ -186,12 +188,28 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
       r.name.toLowerCase().includes(filter.toLowerCase()) ||
       r.complaint.toLowerCase().includes(filter.toLowerCase()) ||
       r.token.toLowerCase().includes(filter.toLowerCase())
+    ).filter(r =>
+      (!statusFilters.length || statusFilters.includes(r.status)) &&
+      (!complaintFilters.length || complaintFilters.includes(r.complaint)) &&
+      (!priorityFilters.length || priorityFilters.includes(r.priority))
     );
   };
 
-  const apt = applyFilter(MOCK_OP_LIST.appointment);
-  const pkd = applyFilter(MOCK_OP_LIST.parked);
-  const trtd = applyFilter(MOCK_OP_LIST.treated);
+  const applyHeaderFilters = rows => rows.filter(r =>
+    (!statusFilters.length || statusFilters.includes(r.status)) &&
+    (!complaintFilters.length || complaintFilters.includes(r.complaint)) &&
+    (!priorityFilters.length || priorityFilters.includes(r.priority))
+  );
+
+  const apt = filter.trim() ? applyFilter(MOCK_OP_LIST.appointment) : applyHeaderFilters(MOCK_OP_LIST.appointment);
+  const pkd = filter.trim() ? applyFilter(MOCK_OP_LIST.parked) : applyHeaderFilters(MOCK_OP_LIST.parked);
+  const trtd = filter.trim() ? applyFilter(MOCK_OP_LIST.treated) : applyHeaderFilters(MOCK_OP_LIST.treated);
+
+  const headerFilters = {
+    Status: { value: statusFilters, options: OP_FILTER_OPTIONS.status, onChange: setStatusFilters },
+    Complaint: { value: complaintFilters, options: OP_FILTER_OPTIONS.complaint, onChange: setComplaintFilters },
+    Priority: { value: priorityFilters, options: OP_FILTER_OPTIONS.priority, onChange: setPriorityFilters },
+  };
 
   const handleSelect = (row) => {
     onSelectPatient && onSelectPatient(row);
@@ -215,7 +233,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="list-modal-flat flex w-[min(96vw,1400px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
+        className="list-modal-flat flex w-[min(96vw,1100px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
         style={{
           background: "var(--color-surface)",
         }}
@@ -306,7 +324,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         </div>
 
         {/* Table Header */}
-        <ColHeader />
+        <ColHeader filters={headerFilters} />
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">

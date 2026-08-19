@@ -7,9 +7,6 @@ export default function Dashboard({ onLogout }) {
     <main className="em-main-menu">
       <header className="em-title-bar">
         <span className="em-title">E-Medics</span>
-        <div className="em-window-controls" aria-hidden="true">
-          <span>−</span><span>□</span><span>×</span>
-        </div>
       </header>
 
       <DesktopMenuBar onLogout={onLogout} />

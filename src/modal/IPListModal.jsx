@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Bed, Calendar, CheckCircle, Clock, Eye, LogOut, ParkingCircle, Stethoscope, Users } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Stethoscope, Users } from "lucide-react";
 import DataTable from "react-data-table-component";
 
 const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
@@ -51,7 +51,7 @@ const IP_SECTIONS = [
   },
 ];
 
-const GRID_COLUMNS = "92px 74px 145px 145px minmax(150px,1fr) minmax(165px,1fr) 90px 110px 110px";
+const GRID_COLUMNS = "92px 74px 145px 145px 180px 200px 90px 110px 110px";
 
 const FILTER_OPTIONS = {
   ward: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[0])))],
@@ -77,24 +77,57 @@ function HighlightedRoom({ room }) {
   });
 }
 
-function FilterSelect({ label, value, options, onChange }) {
+function HeaderFilter({ label, value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  const filterRef = useRef(null);
+  const allSelected = value.length === options.length;
+
+  useEffect(() => {
+    const closeOnOutsideClick = event => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, []);
+
+  const toggleOption = option => {
+    onChange(value.includes(option) ? value.filter(item => item !== option) : [...value, option]);
+  };
+
   return (
-    <label className="flex items-center gap-1.5 text-xs font-bold">
-      <span>{label}</span>
-      <select value={value} onChange={event => onChange(event.target.value)} className="border px-2 py-1 text-xs font-normal outline-none" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-        <option value="All">All</option>
-        {options.map(option => <option key={option} value={option}>{option}</option>)}
-      </select>
-    </label>
+    <div ref={filterRef} className="relative flex min-w-0 flex-1 flex-col gap-1">
+      <span className="truncate">{label}</span>
+      <button type="button" onClick={() => setOpen(current => !current)} className="flex min-w-0 items-center gap-1 border-b border-white/50 px-0.5 py-0.5 text-left text-[0.65rem] font-normal text-white/70 hover:text-white" aria-label={`Filter by ${label}`} aria-expanded={open}>
+        <Funnel size={10} className={value.length ? "text-cyan-300" : "text-white/50"} />
+        <span className="min-w-0 flex-1 truncate">{value.length ? `${value.length} selected` : "Filter by..."}</span>
+        <ChevronDown size={10} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 min-w-[190px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
+          <label className="flex cursor-pointer items-center gap-2 border-b border-slate-200 px-1 py-1.5 text-xs font-semibold">
+            <input type="checkbox" checked={allSelected} onChange={() => onChange(allSelected ? [] : [...options])} className="h-3.5 w-3.5 accent-blue-600" />
+            <span>Select All</span>
+          </label>
+          {options.map(option => (
+            <label key={option} className="flex cursor-pointer items-center gap-2 px-1 py-1.5 text-xs font-normal hover:bg-blue-50">
+              <input type="checkbox" checked={value.includes(option)} onChange={() => toggleOption(option)} className="h-3.5 w-3.5 flex-shrink-0 accent-blue-600" />
+              <span className="whitespace-nowrap">{option}</span>
+            </label>
+          ))}
+          {value.length > 0 && <button type="button" onClick={() => onChange([])} className="mt-1 w-full border-t border-slate-200 px-1 pt-2 text-left text-xs font-semibold text-blue-700 hover:text-blue-900">Clear filter</button>}
+        </div>
+      )}
+    </div>
   );
 }
 
 export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03-02-2024", time = "10:00" }) {
   const [filter, setFilter] = useState("");
-  const [ward, setWard] = useState("All");
-  const [complaint, setComplaint] = useState("All");
-  const [priority, setPriority] = useState("All");
-  const [dutyDoctor, setDutyDoctor] = useState("All");
+  const [wardFilters, setWardFilters] = useState([]);
+  const [complaintFilters, setComplaintFilters] = useState([]);
+  const [priorityFilters, setPriorityFilters] = useState([]);
+  const [dutyDoctorFilters, setDutyDoctorFilters] = useState([]);
   const [activeSection, setActiveSection] = useState("all");
   const [hoveredSection, setHoveredSection] = useState(null);
   const normalizedFilter = filter.trim().toLowerCase();
@@ -104,13 +137,13 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     rows: section.rows
       .map((row, rowIndex) => [...row, DUTY_NURSES[(sectionIndex + rowIndex) % DUTY_NURSES.length]])
       .filter(row =>
-        (ward === "All" || row[0] === ward) &&
-        (complaint === "All" || row[5] === complaint) &&
-        (priority === "All" || row[6] === priority) &&
-        (dutyDoctor === "All" || row[7] === dutyDoctor) &&
+        (!wardFilters.length || wardFilters.includes(row[0])) &&
+        (!complaintFilters.length || complaintFilters.includes(row[5])) &&
+        (!priorityFilters.length || priorityFilters.includes(row[6])) &&
+        (!dutyDoctorFilters.length || dutyDoctorFilters.includes(row[7])) &&
         (!normalizedFilter || row.some(value => value.toLowerCase().includes(normalizedFilter)))
       ),
-  })), [complaint, dutyDoctor, normalizedFilter, priority, ward]);
+  })), [complaintFilters, dutyDoctorFilters, normalizedFilter, priorityFilters, wardFilters]);
 
   const handleSelect = row => {
     onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8] });
@@ -133,15 +166,13 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   const visibleSections = activeSection === "all"
     ? sections
     : sections.filter(section => section.key === activeSection);
-  const totalPatients = sections.reduce((total, section) => total + section.rows.length, 0);
-
   const tableColumns = [
     { name: "Ward", selector: row => row[0], width: "92px" },
     { name: "Room#", selector: row => row[1], cell: row => <HighlightedRoom room={row[1]} />, width: "74px" },
     { name: "Patient's Doctor", selector: row => row[2], width: "145px" },
     { name: "Queue Status", selector: row => row[3], width: "145px" },
-    { name: "Patient Name", selector: row => row[4], minWidth: "150px", grow: 1 },
-    { name: "Chief Complaint", selector: row => row[5], minWidth: "165px", grow: 1 },
+    { name: "Patient Name", selector: row => row[4], width: "180px" },
+    { name: "Chief Complaint", selector: row => row[5], width: "200px" },
     { name: "Priority", selector: row => row[6], width: "90px" },
     { name: "Duty Doctor", selector: row => row[7], width: "110px" },
     { name: "Duty Nurse", selector: row => row[8], width: "110px" },
@@ -171,9 +202,16 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     },
   };
 
+  const headerFilters = {
+    Ward: { value: wardFilters, options: FILTER_OPTIONS.ward, onChange: setWardFilters },
+    "Chief Complaint": { value: complaintFilters, options: FILTER_OPTIONS.complaint, onChange: setComplaintFilters },
+    Priority: { value: priorityFilters, options: FILTER_OPTIONS.priority, onChange: setPriorityFilters },
+    "Duty Doctor": { value: dutyDoctorFilters, options: FILTER_OPTIONS.dutyDoctor, onChange: setDutyDoctorFilters },
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-      <div className="list-modal-flat flex w-[min(96vw,1400px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
+      <div className="list-modal-flat flex w-[min(96vw,1200px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
             <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Bed size={20} />IP Patient List</h2>
@@ -219,23 +257,22 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           </div>
         </div>
 
-        <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
-          <FilterSelect label="Ward" value={ward} options={FILTER_OPTIONS.ward} onChange={setWard} />
-          <FilterSelect label="Chief Complaint" value={complaint} options={FILTER_OPTIONS.complaint} onChange={setComplaint} />
-          <FilterSelect label="Priority" value={priority} options={FILTER_OPTIONS.priority} onChange={setPriority} />
-          <FilterSelect label="Duty Doctor" value={dutyDoctor} options={FILTER_OPTIONS.dutyDoctor} onChange={setDutyDoctor} />
-          <span className="ml-auto text-xs" style={{ color: "var(--color-text-muted)" }}>{totalPatients} patients</span>
-        </div>
-
-        <div className="grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: "var(--color-primary-dark)", borderColor: "var(--color-border)" }}>
-          {COLUMNS.map(column => <div key={column} className="border-r px-3 py-2 last:border-r-0" style={{ borderColor: "rgba(255,255,255,0.12)" }}>{column}</div>)}
+        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: "var(--color-primary-dark)", borderColor: "var(--color-border)" }}>
+          {COLUMNS.map(column => {
+            const filterConfig = headerFilters[column];
+            return (
+              <div key={column} className="flex min-w-0 items-start border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+                {filterConfig ? <HeaderFilter label={column} {...filterConfig} /> : <span className="truncate py-1">{column}</span>}
+              </div>
+            );
+          })}
         </div>
 
         <div className="min-h-0 flex-1 overflow-auto">
           {visibleSections.map(section => (
             <div key={section.key}>
               <div className="sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2" style={{ background: section.color, borderColor: "var(--color-border)" }}>
-                <span className="text-xs font-extrabold uppercase tracking-wide">{section.label}</span>
+                <span className="text-xs font-extrabold tracking-wide">{section.label}</span>
                 <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[0.6rem] font-bold">{section.rows.length}</span>
               </div>
               <DataTable
