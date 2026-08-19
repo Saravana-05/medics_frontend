@@ -233,7 +233,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="list-modal-flat flex w-[min(96vw,1100px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
+        className="list-modal-flat flex w-[min(96vw,925px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up"
         style={{
           background: "var(--color-surface)",
         }}
@@ -286,7 +286,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                   onClick={() => setActiveSection(section.key)}
                   onMouseEnter={() => setHoveredSection(section.key)}
                   onMouseLeave={() => setHoveredSection(null)}
-                  className="relative flex w-36 items-center justify-center text-xs font-bold transition-all"
+                  className="relative flex w-32 items-center justify-center text-xs font-bold transition-all"
                   style={{
                     marginLeft: index === 0 ? 0 : -slant,
                     zIndex: activeSection === section.key ? sections.length + 1 : sections.length - index,

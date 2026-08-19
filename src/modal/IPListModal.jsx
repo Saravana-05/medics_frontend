@@ -211,7 +211,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-      <div className="list-modal-flat flex w-[min(96vw,1200px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
+      <div className="list-modal-flat flex w-[min(96vw,1146px)] max-h-[90vh] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
             <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Bed size={20} />IP Patient List</h2>
