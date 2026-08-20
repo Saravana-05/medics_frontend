@@ -280,7 +280,7 @@ export default function OPDeskScreen({ user, onLogout }) {
       </div>
       <Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />
       {/* ── Main workspace with responsive split ── */}
-      <div className="flex-1 flex gap-2 min-h-0 relative pl-1 pr-2" style={{ background: "var(--color-surface-alt)" }}>
+      <div className="flex-1 flex gap-[5px] min-h-0 relative px-1" style={{ background: "var(--color-surface-alt)" }}>
         <>
             {/* Left Section - Prescription Tabs + Active Tab Content */}
             <div
@@ -295,7 +295,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 // Desktop: flex-[7]'s flex-basis:0% would silently ignore the
                 // width the alignment effect sets below, so it's swapped for
                 // flex-none — a plain px width — once !isTabletView.
-                ...(isTabletView ? {} : { width: "58%" }),
+                ...(isTabletView ? {} : { width: 0, flex: "52 1 0%" }),
               }}
             >
               {/* Tabs + toolbar share one row — tab buttons on the left, action
@@ -384,7 +384,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {activeConfig?.sidePanel && !isTabletView && (
               <div
                 className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] shadow-sm"
-                style={{ width: "27.5%", minWidth: "420px", marginRight: "2px", background: "#ffffff", border: "1px solid var(--color-border)" }}
+                style={{ width: 0, minWidth: 0, flex: "25 1 0%", background: "#ffffff", border: "1px solid var(--color-border)" }}
               >
                 <PrescriptionSidePanel
                   config={activeConfig}
@@ -415,12 +415,13 @@ export default function OPDeskScreen({ user, onLogout }) {
                   ? isRightPanelExpanded
                     ? 'flex-[5] w-auto'
                     : 'w-0 overflow-hidden border-none shadow-none'
-                  : 'w-[445px] flex-none'
+                  : 'min-w-0'
               }`}
               style={{
                 background: "#ffffff",
                 border: isTabletView && !isRightPanelExpanded ? "none" : "1px solid var(--color-border)",
-                marginLeft: isTabletView ? undefined : "-4px",
+                marginLeft: 0,
+                ...(isTabletView ? {} : { width: 0, flex: "23 1 0%" }),
               }}
             >
               <PreviousVisitsTable visits={visits} patient={selectedPatient} currentRecord={{ drugs, labs, services, ipEntries, carePlanItems }} />

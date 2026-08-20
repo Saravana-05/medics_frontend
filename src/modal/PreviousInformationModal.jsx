@@ -89,7 +89,7 @@ function DrugGroupPrescription() {
 
 function DrugTabLayout({ rows }) {
   return (
-    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pb-1">
+    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="min-h-0 flex-1 overflow-auto">
           <Drugs rows={rows} />
@@ -106,7 +106,7 @@ function LabTestTabLayout({ rows }) {
   const reportRows = tests.map(test => ({ ...labTestDetails[test.name], ...test }));
 
   return (
-    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pb-1">
+    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[var(--color-lab-light)] text-center text-[11px] font-bold text-slate-900">
           <span>No.</span><span>Test Name</span>
@@ -136,7 +136,7 @@ function ServiceTabLayout({ rows }) {
   const rightFillerCount = Math.max(0, 10 - serviceFiles.length);
 
   return (
-    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pb-1">
+    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[var(--color-services-light)] text-center text-[11px] font-bold text-slate-900">
           <span>No.</span><span>Service Name</span>
@@ -165,7 +165,7 @@ function CarePlanTabLayout({ rows }) {
   const leftFillerCount = Math.max(0, 10 - activities.length);
   const rightFillerCount = Math.max(0, 10 - carePlanTemplates.length);
   return (
-    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pb-1">
+    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 grid-cols-[52px_120px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[var(--color-primary-muted)] text-center text-[11px] font-bold text-slate-900"><span>No.</span><span>Milestone</span><span>Pathway Name</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -189,7 +189,7 @@ function IpTimelineTabLayout({ rows }) {
   const fillerCount = Math.max(0, 10 - entries.length);
   const subjectFor = item => item.display?.primaryLine || item.name || item.subject || "—";
   return (
-    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pb-1">
+    <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 grid-cols-[32px_82px_70px_72px_minmax(90px,1fr)_minmax(90px,1fr)] items-center border-b border-slate-300 bg-[#fff1e1] text-center text-[10px] font-bold text-slate-900"><span>No.</span><span>Medic</span><span>Time</span><span>Entry Type</span><span>Subject</span><span>Notes</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -297,7 +297,7 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
           </div>
         </section>
 
-        <nav className={`grid h-12 shrink-0 ${hasRightPanel ? "grid-cols-[minmax(0,58fr)_minmax(0,42fr)] gap-2 bg-slate-100 px-1 pt-1" : "grid-cols-1 border-b border-slate-300 bg-white"}`}>
+        <nav className={`grid h-12 shrink-0 ${hasRightPanel ? "grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pt-1" : "grid-cols-1 border-b border-slate-300 bg-white"}`}>
           <div className={`flex min-w-0 overflow-hidden ${hasRightPanel ? "border border-slate-300 bg-white pl-2" : "pl-2"}`}>
             <PrescriptionTabs activeTab={activeTab} setActiveTab={setActiveTab} compact />
           </div>
