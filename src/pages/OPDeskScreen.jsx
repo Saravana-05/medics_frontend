@@ -295,7 +295,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 // Desktop: flex-[7]'s flex-basis:0% would silently ignore the
                 // width the alignment effect sets below, so it's swapped for
                 // flex-none — a plain px width — once !isTabletView.
-                ...(isTabletView ? {} : { width: 0, flex: "52 1 0%" }),
+                ...(isTabletView ? {} : { width: 0, flex: "49 1 0%" }),
               }}
             >
               {/* Tabs + toolbar share one row — tab buttons on the left, action
@@ -384,7 +384,7 @@ export default function OPDeskScreen({ user, onLogout }) {
             {activeConfig?.sidePanel && !isTabletView && (
               <div
                 className="flex-shrink-0 overflow-hidden mt-[8px] mb-[8px] shadow-sm"
-                style={{ width: 0, minWidth: 0, flex: "25 1 0%", background: "#ffffff", border: "1px solid var(--color-border)" }}
+                style={{ width: 0, minWidth: 0, flex: "27.5 1 0%", background: "#ffffff", border: "1px solid var(--color-border)" }}
               >
                 <PrescriptionSidePanel
                   config={activeConfig}
@@ -421,7 +421,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 background: "#ffffff",
                 border: isTabletView && !isRightPanelExpanded ? "none" : "1px solid var(--color-border)",
                 marginLeft: 0,
-                ...(isTabletView ? {} : { width: 0, flex: "23 1 0%" }),
+                ...(isTabletView ? {} : { width: 0, flex: "23.5 1 0%" }),
               }}
             >
               <PreviousVisitsTable visits={visits} patient={selectedPatient} currentRecord={{ drugs, labs, services, ipEntries, carePlanItems }} />
