@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { 
-  Pill, FlaskConical, Settings, FileSearch, 
-  ChevronUp, ChevronDown, Copy, Check, BookOpen, Printer, Eye, Ban, ParkingCircle,
-  ActivitySquare, Thermometer, Heart, Wind, Ruler, Weight, Calculator, Droplet,
-  Stethoscope, Baby, ArrowRightLeft, Clipboard
+import {
+  Pill, FlaskConical, Settings, FileSearch,
+  ChevronUp, ChevronDown, Copy, Check, Printer, Eye,
+  ActivitySquare, Thermometer, Heart, Wind, ClipboardList
 } from "lucide-react";
 
 const PRESCRIPTION_TABS = [
   { key: "drugs", label: "Drugs", icon: Pill, color: "var(--color-drugs)" },
-  { key: "lab", label: "Lab", icon: FlaskConical, color: "var(--color-lab)" },
-  { key: "services", label: "Services", icon: Settings, color: "var(--color-services)" },
-  { key: "findings", label: "Findings", icon: FileSearch, color: "var(--color-info)" },
+  { key: "lab", label: "Lab-Test", icon: FlaskConical, color: "var(--color-lab)" },
+  { key: "services", label: "Service", icon: Settings, color: "var(--color-services)" },
+  { key: "findings", label: "Care-Plan", icon: FileSearch, color: "var(--color-info)" },
+  { key: "timeline", label: "IP Timeline", icon: ClipboardList, color: "#d97706" },
 ];
 
 // Function to calculate dosage schedule based on period

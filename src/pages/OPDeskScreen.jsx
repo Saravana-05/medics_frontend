@@ -112,8 +112,9 @@ export default function OPDeskScreen({ user, onLogout }) {
   }, []);
 
   const selectPatient = (p) => {
-    setSelectedPatient(p);
-    const record = p ? getPatientRecord(p.id) : null;
+    const resolvedPatient = p?.patientId ? patients.find(patient => patient.id === p.patientId) || p : p;
+    setSelectedPatient(resolvedPatient);
+    const record = resolvedPatient ? getPatientRecord(resolvedPatient.id) : null;
     setDrugs(record?.drugs || []);
     setLabs(record?.labs || []);
     setServices(record?.services || []);
@@ -422,7 +423,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 marginLeft: isTabletView ? undefined : "-4px",
               }}
             >
-              <PreviousVisitsTable visits={visits} />
+              <PreviousVisitsTable visits={visits} patient={selectedPatient} currentRecord={{ drugs, labs, services, ipEntries, carePlanItems }} />
             </div>
         </>
       </div>

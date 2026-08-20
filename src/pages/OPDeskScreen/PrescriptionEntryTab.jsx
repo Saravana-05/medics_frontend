@@ -85,7 +85,7 @@ function ActionButton({ onClick, label, bg, hoverBg, textColor = "white" }) {
   return (
     <button onClick={onClick}
       className="inline-flex items-center justify-center px-3.5 text-[0.72rem] font-semibold transition-all duration-150 cursor-pointer leading-none"
-      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box" }}
+      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)" }}
       onMouseEnter={e => e.currentTarget.style.background = hoverBg}
       onMouseLeave={e => e.currentTarget.style.background = bg}>
       {label}

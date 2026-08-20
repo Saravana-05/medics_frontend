@@ -16,7 +16,7 @@ const GRAY_DARK = "#6b7280";
 // not a pointed chevron.
 const SLANT = 16;
 
-export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) {
+export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, compact = false }) {
   const [hoveredKey, setHoveredKey] = useState(null);
 
   return (
@@ -47,8 +47,8 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount }) 
             onMouseLeave={() => setHoveredKey(null)}
             className={`relative flex items-center justify-center gap-1 font-bold text-md transition-all duration-200 ${isLast ? "px-5" : ""}`}
             style={{
-              width: isLast ? "auto" : 132,
-              minWidth: isLast ? 128 : undefined,
+              width: isLast ? "auto" : compact ? 116 : 132,
+              minWidth: isLast ? (compact ? 112 : 128) : undefined,
               flexShrink: 0,
               marginLeft: isFirst ? 0 : -SLANT,
               zIndex: isActive ? PRESCRIPTION_TABS.length + 1 : PRESCRIPTION_TABS.length - i,

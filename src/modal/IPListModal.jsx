@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Stethoscope, Users } from "lucide-react";
 import DataTable from "react-data-table-component";
+import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
 
 const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
 const DUTY_NURSES = ["Niveditha", "Soundarya", "Rajalakshmi"];
@@ -122,7 +123,7 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
   );
 }
 
-export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03-02-2024", time = "10:00" }) {
+export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00" }) {
   const [filter, setFilter] = useState("");
   const [wardFilters, setWardFilters] = useState([]);
   const [complaintFilters, setComplaintFilters] = useState([]);
@@ -215,12 +216,12 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           <div className="flex items-center justify-between gap-4 px-5 py-3">
             <div className="flex items-center gap-4">
               <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold text-white"><Bed size={20} />In Patient List</h2>
-              <div className="flex items-center gap-2 whitespace-nowrap text-xs">
-                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
-                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
+              <div className="flex items-center whitespace-nowrap text-xs">
+                <div className="flex items-center gap-1.5 pr-4" style={{ color: "#fef3c7" }}>
+                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{String(date).trim().split(/\s+/)[0].replaceAll("-", "/")}</span>
                 </div>
-                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
-                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
+                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4" style={{ color: "#f3e8ff" }}>
+                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{formatTimeWithPeriod(time)}</span>
                 </div>
               </div>
             </div>
@@ -251,7 +252,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
               <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[205px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
             </div>
             <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
+              <div className="flex items-center gap-1.5" style={{ color: "#dbeafe" }}>
                 <Stethoscope size={12} /><span className="font-semibold">Doctor:</span><span>{doctor}</span>
               </div>
             </div>

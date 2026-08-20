@@ -4,20 +4,21 @@ import {
   ParkingCircle, CheckCircle, Filter, ChevronDown, Star,
   Activity, Stethoscope, ClipboardList, Tag, Eye
 } from "lucide-react";
+import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
 
 /* ══════════════════════════════════════════════════════════
    MOCK DATA (replace with real API / props)
 ══════════════════════════════════════════════════════════ */
 const MOCK_OP_LIST = {
   appointment: [
-    { token: "B1-9*",  sched: "10:05", status: "OP-Waiting",     docNo: "",     name: "Raveendran. K",      complaint: "Fever, Headache",     priority: "Normal",      need: "New Need", age: 45, gender: "M" },
-    { token: "B1-10",  sched: "10:10", status: "OP-Waiting",     docNo: "",     name: "Nandhini. A",        complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 32, gender: "F" },
-    { token: "B2-12",  sched: "10:35", status: "OP-Waiting",     docNo: "",     name: "Anjali (Baby). L",   complaint: "Fever, Cold, Cry",    priority: "Normal",      need: "New Need", age: 2, gender: "F" },
-    { token: "B2-13",  sched: "10:40", status: "OP-Appointment", docNo: "",     name: "Vignesh (Infant). R",complaint: "Injury Arm, Leg",     priority: "Urgent (OS)", need: "New Patient", age: 1, gender: "M" },
-    { token: "B2-14#", sched: "10:45", status: "OP-Appointment", docNo: "",     name: "Ramakrishnan. K.R",  complaint: "Allergy, Rashes",     priority: "Normal",      need: "New Need", age: 58, gender: "M" },
-    { token: "B2-15",  sched: "10:50", status: "OP-Appointment", docNo: "",     name: "Shankar. S",         complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 42, gender: "M" },
-    { token: "B2-16",  sched: "10:55", status: "OP-Appointment", docNo: "",     name: "Sivakumar. T",       complaint: "Bruise Leg, Arm",     priority: "Normal",      need: "Follow-up", age: 39, gender: "M" },
-    { token: "B2-17*", sched: "11:00", status: "OP-Waiting",     docNo: "",     name: "Radhika. P",         complaint: "High Fever, Cold",    priority: "Normal (OS)", need: "New Need", age: 28, gender: "F" },
+    { patientId: "PID-1042", token: "B1-9*",  sched: "10:05", status: "OP-Waiting",     docNo: "",     name: "Raveendran. K",      complaint: "Fever, Headache",     priority: "Normal",      need: "New Need", age: 45, gender: "M" },
+    { patientId: "PID-2187", token: "B1-10",  sched: "10:10", status: "OP-Waiting",     docNo: "",     name: "Nandhini. A",        complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 32, gender: "F" },
+    { patientId: "PID-3301", token: "B2-12",  sched: "10:35", status: "OP-Waiting",     docNo: "",     name: "Anjali (Baby). L",   complaint: "Fever, Cold, Cry",    priority: "Normal",      need: "New Need", age: 2, gender: "F" },
+    { patientId: "PID-4456", token: "B2-13",  sched: "10:40", status: "OP-Appointment", docNo: "",     name: "Vignesh (Infant). R",complaint: "Injury Arm, Leg",     priority: "Urgent (OS)", need: "New Patient", age: 1, gender: "M" },
+    { patientId: "PID-5567", token: "B2-14#", sched: "10:45", status: "OP-Appointment", docNo: "",     name: "Ramakrishnan. K.R",  complaint: "Allergy, Rashes",     priority: "Normal",      need: "New Need", age: 58, gender: "M" },
+    { patientId: "PID-6678", token: "B2-15",  sched: "10:50", status: "OP-Appointment", docNo: "",     name: "Shankar. S",         complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 42, gender: "M" },
+    { patientId: "PID-7789", token: "B2-16",  sched: "10:55", status: "OP-Appointment", docNo: "",     name: "Sivakumar. T",       complaint: "Bruise Leg, Arm",     priority: "Normal",      need: "Follow-up", age: 39, gender: "M" },
+    { patientId: "PID-8890", token: "B2-17*", sched: "11:00", status: "OP-Waiting",     docNo: "",     name: "Radhika. P",         complaint: "High Fever, Cold",    priority: "Normal (OS)", need: "New Need", age: 28, gender: "F" },
   ],
   parked: [
     { token: "B1-2",    sched: "9:35", status: "OP-Parked",          docNo: "3898", name: "Vidhya Vimal",      complaint: "High Fever",          priority: "Normal",      need: "New Need", age: 35, gender: "F" },
@@ -72,7 +73,11 @@ function PatientRow({ row, index, onSelect }) {
     >
       {values.map((value, cellIndex) => (
         <span key={cellIndex} className="truncate border-b border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "var(--color-border)" }} title={String(value)}>
-          {cellIndex === 0 ? <HighlightedToken token={String(value)} /> : value}
+          {cellIndex === 0
+            ? <HighlightedToken token={String(value)} />
+            : cellIndex === 1
+              ? formatTimeWithPeriod(value)
+              : value}
         </span>
       ))}
     </button>
@@ -246,12 +251,12 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 <ClipboardList size={20} />
                 Out Patient List
               </h2>
-              <div className="flex items-center gap-2 whitespace-nowrap text-xs">
-                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(254,243,199,0.18)", color: "#fef3c7" }}>
-                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{date}</span>
+              <div className="flex items-center whitespace-nowrap text-xs">
+                <div className="flex items-center gap-1.5 pr-4" style={{ color: "#fef3c7" }}>
+                  <Calendar size={12} /><span className="font-semibold">Date:</span><span>{String(date).trim().split(/\s+/)[0]}</span>
                 </div>
-                <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(243,232,255,0.18)", color: "#f3e8ff" }}>
-                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{time}</span>
+                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4" style={{ color: "#f3e8ff" }}>
+                  <Clock size={12} /><span className="font-semibold">Time:</span><span>{formatTimeWithPeriod(time)}</span>
                 </div>
               </div>
             </div>
@@ -290,7 +295,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
               <input value={filter} onChange={e => setFilter(e.target.value)} placeholder="Search by name, token, complaint..." className="w-[210px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
             </div>
             <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
-              <div className="flex items-center gap-1.5 rounded px-2 py-1" style={{ background: "rgba(219,234,254,0.18)", color: "#dbeafe" }}>
+              <div className="flex items-center gap-1.5" style={{ color: "#dbeafe" }}>
                 <Stethoscope size={12} />
                 <span className="font-semibold">Doctor:</span>
                 <span>{doctor}</span>

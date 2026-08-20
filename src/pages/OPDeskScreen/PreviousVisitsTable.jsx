@@ -4,7 +4,7 @@ import {
   ChevronDown, ChevronUp, History,
   ArrowRight, Eye, Filter, Search, Settings, ListFilter 
 } from "lucide-react";
-import PrescriptionViewModal from "../../modal/PrescriptionViewModal";
+import PreviousInformationModal from "../../modal/PreviousInformationModal";
 import useFillRowCount from "../../hooks/useFillRowCount";
 import DataTable from "react-data-table-component";
 import { ArrowUpDown } from "lucide-react";
@@ -124,7 +124,7 @@ function PreviousInfoDataTable({ columns, rows, fillRowCount, selectedRowSl, onO
   </div>;
 }
 
-export default function PreviousVisitsTable({ visits = [] }) {
+export default function PreviousVisitsTable({ visits = [], patient = null, currentRecord = {} }) {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterText, setFilterText] = useState("");
@@ -610,9 +610,17 @@ export default function PreviousVisitsTable({ visits = [] }) {
 
       {/* Prescription View Modal */}
       {selectedVisit && (
-        <PrescriptionViewModal 
+        <PreviousInformationModal
           visit={selectedVisit}
-          prescriptions={prescriptions[selectedVisit.sl] || {}}
+          patient={patient}
+          prescriptions={{
+            ...(prescriptions[selectedVisit.sl] || {}),
+            ...(currentRecord.drugs?.length ? { drugs: currentRecord.drugs } : {}),
+            ...(currentRecord.labs?.length ? { labs: currentRecord.labs } : {}),
+            ...(currentRecord.services?.length ? { services: currentRecord.services } : {}),
+            ...(currentRecord.ipEntries?.length ? { ipEntries: currentRecord.ipEntries } : {}),
+            ...(currentRecord.carePlanItems?.length ? { carePlanItems: currentRecord.carePlanItems } : {}),
+          }}
           onClose={closeModal}
           onNavigate={handleNavigate}
           currentIndex={currentVisitIndex}

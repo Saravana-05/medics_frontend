@@ -47,7 +47,7 @@ function EmptyPanelRow({ columnCount }) {
 function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, accentText = "white", textAccent, onAdd, addLabel, searchTerm, onSearchChange, actions }) {
   return (
     <>
-      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: accentLight, backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.035))", borderColor: "var(--color-border)" }}>
+      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: `color-mix(in srgb, ${accentLight} 88%, ${accentColor} 12%)`, backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045))", borderColor: "var(--color-border)" }}>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h3 className="font-bold leading-tight" style={{ color: textAccent || accentColor, fontSize: "12.5px" }}>{title}</h3>
