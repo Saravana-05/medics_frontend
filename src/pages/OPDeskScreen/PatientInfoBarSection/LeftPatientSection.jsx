@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import {
-  Users, ChevronDown, X
+  Users, ChevronDown, Plus, X
 } from "lucide-react";
 
 /* ── Attendant Card — same layout as ClinicalCard (icon + title + data) ── */
@@ -225,7 +225,8 @@ export default function LeftPatientSection({
   onAddPatient,
   open,
   setOpen,
-  tabsRowRef
+  tabsRowRef,
+  appointmentTitle = "By Appointments"
 }) {
   const p = selectedPatient || {};
   const [showAddModal, setShowAddModal] = useState(false);
@@ -288,7 +289,17 @@ export default function LeftPatientSection({
         {/* Patient Selection */}
         <div className="md:w-[30%] md:flex-shrink-0 lg:w-auto lg:flex-none lg:p-1">
           <div className="text-[0.7rem] font-bold tracking-wide mb-1 flex items-center justify-between md:hidden lg:flex" style={{ color: "var(--color-text-muted)" }}>
-            <span>Appointments ({completedAppointmentCount}/{patients.length})</span>
+            <span>{appointmentTitle} ({completedAppointmentCount}/{patients.length})</span>
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded transition-colors hover:bg-[var(--color-primary-muted)]"
+              style={{ color: "var(--color-primary)" }}
+              title="Add New Patient"
+              aria-label="Add New Patient"
+            >
+              <Plus size={17} strokeWidth={2.5} />
+            </button>
           </div>
           <PatientDropdown
             patients={patients}

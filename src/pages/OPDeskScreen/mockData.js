@@ -1,3 +1,57 @@
+import listPatients from "../../data/listPatients.json";
+import listPatientPreviousVisits from "../../data/listPatientPreviousVisits.json";
+import listPatientClinicalProfiles from "../../data/listPatientClinicalProfiles.json";
+
+const enrichedListPatients = listPatients.map(patient => ({
+  ...patient,
+  ...listPatientClinicalProfiles[patient.id],
+  appointment: {
+    datetime: patient.docDate,
+    priority: patient.appointmentStatus === "parked" ? "Important" : "Normal",
+  },
+  todaysVisit: {
+    type: patient.appointmentStatus === "completed" ? "Follow-up" : "Current Visit",
+    firstVisit: "01/01/2023",
+    visitCount: listPatientClinicalProfiles[patient.id]?.historyCount || 3,
+    corporate: "No",
+    fee: "Cash",
+  },
+  chronicAllergy: [
+    { type: "Allergy", name: "No known drug allergy", since: "—", severity: "Low" },
+    { type: "Chronic", name: patient.chiefComplaint, since: "2023", severity: "Medium" },
+  ],
+  family: [
+    { relation: "Attendant", name: "Family Attendant", age: 42, condition: "Nil" },
+  ],
+  attendant: { name: "Family Attendant", relationship: "Relative", phone: "9000000000" },
+  address: { line1: "Madurai", line2: "Tamil Nadu", line3: "625001", line4: "India", phone: "9000000000" },
+}));
+
+const expandedListPatientPreviousVisits = Object.fromEntries(enrichedListPatients.map(patient => {
+  const baseVisit = listPatientPreviousVisits[patient.id]?.[0];
+  if (!baseVisit) return [patient.id, []];
+  const count = listPatientClinicalProfiles[patient.id]?.historyCount || 3;
+  const complaints = listPatientClinicalProfiles[patient.id]?.previousComplaints || [patient.chiefComplaint];
+  const [day, month, year] = baseVisit.entryDt.split(" ")[0].split("/").map(Number);
+  const baseDate = new Date(year, month - 1, day);
+  return [patient.id, Array.from({ length: count }, (_, index) => {
+    const visitDate = new Date(baseDate);
+    visitDate.setDate(baseDate.getDate() - index * 14);
+    const dateText = [visitDate.getDate(), visitDate.getMonth() + 1, visitDate.getFullYear()].map((part, partIndex) => partIndex < 2 ? String(part).padStart(2, "0") : part).join("/");
+    const isIp = patient.id.startsWith("IPL-");
+    return {
+      ...baseVisit,
+      sl: baseVisit.sl * 10 + index + 1,
+      entryDt: `${dateText} ${baseVisit.entryDt.split(" ").slice(1).join(" ")}`,
+      docModule: `${String(baseVisit.docModule).split(":")[0]}: ${isIp ? "IP" : "OP"}-${index % 3 === 1 ? "LP-R" : "DP"}`,
+      reportDt: index % 3 === 1 ? `${dateText} 14:30` : "",
+      complaint: complaints[index % complaints.length],
+      observation: patient.firstObservation || "Clinical condition reviewed",
+      nextVisit: index === 0 ? baseVisit.nextVisit : "",
+    };
+  })];
+}));
+
 const CARE_PLAN_ROWS = [
   ["10-06-2026", "Week-8",  "1st AN Visit",  "Test",       "CBC, Bl.gp, HIV, HBsAg, RBS, Urine, USG dating", "Lapsed",      "No",  "Confirm pregnancy, baseline"],
   ["10-06-2026", "Week-8",  "1st AN Visit",  "Drug",       "Start Folic Acid 5mg, TT1",                       "Late Visit",  "Yes", "Prophylaxis and nutrition"],
@@ -714,9 +768,11 @@ export const MOCK_PATIENTS = [
       { relation: "Father", name: "Sri.Babu", age: 78, condition: "Osteoporosis" },
     ],
   },
+  ...enrichedListPatients,
 ];
 
 export const PREVIOUS_VISITS = {
+  ...expandedListPatientPreviousVisits,
   "PID-1042": [
     { sl: 45, entryDt: "02/02/2024 16:02", docModule: "3902: OP-DP", reportDt: "", complaint: "Allergy, Anxiety", vitals: "86/25.7/140:90:96/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
     { sl: 44, entryDt: "02/02/2024 12:30", docModule: "3902: OP-LP-R", reportDt: "02/02/2024 16.00", complaint: "Allergy, Anxiety", vitals: "86/25.7/145:90:95/101.", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },

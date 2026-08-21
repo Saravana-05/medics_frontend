@@ -16,7 +16,7 @@ const GRAY_DARK = "#6b7280";
 // not a pointed chevron.
 const SLANT = 16;
 
-export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, compact = false }) {
+export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, compact = false, fullBorder = false }) {
   const [hoveredKey, setHoveredKey] = useState(null);
 
   return (
@@ -54,7 +54,10 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
               zIndex: isActive ? PRESCRIPTION_TABS.length + 1 : PRESCRIPTION_TABS.length - i,
               clipPath,
               background: showColor ? tab.color : GRAY_DARK,
-              boxShadow: isActive ? "inset 0 1px 4px rgba(0,0,0,0.3)" : "none",
+              boxShadow: [
+                isActive ? "inset 0 1px 4px rgba(0,0,0,0.3)" : null,
+                fullBorder ? "inset 0 0 0 1px rgba(255,255,255,0.75)" : null,
+              ].filter(Boolean).join(", ") || "none",
               color: showColor ? (tab.textColor || "white") : "white",
             }}
           >

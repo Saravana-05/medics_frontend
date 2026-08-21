@@ -661,6 +661,10 @@ body {
   display: none !important;
 }
 
+.list-modal-flat svg.search-field-icon {
+  display: block !important;
+}
+
 /* ##f7cbca - light red
 #5d6b6b - green
 #f1f7f7 - light gray

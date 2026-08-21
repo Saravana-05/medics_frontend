@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Calendar, Clock, User, FileText, AlertCircle, Users,
   ParkingCircle, CheckCircle, Filter, ChevronDown, Star,
-  Activity, Stethoscope, ClipboardList, Tag, Eye
+  Activity, Stethoscope, ClipboardList, Tag, Eye, Search
 } from "lucide-react";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
 
@@ -59,20 +59,23 @@ function HighlightedToken({ token }) {
   });
 }
 
-function PatientRow({ row, index, onSelect }) {
+function PatientRow({ row, index, onSelect, onFocus, focused }) {
   const values = [row.token, row.sched, row.status, row.docNo || "—", row.name, row.complaint, row.priority, row.need];
   return (
     <button
       type="button"
-      onClick={() => onSelect && onSelect(row)}
+      onClick={() => onFocus?.(row)}
+      onDoubleClick={() => onSelect && onSelect(row)}
       className="grid w-full text-left text-xs transition-colors hover:bg-blue-50"
       style={{
-        gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px minmax(100px, 1fr)",
-        background: index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
+        gridTemplateColumns: "93px 93px 148px 69px 191px 212px 139px 106px",
+        background: focused ? "#dbeafe" : index % 2 === 0 ? "var(--color-surface)" : "var(--color-surface-alt)",
+        outline: focused ? "2px solid #2563eb" : "none",
+        outlineOffset: focused ? "-2px" : undefined,
       }}
     >
       {values.map((value, cellIndex) => (
-        <span key={cellIndex} className="truncate border-b border-r px-2 py-1.5 last:border-r-0" style={{ borderColor: "var(--color-border)" }} title={String(value)}>
+        <span key={cellIndex} className="truncate border-b border-r py-1.5 pl-[6px] pr-2 last:border-r-0" style={{ borderColor: "var(--color-border)" }} title={String(value)}>
           {cellIndex === 0
             ? <HighlightedToken token={String(value)} />
             : cellIndex === 1
@@ -128,7 +131,7 @@ function OPHeaderFilter({ label, value, options, onChange }) {
         <ChevronDown size={10} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 min-w-[190px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full min-w-[150px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
           <label className="flex cursor-pointer items-center gap-2 border-b border-slate-200 px-1 py-1.5 text-xs font-semibold">
             <input type="checkbox" checked={allSelected} onChange={() => onChange(allSelected ? [] : [...options])} className="h-3.5 w-3.5 accent-blue-600" />
             <span>Select All</span>
@@ -160,14 +163,14 @@ function ColHeader({ filters }) {
 
   return (
     <div className="relative z-30 grid border-b" style={{
-      gridTemplateColumns: "70px 70px 140px 65px 180px 200px 100px minmax(100px, 1fr)",
+      gridTemplateColumns: "93px 93px 148px 69px 191px 212px 139px 106px",
       background: "var(--color-primary-dark)",
       borderColor: "var(--color-border)"
     }}>
       {columns.map(col => {
         const filterConfig = filters[col.label];
         return (
-          <div key={col.label} className="flex min-w-0 items-start gap-1 px-2 py-1.5">
+          <div key={col.label} className="flex min-w-0 items-start gap-1 py-1.5 pl-[6px] pr-2">
             {filterConfig ? <OPHeaderFilter label={col.label} {...filterConfig} /> : <>
               {col.icon && <col.icon size={10} className="mt-1" style={{ color: "rgba(255,255,255,0.7)" }} />}
               <span className="truncate py-0.5 text-[11.25px] font-bold tracking-wide text-white">{col.label}</span>
@@ -180,12 +183,51 @@ function ColHeader({ filters }) {
 }
 
 export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00" }) {
+  const modalRef = useRef(null);
   const [filter, setFilter] = useState("");
   const [statusFilters, setStatusFilters] = useState([]);
   const [complaintFilters, setComplaintFilters] = useState([]);
   const [priorityFilters, setPriorityFilters] = useState([]);
   const [activeSection, setActiveSection] = useState("all");
   const [hoveredSection, setHoveredSection] = useState(null);
+  const [focusedToken, setFocusedToken] = useState(null);
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    modalRef.current?.focus();
+
+    const trapFocus = event => {
+      if (event.key !== "Tab" || !modalRef.current) return;
+      const focusable = [...modalRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) {
+        event.preventDefault();
+        modalRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!focusable.includes(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", trapFocus);
+    return () => {
+      document.removeEventListener("keydown", trapFocus);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus?.();
+    };
+  }, []);
 
   const applyFilter = (rows) => {
     if (!filter.trim()) return rows;
@@ -217,7 +259,12 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   };
 
   const handleSelect = (row) => {
-    onSelectPatient && onSelectPatient(row);
+    const listSection = row.status?.includes("Treated")
+      ? "treated"
+      : row.status?.includes("Parked")
+        ? "parked"
+        : "appointment";
+    onSelectPatient && onSelectPatient({ ...row, listType: "op", listSection });
     onClose && onClose();
   };
 
@@ -229,22 +276,52 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   ];
 
   const totalPatients = apt.length + pkd.length + trtd.length;
+  const visibleRows = activeSection === "appointment"
+    ? apt
+    : activeSection === "parked"
+      ? pkd
+      : activeSection === "treated"
+        ? trtd
+        : [...apt, ...pkd, ...trtd];
+
+  const focusRow = row => {
+    setFocusedToken(row.token);
+    gridRef.current?.focus();
+  };
+
+  const handleGridKeyDown = event => {
+    if (!visibleRows.length || !["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) return;
+    event.preventDefault();
+    const currentIndex = visibleRows.findIndex(row => row.token === focusedToken);
+    if (event.key === "Enter") {
+      if (currentIndex >= 0) handleSelect(visibleRows[currentIndex]);
+      return;
+    }
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    const nextIndex = currentIndex < 0
+      ? (direction > 0 ? 0 : visibleRows.length - 1)
+      : Math.max(0, Math.min(visibleRows.length - 1, currentIndex + direction));
+    setFocusedToken(visibleRows[nextIndex].token);
+  };
 
   return (
     <div
-      onClick={onClose}
       className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in"
       style={{ background: "rgba(0,0,0,0.5)" }}
     >
       <div
-        onClick={e => e.stopPropagation()}
-        className="list-modal-flat flex h-[90vh] w-[min(96vw,1146px)] flex-col overflow-hidden shadow-2xl animate-slide-up"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Out Patient List"
+        tabIndex={-1}
+        className="list-modal-flat flex h-[90vh] w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up"
         style={{
           background: "var(--color-surface)",
         }}
       >
         {/* Header */}
-        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)" }}>
+        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary-dark) 50%, white) 0%, color-mix(in srgb, var(--color-primary) 50%, white) 100%)" }}>
           <div className="px-5 py-3 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2 whitespace-nowrap">
@@ -252,15 +329,15 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 Out Patient List
               </h2>
               <div className="flex items-center whitespace-nowrap text-xs">
-                <div className="flex items-center gap-1.5 pr-4" style={{ color: "#fef3c7" }}>
+                <div className="flex items-center gap-1.5 pr-4 text-[12.5px]" style={{ color: "#000000" }}>
                   <Calendar size={12} /><span className="font-semibold">Date:</span><span>{String(date).trim().split(/\s+/)[0]}</span>
                 </div>
-                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4" style={{ color: "#f3e8ff" }}>
+                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4 text-[12.5px]" style={{ color: "#000000" }}>
                   <Clock size={12} /><span className="font-semibold">Time:</span><span>{formatTimeWithPeriod(time)}</span>
                 </div>
               </div>
             </div>
-            <button onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10">Close</button>
+            <button onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-80" style={{ background: "rgba(0,0,0,0.5)" }}>Close</button>
           </div>
 
           {/* Section Tabs */}
@@ -274,9 +351,10 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                   onClick={() => setActiveSection(section.key)}
                   onMouseEnter={() => setHoveredSection(section.key)}
                   onMouseLeave={() => setHoveredSection(null)}
-                  className="relative flex w-32 items-center justify-center text-xs font-bold transition-all"
+                  className="relative flex w-[108px] flex-shrink-0 items-center justify-center text-xs font-bold transition-all"
                   style={{
                     marginLeft: index === 0 ? 0 : -slant,
+                    paddingLeft: index === 0 ? 0 : slant * 2,
                     zIndex: activeSection === section.key ? sections.length + 1 : sections.length - index,
                     clipPath: index === 0
                       ? `polygon(0 0, calc(100% - ${slant}px) 0, 100% 100%, 0 100%)`
@@ -291,14 +369,14 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 </button>
               );
             })}
-            <div className="relative ml-3 flex items-center">
-              <input value={filter} onChange={e => setFilter(e.target.value)} placeholder="Search by name, token, complaint..." className="w-[210px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
+            <div className="relative ml-[30px] flex items-center">
+              <Search size={13} className="search-field-icon pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-black" />
+              <input value={filter} onChange={e => setFilter(e.target.value)} placeholder="Search by name, token, complaint..." className="w-[210px] border border-slate-300 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-800 outline-none placeholder:text-slate-400" />
             </div>
-            <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
-              <div className="flex items-center gap-1.5" style={{ color: "#dbeafe" }}>
-                <Stethoscope size={12} />
-                <span className="font-semibold">Doctor:</span>
-                <span>{doctor}</span>
+            <div className="ml-auto mr-[20px] flex items-center whitespace-nowrap">
+              <div className="flex items-center gap-1.5" style={{ color: "#ffffff" }}>
+                <Stethoscope size={16} />
+                <span className="text-[16px] font-semibold">{doctor}</span>
               </div>
             </div>
           </div>
@@ -308,7 +386,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         <ColHeader filters={headerFilters} />
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="flex-1 overflow-y-auto outline-none">
           {/* Appointments Section */}
           {(activeSection === "all" || activeSection === "appointment") && apt.length > 0 && (
             <>
@@ -320,7 +398,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 note="At day end — remaining appointments will be counted as Cancelled"
               />
               {apt.map((row, i) => (
-                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} section="appointment" />
+                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} onFocus={focusRow} focused={focusedToken === row.token} section="appointment" />
               ))}
             </>
           )}
@@ -336,7 +414,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 note="At day end — parked patients will be carried over to next day"
               />
               {pkd.map((row, i) => (
-                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} section="parked" />
+                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} onFocus={focusRow} focused={focusedToken === row.token} section="parked" />
               ))}
             </>
           )}
@@ -352,7 +430,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 note="Completed consultations"
               />
               {trtd.map((row, i) => (
-                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} section="treated" />
+                <PatientRow key={row.token} row={row} index={i} onSelect={handleSelect} onFocus={focusRow} focused={focusedToken === row.token} section="treated" />
               ))}
             </>
           )}
@@ -387,7 +465,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           </div>
           <div className="text-xs italic flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
             <Eye size={12} />
-            Click any row to load patient
+            Double-click any row to load patient
           </div>
         </div>
       </div>

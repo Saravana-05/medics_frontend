@@ -1,4 +1,6 @@
 {
+  "TSH - Thyroid Stimulating Hormone": { "unit": "uIU/mL", "bioRef": "0.40 - 4.50", "specimen": "Serum" },
+  "Fasting Blood Sugar": { "unit": "mg/dL", "bioRef": "70 - 110", "specimen": "Plasma - Fluoride" },
   "Complete Blood Count (CBC)": { "unit": "cells/cmm", "bioRef": "4000 - 11000", "specimen": "EDTA Blood" },
   "Erythrocyte Sedimentation Rate (ESR)": { "unit": "mm/hr", "bioRef": "0 - 20", "specimen": "EDTA Blood" },
   "Blood Sugar - Fasting": { "unit": "mg/dL", "bioRef": "70 - 110", "specimen": "Plasma - Fluoride" },

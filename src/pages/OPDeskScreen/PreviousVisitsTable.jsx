@@ -166,11 +166,14 @@ export default function PreviousVisitsTable({ visits = [], patient = null, curre
             { name: "Amoxicillin 250mg", form: "Cap", intake: "1", period: "BD", when: "Before Food", detail: "Before meals", days: 7 }
           ],
           labs: [
-            { name: "Complete Blood Count (CBC)", detail: "Fasting" },
-            { name: "Lipid Profile", detail: "Fasting" }
+            { name: "TSH - Thyroid Stimulating Hormone", detail: "(Before & After Break-fast)", observedValue: "2.85", unit: "uIU/mL", bioRef: "0.40 - 4.50", specimen: "Serum" },
+            { name: "Fasting Blood Sugar", detail: "(Before Break-fast)", observedValue: "92", unit: "mg/dL", bioRef: "70 - 110", specimen: "Plasma - Fluoride" }
           ],
           services: [
             { type: "X-Ray", name: "Chest X-Ray PA", detail: "Chest" }
+          ],
+          ipEntries: [
+            { id: `history-ip-${visit.sl}`, medic: visit.by || "Dr. Chandra Sekar", time: visit.entryDt?.split(" ").slice(1).join(" ") || "10:00", entryType: "Instruction", name: visit.complaint || "Clinical Review", notes: "Previous visit reviewed and follow-up advised" }
           ],
           findings: {
             diagnosis: "Upper Respiratory Tract Infection",
@@ -621,10 +624,17 @@ export default function PreviousVisitsTable({ visits = [], patient = null, curre
             ...(currentRecord.ipEntries?.length ? { ipEntries: currentRecord.ipEntries } : {}),
             ...(currentRecord.carePlanItems?.length ? { carePlanItems: currentRecord.carePlanItems } : {}),
           }}
+          onUpdatePrescription={(changes) => {
+            savePrescriptionForVisit(selectedVisit.sl, changes);
+            setPrescriptions(current => ({
+              ...current,
+              [selectedVisit.sl]: { ...current[selectedVisit.sl], ...changes },
+            }));
+          }}
           onClose={closeModal}
           onNavigate={handleNavigate}
           currentIndex={currentVisitIndex}
-          totalVisits={filteredVisits.length}
+          navigationVisits={filteredVisits}
         />
       )}
     </>

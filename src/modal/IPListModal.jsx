@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Stethoscope, Users } from "lucide-react";
+import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Search, Stethoscope, Users } from "lucide-react";
 import DataTable from "react-data-table-component";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
 
 const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
 const DUTY_NURSES = ["Niveditha", "Soundarya", "Rajalakshmi"];
+const IP_TOOLBAR_BACKGROUND = "color-mix(in srgb, var(--color-danger) 50%, white)";
+const IP_TABLE_HEADER_BACKGROUND = "color-mix(in srgb, var(--color-danger) 90%, white)";
 
 const IP_SECTIONS = [
   {
@@ -52,7 +54,7 @@ const IP_SECTIONS = [
   },
 ];
 
-const GRID_COLUMNS = "92px 74px 145px 145px 180px 200px 90px 110px 110px";
+const GRID_COLUMNS = "92px 74px 115px 125px 153px 150px 90px 126px 126px";
 
 const FILTER_OPTIONS = {
   ward: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[0])))],
@@ -105,7 +107,7 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 min-w-[190px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full min-w-[150px] overflow-y-auto border border-slate-200 bg-white p-2 text-slate-800 shadow-xl" onClick={event => event.stopPropagation()}>
           <label className="flex cursor-pointer items-center gap-2 border-b border-slate-200 px-1 py-1.5 text-xs font-semibold">
             <input type="checkbox" checked={allSelected} onChange={() => onChange(allSelected ? [] : [...options])} className="h-3.5 w-3.5 accent-blue-600" />
             <span>Select All</span>
@@ -124,6 +126,7 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
 }
 
 export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00" }) {
+  const modalRef = useRef(null);
   const [filter, setFilter] = useState("");
   const [wardFilters, setWardFilters] = useState([]);
   const [complaintFilters, setComplaintFilters] = useState([]);
@@ -131,7 +134,45 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   const [dutyDoctorFilters, setDutyDoctorFilters] = useState([]);
   const [activeSection, setActiveSection] = useState("all");
   const [hoveredSection, setHoveredSection] = useState(null);
+  const [focusedRowKey, setFocusedRowKey] = useState(null);
+  const gridRef = useRef(null);
   const normalizedFilter = filter.trim().toLowerCase();
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    modalRef.current?.focus();
+
+    const trapFocus = event => {
+      if (event.key !== "Tab" || !modalRef.current) return;
+      const focusable = [...modalRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) {
+        event.preventDefault();
+        modalRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!focusable.includes(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", trapFocus);
+    return () => {
+      document.removeEventListener("keydown", trapFocus);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus?.();
+    };
+  }, []);
 
   const sections = useMemo(() => IP_SECTIONS.map((section, sectionIndex) => ({
     ...section,
@@ -146,8 +187,9 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
       ),
   })), [complaintFilters, dutyDoctorFilters, normalizedFilter, priorityFilters, wardFilters]);
 
-  const handleSelect = row => {
-    onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8] });
+  const handleSelect = (row, sectionKey) => {
+    const listSection = sectionKey || visibleSections.find(section => section.rows.includes(row))?.key || "ip";
+    onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8], listType: "ip", listSection });
     onClose?.();
   };
 
@@ -167,16 +209,38 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   const visibleSections = activeSection === "all"
     ? sections
     : sections.filter(section => section.key === activeSection);
+  const visibleRows = visibleSections.flatMap(section => section.rows);
+  const rowKey = row => row.join("|");
+
+  const focusRow = row => {
+    setFocusedRowKey(rowKey(row));
+    gridRef.current?.focus();
+  };
+
+  const handleGridKeyDown = event => {
+    if (!visibleRows.length || !["ArrowUp", "ArrowDown", "Enter"].includes(event.key)) return;
+    event.preventDefault();
+    const currentIndex = visibleRows.findIndex(row => rowKey(row) === focusedRowKey);
+    if (event.key === "Enter") {
+      if (currentIndex >= 0) handleSelect(visibleRows[currentIndex]);
+      return;
+    }
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    const nextIndex = currentIndex < 0
+      ? (direction > 0 ? 0 : visibleRows.length - 1)
+      : Math.max(0, Math.min(visibleRows.length - 1, currentIndex + direction));
+    setFocusedRowKey(rowKey(visibleRows[nextIndex]));
+  };
   const tableColumns = [
     { name: "Ward", selector: row => row[0], width: "92px" },
     { name: "Room#", selector: row => row[1], cell: row => <HighlightedRoom room={row[1]} />, width: "74px" },
-    { name: "Patient's Doctor", selector: row => row[2], width: "145px" },
-    { name: "Queue Status", selector: row => row[3], width: "145px" },
-    { name: "Patient Name", selector: row => row[4], width: "180px" },
-    { name: "Chief Complaint", selector: row => row[5], width: "200px" },
+    { name: "Patient's Doctor", selector: row => row[2], width: "115px" },
+    { name: "Queue Status", selector: row => row[3], width: "125px" },
+    { name: "Patient Name", selector: row => row[4], width: "153px" },
+    { name: "Chief Complaint", selector: row => row[5], width: "150px" },
     { name: "Priority", selector: row => row[6], width: "90px" },
-    { name: "Duty Doctor", selector: row => row[7], width: "110px" },
-    { name: "Duty Nurse", selector: row => row[8], width: "110px" },
+    { name: "Duty Doctor", selector: row => row[7], width: "126px" },
+    { name: "Duty Nurse", selector: row => row[8], width: "126px" },
   ];
 
   const tableStyles = {
@@ -193,7 +257,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     },
     cells: {
       style: {
-        paddingLeft: "8px",
+        paddingLeft: "6px",
         paddingRight: "8px",
         borderRight: "1px solid var(--color-border)",
         whiteSpace: "nowrap",
@@ -210,22 +274,22 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     "Duty Doctor": { value: dutyDoctorFilters, options: FILTER_OPTIONS.dutyDoctor, onChange: setDutyDoctorFilters },
   };
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }} onClick={onClose}>
-      <div className="list-modal-flat flex h-[90vh] w-[min(96vw,1146px)] flex-col overflow-hidden shadow-2xl animate-slide-up" style={{ background: "var(--color-surface)" }} onClick={event => event.stopPropagation()}>
-        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, #991b1b 0%, var(--color-danger) 100%)" }}>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }}>
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-label="In Patient List" tabIndex={-1} className="list-modal-flat flex h-[90vh] w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up" style={{ background: "var(--color-surface)" }}>
+        <div className="flex-shrink-0 rounded-t-xl" style={{ background: IP_TOOLBAR_BACKGROUND }}>
           <div className="flex items-center justify-between gap-4 px-5 py-3">
             <div className="flex items-center gap-4">
               <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold text-white"><Bed size={20} />In Patient List</h2>
               <div className="flex items-center whitespace-nowrap text-xs">
-                <div className="flex items-center gap-1.5 pr-4" style={{ color: "#fef3c7" }}>
+                <div className="flex items-center gap-1.5 pr-4 text-[12.5px]" style={{ color: "#000000" }}>
                   <Calendar size={12} /><span className="font-semibold">Date:</span><span>{String(date).trim().split(/\s+/)[0].replaceAll("-", "/")}</span>
                 </div>
-                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4" style={{ color: "#f3e8ff" }}>
+                <div className="ml-4 flex items-center gap-1.5 border-l border-white/30 pl-4 text-[12.5px]" style={{ color: "#000000" }}>
                   <Clock size={12} /><span className="font-semibold">Time:</span><span>{formatTimeWithPeriod(time)}</span>
                 </div>
               </div>
             </div>
-            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/10" title="Close">Close</button>
+            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-80" style={{ background: "rgba(0,0,0,0.5)" }} title="Close">Close</button>
           </div>
 
           <div className="flex items-stretch" style={{ height: 34 }}>
@@ -248,18 +312,19 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 </button>
               );
             })}
-            <div className="relative ml-3 flex items-center">
-              <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[205px] border border-white/30 bg-white/15 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/60" />
+            <div className="relative ml-[30px] flex items-center">
+              <Search size={13} className="search-field-icon pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-black" />
+              <input value={filter} onChange={event => setFilter(event.target.value)} placeholder="Search by patient, ward, complaint..." className="w-[205px] border border-slate-300 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-800 outline-none placeholder:text-slate-400" />
             </div>
-            <div className="ml-auto mr-4 flex items-center whitespace-nowrap text-xs">
-              <div className="flex items-center gap-1.5" style={{ color: "#dbeafe" }}>
-                <Stethoscope size={12} /><span className="font-semibold">Doctor:</span><span>{doctor}</span>
+            <div className="ml-auto mr-[20px] flex items-center whitespace-nowrap">
+              <div className="flex items-center gap-1.5" style={{ color: "#ffffff" }}>
+                <Stethoscope size={16} /><span className="text-[16px] font-semibold">{doctor}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: "#b91c1c", borderColor: "var(--color-border)" }}>
+        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: IP_TABLE_HEADER_BACKGROUND, borderColor: "var(--color-border)" }}>
           {COLUMNS.map(column => {
             const filterConfig = headerFilters[column];
             return (
@@ -270,7 +335,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           })}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-auto">
+        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="min-h-0 flex-1 overflow-auto outline-none">
           {visibleSections.map(section => (
             <div key={section.key}>
               <div className="sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2" style={{ background: section.color, borderColor: "var(--color-border)" }}>
@@ -286,7 +351,12 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
                 pointerOnHover
                 dense
                 customStyles={tableStyles}
-                onRowClicked={handleSelect}
+                conditionalRowStyles={[{
+                  when: row => rowKey(row) === focusedRowKey,
+                  style: { backgroundColor: "#dbeafe", outline: "2px solid #2563eb", outlineOffset: "-2px" },
+                }]}
+                onRowClicked={focusRow}
+                onRowDoubleClicked={row => handleSelect(row, section.key)}
                 noDataComponent={<div className="px-4 py-8 text-sm" style={{ color: "var(--color-text-muted)" }}>No matching patients</div>}
               />
             </div>
@@ -299,7 +369,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
             <span className="rounded px-2 py-1" style={{ background: "#fef3c7", color: "#b45309" }}># Corporate</span>
             <span className="rounded px-2 py-1" style={{ background: "#f3e8ff", color: "#7e22ce" }}>@ Referral</span>
           </div>
-          <div className="flex items-center gap-1 text-xs italic" style={{ color: "var(--color-text-muted)" }}><Eye size={12} />Click any row to load patient</div>
+          <div className="flex items-center gap-1 text-xs italic" style={{ color: "var(--color-text-muted)" }}><Eye size={12} />Double-click any row to load patient</div>
         </div>
       </div>
     </div>

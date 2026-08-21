@@ -37,7 +37,23 @@ export default function PatientInfoBar({
 }) {
   const [open, setOpen] = useState(false);
   const [opList, setOpList] = useState(false);
+  const [appointmentTitle, setAppointmentTitle] = useState("By Appointments");
   const p = selectedPatient || {};
+
+  const selectFromPatientDropdown = patient => {
+    setAppointmentTitle("By Appointments");
+    onSelectPatient(patient);
+  };
+
+  const selectFromList = row => {
+    const title = row?.listType === "op"
+      ? "By Appointment of OP List"
+      : row?.listType === "ip"
+        ? "By Appointment of IP List"
+        : "By Appointments";
+    setAppointmentTitle(title);
+    onSelectPatient(row);
+  };
 
   return (
     <>
@@ -70,11 +86,12 @@ export default function PatientInfoBar({
           <LeftPatientSection
             patients={patients}
             selectedPatient={selectedPatient}
-            onSelectPatient={onSelectPatient}
+            onSelectPatient={selectFromPatientDropdown}
             onAddPatient={onAddPatient}
             open={open}
             setOpen={setOpen}
             tabsRowRef={tabsRowRef}
+            appointmentTitle={appointmentTitle}
           />
 
           {/* ── Right Panel ── */}
@@ -100,7 +117,7 @@ export default function PatientInfoBar({
                 onFinalize={onFinalize}
                 onOPList={() => {}}
                 onIPList={onIPList}
-                onSelectPatient={onSelectPatient}
+                onSelectPatient={selectFromList}
               />
             </div>
 

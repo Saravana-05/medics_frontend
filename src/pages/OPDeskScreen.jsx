@@ -112,7 +112,11 @@ export default function OPDeskScreen({ user, onLogout }) {
   }, []);
 
   const selectPatient = (p) => {
-    const resolvedPatient = p?.patientId ? patients.find(patient => patient.id === p.patientId) || p : p;
+    const resolvedPatient = p
+      ? patients.find(patient => patient.name === p.name)
+        || (p.patientId ? patients.find(patient => patient.id === p.patientId) : null)
+        || p
+      : null;
     setSelectedPatient(resolvedPatient);
     const record = resolvedPatient ? getPatientRecord(resolvedPatient.id) : null;
     setDrugs(record?.drugs || []);
