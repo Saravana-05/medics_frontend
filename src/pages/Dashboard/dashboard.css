@@ -1,11 +1,15 @@
-.em-main-menu { display:flex; min-height:100vh; min-height:100dvh; flex-direction:column; overflow:hidden; background:#ccc; font-family:"Segoe UI",Arial,sans-serif; }
-.em-title-bar { position:relative; z-index:80; display:flex; height:43px; flex:0 0 43px; align-items:center; padding:0 22px; background:#000; user-select:none; }
-.em-title { color:#63cec4; font-size:clamp(1.35rem,1.7vw,2rem); font-weight:600; letter-spacing:.2px; text-shadow:2px 0 1px rgb(255 255 255 / 22%),4px 0 4px rgb(99 206 196 / 18%); }
-.em-menu-bar { position:relative; z-index:70; display:flex; min-height:44px; flex:0 0 44px; align-items:stretch; padding-left:14px; border-bottom:1px solid #d8d8d8; background:#3f3f3f; user-select:none; }
+@font-face { font-family:"Sacramento"; src:url("/fonts/Sacramento-Regular.ttf") format("truetype"); font-style:normal; font-weight:400; font-display:swap; }
+
+.em-main-menu { position:relative; display:flex; min-height:100vh; min-height:100dvh; flex-direction:column; overflow:hidden; background:#000; font-family:"Inter",sans-serif; }
+.em-main-menu * { font-family:inherit; }
+.em-title-bar { position:relative; z-index:80; display:flex; height:4vh; min-height:43px; flex:0 0 4vh; align-items:center; padding:0 22px; background:#000; user-select:none; }
+.em-title { align-self:stretch; display:inline-flex; align-items:center; margin-left:-22px; padding:0 22px; background:#000; color:#00e7e7; font-size:18.75px; font-weight:400; letter-spacing:.1px; white-space:nowrap; }
+.em-menu-bar { position:relative; z-index:70; display:flex; width:100%; min-height:44px; flex:0 0 4.1vh; align-items:stretch; padding-left:6px; border:0; background:#222; user-select:none; }
 .em-menu { position:relative; }
-.em-menu-trigger { height:100%; border:0; background:transparent; padding:0 16px; color:#fff; font:inherit; font-size:1.0625rem; cursor:pointer; }
-.em-menu-trigger:hover,.em-menu-trigger:focus-visible,.em-menu.is-open .em-menu-trigger { background:#555; outline:none; }
-.em-op-desk-button { display:flex; align-items:center; gap:7px; margin-left:auto; border:0; padding:0 20px; background:#168f88; color:#fff; font:inherit; font-size:.95rem; font-weight:600; white-space:nowrap; cursor:pointer; transition:background .15s ease; }
+.em-menu-trigger { height:100%; border:0; background:transparent; padding:0 16px; color:#f5f5f5; font:inherit; font-size:1.0625rem; cursor:pointer; }
+.em-menu-trigger:hover,.em-menu-trigger:focus-visible,.em-menu.is-open .em-menu-trigger { background:transparent; outline:none; }
+.em-menu-trigger:focus-visible { box-shadow:inset 0 0 0 2px rgb(255 255 255 / 65%); }
+.em-op-desk-button { display:none; }
 .em-op-desk-button:hover,.em-op-desk-button:focus-visible { background:#20a89f; outline:2px solid #8ce0da; outline-offset:-2px; }
 .em-dropdown,.em-submenu { position:absolute; z-index:90; width:max-content; min-width:230px; padding:8px 0; border:1px solid #d8d8d8; background:#fff; box-shadow:0 4px 12px rgb(0 0 0 / 14%); }
 .em-dropdown { top:100%; left:0; }
@@ -15,10 +19,22 @@
 .em-menu-item { display:flex; width:100%; align-items:center; justify-content:space-between; gap:24px; border:0; background:#fff; padding:6px 18px; color:#1f2937; font:inherit; font-size:1rem; text-align:left; white-space:nowrap; cursor:pointer; }
 .em-menu-item:hover,.em-menu-item:focus-visible { background:#eef7f6; outline:none; }
 .em-menu-separator { height:1px; margin:4px 12px; background:#d0d0d0; }
-.em-workspace { position:relative; min-height:0; flex:1; overflow:hidden; background:#ccc; }
-.em-vertical-brand { position:absolute; bottom:11%; left:10.5%; z-index:2; transform:rotate(-90deg); transform-origin:left bottom; color:#555; font-family:"Segoe Script","Brush Script MT",cursive; font-size:clamp(2.75rem,4vw,4.5rem); letter-spacing:1px; white-space:nowrap; }
-.em-medical-team { position:absolute; bottom:9%; left:23.5%; z-index:3; width:min(34vw,640px); height:min(56vh,610px); object-fit:contain; object-position:bottom; filter:grayscale(1) contrast(.9) brightness(1.08); mix-blend-mode:multiply; opacity:.82; }
-.em-ladder-grid { position:absolute; right:7.3%; bottom:9%; z-index:1; display:grid; width:min(31.25vw,600px); aspect-ratio:1; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
-.em-block-1 { grid-area:1/3; background:#a9a9a9; }.em-block-2 { grid-area:2/2; background:#8a8a8a; }.em-block-3 { grid-area:2/3; background:#686868; }.em-block-4 { grid-area:3/1; background:#777; }.em-block-5 { grid-area:3/2; background:#4d4d4d; }.em-block-6 { grid-area:3/3; background:#242424; }
-@media (max-width:900px) { .em-menu-bar{overflow-x:auto;padding-left:0}.em-menu-trigger{padding:0 12px;font-size:.9rem;white-space:nowrap}.em-op-desk-button{position:sticky;right:0;padding:0 14px}.em-vertical-brand{left:14%}.em-medical-team{left:20%;width:48vw}.em-ladder-grid{right:2%;width:42vw} }
-@media (max-width:600px) { .em-vertical-brand{bottom:auto;top:8%;left:6%;transform:none}.em-medical-team{bottom:7%;left:4%;width:68vw;height:62vh}.em-ladder-grid{right:-10%;bottom:7%;width:64vw} }
+.em-workspace { position:relative; z-index:1; min-height:0; flex:1; overflow:hidden; background:linear-gradient(to right,#fff 0 50%,#48b9bb 50% 100%); }
+.em-hospital-label { position:absolute; top:40%; left:25%; z-index:2; transform:translateX(-50%); color:#111; font-size:clamp(.7rem,1vw,1.2rem); font-weight:700; line-height:1; white-space:nowrap; }
+.em-hospital-illustration { position:absolute; left:7%; top:61%; width:36%; height:auto; transform:translateY(-50%); object-fit:contain; pointer-events:none; user-select:none; }
+.em-brand-mark { position:absolute; top:5.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:clamp(3rem,6.3vw,7.5rem); font-weight:400; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
+.em-doctor-desk-tagline { position:absolute; top:17.5%; left:74%; margin:0; color:#fff; font-size:clamp(1rem,1.55vw,1.9rem); font-weight:300; line-height:1; letter-spacing:.01em; text-align:left; text-shadow:1px 2px 3px rgb(42 92 95 / 34%); white-space:nowrap; }
+.em-doctor-desk-tagline em { margin-right:.12em; font-size:1.12em; font-weight:400; }
+.em-quick-actions { position:absolute; right:9.15%; bottom:10.6%; display:grid; width:28.7%; aspect-ratio:1; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+.em-quick-action { position:relative; border:1px solid rgb(255 255 255 / 82%); background:linear-gradient(135deg,#d9f4f4 0%,#b8e4e4 70%,#a5d6d6 100%); box-shadow:2px 5px 12px rgb(23 79 82 / 38%); cursor:pointer; transition:filter .14s ease,transform .14s ease,box-shadow .14s ease; }
+.em-quick-action-1 { grid-area:3/1; }
+.em-quick-action-2 { grid-area:2/2; }
+.em-quick-action-3 { grid-area:1/3; }
+.em-quick-action-4 { grid-area:3/2; background:linear-gradient(135deg,#72c7c7,#48b0b2); }
+.em-quick-action-5 { grid-area:2/3; background:linear-gradient(135deg,#70c8c7,#44afb0); }
+.em-quick-action-6 { grid-area:3/3; background:linear-gradient(135deg,#16a7ab,#008d91); }
+.em-quick-action:hover { z-index:2; filter:brightness(1.06); transform:translateY(-3px); box-shadow:3px 9px 18px rgb(16 67 70 / 44%); }
+.em-quick-action:focus-visible { z-index:3; outline:3px solid #fff; outline-offset:-5px; }
+.em-quick-action:active { transform:translateY(0); }
+.em-quick-action-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+@media (max-width:900px) { .em-menu-bar{overflow-x:auto}.em-menu-trigger{padding:0 12px;font-size:.9rem;white-space:nowrap}.em-doctor-desk-tagline{font-size:clamp(.65rem,1.55vw,1rem)} }

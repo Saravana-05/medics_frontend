@@ -6,6 +6,7 @@ import CreateHospital from "../pages/Home/CreateHospital";
 import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
 import PlatformDeskScreen from "../pages/PlatformDeskScreen";
+import OPAppointmentsScreen from "../pages/OPAppointmentsScreen/OPAppointmentsScreen";
 
 // Protected Route Component
 function ProtectedRoute({ children, user, requiredRole }) {
@@ -25,6 +26,7 @@ const ROUTES = {
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
   PLATFORM_DESK: "/platformdesk",
+  OP_APPOINTMENTS: "/op-appointments",
 };
 
 export default function AppRouter({ user, onLogin, onLogout }) {
@@ -55,6 +57,15 @@ export default function AppRouter({ user, onLogin, onLogout }) {
         />
 
         {/* OP Desk Route - Protected for doctors */}
+        <Route
+          path={ROUTES.OP_APPOINTMENTS}
+          element={
+            <ProtectedRoute user={user} requiredRole="doctor">
+              <OPAppointmentsScreen />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path={ROUTES.OP_DESK}
           element={

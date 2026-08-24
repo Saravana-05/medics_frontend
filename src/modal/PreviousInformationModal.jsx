@@ -32,13 +32,13 @@ function InfoPair({ label, value }) {
 function Vital({ value, label, color }) {
   return (
     <div className="flex min-h-[31px] items-center justify-center gap-2 rounded-full border px-3 py-1.5" style={{ color, borderColor: `${color}55`, background: `${color}12` }}>
-      <b className="text-[14px]">{value}</b><span className="text-[12px] font-medium">{label}</span>
+      <span className="text-[14px] font-normal">{value}</span><span className="text-[12px] font-normal">{label}</span>
     </div>
   );
 }
 
-function EmptyTabFooter({ background }) {
-  return <div className="h-12 shrink-0 border-t border-slate-300" style={{ background }} aria-hidden="true" />;
+function EmptyTabFooter() {
+  return <div className="h-12 shrink-0 border-t border-sky-200 bg-sky-50" aria-hidden="true" />;
 }
 
 function Drugs({ rows, onChange }) {
@@ -79,11 +79,11 @@ function Drugs({ rows, onChange }) {
         <th className="w-[8%] text-center">Buy</th><th className="w-[7%] text-center">M</th><th className="w-[7%] text-center">N</th>
         <th className="w-[7%] text-center">E</th><th className="w-[7%] text-center">N</th><th className="w-[14%] text-center">Actions</th>
       </tr></thead>
-      <tbody className="text-[11.5px]">{drugRows.map((drug, index) => {
+      <tbody className="text-[14px]">{drugRows.map((drug, index) => {
         const schedule = dosageSchedule(drug.period, drug.intake);
         return <tr key={`${drug.name}-${index}`} className="h-10 border-b border-slate-200">
           <td className="text-center font-semibold text-sky-700">{index + 1}</td>
-          <td className="px-2"><b>{drug.name}</b><div className="text-[11.5px]">({drug.days} Days, {drug.period}, {drug.when})</div></td>
+          <td className="px-2"><b>{drug.name}</b><div className="text-[14px]">({drug.days} Days, {drug.period}, {drug.when})</div></td>
           <td className="text-center font-bold text-slate-700">{buyQuantity(drug)}</td>
           {schedule.map((dose, doseIndex) => <td key={doseIndex} className="text-center">{dose}</td>)}
           <td className="text-center"><span className="inline-flex items-center justify-center gap-1"><button type="button" onClick={() => editDrug(drug, index)} className="p-1 text-[var(--color-primary)]" title={`Edit ${drug.name}`}><Pencil size={13} /></button><button type="button" onClick={() => setViewedDrug(drug)} className="p-1 text-[var(--color-info)]" title={`View ${drug.name}`}><Eye size={13} /></button><button type="button" onClick={() => removeDrug(drug, index)} className="p-1 text-[var(--color-danger)]" title={`Close ${drug.name}`}><X size={13} /></button></span></td>
@@ -130,7 +130,7 @@ function LabTestTabLayout({ rows }) {
           <span>No.</span><span>Test Name</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {tests.map((test, index) => <div key={`${test.name}-${index}`} className="grid h-[45px] grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-200 text-[11.5px] odd:bg-white even:bg-slate-50"><span className="text-center">{index + 1}</span><span className="min-w-0 px-3" title={test.name}><b className="block truncate">{test.name}</b>{test.detail && <small className="mt-0.5 block truncate text-[10px]">{test.detail}</small>}</span></div>)}
+          {tests.map((test, index) => <div key={`${test.name}-${index}`} className="grid h-[45px] grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50"><span className="text-center">{index + 1}</span><span className="min-w-0 px-3" title={test.name}><b className="block truncate">{test.name}</b>{test.detail && <small className="mt-0.5 block truncate text-[14px]">{test.detail}</small>}</span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`lab-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="#f8e5e5" />
@@ -141,7 +141,7 @@ function LabTestTabLayout({ rows }) {
           <span>No.</span><span>Observed Value</span><span>Unit</span><span>Biological Reference - Interval</span><span>Specimen</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {reportRows.map((test, index) => <div key={`${test.name}-report-${index}`} className="grid h-[45px] grid-cols-[36px_80px_58px_minmax(120px,1fr)_82px] items-center border-b border-slate-200 text-center text-[11.5px] odd:bg-white even:bg-slate-50"><span>{index + 1}</span><span className="truncate px-1">{test.observedValue || "—"}</span><span className="truncate px-1 font-semibold">{test.unit || "—"}</span><span className="truncate px-1" title={test.bioRef}>{test.bioRef || "—"}</span><span className="truncate px-1 font-semibold" title={test.specimen}>{test.specimen || "—"}</span></div>)}
+          {reportRows.map((test, index) => <div key={`${test.name}-report-${index}`} className="grid h-[45px] grid-cols-[36px_80px_58px_minmax(120px,1fr)_82px] items-center border-b border-slate-200 text-center text-[14px] odd:bg-white even:bg-slate-50"><span>{index + 1}</span><span className="truncate px-1">{test.observedValue || "—"}</span><span className="truncate px-1 font-semibold">{test.unit || "—"}</span><span className="truncate px-1" title={test.bioRef}>{test.bioRef || "—"}</span><span className="truncate px-1 font-semibold" title={test.specimen}>{test.specimen || "—"}</span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`report-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="#f8e5e5" />
@@ -180,7 +180,7 @@ function ServiceTabLayout({ rows, files = serviceFiles, onFilesChange }) {
           <span>No.</span><span>Service Name</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {services.map((service, index) => <div key={`${service.name}-${index}`} className="grid h-10 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-200 text-[11.5px] odd:bg-white even:bg-slate-50"><span className="text-center">{index + 1}</span><span className="truncate px-3" title={service.detail || service.name}>{service.name}</span></div>)}
+          {services.map((service, index) => <div key={`${service.name}-${index}`} className="grid h-10 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50"><span className="text-center">{index + 1}</span><span className="truncate px-3" title={service.detail || service.name}>{service.name}</span></div>)}
           {Array.from({ length: leftFillerCount }, (_, index) => <div key={`service-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="#eef5e3" />
@@ -191,7 +191,7 @@ function ServiceTabLayout({ rows, files = serviceFiles, onFilesChange }) {
           <span>No.</span><span>File Name</span><span>Type</span><span>Size</span><span>Dt-Time</span><span>Actions</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {reportFiles.map((file, index) => <div key={file.id || index} className="grid h-10 grid-cols-[32px_minmax(90px,1fr)_42px_48px_102px_70px] items-center border-b border-slate-200 text-center text-[11.5px] odd:bg-white even:bg-slate-50"><span>{index + 1}</span><span className="truncate px-1 text-left" title={file.fileName}>{file.fileName}</span><span>{file.type}</span><span>{file.size}</span><span className="whitespace-nowrap text-[10.5px]">{file.dtTime}</span><span className="flex justify-center gap-1"><button type="button" onClick={() => editReportFile(file, index)} className="p-1 text-[var(--color-primary)]" title={`Edit ${file.fileName}`}><Pencil size={12} /></button><button type="button" onClick={() => window.alert(`${file.fileName}\nType: ${file.type || "—"}\nSize: ${file.size || "—"}\nDate-Time: ${file.dtTime || "—"}`)} className="p-1 text-[var(--color-services)]" title={`View ${file.fileName}`}><Eye size={12} /></button></span></div>)}
+          {reportFiles.map((file, index) => <div key={file.id || index} className="grid h-10 grid-cols-[32px_minmax(90px,1fr)_42px_48px_102px_70px] items-center border-b border-slate-200 text-center text-[14px] odd:bg-white even:bg-slate-50"><span>{index + 1}</span><span className="truncate px-1 text-left" title={file.fileName}>{file.fileName}</span><span>{file.type}</span><span>{file.size}</span><span className="whitespace-nowrap text-[14px]">{file.dtTime}</span><span className="flex justify-center gap-1"><button type="button" onClick={() => editReportFile(file, index)} className="p-1 text-[var(--color-primary)]" title={`Edit ${file.fileName}`}><Pencil size={12} /></button><button type="button" onClick={() => window.alert(`${file.fileName}\nType: ${file.type || "—"}\nSize: ${file.size || "—"}\nDate-Time: ${file.dtTime || "—"}`)} className="p-1 text-[var(--color-services)]" title={`View ${file.fileName}`}><Eye size={12} /></button></span></div>)}
           {Array.from({ length: rightFillerCount }, (_, index) => <div key={`file-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="#eef5e3" />
@@ -209,7 +209,7 @@ function CarePlanTabLayout({ rows }) {
       <div className="flex h-full min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[var(--color-primary)] text-center text-[10px] font-bold leading-tight text-white" style={{ gridTemplateColumns: carePlanColumns }}><span>No.</span><span>Medical Condition</span><span>Schedule Date</span><span>Milestone</span><span>Pathway Name</span><span>Activity Type</span><span>Activity Description</span><span>Schedule Status</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {activities.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[11px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: carePlanColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2" title={item.name}>{item.name || "—"}</span><span className="text-center">{item.schDate || "—"}</span><span className="text-center">{item.milestone || "—"}</span><span className="truncate px-2" title={item.pathwayName}>{item.pathwayName || "—"}</span><span className="truncate px-2 text-center" title={item.activityType}>{item.activityType || "—"}</span><span className="truncate px-2" title={item.activityDescription}>{item.activityDescription || "—"}</span><span className="truncate px-2 text-center" title={item.schStatus}>{item.schStatus || "—"}</span></div>)}
+          {activities.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: carePlanColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2" title={item.name}>{item.name || "—"}</span><span className="text-center">{item.schDate || "—"}</span><span className="text-center">{item.milestone || "—"}</span><span className="truncate px-2" title={item.pathwayName}>{item.pathwayName || "—"}</span><span className="truncate px-2 text-center" title={item.activityType}>{item.activityType || "—"}</span><span className="truncate px-2" title={item.activityDescription}>{item.activityDescription || "—"}</span><span className="truncate px-2 text-center" title={item.schStatus}>{item.schStatus || "—"}</span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`care-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="var(--color-primary-muted)" />
@@ -228,7 +228,7 @@ function IpTimelineTabLayout({ rows }) {
       <div className="flex h-full min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
         <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[#f0a866] text-center text-[10px] font-bold text-slate-900" style={{ gridTemplateColumns: timelineColumns }}><span>No.</span><span>Medic</span><span>Time</span><span>Entry Type</span><span>Subject</span><span>Notes</span><span>Actions</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {entries.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[11.5px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: timelineColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2">{item.medic || "—"}</span><span className="text-center">{item.time || "—"}</span><span className="truncate px-2 text-center">{item.entryType || "—"}</span><span className="truncate px-2">{subjectFor(item)}</span><span className="truncate px-2">{item.notes || "—"}</span><span className="flex justify-center"><button type="button" className="p-1 text-[#9a4e16]" title={`View ${subjectFor(item)}`}><Eye size={13} /></button></span></div>)}
+          {entries.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: timelineColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2">{item.medic || "—"}</span><span className="text-center">{item.time || "—"}</span><span className="truncate px-2 text-center">{item.entryType || "—"}</span><span className="truncate px-2">{subjectFor(item)}</span><span className="truncate px-2">{item.notes || "—"}</span><span className="flex justify-center"><button type="button" className="p-1 text-[#9a4e16]" title={`View ${subjectFor(item)}`}><Eye size={13} /></button></span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`ip-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
         </div>
         <EmptyTabFooter background="#fff1e1" />
@@ -373,7 +373,7 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
               <Vital value={historicalVitals.weight} label="Weight" color="#14b8a6" />
               <Vital value={historicalVitals.bmi} label="BMI" color="#22c55e" />
             </div>
-            <div className="grid grid-rows-2 gap-2 border-l border-slate-200 px-5 py-3 text-[14px]"><div className="flex min-h-[31px] items-center"><b className="mr-3 shrink-0 text-slate-500">Chief Complaint:</b><span>{visit.complaint || patient?.chiefComplaint || "—"}</span></div><div className="flex min-h-[31px] items-center"><b className="mr-3 shrink-0 text-slate-500">First Observation:</b><span>{visit.observation || patient?.firstObservation || "—"}</span></div></div>
+            <div className="grid grid-rows-2 gap-2 border-l border-slate-200 px-5 py-3 text-[14px]"><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">Chief Complaint:</span><span className="font-normal">{visit.complaint || patient?.chiefComplaint || "—"}</span></div><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">First Observation:</span><span className="font-normal">{visit.observation || patient?.firstObservation || "—"}</span></div></div>
           </div>
         </section>
 

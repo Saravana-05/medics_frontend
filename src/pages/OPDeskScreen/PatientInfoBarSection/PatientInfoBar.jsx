@@ -37,20 +37,20 @@ export default function PatientInfoBar({
 }) {
   const [open, setOpen] = useState(false);
   const [opList, setOpList] = useState(false);
-  const [appointmentTitle, setAppointmentTitle] = useState("By Appointments");
+  const [appointmentTitle, setAppointmentTitle] = useState("By Appointment");
   const p = selectedPatient || {};
 
   const selectFromPatientDropdown = patient => {
-    setAppointmentTitle("By Appointments");
+    setAppointmentTitle("By Appointment");
     onSelectPatient(patient);
   };
 
   const selectFromList = row => {
     const title = row?.listType === "op"
-      ? "By Appointment of OP List"
+      ? "By OP List"
       : row?.listType === "ip"
-        ? "By Appointment of IP List"
-        : "By Appointments";
+        ? "By IP List"
+        : "By Appointment";
     setAppointmentTitle(title);
     onSelectPatient(row);
   };

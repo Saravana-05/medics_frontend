@@ -22,7 +22,7 @@ export const mainMenuItems = [
   {
     label: "Daily Functionality",
     items: [
-      { label: "Out-Patient Appointment", action: "op-desk" }, { label: "Doctor's Desk", action: "op-desk" }, { separator: true },
+      { label: "Out-Patient Appointment", action: "op-appointments" }, { label: "Doctor's Desk", action: "op-desk" }, { separator: true },
       { label: "In-Patient Management" }, { label: "IP-Nurse's Desk" }, { separator: true },
       { label: "Lab-Test Service", children: ["Test Prescription Entry", "Test Specimen Collection", "Test Result Entry", "Test Result Authorization", "Test Report Delivery"].map(label => ({ label })) },
       { label: "Medical Service", children: ["Service Prescription Entry", "Service Result Entry", "Service Result Authorization", "Service Report Delivery"].map(label => ({ label })) },
