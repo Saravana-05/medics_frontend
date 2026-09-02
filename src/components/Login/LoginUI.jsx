@@ -68,8 +68,9 @@ export default function LoginUI({
           position: relative;
           z-index: 1;
           display: flex;
-          align-items: baseline;
-          gap: 21px;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
           white-space: nowrap;
         }
         .medix-brand-name {
@@ -77,19 +78,29 @@ export default function LoginUI({
           font-size: clamp(50px, 5.74vw, 92px);
           font-weight: 400;
           font-style: italic;
-          transform: translateY(125px);
           line-height: .9;
           letter-spacing: 2px;
           color: #fff;
+          text-align: center;
           text-shadow: 0 7px 5px rgba(0,75,77,.35);
         }
         .medix-brand-tagline {
-          color: #6b7280;
           font-family: "Inter", sans-serif;
           font-size: clamp(15px, 1.65vw, 24px);
           font-style: normal;
           font-weight: 400;
-          transform: translateY(145px);
+          text-align: center;
+          transform: translateX(50px);
+        }
+        .medix-brand-tagline-dots {
+          color: #f87171;
+        }
+        .medix-brand-tagline-for {
+          color: #f87171;
+          font-style: italic;
+        }
+        .medix-brand-tagline-text {
+          color: #374151;
         }
         .medix-hero-icon {
           position: relative;
@@ -288,8 +299,12 @@ export default function LoginUI({
       <section className="medix-login-shell" aria-label="Medix sign in">
         <div className="medix-login-hero" aria-hidden="true">
           <div className="medix-brand">
-            <span className="medix-brand-name">E-Medics</span>
-            <span className="medix-brand-tagline">... for Doctors</span>
+            <span className="medix-brand-name">E-Medic</span>
+            <span className="medix-brand-tagline">
+              <span className="medix-brand-tagline-dots">...</span>
+              <span className="medix-brand-tagline-for"> for</span>
+              <span className="medix-brand-tagline-text"> Doctor's Desk</span>
+            </span>
           </div>
           <img className="medix-hero-icon" src={StethoscopeHandDrawn} alt="" />
         </div>

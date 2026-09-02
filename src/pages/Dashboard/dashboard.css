@@ -30,7 +30,7 @@
    existing component: .em-brand-mark (top:6.5%, ~66px),
    .em-hospital-illustration (left:7%, ~134px), .em-quick-actions
    (right:9.15% / bottom:10.6%) on a 1920x1080 screen. */
-.em-border-frame { position:absolute; inset:0; z-index:1; box-sizing:border-box; border:40px solid #dcdcdc; pointer-events:none; }
+.em-border-frame { position:absolute; inset:0; z-index:1; box-sizing:border-box; border:40px solid #c8c8c8; pointer-events:none; }
 /* .em-workspace clips overflow, so a shadow can't extend past the screen
    edge — this invisible box matches the content hole (same 40px inset) and
    casts a NON-inset shadow that spreads outward FROM the content edge INTO
