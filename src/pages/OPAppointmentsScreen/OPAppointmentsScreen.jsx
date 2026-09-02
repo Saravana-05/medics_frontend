@@ -274,7 +274,7 @@ export default function OPAppointmentsScreen() {
   return <main className={`opa-screen ${appointmentStatus === "confirmed" ? "is-complete" : ""}`}>
     <style>{opAppointmentStyles + confirmationStyles + schedulingStyles + slotListStyles + compactReferenceStyles + slotStateStyles + slotActionStyles + sizingStyles + screenshotStyles + fullWidthStyles + equalWidthStyles + familyCareStyles + brandingRailStyles + brandingPositionStyles + brandingSeparationStyles}</style>
     <header className="opa-header">
-      <button className="opa-back" type="button" onClick={() => navigate("/dashboard")}><ArrowLeft size={17} /> Main Menu</button>
+      <button className="opa-back" type="button" onClick={() => navigate("/main-menu-2")}><ArrowLeft size={17} /> Main Menu</button>
       <div className="opa-brand"><span>OP</span><div><h1>Out-Patient Appointments</h1><p>Appointment planning, patient details and slot allocation</p></div></div>
       <div className="opa-staff">Duty Staff: <strong>Mrs. Stella</strong></div>
     </header>
@@ -333,7 +333,7 @@ export default function OPAppointmentsScreen() {
           <span>Reporting Time</span><strong>15 minutes before the slot</strong>
         </div>
         <p className="opa-confirm-reminder">Confirmation is recorded under the {schedulePattern} schedule. Reminder 1 is sent immediately; {reminders.length - 1} additional reminder{reminders.length === 2 ? "" : "s"} will follow the configured appointment schedule.</p>
-        <footer className="opa-confirm-actions"><button type="button" onClick={() => navigate("/dashboard")}>Main Menu</button><button type="button" onClick={clearAppointment}>New Appointment</button><button className="primary" type="button" onClick={() => setShowConfirmation(false)}>View Appointment</button></footer>
+        <footer className="opa-confirm-actions"><button type="button" onClick={() => navigate("/main-menu-2")}>Main Menu</button><button type="button" onClick={clearAppointment}>New Appointment</button><button className="primary" type="button" onClick={() => setShowConfirmation(false)}>View Appointment</button></footer>
       </section>
     </div>}
   </main>;

@@ -39,21 +39,33 @@
 .em-border-frame-shadow { position:absolute; top:40px; left:40px; right:40px; bottom:40px; z-index:1; box-shadow:0 0 12px 4px rgb(0 0 0 / 35%); pointer-events:none; }
 .em-hospital-label { position:absolute; top:40%; left:25%; z-index:2; transform:translateX(-50%); color:#111; font-size:clamp(.7rem,1vw,1.2rem); font-weight:700; line-height:1; white-space:nowrap; }
 .em-hospital-illustration { position:absolute; left:7%; top:61%; width:36%; height:auto; transform:translateY(-50%); object-fit:contain; pointer-events:none; user-select:none; }
-.em-brand-mark { position:absolute; top:9.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:clamp(3rem,6.3vw,7.5rem); font-weight:400; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
+.em-brand-mark { position:absolute; top:9.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:clamp(3rem,6.3vw,7.5rem); font-weight:400; font-style:italic; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
 .em-doctor-desk-tagline { position:absolute; top:19.5%; left:74%; margin:0; color:#fff; font-size:clamp(1rem,1.55vw,1.9rem); font-weight:300; line-height:1; letter-spacing:.01em; text-align:left; text-shadow:1px 2px 3px rgb(42 92 95 / 34%); white-space:nowrap; }
 .em-doctor-desk-tagline em { margin-right:.12em; font-size:1.12em; font-weight:400; }
-.em-quick-actions { position:absolute; right:9.15%; bottom:10.6%; display:grid; width:28.7%; aspect-ratio:1; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
-.em-quick-action { position:relative; border:1px solid rgb(255 255 255 / 82%); background:linear-gradient(135deg,#d9f4f4 0%,#b8e4e4 70%,#a5d6d6 100%); box-shadow:2px 5px 12px rgb(23 79 82 / 38%); cursor:pointer; transition:filter .14s ease,transform .14s ease,box-shadow .14s ease; }
+/* Same 3x3 grid, same footprint (right:9.15%; bottom:10.6%; width:28.7%;
+   aspect-ratio:1) as before — now on a wrapper so prev/next arrows + dots
+   can sit around it without disturbing the grid itself. Tiles 1-6's
+   background/color come from an inline style (SWAP_COLORS in
+   Dashboard.jsx) so advancing the slider swaps colors across those squares
+   in the same positions; tile 7 keeps its own fixed navy here since it was
+   never part of the 6-square swap set. */
+.em-quick-actions-carousel { position:absolute; right:-20px; bottom:5%; width:28.7%; display:flex; flex-direction:column; align-items:center; }
+.em-quick-actions { position:relative; width:100%; aspect-ratio:1; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+.em-quick-action { position:relative; border:1px solid rgb(255 255 255 / 82%); box-shadow:2px 5px 12px rgb(23 79 82 / 38%); cursor:pointer; transition:filter .14s ease,transform .14s ease,box-shadow .14s ease,background .2s ease,color .2s ease; }
 .em-quick-action-1 { grid-area:3/1; }
 .em-quick-action-2 { grid-area:2/2; }
 .em-quick-action-3 { grid-area:1/3; }
-.em-quick-action-4 { grid-area:3/2; background:linear-gradient(135deg,#72c7c7,#48b0b2); }
-.em-quick-action-5 { grid-area:2/3; background:linear-gradient(135deg,#70c8c7,#44afb0); }
-.em-quick-action-6 { grid-area:3/3; background:linear-gradient(135deg,#16a7ab,#008d91); }
+.em-quick-action-4 { grid-area:3/2; }
+.em-quick-action-5 { grid-area:2/3; }
+.em-quick-action-6 { grid-area:3/3; }
 .em-quick-action-7 { grid-area:1/1; background:linear-gradient(135deg,#315f94,#173f72); color:#fff; }
-.em-quick-action-7 .em-quick-action-label { position:static; display:flex; width:100%; height:100%; align-items:center; justify-content:center; overflow:visible; clip:auto; padding:12px; color:#fff; font-size:clamp(11px,1vw,16px); font-weight:700; line-height:1.2; text-align:center; white-space:normal; }
+.em-quick-action-7 .em-quick-action-label { position:static; display:flex; width:100%; height:100%; align-items:center; justify-content:center; overflow:visible; clip:auto; padding:12px; color:inherit; font-size:clamp(11px,1vw,16px); font-weight:700; line-height:1.2; text-align:center; white-space:normal; }
 .em-quick-action:hover { z-index:2; filter:brightness(1.06); transform:translateY(-3px); box-shadow:3px 9px 18px rgb(16 67 70 / 44%); }
 .em-quick-action:focus-visible { z-index:3; outline:3px solid #fff; outline-offset:-5px; }
 .em-quick-action:active { transform:translateY(0); }
 .em-quick-action-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.em-quick-carousel-dots { display:flex; gap:5px; margin-top:40px; }
+.em-quick-carousel-dot { width:15px; height:15px; padding:0; border:1px solid rgb(255 255 255 / 60%); border-radius:50%; background:var(--dot-color); cursor:pointer; opacity:.55; transition:opacity .14s ease,transform .14s ease; }
+.em-quick-carousel-dot.is-active { opacity:1; transform:scale(1.25); }
+.em-quick-carousel-dot:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 @media (max-width:900px) { .em-menu-bar{overflow-x:auto}.em-menu-trigger{padding:0 12px;font-size:.9rem;white-space:nowrap}.em-doctor-desk-tagline{font-size:clamp(.65rem,1.55vw,1rem)} }

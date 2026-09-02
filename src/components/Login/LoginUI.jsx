@@ -90,6 +90,7 @@ export default function LoginUI({
           font-style: normal;
           font-weight: 400;
           text-align: center;
+          word-spacing: 6px;
           transform: translateX(50px);
         }
         .medix-brand-tagline-dots {

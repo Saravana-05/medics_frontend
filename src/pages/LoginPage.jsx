@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import LoginUI from "../components/Login/LoginUI";
 import { findHospitalByUsername } from "../services/hospitalRegistry";
 
-// Route paths — doctors land on the main menu/Dashboard first; OP Desk is
-// reached from there (top-right "OP Desk" button).
+// Route paths — doctors land on Main Menu 2 first; OP Desk is reached from
+// there (top-right "OP Desk" button / shortcut rail).
 const ROUTES = {
-  DOCTOR: "/dashboard",
+  DOCTOR: "/main-menu-2",
   OFFICE: "/frontdesk",
   PLATFORM: "/platformdesk",
 };

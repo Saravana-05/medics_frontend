@@ -1,7 +1,6 @@
 // routes/Router.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
-import Dashboard from "../pages/Dashboard/Dashboard";
 import CreateHospital from "../pages/Home/CreateHospital";
 import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
@@ -22,7 +21,6 @@ function ProtectedRoute({ children, user, requiredRole }) {
 
 const ROUTES = {
   HOME: "/",
-  DASHBOARD: "/dashboard",
   REGISTER: "/register",
   OP_DESK: "/opdesk",
   FRONT_DESK: "/frontdesk",
@@ -41,17 +39,8 @@ export default function AppRouter({ user, onLogin, onLogout }) {
           element={<LoginPage onLogin={onLogin} />}
         />
 
-        {/* Main menu / dashboard — where a doctor lands right after login;
-            OP Desk and everything else is reached from its top nav. */}
-        <Route
-          path={ROUTES.DASHBOARD}
-          element={
-            <ProtectedRoute user={user} requiredRole="doctor">
-              <Dashboard user={user} onLogout={onLogout} />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Main menu — where a doctor lands right after login; OP Desk and
+            everything else is reached from its top nav / shortcut rail. */}
         <Route
           path={ROUTES.MAIN_MENU_2}
           element={
