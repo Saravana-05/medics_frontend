@@ -162,11 +162,9 @@
 }
 
 .mm2-workspace .em-workspace {
-  background: linear-gradient(
-    to right,
-    #eef1f4 0 max(37.5%, calc(100% - 1200px)),
-    #48b9bb max(37.5%, calc(100% - 1200px)) 100%
-  );
+  background: linear-gradient(to right,
+      #eef1f4 0 max(37.5%, calc(100% - 1200px)),
+      #48b9bb max(37.5%, calc(100% - 1200px)) 100%);
 }
 
 .mm2-workspace .em-hospital-label {
@@ -182,9 +180,9 @@
 
 .mm2-workspace .em-brand-mark {
   right: auto;
-  left: calc(100% + 10px - min(501px, 26.57vw));
+  left: calc(100% + 70px - min(501px, 26.57vw));
   width: 360px;
-  font-size: clamp(calc(3rem - 2px), calc(6.3vw - 2px), calc(7.5rem - 2px));
+  font-size: 92px;
   text-align: left;
 }
 

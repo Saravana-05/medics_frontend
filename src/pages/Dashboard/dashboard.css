@@ -39,7 +39,7 @@
 .em-border-frame-shadow { position:absolute; top:40px; left:40px; right:40px; bottom:40px; z-index:1; box-shadow:0 0 12px 4px rgb(0 0 0 / 35%); pointer-events:none; }
 .em-hospital-label { position:absolute; top:40%; left:25%; z-index:2; transform:translateX(-50%); color:#111; font-size:clamp(.7rem,1vw,1.2rem); font-weight:700; line-height:1; white-space:nowrap; }
 .em-hospital-illustration { position:absolute; left:7%; top:61%; width:36%; height:auto; transform:translateY(-50%); object-fit:contain; pointer-events:none; user-select:none; }
-.em-brand-mark { position:absolute; top:9.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:clamp(50px,5.74vw,92px); font-weight:400; font-style:italic; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
+.em-brand-mark { position:absolute; top:9.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:92px; font-weight:400; font-style:italic; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
 .em-doctor-desk-tagline { position:absolute; top:19.5%; left:74%; margin:0; color:#fff; font-size:clamp(1rem,1.55vw,1.9rem); font-weight:300; line-height:1; letter-spacing:.01em; text-align:left; text-shadow:1px 2px 3px rgb(42 92 95 / 34%); white-space:nowrap; }
 .em-doctor-desk-tagline em { margin-right:.12em; font-size:1.12em; font-weight:400; }
 /* Same 3x3 grid, same footprint (right:9.15%; bottom:10.6%; width:28.7%;
