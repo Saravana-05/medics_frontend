@@ -64,7 +64,7 @@
 .em-quick-action:focus-visible { z-index:3; outline:3px solid #fff; outline-offset:-5px; }
 .em-quick-action:active { transform:translateY(0); }
 .em-quick-action-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-.em-quick-carousel-dots { display:flex; gap:5px; margin-top:40px; }
+.em-quick-carousel-dots { display:flex; gap:12px; margin-top:40px; margin-bottom:20px; }
 .em-quick-carousel-dot { width:15px; height:15px; padding:0; border:1px solid rgb(255 255 255 / 60%); border-radius:50%; background:var(--dot-color); cursor:pointer; opacity:.55; transition:opacity .14s ease,transform .14s ease; }
 .em-quick-carousel-dot.is-active { opacity:1; transform:scale(1.25); }
 .em-quick-carousel-dot:focus-visible { outline:2px solid #fff; outline-offset:2px; }
