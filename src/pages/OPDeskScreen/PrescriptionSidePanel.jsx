@@ -44,14 +44,21 @@ function EmptyPanelRow({ columnCount }) {
   );
 }
 
-function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, accentText = "white", textAccent, onAdd, addLabel, searchTerm, onSearchChange, actions }) {
+function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, accentText = "white", textAccent, onAdd, addLabel, searchTerm, onSearchChange, actions, headerColor, headerLight, titleColor, subtitleColor }) {
+  // headerColor/headerLight let a config recolor just this header bar
+  // (background + title) independently of accentColor, which everything
+  // else in the panel (rows, buttons, borders) still uses. titleColor/
+  // subtitleColor override just the text, independent of the background,
+  // for panels that want black text without also flattening the background.
+  const hColor = headerColor || accentColor;
+  const hLight = headerLight || accentLight;
   return (
     <>
-      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: `color-mix(in srgb, ${accentLight} 88%, ${accentColor} 12%)`, backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045))", borderColor: "var(--color-border)" }}>
+      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: headerColor ? hColor : `color-mix(in srgb, ${hLight} 88%, ${hColor} 12%)`, backgroundImage: headerColor ? "none" : "linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045))", borderColor: "var(--color-border)" }}>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
-            <h3 className="font-bold leading-tight" style={{ color: textAccent || accentColor, fontSize: "12.5px" }}>{title}</h3>
-            <p className="text-[0.58rem] font-normal leading-tight" style={{ color: "var(--color-text-muted)" }}>{subtitle}</p>
+            <h3 className="font-bold leading-tight" style={{ color: titleColor || (headerColor ? "#000" : (textAccent || accentColor)), fontSize: "12.5px" }}>{title}</h3>
+            <p className="text-[0.58rem] font-normal leading-tight" style={{ color: subtitleColor || (headerColor ? "#000" : "var(--color-text-muted)") }}>{subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
@@ -75,9 +82,9 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
   );
 }
 
-/* ── "group-list" panel type: Drug Group Prescription / Test Group Prescription / IP Time Group ── */
+/* ── "group-list" panel type: Group Prescription / Test Group Prescription / IP Time Group ── */
 function GroupListPanel({
-  sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon, hasPatient = false, onApplyGroup, catalogList = [], typeLabel = "", onGroupSaved,
+  sidePanel, accentColor, accentLight, accentText = "white", textAccent, headerColor, headerLight, icon, hasPatient = false, onApplyGroup, catalogList = [], typeLabel = "", onGroupSaved,
   // New-group flow, step 2: the title popup closes and hands off to the main
   // grid's own add-row — draftActive/draftTitle/draftItems mirror OPDeskScreen's
   // groupDraft state (items are whatever's been added to the grid since the
@@ -142,7 +149,7 @@ function GroupListPanel({
 
   return (
     <>
-      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent} headerColor={headerColor} headerLight={headerLight}
         subtitle={`${entries.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
@@ -444,7 +451,7 @@ function ReportViewPanel({ sidePanel, accentColor, accentLight, icon, reportItem
 /* ── "entry-mirror" panel type (IP Time): a live, read-only reflection of the
    left grid's own entries — Entry Type / Subject / Notes per row — not an
    aggregated group list. Adding/editing happens in the main grid only. ── */
-function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon, mirrorItems = [] }) {
+function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, headerColor, headerLight, icon, mirrorItems = [] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [entryTypeFilter, setEntryTypeFilter] = useState("All Types");
   const [selectedId, setSelectedId] = useState(null);
@@ -464,7 +471,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
   return (
     <>
-      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent} headerColor={headerColor} headerLight={headerLight}
         subtitle={`${mirrorItems.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
@@ -512,7 +519,7 @@ function EntryMirrorPanel({ sidePanel, accentColor, accentLight, accentText = "w
 }
 
 /* ── "file-manager" panel type (Services) ── */
-function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon }) {
+function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, headerColor, headerLight, icon }) {
   const [files, setFiles] = useState(serviceFiles);
   const [fileTypeFilter, setFileTypeFilter] = useState("All Types");
   const [searchTerm, setSearchTerm] = useState("");
@@ -556,7 +563,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 
   return (
     <>
-      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent} headerColor={headerColor} headerLight={headerLight}
         subtitle={`${files.length} File${files.length !== 1 ? "s" : ""}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
@@ -629,7 +636,7 @@ function FileManagerPanel({ sidePanel, accentColor, accentLight, accentText = "w
 /* ── "care-plan-list" panel type (Care-Plan): a browsable library of care-plan
    templates — Speciality / Med. Condition / Milestones / Period — distinct
    from Drug/Lab's medicine-picker group-list shape. ── */
-function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, icon }) {
+function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "white", textAccent, headerColor, headerLight, icon }) {
   const [entries, setEntries] = useState(carePlanTemplatesSeed);
   const [specialityFilter, setSpecialityFilter] = useState("All Specialities");
   const [searchTerm, setSearchTerm] = useState("");
@@ -663,7 +670,7 @@ function CarePlanListPanel({ sidePanel, accentColor, accentLight, accentText = "
 
   return (
     <>
-      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent}
+      <PanelHeader icon={icon} title={sidePanel.title} accentColor={accentColor} accentLight={accentLight} accentText={accentText} textAccent={textAccent} headerColor={headerColor} headerLight={headerLight} titleColor="black" subtitleColor="black"
         subtitle={`${entries.length} ${sidePanel.itemLabel}`}
         searchTerm={searchTerm} onSearchChange={setSearchTerm}
         actions={<div className="relative">
@@ -809,7 +816,7 @@ export default function PrescriptionSidePanel({
   if (sidePanel.type === "file-manager") {
     return (
       <div className={wrapperClass} style={wrapperStyle}>
-        <FileManagerPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} />
+        <FileManagerPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} headerColor={config.tableHeaderColor} headerLight={config.tableHeaderColorLight} icon={config.icon} />
       </div>
     );
   }
@@ -817,7 +824,7 @@ export default function PrescriptionSidePanel({
   if (sidePanel.type === "entry-mirror") {
     return (
       <div className={wrapperClass} style={wrapperStyle}>
-        <EntryMirrorPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} mirrorItems={mirrorItems} />
+        <EntryMirrorPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} headerColor={config.tableHeaderColor} headerLight={config.tableHeaderColorLight} icon={config.icon} mirrorItems={mirrorItems} />
       </div>
     );
   }
@@ -825,7 +832,7 @@ export default function PrescriptionSidePanel({
   if (sidePanel.type === "care-plan-list") {
     return (
       <div className={wrapperClass} style={wrapperStyle}>
-        <CarePlanListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} />
+        <CarePlanListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} headerColor={config.tableHeaderColor} headerLight={config.tableHeaderColorLight} icon={config.icon} />
       </div>
     );
   }
@@ -834,7 +841,7 @@ export default function PrescriptionSidePanel({
   // Drug ↔ Lab remounts fresh (and re-seeds entries) instead of reusing stale state.
   return (
     <div className={wrapperClass} style={wrapperStyle}>
-      <GroupListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} icon={config.icon} hasPatient={hasPatient} onApplyGroup={onApplyGroup} catalogList={CATALOG_SOURCES[config.searchSource] || []} typeLabel={config.label} onGroupSaved={onGroupSaved}
+      <GroupListPanel key={config.key} sidePanel={sidePanel} accentColor={config.color} accentLight={config.colorLight} accentText={config.colorText} textAccent={config.textAccent} headerColor={config.tableHeaderColor} headerLight={config.tableHeaderColorLight} icon={config.icon} hasPatient={hasPatient} onApplyGroup={onApplyGroup} catalogList={CATALOG_SOURCES[config.searchSource] || []} typeLabel={config.label} onGroupSaved={onGroupSaved}
         draftActive={draftActive} draftTitle={draftTitle} draftItems={draftItems} onStartDraft={onStartDraft} onSaveDraft={onSaveDraft} onCancelDraft={onCancelDraft} />
     </div>
   );

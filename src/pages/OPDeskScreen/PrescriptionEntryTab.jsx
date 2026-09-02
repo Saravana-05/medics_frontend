@@ -346,7 +346,7 @@ function CarePlanDataTable({ columns, items, fillRowCount, selectedRowId, onSele
       <div className="relative flex h-full w-full items-center justify-center gap-1 pr-2" onClick={event => event.stopPropagation()}>
         <span className={`${col.key === "no" ? "whitespace-nowrap" : "truncate"} text-center font-bold`} title={col.label.replace("\n", " ")}>{col.label.replace("\n", " ")}</span>
         {col.key !== "actions" && (
-          <button type="button" onClick={() => toggleSort(col.key)} className="flex-shrink-0 p-0.5" title={`Sort ${col.label.replace("\n", " ")}`} style={{ color: "var(--color-primary)" }}>
+          <button type="button" onClick={() => toggleSort(col.key)} className="flex-shrink-0 p-0.5" title={`Sort ${col.label.replace("\n", " ")}`} style={{ color: "black" }}>
             {sortConfig.key !== col.key ? <ArrowUpDown size={11} /> : sortConfig.direction === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
           </button>
         )}
@@ -392,8 +392,8 @@ function CarePlanDataTable({ columns, items, fillRowCount, selectedRowId, onSele
     table: { style: { backgroundColor: "var(--color-surface)" } },
     tableWrapper: { style: { height: "100%", minHeight: "100%" } },
     responsiveWrapper: { style: { height: "100%", minHeight: "100%" } },
-    headRow: { style: { minHeight: "34px", height: "34px", backgroundColor: "var(--color-primary-muted)", borderBottom: "1px solid var(--color-border)" } },
-    headCells: { style: { paddingLeft: "8px", paddingRight: "8px", color: "var(--color-primary-dark)", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", justifyContent: "center" } },
+    headRow: { style: { minHeight: "34px", height: "34px", backgroundColor: accentColor, borderBottom: "1px solid var(--color-border)" } },
+    headCells: { style: { paddingLeft: "8px", paddingRight: "8px", color: "black", fontSize: "12px", fontWeight: 700, letterSpacing: "1px", justifyContent: "center" } },
     rows: { style: { minHeight: "32px", height: "32px", fontSize: "14px", color: "var(--color-text-base)", borderBottom: "1px solid var(--color-border)" } },
     cells: { style: { paddingLeft: "8px", paddingRight: "8px", overflow: "visible" } },
   };
@@ -1171,7 +1171,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
 
         {!config.hideAddRow && (
           <div className="flex-shrink-0 mt-3">
-            <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.color} accentText={config.tableHeaderText || config.colorText} />
+            <AddTableHeader columns={buildAddRowColumns(config)} accentColor={config.tableHeaderColor || config.color} accentText={config.tableHeaderText || config.colorText} />
             {showAddRow ? (
               <AddRow ref={addRowRef} config={config} draft={draft} onDraftChange={setD} onCommit={commitDraft} onCancel={cancelAdd}
                 query={query} setQuery={setQuery} suggestions={suggestions} allSuggestions={searchList} rowNumber={items.length + 1} searchMode={searchMode} />

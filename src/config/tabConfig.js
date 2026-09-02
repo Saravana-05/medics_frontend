@@ -30,15 +30,20 @@ export const TAB_CONFIGS = {
     key: "drugs",
     label: "Drug",
     icon: Pill,
-    color: "var(--color-services)",
-    colorLight: "var(--color-services-light)",
+    color: "var(--color-drugs)",
+    colorLight: "var(--color-drugs-light)",
     colorText: "white",
     tableHeaderText: "#111827",
     // Used wherever the accent is rendered as TEXT/icon color on a white or
     // near-white background (not as a solid background needing colorText on
     // top of it). For the 3 saturated tabs this is just `color` itself; IP
     // Time-line's pale cream isn't legible as text, so it uses colorText (navy) instead.
-    textAccent: "var(--color-services)",
+    textAccent: "var(--color-drugs)",
+    // Separate from `color` — only the entry table header and the Drug Group
+    // Prescription panel header read these, so they can be recolored without
+    // touching the Drug tab button itself.
+    tableHeaderColor: "var(--color-drugs-header)",
+    tableHeaderColorLight: "var(--color-drugs-header-light)",
 
     labels: {
       addButton: "Add Medicine",
@@ -115,10 +120,15 @@ export const TAB_CONFIGS = {
     key: "lab",
     label: "Lab-Test",
     icon: FlaskConical,
-    color: "#d67d7d",
-    colorLight: "#f8e5e5",
+    color: "var(--color-lab)",
+    colorLight: "var(--color-lab-light)",
     colorText: "#111827",
-    textAccent: "#9b3535",
+    textAccent: "var(--color-lab)",
+    // Separate from `color` — only the entry table header and the Lab Test
+    // Group panel header read these, so they can be recolored without
+    // touching the Lab tab button itself.
+    tableHeaderColor: "var(--color-lab-header)",
+    tableHeaderColorLight: "var(--color-lab-header-light)",
 
     labels: {
       addButton: "Add Test",
@@ -181,10 +191,15 @@ export const TAB_CONFIGS = {
     key: "services",
     label: "Service",
     icon: ServicesIcon,
-    color: "#a9cb77",
-    colorLight: "#eef5e3",
+    color: "var(--color-services)",
+    colorLight: "var(--color-services-light)",
     colorText: "#111827",
-    textAccent: "#567228",
+    textAccent: "var(--color-services)",
+    // Separate from `color` — only the entry table header and the Service
+    // Reports panel header read these, so they can be recolored without
+    // touching the Services tab button itself.
+    tableHeaderColor: "var(--color-services-header)",
+    tableHeaderColorLight: "var(--color-services-header-light)",
 
     labels: {
       addButton: "Add Service",
@@ -215,10 +230,15 @@ export const TAB_CONFIGS = {
     key: "iptime",
     label: "IP Timeline",
     icon: Clock,
-    color: "#f0a866",
-    colorLight: "#fff1e1",
+    color: "var(--color-iptime)",
+    colorLight: "var(--color-iptime-light)",
     colorText: "#111827",
-    textAccent: "#9a4e16",
+    textAccent: "var(--color-iptime)",
+    // Separate from `color` — only the entry table header and the Patient
+    // Group Service panel header read these, so they can be recolored
+    // without touching the IP Timeline tab button or view table header.
+    tableHeaderColor: "var(--color-iptime-header)",
+    tableHeaderColorLight: "var(--color-iptime-header-light)",
 
     labels: {
       addButton: "Add Entry",
@@ -290,10 +310,14 @@ export const TAB_CONFIGS = {
     key: "carePlan",
     label: "Care-Plan",
     icon: ClipboardList,
-    color: "var(--color-primary)",
-    colorLight: "var(--color-primary-muted)",
-    colorText: "white",
-    textAccent: "var(--color-primary)",
+    color: "var(--color-careplan)",
+    colorLight: "var(--color-careplan-light)",
+    colorText: "black",
+    textAccent: "var(--color-careplan)",
+    // Only the Care-Plan Template panel header reads these, so it can be
+    // recolored without touching the tab button or table header.
+    tableHeaderColor: "var(--color-careplan-header)",
+    tableHeaderColorLight: "var(--color-careplan-header-light)",
 
     labels: {
       addButton: "Add Activity",

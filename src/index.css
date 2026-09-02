@@ -34,21 +34,46 @@
   /* ── Tabs ── one shared brand palette (navy / red / blue / cream) reused
      verbatim across every tab, table header, and accent in the app instead of
      each tab having its own unrelated hue. */
-  --color-drugs: #0c324a;
-  /* navy   – Drugs         */
-  --color-drugs-light: #e2e7e9;
-  --color-lab: #c11720;
-  /* red    – Lab           */
-  --color-lab-light: #f7e3e4;
-  --color-services: #679cbc;
-  /* blue   – Services      */
-  --color-services-light: #e1ebf2;
-  --color-iptime: #D0A0A3;
-  /* dusty rose – IP Time-line */
-  --color-iptime-light: #faedda;
-  --color-careplan: #0f766e;
-  /* teal   – Care-Plan     */
-  --color-careplan-light: #e2eeed;
+  --color-drugs: #768aab;
+  /* light blue – Drugs (tab button itself) */
+  --color-drugs-light: #e3eef9;
+  /* Separate from the tab color above — used only by the entry table
+     header and the Drug Group Prescription panel header, so changing
+     this never touches the tab button. */
+  --color-drugs-header: #a7b3ce;
+  --color-drugs-header-light: #eef0f6;
+  --color-lab: #63cec4;
+  /* teal   – Lab (tab button itself) */
+  --color-lab-light: #e3f7f5;
+  /* Separate from the tab color above — used only by the entry table
+     header and the Lab Test Group panel header, so changing this never
+     touches the tab button. */
+  --color-lab-header: #90e5dd;
+  --color-lab-header-light: #e6faf7;
+  --color-services: #c6bcb3;
+  /* taupe  – Services (tab button itself) */
+  --color-services-light: #f2efec;
+  /* Separate from the tab color above — used only by the entry table
+     header and the Service Reports panel header, so changing this never
+     touches the tab button. */
+  --color-services-header: #d9d1c0;
+  --color-services-header-light: #f6f2e9;
+  --color-iptime: #b3b3bd;
+  /* gray   – IP Time-line (tab + view table header) */
+  --color-iptime-light: #eeeef1;
+  /* Separate from the tab color above — used only by the entry table
+     header and the Patient Group Service panel header, so changing the
+     tab color never touches those. */
+  --color-iptime-header: #cccccf;
+  --color-iptime-header-light: #f2f2f3;
+  --color-careplan: #ff6b7a;
+  /* coral  – Care-Plan     */
+  --color-careplan-light: #fce6e8;
+  /* Separate from the tab color above — used only by the Care-Plan
+     Template panel header, so changing this never touches the tab
+     button or table header. */
+  --color-careplan-header: #ffb8be;
+  --color-careplan-header-light: #fff0f1;
   --color-info: #0ea5e9;
   /* blue   – Info/Findings */
   --color-info-light: #c8eef4;
@@ -221,6 +246,7 @@ body {
 .dropdown-thin-scrollbar {
   scrollbar-width: thin;
 }
+
 .dropdown-thin-scrollbar::-webkit-scrollbar,
 .dropdown-thin-scrollbar *::-webkit-scrollbar {
   width: 0.04px;
@@ -233,9 +259,11 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--color-text-subtle) transparent;
 }
+
 .search-results-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
+
 .search-results-scrollbar::-webkit-scrollbar-thumb {
   background: var(--color-text-subtle);
   border-radius: 999px;
@@ -293,18 +321,18 @@ body {
   font-size: 14px;
 }
 
-.side-panel-data-row > div > span {
+.side-panel-data-row>div>span {
   font-size: 14px !important;
 }
 
 .care-plan-panel-data-row .text-xs,
-.care-plan-panel-data-row > div > span {
+.care-plan-panel-data-row>div>span {
   font-size: 13px !important;
 }
 
-.side-panel-data-row > :first-child,
-.service-panel-data-row > :first-child,
-.ip-mirror-row > :first-child {
+.side-panel-data-row> :first-child,
+.service-panel-data-row> :first-child,
+.ip-mirror-row> :first-child {
   text-align: center !important;
 }
 
@@ -313,8 +341,8 @@ body {
 }
 
 /* IP Time-line mirror: Entry Type and Subject fit 15 characters; Notes expands. */
-.ip-mirror-header > :nth-child(2),
-.ip-mirror-row > :nth-child(2) {
+.ip-mirror-header> :nth-child(2),
+.ip-mirror-row> :nth-child(2) {
   width: 5.5rem !important;
   flex: 0 0 5.5rem !important;
   min-width: 0;
@@ -324,8 +352,8 @@ body {
   text-align: left;
 }
 
-.ip-mirror-header > :nth-child(3),
-.ip-mirror-row > :nth-child(3) {
+.ip-mirror-header> :nth-child(3),
+.ip-mirror-row> :nth-child(3) {
   width: 6.5rem !important;
   flex: 0 0 6.5rem !important;
   min-width: 0;
@@ -335,17 +363,17 @@ body {
   text-align: left;
 }
 
-.ip-mirror-header > :nth-child(4),
-.ip-mirror-row > :nth-child(4) {
+.ip-mirror-header> :nth-child(4),
+.ip-mirror-row> :nth-child(4) {
   width: auto !important;
   flex: 1 1 0% !important;
   min-width: 0;
   text-align: left;
 }
 
-.ip-mirror-row > :nth-child(2) *,
-.ip-mirror-row > :nth-child(3) *,
-.ip-mirror-row > :nth-child(4) * {
+.ip-mirror-row> :nth-child(2) *,
+.ip-mirror-row> :nth-child(3) *,
+.ip-mirror-row> :nth-child(4) * {
   display: block;
   width: 100%;
   font-size: 12px !important;
@@ -361,26 +389,26 @@ body {
   align-items: center;
 }
 
-.ip-mirror-row > * {
+.ip-mirror-row>* {
   display: flex;
   align-items: center;
   height: 100%;
 }
 
-.ip-mirror-row > :first-child {
+.ip-mirror-row> :first-child {
   transform: translateX(4px);
 }
 
-.ip-mirror-row > :nth-child(2) {
+.ip-mirror-row> :nth-child(2) {
   padding-left: 6px !important;
 }
 
-.ip-mirror-header > :nth-child(2) {
+.ip-mirror-header> :nth-child(2) {
   transform: translateX(-4px);
 }
 
 /* Keep only middle-panel Actions header text centered. */
-.table-header-text > :last-child {
+.table-header-text> :last-child {
   text-align: center !important;
 }
 
@@ -393,14 +421,14 @@ body {
 }
 
 /* Center only serial-number data in every table view. */
-.side-panel-data-row > :first-child,
-.service-panel-data-row > :first-child,
-.ip-mirror-row > :first-child {
+.side-panel-data-row> :first-child,
+.service-panel-data-row> :first-child,
+.ip-mirror-row> :first-child {
   text-align: center !important;
   justify-content: center !important;
 }
 
-.ip-mirror-header > * {
+.ip-mirror-header>* {
   text-align: center !important;
 }
 
@@ -428,15 +456,15 @@ body {
 }
 
 /* Square outer shells for the OP Desk left/right drawers. */
-.opdesk-drawer-shell > :first-child {
+.opdesk-drawer-shell> :first-child {
   border-radius: 0 !important;
 }
 
 /* Modal containers are direct children of their full-screen backdrops. Keep
    inner form controls and cards unchanged while squaring the popup itself. */
-.fixed.inset-0 > .rounded-lg,
-.fixed.inset-0 > .rounded-xl,
-.fixed.inset-0 > .rounded-2xl {
+.fixed.inset-0>.rounded-lg,
+.fixed.inset-0>.rounded-xl,
+.fixed.inset-0>.rounded-2xl {
   border-radius: 0 !important;
 }
 
@@ -451,6 +479,7 @@ body {
   font-size: 12px !important;
   letter-spacing: 1px !important;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;
