@@ -180,9 +180,9 @@
 
 .mm2-workspace .em-brand-mark {
   right: auto;
-  left: calc(100% + 70px - min(501px, 26.57vw));
+  left: calc(100% + 135px - min(501px, 26.57vw));
   width: 360px;
-  font-size: 92px;
+  font-size: 75px;
   text-align: left;
 }
 

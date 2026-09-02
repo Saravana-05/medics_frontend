@@ -12,6 +12,11 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
 
+    <!-- Preload the "E-Medic" script font (used on Main Menu 2 / Dashboard)
+         so it's fetched before first paint instead of swapping in after a
+         visible flash of the Segoe Script fallback. -->
+    <link rel="preload" as="font" href="/fonts/Sacramento-Regular.ttf" type="font/ttf" crossorigin />
+
     <style>
       html,
       body,
