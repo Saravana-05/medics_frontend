@@ -94,7 +94,7 @@ export default function LoginUI({
           transform: translateX(50px);
         }
         .medix-brand-tagline-dots {
-          color: #f87171;
+          color: rgba(255, 255, 255, 0.75);
         }
         .medix-brand-tagline-for {
           color: #f87171;
