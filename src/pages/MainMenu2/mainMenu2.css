@@ -141,6 +141,19 @@
   width: 100%;
 }
 
+.mm2-workspace .em-menu-bar::after {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-left: auto;
+  padding: 0 20px;
+  color: #f2f4f5;
+  content: "Zodiac Hospital (2024-26)";
+  font-size: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .mm2-workspace .em-title-bar,
 .mm2-workspace .em-menu-bar,
 .mm2-workspace .em-dropdown,
@@ -151,7 +164,7 @@
 .mm2-workspace .em-workspace {
   background: linear-gradient(
     to right,
-    #fff 0 max(37.5%, calc(100% - 1200px)),
+    #eef1f4 0 max(37.5%, calc(100% - 1200px)),
     #48b9bb max(37.5%, calc(100% - 1200px)) 100%
   );
 }
@@ -169,14 +182,14 @@
 
 .mm2-workspace .em-brand-mark {
   right: auto;
-  left: calc(100% - 10px - min(501px, 26.57vw));
+  left: calc(100% + 10px - min(501px, 26.57vw));
   width: 360px;
   font-size: clamp(calc(3rem - 2px), calc(6.3vw - 2px), calc(7.5rem - 2px));
   text-align: left;
 }
 
 .mm2-workspace .em-doctor-desk-tagline {
-  left: calc(100% - 340px);
+  left: calc(100% - 330px);
   color: #d6dadd;
   font-size: clamp(calc(1rem - 5px), calc(1.55vw - 5px), calc(1.9rem - 5px));
   word-spacing: 5px;
@@ -185,6 +198,10 @@
 .mm2-workspace .em-doctor-desk-tagline em {
   margin-right: 5px;
   color: #ff8585;
+}
+
+.mm2-workspace .em-doctor-desk-name {
+  color: #454b50;
 }
 
 .mm2-workspace .em-quick-actions {

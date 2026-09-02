@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import DesktopMenuBar from "./components/DesktopMenuBar";
 import DoctorDeskTagline from "./components/DoctorDeskTagline";
 import EMedicBrandMark from "./components/EMedicBrandMark";
@@ -35,6 +37,15 @@ function QuickActionTiles({ onAction }) {
 
 export default function Dashboard({ onLogout, hospitalImage = "/hospital-team.png" }) {
   const navigate = useNavigate();
+  const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement);
+
+  // Keeps the icon accurate when fullscreen is exited via Esc or the
+  // browser's own UI, not just this button.
+  useEffect(() => {
+    const syncFullscreen = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
 
   const handleQuickAction = action => {
     if (action.route) {
@@ -47,10 +58,28 @@ export default function Dashboard({ onLogout, hospitalImage = "/hospital-team.pn
     }));
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
   return (
     <main className="em-main-menu">
       <header className="em-title-bar">
         <span className="em-title">Trident Skiode</span>
+        <button
+          type="button"
+          className="em-fullscreen-toggle"
+          onClick={toggleFullscreen}
+          title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+        >
+          {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+        </button>
       </header>
 
       <DesktopMenuBar onLogout={onLogout} />

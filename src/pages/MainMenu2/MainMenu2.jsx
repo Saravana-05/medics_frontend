@@ -50,7 +50,7 @@ export default function MainMenu2({ onLogout }) {
           </nav>
         </aside>
         <section className="mm2-workspace" aria-label="Main Menu 2 workspace">
-          <Dashboard onLogout={onLogout} hospitalImage="/Team2-enhanced.png" />
+          <Dashboard onLogout={onLogout} hospitalImage="/Team2-enhanced-gray.png" />
         </section>
       </div>
     </main>
