@@ -85,6 +85,12 @@ export default function Dashboard({ onLogout, hospitalImage = "/hospital-team.pn
       <DesktopMenuBar onLogout={onLogout} />
 
       <section className="em-workspace" aria-label="E-Medics main menu workspace">
+        <span className="em-left-border-fill" aria-hidden="true" />
+        <span className="em-right-border-fill" aria-hidden="true" />
+        <span className="em-bottom-border-fill" aria-hidden="true" />
+        <span className="em-left-divider" aria-hidden="true" />
+        <span className="em-right-divider" aria-hidden="true" />
+        <span className="em-bottom-divider" aria-hidden="true" />
         <span className="em-hospital-label">HOSPITAL</span>
         <img className="em-hospital-illustration" src={hospitalImage} alt="Hospital and medical team" />
         <EMedicBrandMark />

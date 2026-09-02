@@ -22,6 +22,20 @@
 .em-menu-item:hover,.em-menu-item:focus-visible { background:#eef7f6; outline:none; }
 .em-menu-separator { height:1px; margin:4px 12px; background:#d0d0d0; }
 .em-workspace { position:relative; z-index:1; min-height:0; flex:1; overflow:hidden; background:linear-gradient(to right,#fff 0 50%,#48b9bb 50% 100%); }
+/* Left/right/bottom dividers form one continuous 3-sided frame, 40px in from
+   each edge — each line stops exactly where the next begins (rather than
+   running edge-to-edge) so the corners meet cleanly with no doubled-up
+   crossing pixels. Clear of .em-hospital-illustration (left:7%, ~134px),
+   .em-quick-actions (right:9.15% / bottom:10.6%) on a 1920x1080 screen. */
+.em-left-divider { position:absolute; left:40px; top:0; bottom:40px; width:2px; z-index:2; background:#000; pointer-events:none; }
+.em-right-divider { position:absolute; right:40px; top:0; bottom:40px; width:2px; z-index:2; background:#000; pointer-events:none; }
+.em-bottom-divider { position:absolute; left:40px; right:40px; bottom:40px; height:2px; z-index:2; background:#000; pointer-events:none; }
+/* Dark-gray fill for the 40px border zone itself (inside the black lines) —
+   same three edges, same safe 0-40px band the dividers already sit clear of,
+   so no existing component or image is covered. */
+.em-left-border-fill { position:absolute; left:0; top:0; bottom:0; width:40px; z-index:1; background:#404040; pointer-events:none; }
+.em-right-border-fill { position:absolute; right:0; top:0; bottom:0; width:40px; z-index:1; background:#404040; pointer-events:none; }
+.em-bottom-border-fill { position:absolute; left:0; right:0; bottom:0; height:40px; z-index:1; background:#404040; pointer-events:none; }
 .em-hospital-label { position:absolute; top:40%; left:25%; z-index:2; transform:translateX(-50%); color:#111; font-size:clamp(.7rem,1vw,1.2rem); font-weight:700; line-height:1; white-space:nowrap; }
 .em-hospital-illustration { position:absolute; left:7%; top:61%; width:36%; height:auto; transform:translateY(-50%); object-fit:contain; pointer-events:none; user-select:none; }
 .em-brand-mark { position:absolute; top:5.5%; left:52%; width:22%; color:#fff; font-family:"Sacramento","Segoe Script","Brush Script MT",cursive; font-size:clamp(3rem,6.3vw,7.5rem); font-weight:400; line-height:.8; text-align:center; text-shadow:2px 4px 4px rgb(40 91 94 / 45%); white-space:nowrap; pointer-events:none; user-select:none; }
