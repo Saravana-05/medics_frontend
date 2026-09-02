@@ -11,6 +11,7 @@ const quickActions = [
   { id: "patients", label: "Patient management", position: "em-quick-action-4" },
   { id: "reports", label: "Reports", position: "em-quick-action-5" },
   { id: "settings", label: "Settings", position: "em-quick-action-6" },
+  { id: "main-menu-2", label: "Main Menu 2", route: "/main-menu-2", position: "em-quick-action-7" },
 ];
 
 function QuickActionTiles({ onAction }) {
@@ -32,7 +33,7 @@ function QuickActionTiles({ onAction }) {
   );
 }
 
-export default function Dashboard({ onLogout }) {
+export default function Dashboard({ onLogout, hospitalImage = "/hospital-team.png" }) {
   const navigate = useNavigate();
 
   const handleQuickAction = action => {
@@ -56,7 +57,7 @@ export default function Dashboard({ onLogout }) {
 
       <section className="em-workspace" aria-label="E-Medics main menu workspace">
         <span className="em-hospital-label">HOSPITAL</span>
-        <img className="em-hospital-illustration" src="/hospital-team.png" alt="Hospital and medical team" />
+        <img className="em-hospital-illustration" src={hospitalImage} alt="Hospital and medical team" />
         <EMedicBrandMark />
         <DoctorDeskTagline />
         <QuickActionTiles onAction={handleQuickAction} />

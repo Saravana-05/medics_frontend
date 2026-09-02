@@ -33,6 +33,8 @@
 .em-quick-action-4 { grid-area:3/2; background:linear-gradient(135deg,#72c7c7,#48b0b2); }
 .em-quick-action-5 { grid-area:2/3; background:linear-gradient(135deg,#70c8c7,#44afb0); }
 .em-quick-action-6 { grid-area:3/3; background:linear-gradient(135deg,#16a7ab,#008d91); }
+.em-quick-action-7 { grid-area:1/1; background:linear-gradient(135deg,#315f94,#173f72); color:#fff; }
+.em-quick-action-7 .em-quick-action-label { position:static; display:flex; width:100%; height:100%; align-items:center; justify-content:center; overflow:visible; clip:auto; padding:12px; color:#fff; font-size:clamp(11px,1vw,16px); font-weight:700; line-height:1.2; text-align:center; white-space:normal; }
 .em-quick-action:hover { z-index:2; filter:brightness(1.06); transform:translateY(-3px); box-shadow:3px 9px 18px rgb(16 67 70 / 44%); }
 .em-quick-action:focus-visible { z-index:3; outline:3px solid #fff; outline-offset:-5px; }
 .em-quick-action:active { transform:translateY(0); }

@@ -7,6 +7,7 @@ import OPDeskScreen from "../pages/OPDeskScreen";
 import FrontOfficeDeskScreen from "../pages/FrontOfficeDeskScreen";
 import PlatformDeskScreen from "../pages/PlatformDeskScreen";
 import OPAppointmentsScreen from "../pages/OPAppointmentsScreen/OPAppointmentsScreen";
+import MainMenu2 from "../pages/MainMenu2/MainMenu2";
 
 // Protected Route Component
 function ProtectedRoute({ children, user, requiredRole }) {
@@ -27,6 +28,7 @@ const ROUTES = {
   FRONT_DESK: "/frontdesk",
   PLATFORM_DESK: "/platformdesk",
   OP_APPOINTMENTS: "/op-appointments",
+  MAIN_MENU_2: "/main-menu-2",
 };
 
 export default function AppRouter({ user, onLogin, onLogout }) {
@@ -46,6 +48,15 @@ export default function AppRouter({ user, onLogin, onLogout }) {
           element={
             <ProtectedRoute user={user} requiredRole="doctor">
               <Dashboard user={user} onLogout={onLogout} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path={ROUTES.MAIN_MENU_2}
+          element={
+            <ProtectedRoute user={user} requiredRole="doctor">
+              <MainMenu2 onLogout={onLogout} />
             </ProtectedRoute>
           }
         />

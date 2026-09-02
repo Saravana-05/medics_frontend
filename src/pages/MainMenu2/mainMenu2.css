@@ -1,0 +1,209 @@
+.mm2-screen,
+.mm2-screen * {
+  box-sizing: border-box;
+}
+
+.mm2-screen {
+  min-width: 760px;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #e9edf1;
+  color: #20262d;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.mm2-body {
+  display: block;
+  min-height: 100vh;
+}
+
+.mm2-shortcut-rail {
+  display: none;
+  align-self: start;
+  min-height: calc(100vh - max(87px, 8.1vh));
+  margin-top: max(87px, 8.1vh);
+  padding: 0 30px 28px;
+  background: #61c9c5;
+}
+
+.mm2-shortcut-rail h1 {
+  height: 29px;
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 29px;
+  text-align: center;
+}
+
+.mm2-shortcuts {
+  border: 1px solid #7c858b;
+  background: #cfd1d2;
+}
+
+.mm2-shortcut {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 90px;
+  grid-template-columns: 1fr 1fr;
+  border: 0;
+  border-bottom: 1px solid #7c858b;
+  background: transparent;
+  padding: 0;
+  color: #20262d;
+  cursor: pointer;
+}
+
+.mm2-shortcut:last-child {
+  border-bottom: 0;
+}
+
+.mm2-shortcut:hover,
+.mm2-shortcut:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -3px;
+}
+
+.mm2-number,
+.mm2-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.mm2-number {
+  position: relative;
+  background: var(--shortcut-color);
+  color: #fff;
+  font-size: 37px;
+  font-weight: 300;
+}
+
+.mm2-number::after {
+  position: absolute;
+  z-index: 1;
+  top: 11px;
+  width: 0;
+  height: 0;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  content: "";
+}
+
+.number-first .mm2-number::after {
+  right: -15px;
+  border-left: 15px solid var(--shortcut-color);
+}
+
+.label-first .mm2-number {
+  grid-column: 2;
+}
+
+.label-first .mm2-number::after {
+  left: -15px;
+  border-right: 15px solid var(--shortcut-color);
+}
+
+.label-first .mm2-label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.mm2-label {
+  padding: 7px;
+  background: #cfd1d2;
+  font-size: 14px;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.mm2-workspace {
+  min-width: 0;
+  overflow: visible;
+  background: #e9edf1;
+}
+
+.mm2-workspace .em-main-menu {
+  min-width: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.mm2-workspace .em-workspace {
+  overflow: hidden;
+}
+
+.mm2-workspace .em-title-bar,
+.mm2-workspace .em-menu-bar {
+  left: 0;
+  width: 100%;
+}
+
+.mm2-workspace .em-title-bar,
+.mm2-workspace .em-menu-bar,
+.mm2-workspace .em-dropdown,
+.mm2-workspace .em-submenu {
+  z-index: 100;
+}
+
+.mm2-workspace .em-workspace {
+  background: linear-gradient(
+    to right,
+    #fff 0 max(37.5%, calc(100% - 1200px)),
+    #48b9bb max(37.5%, calc(100% - 1200px)) 100%
+  );
+}
+
+.mm2-workspace .em-hospital-label {
+  display: none;
+}
+
+.mm2-workspace .em-hospital-illustration {
+  left: 2.5%;
+  width: min(650px, 39%);
+  max-height: 78%;
+  object-fit: contain;
+}
+
+.mm2-workspace .em-brand-mark {
+  right: auto;
+  left: calc(100% - 10px - min(501px, 26.57vw));
+  width: 360px;
+  font-size: clamp(calc(3rem - 2px), calc(6.3vw - 2px), calc(7.5rem - 2px));
+  text-align: left;
+}
+
+.mm2-workspace .em-doctor-desk-tagline {
+  left: calc(100% - 340px);
+  color: #d6dadd;
+  font-size: clamp(calc(1rem - 5px), calc(1.55vw - 5px), calc(1.9rem - 5px));
+  word-spacing: 5px;
+}
+
+.mm2-workspace .em-doctor-desk-tagline em {
+  margin-right: 5px;
+  color: #ff8585;
+}
+
+.mm2-workspace .em-quick-actions {
+  right: 80px;
+  width: min(501px, 26.57vw);
+  aspect-ratio: 1 / 1;
+}
+
+.mm2-workspace .em-quick-action-7 {
+  display: none;
+}
+
+@media (max-height: 900px) {
+  .mm2-shortcut-rail {
+    min-height: calc(100vh - max(87px, 8.1vh));
+  }
+
+  .mm2-shortcut {
+    height: calc((100vh - 102px) / 9);
+    min-height: 65px;
+  }
+}
