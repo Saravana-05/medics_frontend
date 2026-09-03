@@ -322,7 +322,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                       onSave={handleSaveActiveTab}
                       onPreview={activeTab === "lab" ? () => setLabShowReport(v => !v) : undefined}
                       accentColor={activeConfig?.color}
-                      accentText={activeConfig?.colorText}
+                      accentText={activeTab === "drugs" ? "#111827" : activeConfig?.colorText}
                     />
                   )}
                 </div>

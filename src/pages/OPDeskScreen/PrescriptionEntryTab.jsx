@@ -137,22 +137,29 @@ function EntryFooterBar({
 
 export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentText }) {
   const darkText = accentText || "white";
-  // Derive every action shade from the active tab instead of maintaining
-  // separate hard-coded palettes that can drift from the configured colors.
-  const shades = [
-    `color-mix(in srgb, ${accentColor} 60%, white)`,
-    `color-mix(in srgb, ${accentColor} 70%, white)`,
-    `color-mix(in srgb, ${accentColor} 80%, white)`,
-    `color-mix(in srgb, ${accentColor} 90%, white)`,
-    accentColor,
-  ];
-  const hoverShades = [
-    `color-mix(in srgb, ${accentColor} 70%, white)`,
-    `color-mix(in srgb, ${accentColor} 80%, white)`,
-    `color-mix(in srgb, ${accentColor} 90%, white)`,
-    accentColor,
-    `color-mix(in srgb, ${accentColor} 90%, black)`,
-  ];
+  // Precomputed 60/70/80/90/100% tab-color shades. Plain hex values keep
+  // these buttons visible in legacy Chrome on Windows 7, which does not
+  // understand CSS color-mix().
+  const toolbarPalettes = {
+    "var(--color-drugs)": {
+      normal: ["#adb9cd", "#9fadc4", "#91a1bc", "#8496b3", "#768aab"],
+      hover: ["#9fadc4", "#91a1bc", "#8496b3", "#768aab", "#6a7c9a"],
+    },
+    "var(--color-lab)": {
+      normal: ["#a1e2dc", "#92ddd6", "#82d8d0", "#73d3ca", "#63cec4"],
+      hover: ["#92ddd6", "#82d8d0", "#73d3ca", "#63cec4", "#59b9b0"],
+    },
+    "var(--color-services)": {
+      normal: ["#ddd7d1", "#d7d0ca", "#d1c9c2", "#ccc3bb", "#c6bcb3"],
+      hover: ["#d7d0ca", "#d1c9c2", "#ccc3bb", "#c6bcb3", "#b2a9a1"],
+    },
+  };
+  const palette = toolbarPalettes[accentColor] || {
+    normal: [accentColor, accentColor, accentColor, accentColor, accentColor],
+    hover: [accentColor, accentColor, accentColor, accentColor, accentColor],
+  };
+  const shades = palette.normal;
+  const hoverShades = palette.hover;
 
   return (
     <div className="flex items-center overflow-hidden">
