@@ -84,9 +84,9 @@ function ActionButton({ onClick, label, shortcutKey, bg, hoverBg, textColor = "w
   const shortcutIndex = label.toLowerCase().lastIndexOf(shortcutKey.toLowerCase());
 
   return (
-    <button onClick={onClick} accessKey={shortcutKey} aria-label={`${label} (Alt+${shortcutKey.toUpperCase()})`}
+    <button onClick={onClick} data-page-shortcut={shortcutKey} aria-label={`${label} (Alt+${shortcutKey.toUpperCase()})`}
       className="inline-flex items-center justify-center px-3.5 text-[0.72rem] font-semibold transition-all duration-150 cursor-pointer leading-none"
-      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)", border: "1px solid #4b5563", marginLeft: "-1px" }}
+      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)", border: "none" }}
       onMouseEnter={e => { setIsHovered(true); e.currentTarget.style.background = hoverBg; }}
       onMouseLeave={e => { setIsHovered(false); e.currentTarget.style.background = bg; }}>
       <span style={isHovered ? { textDecorationLine: "underline", textDecorationColor: "#ef4444", textDecorationThickness: "2px", textUnderlineOffset: "4px" } : undefined}>
@@ -144,21 +144,21 @@ function EntryFooterBar({
 
 export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentText }) {
   const darkText = accentText || "white";
-  // Precomputed 60/70/80/90/100% tab-color shades. Plain hex values keep
+  // Precomputed 52/64/76/88/100% tab-color shades. Plain hex values keep
   // these buttons visible in legacy Chrome on Windows 7, which does not
   // understand CSS color-mix().
   const toolbarPalettes = {
     "var(--color-drugs)": {
-      normal: ["#adb9cd", "#9fadc4", "#91a1bc", "#8496b3", "#768aab"],
-      hover: ["#9fadc4", "#91a1bc", "#8496b3", "#768aab", "#6a7c9a"],
+      normal: ["#b8c2d3", "#a7b4c9", "#97a6bf", "#8698b5", "#768aab"],
+      hover: ["#a7b4c9", "#97a6bf", "#8698b5", "#768aab", "#6a7c9a"],
     },
     "var(--color-lab)": {
-      normal: ["#a1e2dc", "#92ddd6", "#82d8d0", "#73d3ca", "#63cec4"],
-      hover: ["#92ddd6", "#82d8d0", "#73d3ca", "#63cec4", "#59b9b0"],
+      normal: ["#aee6e0", "#9be0d9", "#88dad2", "#76d4cb", "#63cec4"],
+      hover: ["#9be0d9", "#88dad2", "#76d4cb", "#63cec4", "#59b9b0"],
     },
     "var(--color-services)": {
-      normal: ["#ddd7d1", "#d7d0ca", "#d1c9c2", "#ccc3bb", "#c6bcb3"],
-      hover: ["#d7d0ca", "#d1c9c2", "#ccc3bb", "#c6bcb3", "#b2a9a1"],
+      normal: ["#e1dcd7", "#dbd4ce", "#d4ccc5", "#cdc4bc", "#c6bcb3"],
+      hover: ["#dbd4ce", "#d4ccc5", "#cdc4bc", "#c6bcb3", "#b2a9a1"],
     },
   };
   const palette = toolbarPalettes[accentColor] || {
@@ -169,7 +169,7 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentT
   const hoverShades = palette.hover;
 
   return (
-    <div className="flex items-center overflow-hidden">
+    <div className="flex items-center overflow-hidden" style={{ gap: "2px" }}>
       <ActionButton label="Clear" shortcutKey="c" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
       <ActionButton label="Paste" shortcutKey="e" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
       <ActionButton label="Preview" shortcutKey="v" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />

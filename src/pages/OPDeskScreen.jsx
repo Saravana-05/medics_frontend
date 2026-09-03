@@ -102,6 +102,31 @@ export default function OPDeskScreen({ user, onLogout }) {
   const [groupDraft, setGroupDraft] = useState(null); // null | { tabKey, title }
   const [groupDraftItems, setGroupDraftItems] = useState([]);
 
+  // Page-level shortcuts use Alt plus the underlined letter/number.
+  // Never intercept shortcuts while the user is typing or choosing a value.
+  useEffect(() => {
+    const handlePageShortcut = event => {
+      if (!event.altKey || event.shiftKey || event.ctrlKey || event.metaKey || event.repeat) return;
+
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']")) return;
+
+      const shortcut = String(event.key || "").toLowerCase();
+      if (!/^[a-z0-9]$/.test(shortcut)) return;
+
+      const control = document.querySelector(`[data-page-shortcut="${shortcut}"]`);
+      if (!(control instanceof HTMLElement)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      control.click();
+      control.focus({ preventScroll: true });
+    };
+
+    window.addEventListener("keydown", handlePageShortcut);
+    return () => window.removeEventListener("keydown", handlePageShortcut);
+  }, []);
+
   // Check window resize for tablet view
   useState(() => {
     const handleResize = () => {

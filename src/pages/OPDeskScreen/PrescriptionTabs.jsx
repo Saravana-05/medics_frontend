@@ -39,7 +39,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
         return (
           <button
             key={tab.key}
-            accessKey={tab.shortcut}
+            data-page-shortcut={tab.shortcut}
             aria-label={`${tab.label} (Alt+${tab.shortcut})`}
             onClick={() => setActiveTab(tab.key)}
             onMouseEnter={() => setHoveredKey(tab.key)}

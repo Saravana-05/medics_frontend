@@ -52,7 +52,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
             {/* ── BUTTONS: all in one row, equal size (Park) & equal spacing ── */}
             <div className="flex flex-row gap-2 mb-2">
               <button
-                accessKey="o"
+                data-page-shortcut="o"
                 aria-label="OP List (Alt+O)"
                 onClick={() => {
                   setActiveTab("op-list");
@@ -66,7 +66,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <span><ShortcutLetter>O</ShortcutLetter>P List</span>
               </button>
               <button
-                accessKey="i"
+                data-page-shortcut="i"
                 aria-label="IP List (Alt+I)"
                 onClick={() => {
                   setActiveTab("ip-list");
@@ -81,7 +81,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <span><ShortcutLetter>I</ShortcutLetter>P List</span>
               </button>
               <button
-                accessKey="l"
+                data-page-shortcut="l"
                 aria-label="All Patients (Alt+L)"
                 onClick={() => {
                   setActiveTab("all-patients");
@@ -95,7 +95,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <span>Al<ShortcutLetter>l</ShortcutLetter> Patients</span>
               </button>
               <button
-                accessKey="k"
+                data-page-shortcut="k"
                 aria-label="Park (Alt+K)"
                 onClick={() => {
                   setActiveTab("park");
@@ -109,7 +109,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 <span>Par<ShortcutLetter>k</ShortcutLetter></span>
               </button>
               <button
-                accessKey="z"
+                data-page-shortcut="z"
                 aria-label="Finalize (Alt+Z)"
                 onClick={() => {
                   setActiveTab("finalize");

@@ -202,7 +202,7 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient, onHov
             <button
               type="button"
               key={tab.key}
-              accessKey={tab.shortcut}
+              data-page-shortcut={tab.shortcut}
               aria-label={`${tab.label} (Alt+${tab.shortcut.toUpperCase()})`}
               onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={() => setHoveredKey(tab.key)}

@@ -21,7 +21,7 @@ const RIGHT_TABS = [
   {
     key: "reports",
     label: "Reports",
-    shortcut: "r",
+    shortcut: "t",
     color: "#679cbc",
   },
   {
@@ -183,7 +183,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
             <button
               type="button"
               key={tab.key}
-              accessKey={tab.shortcut}
+              data-page-shortcut={tab.shortcut}
               aria-label={`${tab.label} (Alt+${tab.shortcut.toUpperCase()})`}
               onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={() => setHoveredKey(tab.key)}
