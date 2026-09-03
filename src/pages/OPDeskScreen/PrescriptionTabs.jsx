@@ -3,11 +3,11 @@ import { TAB_CONFIGS } from "../../config/tabConfig";
 
 // All prescription UI surfaces derive their palette from TAB_CONFIGS.
 const PRESCRIPTION_TABS = [
-  { key: "drugs",    label: "Drug",        color: TAB_CONFIGS.drugs.color,    textColor: "black" },
-  { key: "lab",      label: "Lab-Test",    color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText },
-  { key: "services", label: "Service",     color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText },
-  { key: "carePlan", label: "Care-Plan",   color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText },
-  { key: "iptime",   label: "IP Timeline", color: TAB_CONFIGS.iptime.color,   textColor: TAB_CONFIGS.iptime.colorText },
+  { key: "drugs",    label: "Drug",        shortcut: "1", color: TAB_CONFIGS.drugs.color,    textColor: "black" },
+  { key: "lab",      label: "Lab-Test",    shortcut: "2", color: TAB_CONFIGS.lab.color,      textColor: TAB_CONFIGS.lab.colorText },
+  { key: "services", label: "Service",     shortcut: "3", color: TAB_CONFIGS.services.color, textColor: TAB_CONFIGS.services.colorText },
+  { key: "carePlan", label: "Care-Plan",   shortcut: "4", color: TAB_CONFIGS.carePlan.color, textColor: TAB_CONFIGS.carePlan.colorText },
+  { key: "iptime",   label: "IP Timeline", shortcut: "5", color: TAB_CONFIGS.iptime.color,   textColor: TAB_CONFIGS.iptime.colorText },
 ];
 
 // Width of the diagonal slant (px) between tabs — a parallelogram "slide" cut,
@@ -39,6 +39,8 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
         return (
           <button
             key={tab.key}
+            accessKey={tab.shortcut}
+            aria-label={`${tab.label} (Alt+${tab.shortcut})`}
             onClick={() => setActiveTab(tab.key)}
             onMouseEnter={() => setHoveredKey(tab.key)}
             onMouseLeave={() => setHoveredKey(null)}
@@ -74,7 +76,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
                 textUnderlineOffset: "4px",
               } : undefined}
             >
-              {tab.label}
+              <span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>{tab.shortcut}</span>. {tab.label}
             </span>
             {count > 0 && (
               <sup

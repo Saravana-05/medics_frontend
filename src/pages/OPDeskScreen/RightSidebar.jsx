@@ -9,24 +9,33 @@ const RIGHT_TABS = [
   {
     key: "parked",
     label: "Parked",
+    shortcut: "d",
     color: "#eb6367",
   },
   {
     key: "emergency",
     label: "Emergency",
+    shortcut: "g",
     color: "#73bfb8",
   },
   {
     key: "reports",
     label: "Reports",
+    shortcut: "r",
     color: "#679cbc",
   },
   {
     key: "schedule",
     label: "Schedule",
+    shortcut: "h",
     color: "#0c324a",
   },
 ];
+
+function ShortcutLabel({ label, shortcut }) {
+  const index = label.toLowerCase().lastIndexOf(shortcut);
+  return <>{label.slice(0, index)}<span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>{label[index]}</span>{label.slice(index + 1)}</>;
+}
 
 // ── Shared dimensions ───────────────────────────────────────────────
 const PANEL_WIDTH   = 360;
@@ -171,8 +180,11 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
           const isLit     = isActive;
 
           return (
-            <div
+            <button
+              type="button"
               key={tab.key}
+              accessKey={tab.shortcut}
+              aria-label={`${tab.label} (Alt+${tab.shortcut.toUpperCase()})`}
               onClick={(e) => handleTabActivate(e, tab)}
               onMouseEnter={() => setHoveredKey(tab.key)}
               onMouseLeave={() => setHoveredKey(null)}
@@ -180,6 +192,8 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
               style={{
                 minHeight: "52px",
                 background: tab.color,
+                border: "none",
+                padding: 0,
                 opacity: isLit ? 1 : 0.92,
                 borderBottom: "2px solid var(--color-surface)",
                 boxShadow: isActive ? "inset 0 0 0 2px rgba(255,255,255,0.85)" : "none",
@@ -197,9 +211,9 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
       : "0 3px 2px rgba(0, 0, 0, 0.35)",
   }}
 >
-  {tab.label}
+  <ShortcutLabel label={tab.label} shortcut={tab.shortcut} />
 </span>
-            </div>
+            </button>
           );
         })}
       </div>

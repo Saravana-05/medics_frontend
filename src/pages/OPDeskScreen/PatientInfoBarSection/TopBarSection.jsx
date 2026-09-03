@@ -2,6 +2,12 @@ import { useState } from "react";
 import OPListModal from "../../../modal/Oplistmodal";
 import IPListModal from "../../../modal/IPListModal";
 
+const ShortcutLetter = ({ children }) => (
+  <span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>
+    {children}
+  </span>
+);
+
 export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient }) {
   const p = patient;
   const [followUpDate, setFollowUpDate] = useState(() => {
@@ -46,6 +52,8 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
             {/* ── BUTTONS: all in one row, equal size (Park) & equal spacing ── */}
             <div className="flex flex-row gap-2 mb-2">
               <button
+                accessKey="o"
+                aria-label="OP List (Alt+O)"
                 onClick={() => {
                   setActiveTab("op-list");
                   setShowOPList(true);
@@ -55,9 +63,11 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 onMouseEnter={() => setHoveredTab("op-list")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                OP List
+                <span><ShortcutLetter>O</ShortcutLetter>P List</span>
               </button>
               <button
+                accessKey="i"
+                aria-label="IP List (Alt+I)"
                 onClick={() => {
                   setActiveTab("ip-list");
                   setShowIPList(true);
@@ -68,9 +78,11 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 onMouseEnter={() => setHoveredTab("ip-list")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                IP List
+                <span><ShortcutLetter>I</ShortcutLetter>P List</span>
               </button>
               <button
+                accessKey="l"
+                aria-label="All Patients (Alt+L)"
                 onClick={() => {
                   setActiveTab("all-patients");
                   onPark?.();
@@ -80,9 +92,11 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 onMouseEnter={() => setHoveredTab("all-patients")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                All Patients
+                <span>Al<ShortcutLetter>l</ShortcutLetter> Patients</span>
               </button>
               <button
+                accessKey="k"
+                aria-label="Park (Alt+K)"
                 onClick={() => {
                   setActiveTab("park");
                   onPark?.();
@@ -92,9 +106,11 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 onMouseEnter={() => setHoveredTab("park")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                Park
+                <span>Par<ShortcutLetter>k</ShortcutLetter></span>
               </button>
               <button
+                accessKey="z"
+                aria-label="Finalize (Alt+Z)"
                 onClick={() => {
                   setActiveTab("finalize");
                   onFinalize?.();
@@ -104,7 +120,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 onMouseEnter={() => setHoveredTab("finalize")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                Finalize
+                <span>Finali<ShortcutLetter>z</ShortcutLetter>e</span>
               </button>
             </div>
 
