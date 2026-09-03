@@ -137,45 +137,22 @@ function EntryFooterBar({
 
 export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentLight, accentText }) {
   const darkText = accentText || "white";
-  // Five distinct shades of the active tab's own accent color, lightest to
-  // darkest — one per button, not just a 3-tier split.
-  const toolbarPalettes = {
-    "var(--color-drugs)": {
-      normal: ["#b6c2c8", "#8699a5", "#566f80", "#0c324a", "#0a283b"],
-      hover: ["#93a5af", "#667e8d", "#304f62", "#0b2d43", "#08202f"],
-    },
-    "var(--color-lab)": {
-      normal: ["#edb9bc", "#e08b90", "#d15d64", "#c11720", "#9a121a"],
-      hover: ["#e49a9f", "#d36a70", "#c93b43", "#ae151d", "#7d0f15"],
-    },
-    "var(--color-services)": {
-      normal: ["#d1e1e9", "#b3cedd", "#8eb6ca", "#679cbc", "#527d96"],
-      hover: ["#bfd5e1", "#9fc1d2", "#7aa8c0", "#5d8ca9", "#426478"],
-    },
-    "var(--color-careplan)": {
-      normal: ["#b7d6d4", "#87bbb7", "#579f9a", "#0f766e", "#0c5e58"],
-      hover: ["#99c7c3", "#67aaa5", "#339087", "#0e6a63", "#094c47"],
-    },
-    "var(--color-primary)": {
-      normal: ["#b7d3eb", "#87b5de", "#5797d0", "#0f6cbd", "#0c5697"],
-      hover: ["#99c2e5", "#679fd4", "#337fc6", "#0e61aa", "#094579"],
-    },
-    "#d67d7d": {
-      normal: ["#f3d9d9", "#e9baba", "#df9b9b", "#c86262", "#a94444"],
-      hover: ["#edc9c9", "#e2a8a8", "#d88686", "#b85353", "#913939"],
-    },
-    "#a9cb77": {
-      normal: ["#e8f0dc", "#d4e3bd", "#bfd69e", "#86ad4d", "#668b31"],
-      hover: ["#dce8ca", "#c6d9aa", "#afca88", "#769b43", "#557728"],
-    },
-    "#f0a866": {
-      normal: ["#fbe8d6", "#f7d2b0", "#f3bc89", "#df8738", "#bd6720"],
-      hover: ["#f8dcc5", "#f3c49b", "#eeaa70", "#cb762d", "#a95619"],
-    },
-  };
-  const palette = toolbarPalettes[accentColor] || toolbarPalettes["var(--color-primary)"];
-  const shades = palette.normal;
-  const hoverShades = palette.hover;
+  // Derive every action shade from the active tab instead of maintaining
+  // separate hard-coded palettes that can drift from the configured colors.
+  const shades = [
+    accentLight,
+    `color-mix(in srgb, ${accentColor} 45%, white)`,
+    `color-mix(in srgb, ${accentColor} 70%, white)`,
+    accentColor,
+    `color-mix(in srgb, ${accentColor} 82%, black)`,
+  ];
+  const hoverShades = [
+    `color-mix(in srgb, ${accentColor} 30%, white)`,
+    `color-mix(in srgb, ${accentColor} 60%, white)`,
+    `color-mix(in srgb, ${accentColor} 82%, white)`,
+    `color-mix(in srgb, ${accentColor} 88%, black)`,
+    `color-mix(in srgb, ${accentColor} 70%, black)`,
+  ];
 
   return (
     <div className="flex items-center overflow-hidden">
@@ -537,7 +514,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
         onFocus={() => setShowDropdown(options.length > 0)}
         onClick={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)", background: hasValue ? "var(--color-primary-muted)" : "var(--color-surface)",
+        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-border)" : "1px solid var(--color-border)", background: hasValue ? "var(--color-primary-muted)" : "var(--color-surface)",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
       {options.length > 0 && (
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
@@ -914,7 +891,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                 onKeyDown={e => handleFieldKeyDown(e, "name")}
                 placeholder={config.labels.searchPlaceholder}
                 className="prescription-entry-control prescription-entry-placeholder w-full text-[1rem] font-medium outline-none"
-                style={{ fontSize: "1rem", border: selected ? "1.5px solid var(--color-primary)" : "1px solid var(--color-border)",
+                style={{ fontSize: "1rem", border: selected ? "1.5px solid var(--color-border)" : "1px solid var(--color-border)",
                   background: selected ? "var(--color-primary-muted)" : "var(--color-surface)", color: config.textAccent || config.color,
                   paddingLeft: "0.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
               {selected && (

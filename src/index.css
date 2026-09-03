@@ -298,7 +298,7 @@ body {
 .prescription-entry-control:focus,
 .prescription-entry-control:focus-visible {
   background: var(--color-primary-muted) !important;
-  border-color: var(--color-primary) !important;
+  border-color: var(--color-border) !important;
   outline: none;
 }
 
