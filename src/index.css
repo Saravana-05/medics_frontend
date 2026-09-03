@@ -292,12 +292,12 @@ body {
   height: 30px;
   min-height: 30px;
   box-sizing: border-box;
-  background: var(--color-surface);
+  background: #ffffff;
 }
 
 .prescription-entry-control:focus,
 .prescription-entry-control:focus-visible {
-  background: var(--color-primary-muted) !important;
+  background: #ffffff !important;
   border-color: var(--color-border) !important;
   outline: none;
 }

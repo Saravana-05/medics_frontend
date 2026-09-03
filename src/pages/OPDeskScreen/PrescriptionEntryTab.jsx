@@ -86,7 +86,7 @@ function ActionButton({ onClick, label, shortcutKey, bg, hoverBg, textColor = "w
   return (
     <button onClick={onClick} accessKey={shortcutKey} aria-label={`${label} (Alt+${shortcutKey.toUpperCase()})`}
       className="inline-flex items-center justify-center px-3.5 text-[0.72rem] font-semibold transition-all duration-150 cursor-pointer leading-none"
-      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)", border: "1px solid var(--color-border)", marginLeft: "-1px" }}
+      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)", border: "1px solid #4b5563", marginLeft: "-1px" }}
       onMouseEnter={e => { setIsHovered(true); e.currentTarget.style.background = hoverBg; }}
       onMouseLeave={e => { setIsHovered(false); e.currentTarget.style.background = bg; }}>
       <span style={isHovered ? { textDecorationLine: "underline", textDecorationColor: "#ef4444", textDecorationThickness: "2px", textUnderlineOffset: "4px" } : undefined}>
@@ -528,7 +528,7 @@ function TypableInput({ value, options = [], onChange, onKeyDown, dataField, pla
         onFocus={() => setShowDropdown(options.length > 0)}
         onClick={() => setShowDropdown(options.length > 0)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)} placeholder={placeholder}
-        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-border)" : "1px solid var(--color-border)", background: hasValue ? "var(--color-primary-muted)" : "var(--color-surface)",
+        className="prescription-entry-control w-full px-2 text-[1rem] outline-none" style={{ fontSize: "1rem", border: hasValue ? "1.5px solid var(--color-border)" : "1px solid var(--color-border)", background: "#ffffff",
           paddingRight: options.length > 0 ? "1.75rem" : undefined }} />
       {options.length > 0 && (
         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
@@ -570,7 +570,7 @@ function ArrowSelect({ dataField, value, options, onChange, onNavigate, placehol
       <button type="button" data-field={dataField} onClick={() => setOpen(v => !v)} onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         className="prescription-entry-control w-full flex items-center justify-between px-2 text-[1rem] text-left"
-        style={{ border: "1px solid var(--color-border)", background: open ? "var(--color-primary-muted)" : "var(--color-surface)", ...extraStyle }}>
+        style={{ border: "1px solid var(--color-border)", background: "#ffffff", ...extraStyle }}>
         <span className={`min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${value ? "" : "prescription-dropdown-placeholder"}`} style={{ fontSize: value ? "1rem" : "0.8rem" }}>{value || placeholder}</span>
         <ChevronDown size={13} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
@@ -609,7 +609,7 @@ function TimeColumnSelect({ value, options, disabledSet, onChange, format, width
     <div ref={anchorRef} className={`relative min-w-0 ${width || "flex-1"}`}>
       <button type="button" onClick={() => setOpen(v => !v)} onBlur={() => setTimeout(() => setOpen(false), 150)}
         className="prescription-entry-control w-full flex items-center justify-between px-1.5 text-[1rem] text-left"
-        style={{ border: "1px solid var(--color-border)", background: open ? "var(--color-primary-muted)" : "var(--color-surface)" }}>
+        style={{ border: "1px solid var(--color-border)", background: "#ffffff" }}>
         <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: "1rem" }}>{fmt(value)}</span>
         <ChevronDown size={12} style={{ flexShrink: 0, opacity: 0.6 }} />
       </button>
@@ -906,7 +906,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
                 placeholder={config.labels.searchPlaceholder}
                 className="prescription-entry-control prescription-entry-placeholder w-full text-[1rem] font-medium outline-none"
                 style={{ fontSize: "1rem", border: selected ? "1.5px solid var(--color-border)" : "1px solid var(--color-border)",
-                  background: selected ? "var(--color-primary-muted)" : "var(--color-surface)", color: config.textAccent || config.color,
+                  background: "#ffffff", color: config.textAccent || config.color,
                   paddingLeft: "0.75rem", paddingRight: selected ? "3.5rem" : "1.75rem" }} />
               {selected && (
                 <button type="button" onMouseDown={e => { e.preventDefault(); handleClear(); }} title="Clear"
@@ -932,7 +932,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="days" className="w-16 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="days" type="number" min="1" max="365" value={draft.days}
               onChange={e => onDraftChange("days")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "days")}
-              className="prescription-entry-control prescription-entry-placeholder w-full px-2 text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} placeholder="Days" />
+              className="prescription-entry-control prescription-entry-placeholder w-full px-2 text-left font-semibold outline-none" style={{ border: "1px solid var(--color-border)", background: "#ffffff", fontSize: "1rem" }} placeholder="Days" />
           </div>
         );
         if (field === "intake") return (
@@ -971,7 +971,7 @@ const AddRow = React.forwardRef(({ config, draft, onDraftChange, onCommit, query
           <div key="schDate" className="w-28 flex-shrink-0 px-1 py-1.5 flex items-center">
             <input data-field="schDate" type="date" value={draft.schDate}
               onChange={e => onDraftChange("schDate")(e.target.value)} onKeyDown={e => handleFieldKeyDown(e, "schDate")}
-              className="prescription-entry-control prescription-entry-placeholder w-full px-1.5 outline-none" style={{ border: "1px solid var(--color-border)", background: "var(--color-surface)", fontSize: "1rem" }} />
+              className="prescription-entry-control prescription-entry-placeholder w-full px-1.5 outline-none" style={{ border: "1px solid var(--color-border)", background: "#ffffff", fontSize: "1rem" }} />
           </div>
         );
 
