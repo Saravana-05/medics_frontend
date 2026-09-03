@@ -113,6 +113,7 @@ export default function PatientInfoBar({
             >
               <TopBarSection
                 patient={p}
+                tabsRowRef={tabsRowRef}
                 onPark={onPark}
                 onFinalize={onFinalize}
                 onOPList={() => {}}
@@ -144,6 +145,7 @@ export default function PatientInfoBar({
       {/* OP List Modal */}
       {opList && (
         <OPListModal
+          verticalAnchorRef={tabsRowRef}
           onClose={() => setOpList(false)}
           onSelectPatient={(row) => {
             const match = patients.find(pt => pt.name === row.name);

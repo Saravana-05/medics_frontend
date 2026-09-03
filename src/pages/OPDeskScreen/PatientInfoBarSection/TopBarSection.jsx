@@ -8,7 +8,7 @@ const ShortcutLetter = ({ children }) => (
   </span>
 );
 
-export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient }) {
+export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
   const p = patient;
   const [followUpDate, setFollowUpDate] = useState(() => {
     const today = new Date();
@@ -184,6 +184,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
       {/* ── OP List Modal ── */}
       {showOPList && (
         <OPListModal
+          verticalAnchorRef={tabsRowRef}
           onClose={() => setShowOPList(false)}
           onSelectPatient={(row) => {
             onSelectPatient && onSelectPatient(row);

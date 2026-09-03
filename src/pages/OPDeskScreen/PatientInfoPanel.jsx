@@ -84,12 +84,8 @@ function StatusBadge({ status, type }) {
 // Tab configuration — each tab renders as a vertical colored bar + icon button
 const TABS = [
   { key: "address",     label: "Address",       icon: MapPin,       color: "#4a90d9" },
-  { key: "attendant",   label: "Attendant",     icon: Users,        color: "#a78bdb" },
   { key: "appointment", label: "Appointment",   icon: CalendarIcon, color: "#f5b301" },
-  { key: "visit",       label: "Today's Visit", icon: Clock,        color: "#4caf82" },
   { key: "insurance",   label: "Insurance",     icon: Shield,       color: "#ef5a6f" },
-  { key: "gynac",       label: "Gynecology",    icon: BabyIcon2,    color: "#d946ef" },
-  { key: "ipinfo",      label: "IP Info",       icon: Hospital,     color: "#6dc4c4" },
 ];
 
 // Header height for scroll calculation - Increased to accommodate larger photo + details
@@ -116,12 +112,8 @@ export default function PatientInfoPanel({
       line4: "",
       phone: "",
     },
-    attendant: p.attendant || { name: "", relationship: "", phone: "" },
     appointment: p.appointment || { datetime: "", priority: "" },
-    todaysVisit: p.todaysVisit || { type: "", firstVisit: "", visitCount: "", corporate: "", fee: "" },
     insurer: p.insurer || { name: "", plan: "", period: "", claim: "" },
-    gynacInfo: p.gynacInfo || null,
-    ipInfo: p.ipInfo || { ward: "", bed: "", admitDate: "", consultant: "" },
   };
 
   // Scrollable content area height
@@ -161,30 +153,11 @@ export default function PatientInfoPanel({
             )}
           </div>
         );
-      case "attendant":
-        return (
-          <div className="space-y-3">
-            <InfoCard label="Name" value={patientData.attendant.name} icon={User} color="var(--color-info)" />
-            <div className="grid grid-cols-2 gap-2">
-              <InfoCard label="Relationship" value={patientData.attendant.relationship} color="var(--color-info)" />
-              <InfoCard label="Phone" value={patientData.attendant.phone} icon={Phone} color="var(--color-primary)" />
-            </div>
-          </div>
-        );
       case "appointment":
         return (
           <div className="space-y-2">
             <DetailRow label="Date & Time" value={patientData.appointment.datetime} icon={Clock} />
             <DetailRow label="Priority" value={<StatusBadge status={patientData.appointment.priority} type="priority" />} icon={AlertCircle} />
-          </div>
-        );
-      case "visit":
-        return (
-          <div className="space-y-2">
-            <DetailRow label="Visit Type" value={<StatusBadge status={patientData.todaysVisit.type} />} icon={Activity} />
-            <DetailRow label="First Visit" value={patientData.todaysVisit.firstVisit} subtitle={patientData.todaysVisit.visitCount} icon={CalendarDays} />
-            <DetailRow label="Corporate" value={patientData.todaysVisit.corporate} icon={Building2} />
-            <DetailRow label="Fee Type" value={<StatusBadge status={patientData.todaysVisit.fee} type="fee" />} icon={Wallet} />
           </div>
         );
       case "insurance":
@@ -194,43 +167,6 @@ export default function PatientInfoPanel({
             <DetailRow label="Plan" value={patientData.insurer.plan} icon={FileText} />
             <DetailRow label="Period" value={patientData.insurer.period} icon={Calendar} />
             <DetailRow label="Claim Status" value={<StatusBadge status={patientData.insurer.claim} type="claim" />} icon={CheckCircle} />
-          </div>
-        );
-      case "gynac":
-        if (!patientData.gynacInfo) {
-          return (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <BabyIcon2 size={32} style={{ color: "var(--color-text-subtle)" }} />
-                <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>No gynecology information available</p>
-              </div>
-            </div>
-          );
-        }
-        return (
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              <InfoCard label="LMP" value={patientData.gynacInfo.lmp} color="#d946ef" />
-              <InfoCard label="EDD" value={patientData.gynacInfo.edd} color="#d946ef" />
-            </div>
-            <DetailRow label="Doctor" value={patientData.gynacInfo.doc} icon={User} />
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <InfoCard label="Pregnancies" value={patientData.gynacInfo.pregnancies} />
-              <InfoCard label="Deliveries" value={patientData.gynacInfo.deliveries} />
-              <InfoCard label="Abortions" value={patientData.gynacInfo.abortions} />
-              <InfoCard label="Living Children" value={patientData.gynacInfo.livingChildren} />
-            </div>
-          </div>
-        );
-      case "ipinfo":
-        return (
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <InfoCard label="Ward" value={patientData.ipInfo.ward} icon={DoorOpen} color="var(--color-info)" />
-              <InfoCard label="Bed" value={patientData.ipInfo.bed} icon={Bed} color="var(--color-info)" />
-            </div>
-            <DetailRow label="Admit Date" value={patientData.ipInfo.admitDate} icon={CalendarDays} />
-            <DetailRow label="Consultant" value={patientData.ipInfo.consultant} icon={UserRound} />
           </div>
         );
       default:

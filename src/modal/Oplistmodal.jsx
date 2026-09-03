@@ -182,7 +182,7 @@ function ColHeader({ filters }) {
   );
 }
 
-export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00" }) {
+export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00", verticalAnchorRef }) {
   const modalRef = useRef(null);
   const [filter, setFilter] = useState("");
   const [statusFilters, setStatusFilters] = useState([]);
@@ -192,6 +192,57 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   const [hoveredSection, setHoveredSection] = useState(null);
   const [focusedToken, setFocusedToken] = useState(null);
   const gridRef = useRef(null);
+  const [verticalBounds, setVerticalBounds] = useState({ top: 32, height: Math.max(320, window.innerHeight - 40) });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const dragStateRef = useRef(null);
+
+  const handleDragStart = event => {
+    if (event.button !== undefined && event.button !== 0) return;
+    if (event.target.closest("button, input, select, textarea, a")) return;
+    const modalRect = modalRef.current?.getBoundingClientRect();
+    if (!modalRect) return;
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startOffset: dragOffset,
+      startRect: modalRect,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handleDragMove = event => {
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const rawX = event.clientX - drag.startX;
+    const rawY = event.clientY - drag.startY;
+    const nextLeft = Math.min(window.innerWidth - drag.startRect.width, Math.max(0, drag.startRect.left + rawX));
+    const nextTop = Math.min(window.innerHeight - drag.startRect.height, Math.max(0, drag.startRect.top + rawY));
+    setDragOffset({
+      x: drag.startOffset.x + nextLeft - drag.startRect.left,
+      y: drag.startOffset.y + nextTop - drag.startRect.top,
+    });
+  };
+
+  const handleDragEnd = event => {
+    if (dragStateRef.current?.pointerId !== event.pointerId) return;
+    dragStateRef.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  };
+
+  useEffect(() => {
+    const syncVerticalBounds = () => {
+      const anchorTop = verticalAnchorRef?.current?.getBoundingClientRect().top ?? 32;
+      const top = Math.max(0, Math.round(anchorTop) - 58);
+      const viewGridBottom = document.querySelector("[data-prescription-view-grid]")?.getBoundingClientRect().bottom;
+      const workspaceBottom = viewGridBottom ?? window.innerHeight - 8;
+      setVerticalBounds({ top, height: Math.max(200, Math.round(workspaceBottom) - top) });
+    };
+
+    syncVerticalBounds();
+    window.addEventListener("resize", syncVerticalBounds);
+    return () => window.removeEventListener("resize", syncVerticalBounds);
+  }, [verticalAnchorRef]);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement;
@@ -306,8 +357,8 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in"
-      style={{ background: "rgba(0,0,0,0.5)" }}
+      className="fixed inset-0 z-[100] flex items-start justify-center animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.5)", paddingTop: verticalBounds.top, boxSizing: "border-box" }}
     >
       <div
         ref={modalRef}
@@ -315,14 +366,22 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         aria-modal="true"
         aria-label="Out Patient List"
         tabIndex={-1}
-        className="list-modal-flat flex h-[90vh] w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up"
+        className="list-modal-flat flex w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up"
         style={{
           background: "var(--color-surface)",
+          height: verticalBounds.height,
+          transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
         }}
       >
         {/* Header */}
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary-dark) 50%, white) 0%, color-mix(in srgb, var(--color-primary) 50%, white) 100%)" }}>
-          <div className="px-5 py-3 flex items-center justify-between">
+          <div className="px-5 py-3 flex items-center justify-between select-none"
+            onPointerDown={handleDragStart}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+            onPointerCancel={handleDragEnd}
+            style={{ cursor: dragStateRef.current ? "grabbing" : "grab", touchAction: "none" }}
+            title="Drag to move">
             <div className="flex items-center gap-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2 whitespace-nowrap">
                 <ClipboardList size={20} />

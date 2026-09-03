@@ -1124,6 +1124,7 @@ const PrescriptionEntryTab = React.forwardRef(function PrescriptionEntryTab({ co
     <div className="flex flex-col overflow-hidden" style={{ background: "var(--color-surface)", height: "100%", minHeight: "300px" }}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <div
+          data-prescription-view-grid
           className="h-full flex flex-col overflow-hidden"
         >
           {config.key === "carePlan" ? (

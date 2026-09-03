@@ -14,8 +14,8 @@ const LEFT_TABS = [
   },
   { 
     key: "chronicAllergy", 
-    label: "Allergy", 
-    shortcut: "a",
+    label: "Caution", 
+    shortcut: "u",
     color: "#73bfb8",
   },
   { 
