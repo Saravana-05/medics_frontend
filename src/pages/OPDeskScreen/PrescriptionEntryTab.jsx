@@ -78,17 +78,24 @@ function PortalDropdown({ anchorEl, open, children, maxVisibleRows, scrollbarCla
   );
 }
 
-/* Flat, borderless segments that sit flush against each other, shaded from the
-   active tab's own accent color — light green/green/dark green on Drug, light
-   brown/brown/dark brown on Lab, etc. — instead of a fixed color regardless of tab. */
-function ActionButton({ onClick, label, bg, hoverBg, textColor = "white" }) {
+/* Compact action segments shaded from the active tab's accent color. */
+function ActionButton({ onClick, label, shortcutKey, bg, hoverBg, textColor = "white" }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const shortcutIndex = label.toLowerCase().lastIndexOf(shortcutKey.toLowerCase());
+
   return (
-    <button onClick={onClick}
+    <button onClick={onClick} accessKey={shortcutKey} aria-label={`${label} (Alt+${shortcutKey.toUpperCase()})`}
       className="inline-flex items-center justify-center px-3.5 text-[0.72rem] font-semibold transition-all duration-150 cursor-pointer leading-none"
-      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)" }}
-      onMouseEnter={e => e.currentTarget.style.background = hoverBg}
-      onMouseLeave={e => e.currentTarget.style.background = bg}>
-      {label}
+      style={{ background: bg, color: textColor, height: "30px", boxSizing: "border-box", filter: "saturate(1.12) contrast(1.06)", border: "1px solid var(--color-border)", marginLeft: "-1px" }}
+      onMouseEnter={e => { setIsHovered(true); e.currentTarget.style.background = hoverBg; }}
+      onMouseLeave={e => { setIsHovered(false); e.currentTarget.style.background = bg; }}>
+      <span style={isHovered ? { textDecorationLine: "underline", textDecorationColor: "#ef4444", textDecorationThickness: "2px", textUnderlineOffset: "4px" } : undefined}>
+        {label.slice(0, shortcutIndex)}
+        <span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>
+          {label[shortcutIndex]}
+        </span>
+        {label.slice(shortcutIndex + 1)}
+      </span>
     </button>
   );
 }
@@ -163,11 +170,11 @@ export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentT
 
   return (
     <div className="flex items-center overflow-hidden">
-      <ActionButton label="Clear" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
-      <ActionButton label="Paste" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
-      <ActionButton label="Preview" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />
-      <ActionButton label="Save" onClick={onSave} bg={shades[3]} hoverBg={hoverShades[3]} textColor={darkText} />
-      <ActionButton label="Print" bg={shades[4]} hoverBg={hoverShades[4]} textColor={darkText} />
+      <ActionButton label="Clear" shortcutKey="r" onClick={onClear} bg={shades[0]} hoverBg={hoverShades[0]} textColor="#1f2937" />
+      <ActionButton label="Paste" shortcutKey="e" bg={shades[1]} hoverBg={hoverShades[1]} textColor="#1f2937" />
+      <ActionButton label="Preview" shortcutKey="w" onClick={onPreview} bg={shades[2]} hoverBg={hoverShades[2]} textColor={darkText} />
+      <ActionButton label="Save" shortcutKey="s" onClick={onSave} bg={shades[3]} hoverBg={hoverShades[3]} textColor={darkText} />
+      <ActionButton label="Print" shortcutKey="p" bg={shades[4]} hoverBg={hoverShades[4]} textColor={darkText} />
     </div>
   );
 }
