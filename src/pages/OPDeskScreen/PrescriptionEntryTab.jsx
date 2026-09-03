@@ -135,23 +135,23 @@ function EntryFooterBar({
   );
 }
 
-export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentLight, accentText }) {
+export function ModernToolbar({ onClear, onSave, onPreview, accentColor, accentText }) {
   const darkText = accentText || "white";
   // Derive every action shade from the active tab instead of maintaining
   // separate hard-coded palettes that can drift from the configured colors.
   const shades = [
-    accentLight,
-    `color-mix(in srgb, ${accentColor} 45%, white)`,
+    `color-mix(in srgb, ${accentColor} 60%, white)`,
     `color-mix(in srgb, ${accentColor} 70%, white)`,
+    `color-mix(in srgb, ${accentColor} 80%, white)`,
+    `color-mix(in srgb, ${accentColor} 90%, white)`,
     accentColor,
-    `color-mix(in srgb, ${accentColor} 82%, black)`,
   ];
   const hoverShades = [
-    `color-mix(in srgb, ${accentColor} 30%, white)`,
-    `color-mix(in srgb, ${accentColor} 60%, white)`,
-    `color-mix(in srgb, ${accentColor} 82%, white)`,
-    `color-mix(in srgb, ${accentColor} 88%, black)`,
-    `color-mix(in srgb, ${accentColor} 70%, black)`,
+    `color-mix(in srgb, ${accentColor} 70%, white)`,
+    `color-mix(in srgb, ${accentColor} 80%, white)`,
+    `color-mix(in srgb, ${accentColor} 90%, white)`,
+    accentColor,
+    `color-mix(in srgb, ${accentColor} 90%, black)`,
   ];
 
   return (
