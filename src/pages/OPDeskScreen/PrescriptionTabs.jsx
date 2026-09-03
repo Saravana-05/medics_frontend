@@ -14,19 +14,6 @@ const PRESCRIPTION_TABS = [
 // not a pointed chevron.
 const SLANT = 16;
 
-// Fixed tab-bar height (matches the container's own `height: 48` below) —
-// needed to compute exactly where the selected-tab's diagonal accent line
-// should stop so it meets the bottom accent line without protruding past it.
-const TAB_HEIGHT = 48;
-const ACCENT_MARGIN = 5; // inset from the tab's right/bottom edges
-const ACCENT_THICKNESS = 2;
-// y (px, from the top) where the bottom accent line's top edge sits —
-// the diagonal line's endpoint is trimmed to land exactly here.
-const ACCENT_JOIN_Y = TAB_HEIGHT - ACCENT_MARGIN - ACCENT_THICKNESS;
-// The diagonal shifts SLANT px over the full tab height; at the trimmed
-// join point it's only shifted proportionally that far.
-const ACCENT_JOIN_SHIFT = SLANT * (ACCENT_JOIN_Y / TAB_HEIGHT);
-
 export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, compact = false, fullBorder = false }) {
   const [hoveredKey, setHoveredKey] = useState(null);
 
@@ -78,29 +65,17 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
               color: tab.textColor || "white",
             }}
           >
-            {isActive && (
-              <>
-                {/* 2px white accent on the right + bottom edges, inset 5px —
-                    selected-tab indicator only, shown on no other state.
-                    The right edge is cut with the same "\" slant as the tab's
-                    own clip-path (SLANT px over the full height), so this
-                    line runs parallel to that edge instead of straight down.
-                    Its bottom endpoint is trimmed to ACCENT_JOIN_Y — exactly
-                    where the bottom accent line's top edge sits — so it
-                    meets that line flush instead of continuing past it. */}
-                <span aria-hidden="true" style={{
-                  position: "absolute", inset: 0,
-                  clipPath: `polygon(calc(100% - ${SLANT + ACCENT_MARGIN}px) 0, calc(100% - ${SLANT + ACCENT_MARGIN - ACCENT_JOIN_SHIFT}px) ${ACCENT_JOIN_Y}px, calc(100% - ${SLANT + ACCENT_MARGIN + ACCENT_THICKNESS - ACCENT_JOIN_SHIFT}px) ${ACCENT_JOIN_Y}px, calc(100% - ${SLANT + ACCENT_MARGIN + ACCENT_THICKNESS}px) 0)`,
-                  background: "#fff",
-                }} />
-                {/* Stops at right:7 (5px margin + the diagonal's own 2px
-                    thickness), i.e. exactly where the diagonal line begins,
-                    so the two fuse into one clean corner instead of
-                    overlapping/crossing at the joint. */}
-                <span aria-hidden="true" style={{ position: "absolute", left: 5, right: 7, bottom: 5, height: 2, background: "#fff" }} />
-              </>
-            )}
-            <span className="whitespace-nowrap">{tab.label}</span>
+            <span
+              className="whitespace-nowrap"
+              style={isActive ? {
+                textDecorationLine: "underline",
+                textDecorationColor: "#ef4444",
+                textDecorationThickness: "2px",
+                textUnderlineOffset: "4px",
+              } : undefined}
+            >
+              {tab.label}
+            </span>
             {count > 0 && (
               <sup
                 className="inline-flex items-center justify-center text-center font-bold leading-none"
