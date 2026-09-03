@@ -88,9 +88,7 @@ const TABS = [
   { key: "insurance",   label: "Insurance",     icon: Shield,       color: "#ef5a6f" },
 ];
 
-// Header height for scroll calculation - Increased to accommodate larger photo + details
-const HEADER_H = 180; // Increased significantly for passport photo + details
-const TABS_H = 44;
+const HEADER_H = 112;
 const FOOTER_H = 40;
 
 export default function PatientInfoPanel({
@@ -115,10 +113,6 @@ export default function PatientInfoPanel({
     appointment: p.appointment || { datetime: "", priority: "" },
     insurer: p.insurer || { name: "", plan: "", period: "", claim: "" },
   };
-
-  // Scrollable content area height
-  const footerH = isPopup ? FOOTER_H : 0;
-  const scrollAreaH = popupHeight - HEADER_H - TABS_H - footerH;
 
   // Get the initial letter for fallback avatar
   const getInitials = () => {
@@ -185,129 +179,73 @@ export default function PatientInfoPanel({
         borderLeft: !isPopup ? "2px solid var(--color-primary)" : undefined,
       }}
     >
-      {/* ── HEADER ──────────────────────────────────────────────────────── */}
+      {/* Compact patient identity header */}
       <div
-        className="flex-shrink-0 p-4 border-b flex flex-col items-center justify-center"
+        className="flex-shrink-0 px-4 py-3 border-b flex items-center gap-3"
         style={{
-          background: "linear-gradient(135deg, var(--color-primary-muted) 0%, var(--color-surface) 100%)",
+          background: "linear-gradient(135deg, #eef6fb 0%, #ffffff 100%)",
           borderColor: "var(--color-border)",
           height: HEADER_H,
         }}
       >
-        {/* Avatar with Photo Support - Passport Size */}
-        <div className="relative flex-shrink-0 rounded-full overflow-hidden group shadow-lg"
+        <div className="relative flex-shrink-0 rounded-lg overflow-hidden group shadow-md"
           style={{
-            width: 104,
-            height: 104,
+            width: 72,
+            height: 82,
             background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%)",
-            border: "3px solid white",
+            border: "2px solid white",
           }}>
-          
           {p.photo && !imageError ? (
-            <img
-              src={p.photo}
-              alt={p.name}
-              className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
-            />
+            <img src={p.photo} alt={p.name} className="w-full h-full object-cover" onError={() => setImageError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-white font-bold text-4xl">{getInitials()}</span>
+              <span className="text-white font-bold text-2xl">{getInitials()}</span>
             </div>
           )}
-
-          {/* Edit/Camera button overlay */}
-          <button className="absolute bottom-1 right-1 p-1.5 rounded-full bg-white shadow-md transition-all opacity-0 group-hover:opacity-100">
-            <Camera size={12} style={{ color: "var(--color-primary)" }} />
+          <button className="absolute bottom-1 right-1 p-1 rounded-full bg-white shadow-md transition-all opacity-0 group-hover:opacity-100" title="Change photo">
+            <Camera size={10} style={{ color: "var(--color-primary)" }} />
           </button>
         </div>
 
-        {/* Patient details below photo */}
-        <div className="text-center mt-2.5">
-          <h3 className="text-lg font-bold truncate" style={{ color: "var(--color-text-base)" }}>
-            {p.name || "—"}
-          </h3>
-          <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
-            <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-              <Activity size={10} /> {p.age || "—"} yrs
-            </span>
-            <span className="w-1 h-1 rounded-full" style={{ background: "var(--color-text-muted)" }} />
-            <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-              <Heart size={10} /> {p.bloodGroup || "—"}
-            </span>
-            {p.gender && (
-              <>
-                <span className="w-1 h-1 rounded-full" style={{ background: "var(--color-text-muted)" }} />
-                <span className="text-xs flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-                  <User size={10} /> {p.gender === "Female" ? "Female" : p.gender === "Male" ? "Male" : p.gender}
-                </span>
-              </>
-            )}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-bold truncate" style={{ color: "var(--color-text-base)" }}>{p.name || "—"}</h3>
+          <div className="mt-0.5 text-[0.65rem] font-semibold" style={{ color: "var(--color-primary)" }}>{p.id || p.patientId || "Patient profile"}</div>
+          <div className="grid grid-cols-3 gap-1.5 mt-2">
+            <div className="px-2 py-1 rounded" style={{ background: "#ffffff", border: "1px solid var(--color-border)" }}>
+              <div className="text-[0.5rem] uppercase" style={{ color: "var(--color-text-muted)" }}>Age</div>
+              <div className="text-xs font-bold">{p.age || "—"} yrs</div>
+            </div>
+            <div className="px-2 py-1 rounded" style={{ background: "#ffffff", border: "1px solid var(--color-border)" }}>
+              <div className="text-[0.5rem] uppercase" style={{ color: "var(--color-text-muted)" }}>Gender</div>
+              <div className="text-xs font-bold truncate">{p.gender || "—"}</div>
+            </div>
+            <div className="px-2 py-1 rounded" style={{ background: "#ffffff", border: "1px solid var(--color-border)" }}>
+              <div className="text-[0.5rem] uppercase" style={{ color: "var(--color-text-muted)" }}>Blood</div>
+              <div className="text-xs font-bold">{p.bloodGroup || "—"}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── TAB BARS: vertical colored "lollipop" bars with rotated labels ── */}
-      <div className="flex-shrink-0 flex gap-1.5 px-2" style={{ background: "var(--color-surface)" }}>
-        {TABS.map(tab => {
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className="flex-1 flex items-center justify-center rounded-b-[22px] transition-all duration-200"
-              style={{
-                height: 168,
-                background: isActive ? "var(--color-success)" : "var(--color-danger)",
-                opacity: isActive ? 1 : 0.9,
-                boxShadow: isActive ? "0 8px 16px rgba(0,0,0,0.20)" : "none",
-              }}
-            >
-              <span
-                className="font-bold text-white whitespace-nowrap leading-none"
-                style={{
-                  writingMode: "vertical-rl",
-                  transform: "rotate(180deg)",
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.03em",
-                  textAlign: "center",
-                }}
-              >
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── ICON ROW: circular icon button per tab ── */}
-      <div className="flex-shrink-0 flex items-center justify-between px-3 py-3">
+      {/* Simple section navigation leaves more room for profile information. */}
+      <div className="flex-shrink-0 grid grid-cols-3 gap-1 p-2 border-b" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
         {TABS.map(tab => {
           const isActive = activeTab === tab.key;
           const Icon = tab.icon;
           return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className="flex items-center justify-center rounded-full transition-all"
-              style={{
-                width: 40,
-                height: 40,
-                background: "var(--color-surface)",
-                boxShadow: isActive
-                  ? "0 0 0 2px var(--color-success), 0 4px 10px rgba(0,0,0,0.14)"
-                  : "0 2px 6px rgba(0,0,0,0.10)",
-              }}
-            >
-              <Icon size={18} style={{ color: isActive ? "var(--color-success)" : "var(--color-danger)" }} />
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              className="flex items-center justify-center gap-1.5 px-2 transition-all"
+              style={{ height: 38, background: isActive ? tab.color : "var(--color-surface-alt)", color: isActive ? "white" : "var(--color-text-base)", border: `1px solid ${isActive ? tab.color : "var(--color-border)"}`, boxShadow: isActive ? "0 2px 5px rgba(0,0,0,0.15)" : "none" }}>
+              <Icon size={13} />
+              <span className="text-[0.67rem] font-bold truncate">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+      <div className="flex-1 min-h-0 overflow-y-auto p-3">
+        <div className="rounded-lg border p-3" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
           {renderContent()}
         </div>
       </div>
