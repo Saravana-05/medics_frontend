@@ -828,10 +828,10 @@ export const PREVIOUS_VISITS = {
     { sl: 6, entryDt: "01/02/2024 11:00", docModule: "3909: OP-DP", reportDt: "", complaint: "Frequent Urination", vitals: "70/--/140:88:82/98.2", by: "Dr.Raj", nextVisit: "17/02/2024" },
   ],
   "9901": [
-    { sl: 9, entryDt: "02/02/2024 13:30", docModule: "3910: OP-DP", reportDt: "", complaint: "Joint Pain", vitals: "58/--/155:92:90/98.8", by: "Dr.Anjali", nextVisit: "20/02/2024" },
+    { sl: 9, entryDt: "02/02/2026 13:30", docModule: "3910: OP-DP", reportDt: "", complaint: "Joint Pain", vitals: "58/--/155:92:90/98.8", by: "Dr.Anjali", nextVisit: "20/02/2024" },
   ],
   "1012": [
-    { sl: 1, entryDt: "03/02/2024 14:00", docModule: "3911: OP-DP", reportDt: "", complaint: "Sore Throat", vitals: "65/--/115:75:72/98.6", by: "Dr.Suresh", nextVisit: "10/02/2024" },
+    { sl: 1, entryDt: "03/02/2025 14:00", docModule: "3911: OP-DP", reportDt: "", complaint: "Sore Throat", vitals: "65/--/115:75:72/98.6", by: "Dr.Suresh", nextVisit: "10/02/2024" },
   ],
   "1123": [
     { sl: 5, entryDt: "02/02/2024 15:00", docModule: "3912: OP-DP", reportDt: "", complaint: "Palpitations", vitals: "75/--/145:90:88/99.2", by: "Dr.Geetha", nextVisit: "15/02/2024" },
