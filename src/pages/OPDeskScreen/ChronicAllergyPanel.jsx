@@ -202,6 +202,64 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           </div>
         )}
 
+        {/* Gynecology Edit Form — modal popup (matches Allergy/Chronic modal, pink theme) */}
+        {editingGynac && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.45)" }}
+            onClick={cancelGynacEdit}
+          >
+            <div
+              className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              style={{ background: "var(--color-surface)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal header */}
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#d946ef" }}>
+                <span className="text-base font-bold text-white">Edit Gynecology</span>
+                <button onClick={cancelGynacEdit} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+
+              {/* Modal body — one field per gynac attribute, pre-filled from the real data */}
+              <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                {gynacFields.map(({ key, label }) => (
+                  <div key={key} className="space-y-1">
+                    <label className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>{label}</label>
+                    <input
+                      type="text"
+                      placeholder={label}
+                      value={gynacDraft[key] ?? ""}
+                      onChange={(e) => setGynacDraft({ ...gynacDraft, [key]: e.target.value })}
+                      className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                      style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal footer */}
+              <div className="flex gap-3 px-4 pb-4">
+                <button
+                  onClick={saveGynacEdit}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-success)", color: "white" }}
+                >
+                  <Check size={16} /> Save
+                </button>
+                <button
+                  onClick={cancelGynacEdit}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-danger)", color: "white" }}
+                >
+                  <X size={16} /> Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="p-3 space-y-4">
           {[{ type: "Allergy", entries: allergyItems }, { type: "Chronic", entries: chronicItems }].map(({ type, entries }, sectionIndex) => (
             <section key={type} className={sectionIndex > 0 ? "border-t pt-3" : ""} style={sectionIndex > 0 ? { borderColor: "var(--color-border)" } : undefined}>
@@ -243,22 +301,9 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-sm font-bold" style={{ color: "#d946ef" }}>Gynecology</h3>
               {gynacInfoState && (
-                <div className="flex items-center gap-1">
-                  {editingGynac ? (
-                    <>
-                      <button onClick={saveGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "var(--color-success)" }} title="Save">
-                        <Check size={15} />
-                      </button>
-                      <button onClick={cancelGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }} title="Cancel">
-                        <X size={15} />
-                      </button>
-                    </>
-                  ) : (
-                    <button onClick={openGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#d946ef" }} title="Edit">
-                      <Pencil size={15} />
-                    </button>
-                  )}
-                </div>
+                <button onClick={openGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#d946ef" }} title="Edit">
+                  <Pencil size={15} />
+                </button>
               )}
             </div>
             {gynacInfoState ? (
@@ -268,17 +313,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                     <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
                     <span className="shrink-0 text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{label}</span>
                     <span className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>-</span>
-                    {editingGynac ? (
-                      <input
-                        type="text"
-                        value={gynacDraft[key] ?? ""}
-                        onChange={(e) => setGynacDraft({ ...gynacDraft, [key]: e.target.value })}
-                        className="min-w-0 flex-1 rounded border px-2 py-0.5 text-right text-sm outline-none"
-                        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                      />
-                    ) : (
-                      <span className="min-w-0 flex-1 truncate text-right text-sm" style={{ color: "var(--color-text-base)" }}>{gynacInfoState[key] ?? "—"}</span>
-                    )}
+                    <span className="min-w-0 flex-1 truncate text-right text-sm" style={{ color: "var(--color-text-base)" }}>{gynacInfoState[key] ?? "—"}</span>
                   </div>
                 ))}
               </div>

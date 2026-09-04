@@ -44,7 +44,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
             onClick={() => setActiveTab(tab.key)}
             onMouseEnter={() => setHoveredKey(tab.key)}
             onMouseLeave={() => setHoveredKey(null)}
-            className={`relative flex items-center justify-center gap-1 font-bold text-md transition-all duration-200 ${isLast ? "px-5" : ""}`}
+            className={`relative flex items-center justify-center gap-1 font-bold text-sm transition-all duration-200 ${isLast ? "px-5" : ""}`}
             style={{
               width: isLast ? "auto" : compact ? 116 : 132,
               minWidth: isLast ? (compact ? 112 : 128) : undefined,
