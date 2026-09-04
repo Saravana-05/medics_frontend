@@ -1,37 +1,37 @@
 import { useState } from "react";
-import { Pencil, X, Check } from "lucide-react";
+import { Pencil, Plus, X, Check } from "lucide-react";
 
 const FAMILY_HISTORY = [
-  { relation: "Grand-parents", name: "Grand Father", age: "72", condition: "Cancer", chronicAllergy: [] },
-  { relation: "Grand-parents", name: "Grand Mother", age: "68", condition: "High BP", chronicAllergy: [] },
-  { relation: "Parents", name: "Father", age: "54", condition: "Diabetes", chronicAllergy: [] },
-  { relation: "Parents", name: "Mother", age: "50", condition: "Thyroid", chronicAllergy: [] },
-  { relation: "Siblings", name: "Brother", age: "32", condition: "High BP", chronicAllergy: [] },
-  { relation: "Siblings", name: "Sister", age: "27", condition: "Asthma", chronicAllergy: [] },
-  { relation: "Children", name: "Son", age: "10", condition: "Dust Allergy", chronicAllergy: [] },
-  { relation: "Children", name: "Daughter", age: "7", condition: "Migraine", chronicAllergy: [] },
+  { relation: "Grand Parents", role: "Grand Father", name: "Mr. Raman", age: "72", condition: "Cancer" },
+  { relation: "Grand Parents", role: "Grand Mother", name: "Mrs. Lakshmi", age: "68", condition: "High BP" },
+  { relation: "Parents", role: "Father", name: "Mr. Krishnaswamy", age: "54", condition: "Diabetes" },
+  { relation: "Parents", role: "Mother", name: "Mrs. Meenakshi", age: "50", condition: "Thyroid" },
+  { relation: "Siblings", role: "Brother", name: "Mr. Kannan", age: "32", condition: "High BP" },
+  { relation: "Siblings", role: "Sister", name: "Ms. Priya", age: "27", condition: "Asthma" },
+  { relation: "Children", role: "Son", name: "Master. Arjun", age: "10", condition: "Dust Allergy" },
+  { relation: "Children", role: "Daughter", name: "Miss. Ananya", age: "7", condition: "Migraine" },
 ];
 
-const FAMILY_GROUPS = ["Grand-parents", "Parents", "Siblings", "Children"];
+const FAMILY_GROUPS = ["Grand Parents", "Parents", "Siblings", "Children"];
+const GROUP_ROLES = {
+  "Grand Parents": ["Grand Father", "Grand Mother"],
+  Parents: ["Father", "Mother"],
+  Siblings: ["Brother", "Sister"],
+  Children: ["Son", "Daughter"],
+};
 
 // Groups that support the group-level modal edit.
-const EDITABLE_GROUPS = ["Grand-parents", "Parents", "Siblings", "Children"];
+const EDITABLE_GROUPS = ["Grand Parents", "Parents", "Siblings", "Children"];
 
 function PatientFamilyPanel({ panelHeight, onUpdate }) {
   const [items, setItems] = useState(FAMILY_HISTORY);
 
-  // Which group's modal is currently open ("Grand-parents" | "Siblings" | "Children" | null)
+  // Which group's modal is currently open.
   const [editingGroup, setEditingGroup] = useState(null);
   // Draft copy of that group's members, pre-filled from the real data, edited inside the modal
   const [groupDraft, setGroupDraft] = useState([]);
 
   const headerH = 50;
-
-  const handleDelete = (index) => {
-    const updatedItems = items.filter((_, i) => i !== index);
-    setItems(updatedItems);
-    if (onUpdate) onUpdate(updatedItems);
-  };
 
   // ── Group-level modal edit (Grand-parents / Siblings / Children) ──
   const openGroupEdit = (group) => {
@@ -48,13 +48,19 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
     );
   };
 
+  const addGroupMember = role => {
+    setGroupDraft(current => [...current, { relation: editingGroup, role, name: "", age: "", condition: "" }]);
+  };
+
+  const removeGroupDraft = draftIndex => {
+    setGroupDraft(current => current.filter((_, index) => index !== draftIndex));
+  };
+
   const saveGroupEdit = () => {
-    const groupEntries = items.filter((member) => member.relation === editingGroup);
-    const updatedItems = items.map((member) => {
-      if (member.relation !== editingGroup) return member;
-      const draftIndex = groupEntries.indexOf(member);
-      return groupDraft[draftIndex] || member;
-    });
+    const updatedItems = [
+      ...items.filter(member => member.relation !== editingGroup),
+      ...groupDraft.filter(member => member.name.trim()).map(member => ({ ...member, relation: editingGroup })),
+    ];
     setItems(updatedItems);
     if (onUpdate) onUpdate(updatedItems);
     setEditingGroup(null);
@@ -77,7 +83,7 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
         style={{ background: "#679cbc", borderColor: "#679cbc", height: headerH, flexShrink: 0 }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-md font-bold text-white">Patient Family History</span>
+          <span className="text-base font-bold text-white">Family History</span>
           <span
             className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-center text-[0.6rem] font-bold leading-none"
             style={{ background: "white", color: "#679cbc" }}
@@ -111,40 +117,31 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
 
               {/* Modal body — one editable row per member, pre-filled with their actual data */}
               <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
-                {groupDraft.map((member, draftIndex) => (
-                  <div
-                    key={`${editingGroup}-${draftIndex}`}
-                    className="space-y-2 pb-3"
-                    style={{ borderBottom: draftIndex < groupDraft.length - 1 ? "1px solid var(--color-border)" : "none" }}
-                  >
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        placeholder="Member Name"
-                        value={member.name}
-                        onChange={(e) => updateGroupDraft(draftIndex, "name", e.target.value)}
-                        className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
-                        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Age"
-                        value={member.age}
-                        onChange={(e) => updateGroupDraft(draftIndex, "age", e.target.value)}
-                        className="w-20 px-3 py-2 text-base rounded-lg border outline-none"
-                        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Condition (e.g., Diabetes, Nil)"
-                      value={member.condition}
-                      onChange={(e) => updateGroupDraft(draftIndex, "condition", e.target.value)}
-                      className="w-full px-3 py-2 text-base rounded-lg border outline-none"
-                      style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                    />
-                  </div>
-                ))}
+                {GROUP_ROLES[editingGroup].map(role => {
+                  const roleMembers = groupDraft.map((member, draftIndex) => ({ member, draftIndex })).filter(({ member }) => member.role === role);
+                  const canAddOrRemove = ["Siblings", "Children"].includes(editingGroup);
+                  return (
+                    <section key={role} className="border-b pb-3" style={{ borderColor: "var(--color-border)" }}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-bold" style={{ color: "#3f6f8f" }}>{role}</span>
+                        {canAddOrRemove && <button type="button" onClick={() => addGroupMember(role)} className="flex h-7 items-center justify-center gap-1 border px-2 text-xs font-semibold" title={`Add ${role}`} style={{ borderColor: "#679cbc", color: "#3f6f8f" }}><Plus size={13} /><span>Add</span></button>}
+                      </div>
+                      <div className="space-y-3">
+                        {roleMembers.map(({ member, draftIndex }) => (
+                          <div key={`${role}-${draftIndex}`} className="space-y-2">
+                            {canAddOrRemove && <div className="flex justify-end"><button type="button" onClick={() => removeGroupDraft(draftIndex)} className="p-1" title={`Remove ${role}`}><X size={13} style={{ color: "var(--color-danger)" }} /></button></div>}
+                            <div className="grid grid-cols-[1fr_76px] gap-2">
+                              <label className="space-y-1"><span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Name</span><input type="text" value={member.name} onChange={(e) => updateGroupDraft(draftIndex, "name", e.target.value)} className="h-8 w-full border px-2 text-sm outline-none" style={{ borderColor: "var(--color-border)" }} /></label>
+                              <label className="space-y-1"><span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Age</span><input type="number" min="0" value={member.age} onChange={(e) => updateGroupDraft(draftIndex, "age", e.target.value)} className="h-8 w-full border px-2 text-sm outline-none" style={{ borderColor: "var(--color-border)" }} /></label>
+                            </div>
+                            <label className="block space-y-1"><span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Disease</span><input type="text" value={member.condition} onChange={(e) => updateGroupDraft(draftIndex, "condition", e.target.value)} className="h-8 w-full border px-2 text-sm outline-none" style={{ borderColor: "var(--color-border)" }} /></label>
+                          </div>
+                        ))}
+                        {roleMembers.length === 0 && <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>No {role.toLowerCase()} added</div>}
+                      </div>
+                    </section>
+                  );
+                })}
               </div>
 
               {/* Modal footer */}
@@ -168,19 +165,20 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
           </div>
         )}
 
-        <div className="p-3 space-y-4">
+        <div className="p-3 space-y-2">
           {FAMILY_GROUPS.map((group, groupIndex) => {
-            const groupItems = items.filter((member) => member.relation === group);
+            const groupItems = items
+              .filter((member) => member.relation === group)
+              .sort((left, right) => GROUP_ROLES[group].indexOf(left.role) - GROUP_ROLES[group].indexOf(right.role));
             const isEditable = EDITABLE_GROUPS.includes(group);
             return (
               <section
                 key={group}
-                className={groupIndex > 0 ? "border-t pt-3" : ""}
-                style={groupIndex > 0 ? { borderColor: "var(--color-border)" } : undefined}
+                className={groupIndex > 0 ? "pt-1" : ""}
               >
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-sm font-bold" style={{ color: "#3f6f8f" }}>{group}</h3>
-                  {isEditable && groupItems.length > 0 && (
+                <div className="mb-1 flex items-center justify-between">
+                  <h3 className="text-xs font-bold" style={{ color: "#3f6f8f" }}>{group}</h3>
+                  {isEditable && (
                     <button
                       onClick={() => openGroupEdit(group)}
                       className="flex h-7 w-7 items-center justify-center rounded border"
@@ -191,40 +189,22 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 gap-2">
-                  {groupItems.map((member, rowIndex) => {
-                    const itemIndex = items.indexOf(member);
+                <div className="grid grid-cols-1 gap-0">
+                  {groupItems.map((member) => {
+                    const sameRoleMembers = groupItems.filter(item => item.role === member.role);
+                    const roleNumber = sameRoleMembers.indexOf(member) + 1;
+                    const roleLabel = sameRoleMembers.length > 1 ? `${member.role} ${roleNumber}` : member.role;
                     return (
                       <div
-                        key={`${group}-${member.name}`}
-                        className="flex items-center gap-1.5 rounded px-2 py-1.5"
-                        style={{ background: rowIndex % 2 === 0 ? "white" : "#f2f7fb" }}
+                        key={`${group}-${member.role}-${member.name}`}
+                        className="flex items-center gap-2 border-b px-2 py-1"
+                        style={{ borderColor: "var(--color-border)" }}
                       >
-                        <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>
-                          {rowIndex + 1}.
-                        </span>
-                        <span
-                          className="min-w-0 flex-1 truncate text-sm font-bold"
-                          title={member.name}
-                          style={{ color: "var(--color-text-base)" }}
-                        >
-                          {member.name}
-                        </span>
-                        <span className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>-</span>
-                        <span className="shrink-0 whitespace-nowrap text-sm" style={{ color: "var(--color-text-base)" }}>
-                          {member.condition}
-                        </span>
-                        {isEditable && (
-                          <div className="ml-auto flex shrink-0 items-center justify-end gap-1">
-                            <button
-                              onClick={() => handleDelete(itemIndex)}
-                              className="rounded bg-white p-1"
-                              title="Delete"
-                            >
-                              <X size={13} style={{ color: "var(--color-danger)" }} />
-                            </button>
-                          </div>
-                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>{roleLabel}</div>
+                          <div className="truncate text-[0.65rem]" title={`${member.name}, ${member.age} years`} style={{ color: "var(--color-text-muted)" }}>{member.name} · {member.age || "—"} yrs</div>
+                        </div>
+                        <span className="max-w-[42%] shrink-0 truncate text-right text-sm" title={member.condition} style={{ color: "var(--color-text-base)" }}>{member.condition || "—"}</span>
                       </div>
                     );
                   })}

@@ -24,10 +24,10 @@ function InfoCard({ label, value, icon: Icon, color, onClick }) {
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex flex-1 min-w-0 items-center gap-2">
-          <div className="shrink-0 text-[0.6rem] font-bold" style={{ color: "var(--color-text-muted)" }}>
+          <div className="shrink-0 text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>
             {label}
           </div>
-          <div className="min-w-0 text-sm font-semibold whitespace-nowrap" style={{ color: "var(--color-text-base)" }}>
+          <div className="min-w-0 truncate text-sm font-semibold whitespace-nowrap" title={typeof value === "string" ? value : undefined} style={{ color: "var(--color-text-base)" }}>
             {value || "—"}
           </div>
         </div>
@@ -52,7 +52,8 @@ function DetailRow({ label, value, icon: Icon, valueColor, bold, subtitle }) {
         </span>
       </div>
       <div className="flex-1 min-w-0">
-        <div className={`text-sm whitespace-nowrap ${bold ? "font-bold" : "font-medium"}`}
+        <div className={`truncate text-sm whitespace-nowrap ${bold ? "font-bold" : "font-medium"}`}
+          title={typeof value === "string" ? value : undefined}
           style={{ color: valueColor || "var(--color-text-base)" }}>
           {value || "—"}
         </div>
@@ -72,11 +73,11 @@ function StatusBadge({ status, type, large }) {
     return "var(--color-primary)";
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full font-bold ${large ? "px-2.5 py-1 text-[0.8rem]" : "px-2 py-0.5 text-[0.6rem]"}`}
+    <span title={status} className={`inline-flex max-w-full items-center gap-1 rounded-full font-bold ${large ? "px-2.5 py-1 text-sm" : "px-2 py-0.5 text-xs"}`}
       style={{ background: `${getStatusColor()}20`, color: getStatusColor() }}>
       {status === "Urgent"    && <AlertCircle size={large ? 13 : 10} />}
       {status === "Follow-up" && <Activity size={large ? 13 : 10} />}
-      {status}
+      <span className="truncate">{status}</span>
     </span>
   );
 }
@@ -94,11 +95,42 @@ function DropdownRow({ label, value, onChange, options, icon: Icon }) {
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-transparent text-base font-bold outline-none cursor-pointer"
+          className="w-full bg-transparent text-sm font-medium outline-none cursor-pointer"
           style={{ color: "var(--color-text-base)" }}
         >
           {options.map(option => <option key={option} value={option}>{option}</option>)}
         </select>
+      </div>
+    </div>
+  );
+}
+
+const toDateInputValue = value => {
+  const text = String(value || "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  const match = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  return match ? `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}` : "";
+};
+
+const formatInsuranceDate = value => {
+  const isoDate = toDateInputValue(value);
+  if (!isoDate) return value || "—";
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
+};
+
+function SectionEditForm({ fields, value, onChange, onSave, onCancel }) {
+  return (
+    <div className="space-y-2">
+      {fields.map(({ key, label }) => (
+        <label key={key} className="grid grid-cols-[112px_minmax(0,1fr)] items-center gap-2 text-xs">
+          <span className="font-semibold" style={{ color: "var(--color-text-muted)" }}>{label}</span>
+          <input type={fields.find(field => field.key === key)?.type || "text"} value={fields.find(field => field.key === key)?.type === "date" ? toDateInputValue(value[key]) : value[key] || ""} onChange={event => onChange({ ...value, [key]: event.target.value })} className="h-7 min-w-0 border px-2 text-sm outline-none" style={{ borderColor: "var(--color-border)", color: "var(--color-text-base)" }} />
+        </label>
+      ))}
+      <div className="flex justify-end gap-1">
+        <button type="button" onClick={onSave} className="flex h-7 items-center gap-1 px-2 text-xs text-white" style={{ background: "var(--color-success)" }}><CheckCircle size={12} />Save</button>
+        <button type="button" onClick={onCancel} className="flex h-7 items-center gap-1 px-2 text-xs text-white" style={{ background: "var(--color-danger)" }}><XCircle size={12} />Cancel</button>
       </div>
     </div>
   );
@@ -122,10 +154,29 @@ export default function PatientInfoPanel({
 }) {
   const [imageError, setImageError] = useState(false);
   const [activeTab, setActiveTab] = useState("address");
+  const p = patient || {};
   const [appointmentPriority, setAppointmentPriority] = useState("Normal");
   const [appointmentBilling, setAppointmentBilling] = useState("Self");
+  const [visitType, setVisitType] = useState("Follow Up");
+  const [insurance, setInsurance] = useState(p.insurer || { name: "", plan: "", period: "", claim: "" });
+  const [company, setCompany] = useState(p.company || { name: "Trisul Enterprises and Engineering Services Private Limited", designation: "Foreman", staffId: "A100302" });
+  const [editingSection, setEditingSection] = useState(null);
+  const [editDraft, setEditDraft] = useState({});
+  const insuranceEndDate = toDateInputValue(insurance.period);
+  const insuranceStatus = insuranceEndDate
+    ? (new Date(`${insuranceEndDate}T23:59:59`) >= new Date() ? "Active" : "Elapsed")
+    : "Unknown";
 
-  const p = patient || {};
+  const startEditing = (section, value) => {
+    setEditingSection(section);
+    setEditDraft({ ...value });
+  };
+
+  const saveSection = () => {
+    if (editingSection === "insurance") setInsurance(editDraft);
+    if (editingSection === "company") setCompany(editDraft);
+    setEditingSection(null);
+  };
 
   const patientData = {
     address: p.address || {
@@ -136,7 +187,7 @@ export default function PatientInfoPanel({
       phone: "",
     },
     appointment: p.appointment || { datetime: "", priority: "" },
-    insurer: p.insurer || { name: "", plan: "", period: "", claim: "" },
+    insurer: insurance,
   };
 
   // Get the initial letter for fallback avatar
@@ -178,11 +229,11 @@ export default function PatientInfoPanel({
             {/* Appointment Today — replaces the old generic Date & Time /
                 Priority rows with this more detailed breakdown. */}
             <div>
-              <div className="text-[11.6px] font-bold tracking-wide whitespace-nowrap mb-2" style={{ color: "var(--color-text-muted)" }}>Appointment Today</div>
+              <div className="mb-2 whitespace-nowrap text-xs font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Appointment Today</div>
               <div className="space-y-2">
                 <DetailRow label="Request Dt-Time" value="18/06/2026 12:05 pm" icon={Clock} />
                 <DetailRow label="Appt.Dt-Time" value="19/06/2026 04:00 pm" icon={CalendarIcon} />
-                <DetailRow label="Visit Type" value="Follow-Up" icon={UserCheck} />
+                <DropdownRow label="Visit Type" value={visitType} onChange={setVisitType} options={["New Instance", "First Visit", "Follow Up"]} icon={UserCheck} />
                 <DropdownRow label="Priority" value={appointmentPriority} onChange={setAppointmentPriority} options={["Normal", "Urgent", "Emergency"]} icon={AlertCircle} />
                 <DropdownRow label="Billing" value={appointmentBilling} onChange={setAppointmentBilling} options={["Self", "Insurance", "Corporate"]} icon={Wallet} />
               </div>
@@ -190,23 +241,36 @@ export default function PatientInfoPanel({
 
             {/* Insurance Information — merged in from the removed Insurance tab. */}
             <div className="pt-2 mt-2 border-t" style={{ borderColor: "var(--color-border)" }}>
-              <div className="text-[11.6px] font-bold tracking-wide whitespace-nowrap mb-2" style={{ color: "var(--color-text-muted)" }}>Insurance Information</div>
-              <div className="space-y-2">
-                <InfoCard label="Provider" value={patientData.insurer.name} icon={Building2} color="var(--color-primary)" />
-                <DetailRow label="Plan" value={patientData.insurer.plan} icon={FileText} />
-                <DetailRow label="Period" value={patientData.insurer.period} icon={Calendar} />
-                <DetailRow label="Claim Status" value={<StatusBadge status={patientData.insurer.claim} type="claim" large />} icon={CheckCircle} />
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="whitespace-nowrap text-xs font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Insurance Information</div>
+                  <span className="rounded-full px-2 py-0.5 text-[0.6rem] font-bold" style={{ background: insuranceStatus === "Active" ? "#dcfce7" : insuranceStatus === "Elapsed" ? "#fee2e2" : "#f3f4f6", color: insuranceStatus === "Active" ? "#15803d" : insuranceStatus === "Elapsed" ? "#b91c1c" : "#6b7280" }}>{insuranceStatus}</span>
+                </div>
+                {editingSection !== "insurance" && <button type="button" onClick={() => startEditing("insurance", insurance)} className="p-1" title="Edit insurance information"><Edit3 size={13} style={{ color: "var(--color-primary)" }} /></button>}
               </div>
+              {editingSection === "insurance" ? (
+                <SectionEditForm fields={[{ key: "name", label: "Provider" }, { key: "plan", label: "Plan" }, { key: "period", label: "Period", type: "date" }, { key: "claim", label: "Claim Status" }]} value={editDraft} onChange={setEditDraft} onSave={saveSection} onCancel={() => setEditingSection(null)} />
+              ) : <div className="space-y-2">
+                <InfoCard label="Provider" value={patientData.insurer.name} color="var(--color-primary)" />
+                <DetailRow label="Plan" value={patientData.insurer.plan} icon={FileText} />
+                <DetailRow label="Period" value={formatInsuranceDate(patientData.insurer.period)} icon={Calendar} />
+                <DetailRow label="Claim Status" value={<StatusBadge status={patientData.insurer.claim} type="claim" large />} icon={CheckCircle} />
+              </div>}
             </div>
 
             {/* Company Information — 3rd section after Insurance Information. */}
             <div className="pt-2 mt-2 border-t" style={{ borderColor: "var(--color-border)" }}>
-              <div className="text-[11.6px] font-bold tracking-wide whitespace-nowrap mb-2" style={{ color: "var(--color-text-muted)" }}>Company Information</div>
-              <div className="space-y-2">
-                <InfoCard label="Name" value="Trisul Enterprises" icon={Building2} color="var(--color-primary)" />
-                <DetailRow label="Staff Designation" value="Foreman" icon={Briefcase} />
-                <DetailRow label="Staff ID" value="A100302" icon={BadgeCheck} />
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="whitespace-nowrap text-xs font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Company Information</div>
+                {editingSection !== "company" && <button type="button" onClick={() => startEditing("company", company)} className="p-1" title="Edit company information"><Edit3 size={13} style={{ color: "var(--color-primary)" }} /></button>}
               </div>
+              {editingSection === "company" ? (
+                <SectionEditForm fields={[{ key: "name", label: "Name" }, { key: "designation", label: "Staff Designation" }, { key: "staffId", label: "Staff ID" }]} value={editDraft} onChange={setEditDraft} onSave={saveSection} onCancel={() => setEditingSection(null)} />
+              ) : <div className="space-y-2">
+                <InfoCard label="Name" value={company.name} color="var(--color-primary)" />
+                <DetailRow label="Staff Designation" value={company.designation} icon={Briefcase} />
+                <DetailRow label="Staff ID" value={company.staffId} icon={BadgeCheck} />
+              </div>}
             </div>
           </div>
         );
@@ -231,7 +295,7 @@ export default function PatientInfoPanel({
           Profile tab's own color (#eb6367 in LeftSidebar's LEFT_TABS). */}
       <div className="px-3 py-2 border-b flex items-center justify-between"
         style={{ background: "#eb6367", borderColor: "#eb6367", height: PROFILE_HEADER_H, flexShrink: 0 }}>
-        <span className="text-md font-bold text-white">Profile Information</span>
+        <span className="text-base font-bold text-white">Patient Information</span>
       </div>
 
       {/* Compact patient identity header — Name left / Photo right on the

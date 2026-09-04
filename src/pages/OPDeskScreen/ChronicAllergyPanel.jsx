@@ -102,7 +102,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
         style={{ background: "#73bfb8", borderColor: "#73bfb8", height: headerH, flexShrink: 0 }}>
         <div className="flex items-center gap-2">
           {/* <AlertCircle size={16} style={{ color: "var(--color-danger)" }} /> */}
-          <span className="text-md font-bold text-white">Patient Caution</span>
+          <span className="text-base font-bold text-white">Caution</span>
           <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-center text-[0.6rem] font-bold leading-none" style={{ background: "white", color: "#3f8f87" }}>{items.length + (gynacInfoState ? 1 : 0)}</span>
         </div>
       </div>
@@ -122,7 +122,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
-              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#73bfb8" }}>
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: newItem.type === "Allergy" ? "#dc2626" : "#3f8f87" }}>
                 <span className="text-base font-bold text-white">
                   {editingIndex !== null ? "Edit" : "Add"} {newItem.type}
                 </span>
@@ -215,7 +215,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
-              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#d946ef" }}>
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#7c3aed" }}>
                 <span className="text-base font-bold text-white">Edit Gynecology</span>
                 <button onClick={cancelGynacEdit} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
                   <X size={20} className="text-white" />
@@ -260,25 +260,25 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           </div>
         )}
 
-        <div className="p-3 space-y-4">
+        <div className="p-3 space-y-2">
           {[{ type: "Allergy", entries: allergyItems }, { type: "Chronic", entries: chronicItems }].map(({ type, entries }, sectionIndex) => (
-            <section key={type} className={sectionIndex > 0 ? "border-t pt-3" : ""} style={sectionIndex > 0 ? { borderColor: "var(--color-border)" } : undefined}>
-              <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-sm font-bold" style={{ color: type === "Chronic" ? "#3f8f87" : "#d97706" }}>{type} ({entries.length})</h3>
-                <button onClick={() => openAddForm(type)} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#3f8f87" }} title={`Add ${type.toLowerCase()}`}>
+            <section key={type} className={sectionIndex > 0 ? "pt-1" : ""}>
+              <div className="mb-1 flex items-center justify-between">
+                <h3 className="text-xs font-bold" style={{ color: type === "Chronic" ? "#3f8f87" : "#dc2626" }}>{type} ({entries.length})</h3>
+                <button onClick={() => openAddForm(type)} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: type === "Allergy" ? "#dc2626" : "#3f8f87" }} title={`Add ${type.toLowerCase()}`}>
                   <Plus size={17} />
                 </button>
               </div>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-0">
                 {entries.length === 0 ? (
                   <div className="col-span-2 rounded border p-3 text-center text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>No {type === "Chronic" ? "chronic conditions" : "allergies"} recorded</div>
                 ) : entries.map((item, i) => {
                   const itemIndex = items.indexOf(item);
                   return (
-                    <div key={`${item.type}-${item.name}-${i}`} className="flex flex-col rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#f2faf9" }}>
+                    <div key={`${item.type}-${item.name}-${i}`} className="flex flex-col border-b px-2 py-1" style={{ borderColor: "var(--color-border)" }}>
                       {/* Top row: index, full name, severity, actions */}
                       <div className="flex items-start gap-1.5">
-                        <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
+                        <span className="shrink-0 text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
                         <span title={item.name} className="min-w-0 flex-1 text-sm font-bold break-words leading-tight" style={{ color: "var(--color-text-base)" }}>{item.name}</span>
                         <span className="shrink-0 whitespace-nowrap text-sm" style={{ color: "var(--color-text-base)" }}>- {item.severity}</span>
                         <div className="ml-1 flex shrink-0 items-center justify-end gap-1">
@@ -297,23 +297,24 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
             </section>
           ))}
 
-          <section className="border-t pt-3" style={{ borderColor: "var(--color-border)" }}>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-bold" style={{ color: "#d946ef" }}>Gynecology</h3>
+          <section className="pt-1">
+            <div className="mb-1 flex items-center justify-between">
+              <h3 className="text-xs font-bold" style={{ color: "#7c3aed" }}>Gynecology</h3>
               {gynacInfoState && (
-                <button onClick={openGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#d946ef" }} title="Edit">
+                <button onClick={openGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#7c3aed" }} title="Edit">
                   <Pencil size={15} />
                 </button>
               )}
             </div>
             {gynacInfoState ? (
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-0">
                 {gynacFields.map(({ key, label }, i) => (
-                  <div key={key} className="flex items-center gap-1.5 rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#faf2fc" }}>
-                    <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
-                    <span className="shrink-0 text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{label}</span>
-                    <span className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>-</span>
-                    <span className="min-w-0 flex-1 truncate text-right text-sm" style={{ color: "var(--color-text-base)" }}>{gynacInfoState[key] ?? "—"}</span>
+                  <div key={key} className="flex flex-col border-b px-2 py-1" style={{ borderColor: "var(--color-border)" }}>
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
+                      <span className="min-w-0 flex-1 text-xs font-bold leading-tight" style={{ color: "var(--color-text-muted)" }}>{label}</span>
+                      <span className="shrink-0 text-sm" style={{ color: "var(--color-text-base)" }}>- {gynacInfoState[key] ?? "—"}</span>
+                    </div>
                   </div>
                 ))}
               </div>

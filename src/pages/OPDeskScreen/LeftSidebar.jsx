@@ -120,6 +120,7 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient, onHov
       case "patientInfo":
         content = (
           <PatientInfoPanel
+            key={patient.id || patient.patientId}
             patient={patient}
             isPopup
             popupWidth={effectivePanelWidth}

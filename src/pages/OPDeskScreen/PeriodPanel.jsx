@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 
 const BASE_START_YEAR = 2020;
 
@@ -102,12 +102,12 @@ function PeriodPanel({ patient, panelHeight, appliedPeriods = FINANCIAL_PERIODS.
         className="flex h-[50px] shrink-0 items-center border-b px-3 py-2"
         style={{ background: "#0c324a", borderColor: "var(--color-border)" }}
       >
-        <span className="text-md font-bold text-white">Data Period</span>
+        <span className="text-base font-bold text-white">Data Period</span>
       </div>
 
       <div className="overflow-y-auto p-3">
         <section className="flex items-center justify-between gap-3 pb-3">
-          <div className="text-xs font-bold" style={{ color: "#0c324a" }}>First Visit</div>
+          <div className="text-xs font-bold" style={{ color: "#0c324a" }}>Current Patient&apos;s First Visit</div>
           <div className="text-right text-sm" style={{ color: "var(--color-text-base)" }}>{firstVisit}</div>
         </section>
 
@@ -154,18 +154,25 @@ function PeriodPanel({ patient, panelHeight, appliedPeriods = FINANCIAL_PERIODS.
             type="button"
             onClick={handleRun}
             disabled={selectedPeriods.length === 0 || isRunning}
-            className="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white shadow-md transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100"
-            style={{ background: "#0c324a" }}
+            className="mx-auto mt-3 flex h-11 w-32 items-center justify-center gap-2 rounded-md border text-sm font-semibold text-white shadow-md transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100"
+            style={{ background: "#0c324a", borderColor: "#164d6c" }}
           >
             {isRunning ? (
               <>
                 <Loader2 size={15} className="animate-spin" />
-                Running...
+                Updating...
               </>
             ) : (
-              "Run Selected Years"
+              "Update"
             )}
           </button>
+          <div
+            className="mt-2 flex items-start justify-center gap-1.5 text-[11px] leading-4"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            <Info size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span>Update is valid only for the current patient. The default data period is restored once the next patient is selected.</span>
+          </div>
         </section>
       </div>
     </div>

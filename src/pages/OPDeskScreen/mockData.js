@@ -124,8 +124,8 @@ export const MOCK_PATIENTS = [
       fee: "Cash",
     },
     insurer: {
-      name: "ABCH",
-      plan: "Plat.Enhanced",
+      name: "ABC Health Insurance Corporation Limited",
+      plan: "Platinum Enhanced Comprehensive Family Health Plan",
       period: "Till 31/01/2025",
       claim: "OP-Yes|Day-Yes",
     },
@@ -241,7 +241,7 @@ export const MOCK_PATIENTS = [
     insurer: {
       name: "Star Health",
       plan: "Family Health Optima",
-      period: "Till 30/06/2024",
+      period: "Till 30/06/2027",
       claim: "OP-Yes|Day-Yes",
     },
     gynacInfo: {
@@ -425,7 +425,7 @@ export const MOCK_PATIENTS = [
     insurer: {
       name: "Bajaj Allianz",
       plan: "Health Guard",
-      period: "Till 30/11/2024",
+      period: "Till 30/11/2028",
       claim: "OP-Yes|Day-No|IP-Yes",
     },
     gynacInfo: null,
@@ -536,7 +536,7 @@ export const MOCK_PATIENTS = [
     insurer: {
       name: "United India",
       plan: "Senior Citizen",
-      period: "Till 30/06/2024",
+      period: "Till 30/06/2027",
       claim: "OP-Yes|Day-Yes",
     },
     gynacInfo: null,
@@ -695,7 +695,7 @@ export const MOCK_PATIENTS = [
     insurer: {
       name: "Royal Sundaram",
       plan: "Health Shield",
-      period: "Till 30/09/2024",
+      period: "Till 30/09/2028",
       claim: "OP-Yes|Day-Yes",
     },
     gynacInfo: {
