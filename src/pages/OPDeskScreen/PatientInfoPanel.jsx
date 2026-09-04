@@ -64,7 +64,7 @@ function DetailRow({ label, value, icon: Icon, valueColor, bold, subtitle }) {
   );
 }
 
-function StatusBadge({ status, type }) {
+function StatusBadge({ status, type, large }) {
   const getStatusColor = () => {
     if (type === "priority") return status === "Urgent" ? "var(--color-danger)" : "var(--color-success)";
     if (type === "fee")      return status === "Cash"   ? "var(--color-primary)" : "var(--color-info)";
@@ -72,12 +72,35 @@ function StatusBadge({ status, type }) {
     return "var(--color-primary)";
   };
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6rem] font-bold"
+    <span className={`inline-flex items-center gap-1 rounded-full font-bold ${large ? "px-2.5 py-1 text-[0.8rem]" : "px-2 py-0.5 text-[0.6rem]"}`}
       style={{ background: `${getStatusColor()}20`, color: getStatusColor() }}>
-      {status === "Urgent"    && <AlertCircle size={10} />}
-      {status === "Follow-up" && <Activity size={10} />}
+      {status === "Urgent"    && <AlertCircle size={large ? 13 : 10} />}
+      {status === "Follow-up" && <Activity size={large ? 13 : 10} />}
       {status}
     </span>
+  );
+}
+
+function DropdownRow({ label, value, onChange, options, icon: Icon }) {
+  return (
+    <div className="flex items-center gap-2 py-1 border-b" style={{ borderColor: "var(--color-border)" }}>
+      <div className="w-36 shrink-0 flex items-center gap-1.5">
+        {Icon && <Icon size={12} style={{ color: "var(--color-text-muted)" }} />}
+        <span className="text-[12px] font-semibold tracking-wide whitespace-nowrap" style={{ color: "var(--color-text-muted)" }}>
+          {label}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <select
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-full bg-transparent text-base font-bold outline-none cursor-pointer"
+          style={{ color: "var(--color-text-base)" }}
+        >
+          {options.map(option => <option key={option} value={option}>{option}</option>)}
+        </select>
+      </div>
+    </div>
   );
 }
 
@@ -99,6 +122,8 @@ export default function PatientInfoPanel({
 }) {
   const [imageError, setImageError] = useState(false);
   const [activeTab, setActiveTab] = useState("address");
+  const [appointmentPriority, setAppointmentPriority] = useState("Normal");
+  const [appointmentBilling, setAppointmentBilling] = useState("Self");
 
   const p = patient || {};
 
@@ -156,11 +181,10 @@ export default function PatientInfoPanel({
               <div className="text-[11.6px] font-bold tracking-wide whitespace-nowrap mb-2" style={{ color: "var(--color-text-muted)" }}>Appointment Today</div>
               <div className="space-y-2">
                 <DetailRow label="Request Dt-Time" value="18/06/2026 12:05 pm" icon={Clock} />
-                <DetailRow label="Appt.Dt-Time" value="19/06/2026" icon={CalendarIcon} />
-                <DetailRow label="Time-Slot" value="04:00 pm" icon={ClockIcon} />
+                <DetailRow label="Appt.Dt-Time" value="19/06/2026 04:00 pm" icon={CalendarIcon} />
                 <DetailRow label="Visit Type" value="Follow-Up" icon={UserCheck} />
-                <DetailRow label="Priority" value={<StatusBadge status="Normal" type="priority" />} icon={AlertCircle} />
-                <DetailRow label="Billing" value="Self" icon={Wallet} />
+                <DropdownRow label="Priority" value={appointmentPriority} onChange={setAppointmentPriority} options={["Normal", "Urgent", "Emergency"]} icon={AlertCircle} />
+                <DropdownRow label="Billing" value={appointmentBilling} onChange={setAppointmentBilling} options={["Self", "Insurance", "Corporate"]} icon={Wallet} />
               </div>
             </div>
 
@@ -171,7 +195,7 @@ export default function PatientInfoPanel({
                 <InfoCard label="Provider" value={patientData.insurer.name} icon={Building2} color="var(--color-primary)" />
                 <DetailRow label="Plan" value={patientData.insurer.plan} icon={FileText} />
                 <DetailRow label="Period" value={patientData.insurer.period} icon={Calendar} />
-                <DetailRow label="Claim Status" value={<StatusBadge status={patientData.insurer.claim} type="claim" />} icon={CheckCircle} />
+                <DetailRow label="Claim Status" value={<StatusBadge status={patientData.insurer.claim} type="claim" large />} icon={CheckCircle} />
               </div>
             </div>
 

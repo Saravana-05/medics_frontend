@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, X, Check } from "lucide-react";
 
 // ── ChronicAllergyPanel Component ──
@@ -15,7 +15,34 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
   });
 
   const headerH = 50;
-  const gynacInfo = patient?.gynacInfo || null;
+  const [gynacInfoState, setGynacInfoState] = useState(patient?.gynacInfo || null);
+  const [editingGynac, setEditingGynac] = useState(false);
+  const [gynacDraft, setGynacDraft] = useState({});
+  const gynacFields = [
+    { key: "lmp", label: "LMP" },
+    { key: "edd", label: "EDD" },
+    { key: "doc", label: "Doctor" },
+    { key: "pregnancies", label: "Pregnancies" },
+    { key: "deliveries", label: "Deliveries" },
+    { key: "abortions", label: "Abortions" },
+    { key: "livingChildren", label: "Living Children" }
+  ];
+  useEffect(() => {
+    setGynacInfoState(patient?.gynacInfo || null);
+  }, [patient?.gynacInfo]);
+
+  const openGynacEdit = () => {
+    setGynacDraft({ ...(gynacInfoState || {}) });
+    setEditingGynac(true);
+  };
+  const saveGynacEdit = () => {
+    setGynacInfoState({ ...gynacDraft });
+    setEditingGynac(false);
+  };
+  const cancelGynacEdit = () => {
+    setEditingGynac(false);
+    setGynacDraft({});
+  };
   const chronicItems = items.filter(item => item.type === "Chronic");
   const allergyItems = items.filter(item => item.type === "Allergy");
 
@@ -76,7 +103,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
         <div className="flex items-center gap-2">
           {/* <AlertCircle size={16} style={{ color: "var(--color-danger)" }} /> */}
           <span className="text-md font-bold text-white">Patient Caution</span>
-          <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-center text-[0.6rem] font-bold leading-none" style={{ background: "white", color: "#3f8f87" }}>{items.length + (gynacInfo ? 1 : 0)}</span>
+          <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-center text-[0.6rem] font-bold leading-none" style={{ background: "white", color: "#3f8f87" }}>{items.length + (gynacInfoState ? 1 : 0)}</span>
         </div>
       </div>
 
@@ -137,20 +164,20 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                 />
                 <div className="flex gap-3">
                   <input
-                    type="date"
+                    type="year"
                     value={newItem.since}
                     onChange={(e) => setNewItem({ ...newItem, since: e.target.value })}
                     className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                   />
-                  <input
+                  {/* <input
                     type="text"
                     placeholder="Reaction (optional)"
                     value={newItem.reaction || ""}
                     onChange={(e) => setNewItem({ ...newItem, reaction: e.target.value })}
                     className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                  />
+                  /> */}
                 </div>
               </div>
 
@@ -190,14 +217,20 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
                 ) : entries.map((item, i) => {
                   const itemIndex = items.indexOf(item);
                   return (
-                    <div key={`${item.type}-${item.name}-${i}`} className="flex items-center gap-1.5 rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#f2faf9" }}>
-                      <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
-                      <span title={item.name} className="min-w-0 flex-1 truncate text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{item.name}</span>
-                      <span className="shrink-0 whitespace-nowrap text-sm" style={{ color: "var(--color-text-base)" }}>- {item.severity}</span>
-                      <span className="shrink-0 whitespace-nowrap text-xs" style={{ color: "var(--color-text-muted)" }}>(Since {item.since ? new Date(item.since).getFullYear() : "N/A"})</span>
-                      <div className="ml-auto flex shrink-0 items-center justify-end gap-1">
-                        <button onClick={() => handleEdit(itemIndex)} className="rounded bg-white p-1" title="Edit"><Pencil size={13} style={{ color: "var(--color-success)" }} /></button>
-                        <button onClick={() => handleDelete(itemIndex)} className="rounded bg-white p-1" title="Delete"><X size={13} style={{ color: "var(--color-danger)" }} /></button>
+                    <div key={`${item.type}-${item.name}-${i}`} className="flex flex-col rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#f2faf9" }}>
+                      {/* Top row: index, full name, severity, actions */}
+                      <div className="flex items-start gap-1.5">
+                        <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
+                        <span title={item.name} className="min-w-0 flex-1 text-sm font-bold break-words leading-tight" style={{ color: "var(--color-text-base)" }}>{item.name}</span>
+                        <span className="shrink-0 whitespace-nowrap text-sm" style={{ color: "var(--color-text-base)" }}>- {item.severity}</span>
+                        <div className="ml-1 flex shrink-0 items-center justify-end gap-1">
+                          <button onClick={() => handleEdit(itemIndex)} className="rounded bg-white p-1" title="Edit"><Pencil size={13} style={{ color: "var(--color-success)" }} /></button>
+                          <button onClick={() => handleDelete(itemIndex)} className="rounded bg-white p-1" title="Delete"><X size={13} style={{ color: "var(--color-danger)" }} /></button>
+                        </div>
+                      </div>
+                      {/* Bottom row: since year, smaller font, indented under the name, tight gap */}
+                      <div className="pl-5 -mt-0.5 leading-tight">
+                        <span className="whitespace-nowrap text-[0.65rem]" style={{ color: "var(--color-text-muted)" }}>(Since {item.since ? new Date(item.since).getFullYear() : "N/A"})</span>
                       </div>
                     </div>
                   );
@@ -207,16 +240,45 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           ))}
 
           <section className="border-t pt-3" style={{ borderColor: "var(--color-border)" }}>
-            <div className="mb-2">
+            <div className="mb-2 flex items-center justify-between">
               <h3 className="text-sm font-bold" style={{ color: "#d946ef" }}>Gynecology</h3>
+              {gynacInfoState && (
+                <div className="flex items-center gap-1">
+                  {editingGynac ? (
+                    <>
+                      <button onClick={saveGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "var(--color-success)" }} title="Save">
+                        <Check size={15} />
+                      </button>
+                      <button onClick={cancelGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }} title="Cancel">
+                        <X size={15} />
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={openGynacEdit} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#d946ef" }} title="Edit">
+                      <Pencil size={15} />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-            {gynacInfo ? (
-              <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-                {[["LMP", gynacInfo.lmp], ["EDD", gynacInfo.edd], ["Doctor", gynacInfo.doc], ["Pregnancies", gynacInfo.pregnancies], ["Deliveries", gynacInfo.deliveries], ["Abortions", gynacInfo.abortions], ["Living Children", gynacInfo.livingChildren]].map(([label, value]) => (
-                  <div key={label} className="flex items-center gap-1.5 rounded px-2 py-1.5 text-sm" style={{ background: "var(--color-surface)" }}>
-                    <span className="font-bold" style={{ color: "var(--color-text-base)" }}>{label}</span>
-                    <span style={{ color: "var(--color-text-muted)" }}>-</span>
-                    <span className="font-normal" style={{ color: "var(--color-text-base)" }}>{value ?? "—"}</span>
+            {gynacInfoState ? (
+              <div className="grid grid-cols-1 gap-2">
+                {gynacFields.map(({ key, label }, i) => (
+                  <div key={key} className="flex items-center gap-1.5 rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#faf2fc" }}>
+                    <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
+                    <span className="shrink-0 text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{label}</span>
+                    <span className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>-</span>
+                    {editingGynac ? (
+                      <input
+                        type="text"
+                        value={gynacDraft[key] ?? ""}
+                        onChange={(e) => setGynacDraft({ ...gynacDraft, [key]: e.target.value })}
+                        className="min-w-0 flex-1 rounded border px-2 py-0.5 text-right text-sm outline-none"
+                        style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                      />
+                    ) : (
+                      <span className="min-w-0 flex-1 truncate text-right text-sm" style={{ color: "var(--color-text-base)" }}>{gynacInfoState[key] ?? "—"}</span>
+                    )}
                   </div>
                 ))}
               </div>
