@@ -80,7 +80,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
             </span>
             {count > 0 && (
               <sup
-                className="inline-flex items-center justify-center text-center font-bold leading-none"
+                className="inline-flex items-center justify-center text-center font-medium leading-none"
                 style={{ fontSize: "12px", color: tab.textColor || "white", transform: "translateY(-0.45em)" }}
               >
                 {count}
