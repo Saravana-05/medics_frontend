@@ -33,7 +33,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
 
   const [patients] = useState([
   { 
-    id: "PID-1042", 
+    id: "1042", 
     name: "Smt. Vijayalakshmi", 
     age: 29, 
     gender: "Female", 
@@ -42,7 +42,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
     type: "OP"
   },
   { 
-    id: "PID-2187", 
+    id: "2187", 
     name: "Mr. Karthik Selvam", 
     age: 27, 
     gender: "Male", 
@@ -51,7 +51,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
     type: "OP"
   },
   { 
-    id: "PID-3301", 
+    id: "3301", 
     name: "Smt. Lakshmi Devi", 
     age: 52, 
     gender: "Female", 

@@ -22,6 +22,8 @@ import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecor
 // whoever is actually logged in when that's someone other than the doctor (e.g. a
 // nurse entering notes on the doctor's behalf).
 const DEFAULT_DOCTOR_NAME = "Dr. Aravind Kumar";
+const VISIT_FINANCIAL_PERIODS = ["2020-21", "2021-22", "2022-23", "2023-24", "2024-25", "2025-26"];
+const DEFAULT_VISIT_PERIODS = VISIT_FINANCIAL_PERIODS.slice(-2);
 
 const CARE_PLAN_HIDDEN_COLUMN_DEFAULTS = {
   name: false,
@@ -94,6 +96,7 @@ export default function OPDeskScreen({ user, onLogout }) {
     localStorage.setItem("carePlanTableColumns", JSON.stringify(carePlanVisibleCols));
   }, [carePlanVisibleCols]);
   const [saveMessage, setSaveMessage] = useState(null); // { text, key } — key forces the toast to re-fire even on repeat text
+  const [visitPeriods, setVisitPeriods] = useState(DEFAULT_VISIT_PERIODS);
 
   // Building a new Drug/Lab Group reuses the main grid's own add-row instead of
   // a separate widget: starting a draft swaps that tab's grid to a blank capture
@@ -114,7 +117,11 @@ export default function OPDeskScreen({ user, onLogout }) {
       const shortcut = String(event.key || "").toLowerCase();
       if (!/^[a-z0-9]$/.test(shortcut)) return;
 
-      const control = document.querySelector(`[data-page-shortcut="${shortcut}"]`);
+      // A modal rendered via a portal is appended after the main app root, so
+      // when both a background control and a modal's control share the same
+      // shortcut, the LAST match in DOM order is the one actually on screen.
+      const matches = document.querySelectorAll(`[data-page-shortcut="${shortcut}"]`);
+      const control = matches[matches.length - 1];
       if (!(control instanceof HTMLElement)) return;
 
       event.preventDefault();
@@ -150,6 +157,7 @@ export default function OPDeskScreen({ user, onLogout }) {
     setIpEntries(record?.ipEntries || []);
     setCarePlanItems(record?.carePlanItems || CARE_PLAN_VIEW_DATA);
     setLabShowReport(false);
+    setVisitPeriods(DEFAULT_VISIT_PERIODS);
   };
 
   // Adds a freshly-registered patient to the in-session patient list and
@@ -209,7 +217,14 @@ export default function OPDeskScreen({ user, onLogout }) {
   // this just clears the capture state so the grid reverts to real items.
   const finishGroupDraft = () => { setGroupDraft(null); setGroupDraftItems([]); };
 
-  const visits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
+  const allVisits = selectedPatient ? (PREVIOUS_VISITS[selectedPatient.id] || []) : [];
+  const visits = allVisits.filter(visit => {
+    const [day, month, year] = String(visit.entryDt || "").split(" ")[0].split("/").map(Number);
+    if (!day || !month || !year) return false;
+    const financialStartYear = month >= 4 ? year : year - 1;
+    const period = `${financialStartYear}-${String(financialStartYear + 1).slice(-2)}`;
+    return visitPeriods.includes(period);
+  });
   const tabCount = { drugs: drugs.length, lab: labs.length, services: services.length, iptime: ipEntries.length, carePlan: carePlanItems.length };
 
   const toggleRightPanel = () => {
@@ -280,9 +295,9 @@ export default function OPDeskScreen({ user, onLogout }) {
       {/* ── Second Row: LeftSidebar + PatientInfoBar + RightSidebar ── */}
       {/* On tablet/mobile this row is capped at 50% of viewport height and scrolls
           internally, so the main workspace below always keeps usable space. */}
-      <div className="flex-shrink-0 flex items-stretch gap-[5px] max-h-screen overflow-y-auto md:max-h-none lg:overflow-visible">
+      <div className="flex-shrink-0 flex items-stretch gap-[5px] max-h-screen overflow-y-auto md:max-h-none lg:h-[240px] lg:min-h-[240px] lg:max-h-[240px] lg:overflow-visible">
         <div className="flex-shrink-0 flex mb-[8px]">
-          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} />
+          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} visitPeriods={visitPeriods} onVisitPeriodsRun={setVisitPeriods} />
         </div>
 
         <div className="flex-1 flex">
@@ -452,7 +467,7 @@ export default function OPDeskScreen({ user, onLogout }) {
                 ...(isTabletView ? {} : { width: 0, flex: "23.5 1 0%" }),
               }}
             >
-              <PreviousVisitsTable visits={visits} patient={selectedPatient} currentRecord={{ drugs, labs, services, ipEntries, carePlanItems }} />
+              <PreviousVisitsTable visits={visits} patient={selectedPatient} />
             </div>
         </>
       </div>

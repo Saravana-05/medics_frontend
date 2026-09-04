@@ -197,6 +197,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
       )}
       {showIPList && (
         <IPListModal
+          verticalAnchorRef={tabsRowRef}
           onClose={() => setShowIPList(false)}
           onSelectPatient={onSelectPatient}
         />

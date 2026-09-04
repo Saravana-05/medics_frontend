@@ -124,7 +124,7 @@ function PreviousInfoDataTable({ columns, rows, fillRowCount, selectedRowSl, onO
   </div>;
 }
 
-export default function PreviousVisitsTable({ visits = [], patient = null, currentRecord = {} }) {
+export default function PreviousVisitsTable({ visits = [], patient = null }) {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterText, setFilterText] = useState("");
@@ -291,7 +291,7 @@ export default function PreviousVisitsTable({ visits = [], patient = null, curre
         
         {/* Header Section with FULL background color */}
         <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{
-          height: "48px",
+          height: "40px",
           boxSizing: "border-box",
           backgroundColor: "var(--color-primary-muted)",
           backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.035))",
@@ -616,14 +616,7 @@ export default function PreviousVisitsTable({ visits = [], patient = null, curre
         <PreviousInformationModal
           visit={selectedVisit}
           patient={patient}
-          prescriptions={{
-            ...(prescriptions[selectedVisit.sl] || {}),
-            ...(currentRecord.drugs?.length ? { drugs: currentRecord.drugs } : {}),
-            ...(currentRecord.labs?.length ? { labs: currentRecord.labs } : {}),
-            ...(currentRecord.services?.length ? { services: currentRecord.services } : {}),
-            ...(currentRecord.ipEntries?.length ? { ipEntries: currentRecord.ipEntries } : {}),
-            ...(currentRecord.carePlanItems?.length ? { carePlanItems: currentRecord.carePlanItems } : {}),
-          }}
+          prescriptions={prescriptions[selectedVisit.sl] || {}}
           onUpdatePrescription={(changes) => {
             savePrescriptionForVisit(selectedVisit.sl, changes);
             setPrescriptions(current => ({

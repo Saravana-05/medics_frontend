@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { Baby, Heart, Plus, Pencil, X, Check } from "lucide-react";
+import { Plus, Pencil, X, Check } from "lucide-react";
 
 // ── ChronicAllergyPanel Component ──
 function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
   const [items, setItems] = useState(patient?.chronicAllergy || []);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [activeSection, setActiveSection] = useState("chronic");
-  const [hoveredSection, setHoveredSection] = useState(null);
   const [newItem, setNewItem] = useState({
     type: "Allergy",
     name: "",
@@ -18,16 +16,12 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
 
   const headerH = 50;
   const gynacInfo = patient?.gynacInfo || null;
-  const visibleItems = items.filter(item => item.type.toLowerCase() === activeSection);
-  const sections = [
-    { key: "chronic", label: "Chronic", count: items.filter(item => item.type === "Chronic").length, color: "#3f8f87" },
-    { key: "allergy", label: "Allergy", count: items.filter(item => item.type === "Allergy").length, color: "#d97706" },
-    { key: "gynecology", label: "Gynecology", count: gynacInfo ? 1 : 0, color: "#d946ef" },
-  ];
+  const chronicItems = items.filter(item => item.type === "Chronic");
+  const allergyItems = items.filter(item => item.type === "Allergy");
 
-  const openAddForm = () => {
+  const openAddForm = (type) => {
     setEditingIndex(null);
-    setNewItem({ type: activeSection === "chronic" ? "Chronic" : "Allergy", name: "", since: "", severity: "Medium", reaction: "" });
+    setNewItem({ type, name: "", since: "", severity: "Medium", reaction: "" });
     setShowAddForm(true);
   };
 
@@ -82,40 +76,9 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
         <div className="flex items-center gap-2">
           {/* <AlertCircle size={16} style={{ color: "var(--color-danger)" }} /> */}
           <span className="text-md font-bold text-white">Patient Caution</span>
-          <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "white", color: "#3f8f87" }}>{items.length + (gynacInfo ? 1 : 0)}</span>
+          <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-center text-[0.6rem] font-bold leading-none" style={{ background: "white", color: "#3f8f87" }}>{items.length + (gynacInfo ? 1 : 0)}</span>
         </div>
       </div>
-
-      {/* OP List-style section tabs */}
-      <div className="flex items-stretch flex-shrink-0" style={{ height: 36, background: "#e5e7eb" }}>
-        {sections.map((section, index) => {
-          const highlighted = activeSection === section.key || hoveredSection === section.key;
-          const slant = 10;
-          return (
-            <button key={section.key} type="button" onClick={() => { setActiveSection(section.key); setShowAddForm(false); }}
-              onMouseEnter={() => setHoveredSection(section.key)} onMouseLeave={() => setHoveredSection(null)}
-              className="relative flex-1 flex items-center justify-center text-[0.68rem] font-bold transition-all"
-              style={{ marginLeft: index ? -slant : 0, paddingLeft: index ? slant : 0, zIndex: activeSection === section.key ? sections.length + 1 : sections.length - index, clipPath: index === 0 ? `polygon(0 0, calc(100% - ${slant}px) 0, 100% 100%, 0 100%)` : `polygon(0 0, calc(100% - ${slant}px) 0, 100% 100%, ${slant}px 100%)`, background: highlighted ? section.color : "#6b7280", color: "white", boxShadow: activeSection === section.key ? "inset 0 1px 4px rgba(0,0,0,0.3)" : "none" }}>
-              <span className="whitespace-nowrap">{section.label}</span>
-              <sup className="ml-1 text-[0.55rem]">{section.count}</sup>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Add button row — right-aligned with light-grey divider + drop shadow (matches SchedulePanel) */}
-      {activeSection !== "gynecology" && <div className="px-3 py-2 flex items-center justify-between gap-2 flex-shrink-0"
-        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}>
-        <span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>{visibleItems.length} {activeSection === "chronic" ? "condition" : "allergy"}{visibleItems.length === 1 ? "" : " entries"}</span>
-        <button
-          onClick={openAddForm}
-          className="flex items-center justify-center rounded-lg transition-all hover:bg-black/5 flex-shrink-0"
-          style={{ width: 40, height: 40, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-          title="Add condition / allergy"
-        >
-          <Plus size={24} style={{ color: "#73bfb8" }} />
-        </button>
-      </div>}
 
       {/* Content */}
       <div className="overflow-y-auto flex-1 min-h-0">
@@ -212,78 +175,56 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           </div>
         )}
 
-        {/* Gynecology summary */}
-        {activeSection === "gynecology" && (gynacInfo ? (
-          <div className="p-3">
-            <div className="grid grid-cols-2 border-l border-t" style={{ borderColor: "var(--color-border)" }}>
-              {[
-                ["LMP", gynacInfo.lmp], ["EDD", gynacInfo.edd], ["Doctor", gynacInfo.doc],
-                ["Pregnancies", gynacInfo.pregnancies], ["Deliveries", gynacInfo.deliveries],
-                ["Abortions", gynacInfo.abortions], ["Living Children", gynacInfo.livingChildren],
-              ].map(([label, value]) => (
-                <div key={label} className="p-3 border-r border-b" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
-                  <div className="text-[0.58rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>{label}</div>
-                  <div className="mt-1 text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{value ?? "—"}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="py-10 flex flex-col items-center text-center">
-            <Baby size={32} style={{ color: "var(--color-text-subtle)" }} />
-            <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>No gynecology information available</p>
-          </div>
-        ))}
+        <div className="p-3 space-y-4">
+          {[{ type: "Allergy", entries: allergyItems }, { type: "Chronic", entries: chronicItems }].map(({ type, entries }, sectionIndex) => (
+            <section key={type} className={sectionIndex > 0 ? "border-t pt-3" : ""} style={sectionIndex > 0 ? { borderColor: "var(--color-border)" } : undefined}>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-sm font-bold" style={{ color: type === "Chronic" ? "#3f8f87" : "#d97706" }}>{type} ({entries.length})</h3>
+                <button onClick={() => openAddForm(type)} className="flex h-7 w-7 items-center justify-center rounded border" style={{ borderColor: "var(--color-border)", color: "#3f8f87" }} title={`Add ${type.toLowerCase()}`}>
+                  <Plus size={17} />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {entries.length === 0 ? (
+                  <div className="col-span-2 rounded border p-3 text-center text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>No {type === "Chronic" ? "chronic conditions" : "allergies"} recorded</div>
+                ) : entries.map((item, i) => {
+                  const itemIndex = items.indexOf(item);
+                  return (
+                    <div key={`${item.type}-${item.name}-${i}`} className="flex items-center gap-1.5 rounded px-2 py-1.5" style={{ background: i % 2 === 0 ? "white" : "#f2faf9" }}>
+                      <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--color-text-muted)" }}>{i + 1}.</span>
+                      <span title={item.name} className="min-w-0 flex-1 truncate text-sm font-bold" style={{ color: "var(--color-text-base)" }}>{item.name}</span>
+                      <span className="shrink-0 whitespace-nowrap text-sm" style={{ color: "var(--color-text-base)" }}>- {item.severity}</span>
+                      <span className="shrink-0 whitespace-nowrap text-xs" style={{ color: "var(--color-text-muted)" }}>(Since {item.since ? new Date(item.since).getFullYear() : "N/A"})</span>
+                      <div className="ml-auto flex shrink-0 items-center justify-end gap-1">
+                        <button onClick={() => handleEdit(itemIndex)} className="rounded bg-white p-1" title="Edit"><Pencil size={13} style={{ color: "var(--color-success)" }} /></button>
+                        <button onClick={() => handleDelete(itemIndex)} className="rounded bg-white p-1" title="Delete"><X size={13} style={{ color: "var(--color-danger)" }} /></button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
 
-        {/* Chronic / Allergy list */}
-        {activeSection !== "gynecology" && (visibleItems.length === 0 ? (
-          <div className="py-8 text-center">
-            <Heart size={32} style={{ color: "var(--color-text-subtle)" }} />
-            <p className="text-sm mt-2" style={{ color: "var(--color-text-muted)" }}>No {activeSection === "chronic" ? "chronic conditions" : "allergies"} recorded</p>
-          </div>
-        ) : visibleItems.map((item, i) => {
-          const itemIndex = items.indexOf(item);
-          return <div key={`${item.type}-${item.name}-${i}`} className="relative p-3 border-b group"
-            style={{ borderColor: "var(--color-border)", background: i % 2 === 0 ? "white" : "#f2faf9" }}>
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                background: item.type === "Allergy" ? "#73bfb8" : "#e6f4f2",
-                color: item.type === "Allergy" ? "white" : "#3f8f87",
-              }}>{item.type}</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                background: item.severity === "High" ? "#73bfb8" : item.severity === "Medium" ? "#dcefec" : "#eef6f5",
-                color: item.severity === "High" ? "white" : item.severity === "Medium" ? "#3f8f87" : "var(--color-text-muted)",
-              }}>{item.severity}</span>
+          <section className="border-t pt-3" style={{ borderColor: "var(--color-border)" }}>
+            <div className="mb-2">
+              <h3 className="text-sm font-bold" style={{ color: "#d946ef" }}>Gynecology</h3>
             </div>
-            <div className="font-bold text-sm mt-1" style={{ color: "var(--color-text-base)" }}>{item.name}</div>
-            <div className="text-[0.65rem] mt-1" style={{ color: "var(--color-text-muted)" }}>
-              Since {item.since ? new Date(item.since).getFullYear() : "N/A"}
-            </div>
-            {item.reaction && (
-              <div className="text-[0.6rem] mt-1 italic" style={{ color: "var(--color-text-muted)" }}>Reaction: {item.reaction}</div>
+            {gynacInfo ? (
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                {[["LMP", gynacInfo.lmp], ["EDD", gynacInfo.edd], ["Doctor", gynacInfo.doc], ["Pregnancies", gynacInfo.pregnancies], ["Deliveries", gynacInfo.deliveries], ["Abortions", gynacInfo.abortions], ["Living Children", gynacInfo.livingChildren]].map(([label, value]) => (
+                  <div key={label} className="flex items-center gap-1.5 rounded px-2 py-1.5 text-sm" style={{ background: "var(--color-surface)" }}>
+                    <span className="font-bold" style={{ color: "var(--color-text-base)" }}>{label}</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>-</span>
+                    <span className="font-normal" style={{ color: "var(--color-text-base)" }}>{value ?? "—"}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded border p-3 text-center text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>No gynecology information available</div>
             )}
-            
-            {/* Edit and Delete Buttons - Visible on Hover */}
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => handleEdit(itemIndex)}
-                className="p-1 rounded hover:bg-white/50 transition-all"
-                style={{ background: "var(--color-surface)" }}
-                title="Edit"
-              >
-                <Pencil size={13} style={{ color: "var(--color-success)" }} />
-              </button>
-              <button
-                onClick={() => handleDelete(itemIndex)}
-                className="p-1 rounded hover:bg-white/50 transition-all"
-                style={{ background: "var(--color-surface)" }}
-                title="Delete"
-              >
-                <X size={13} style={{ color: "var(--color-danger)" }} />
-              </button>
-            </div>
-          </div>;
-        }))}
+          </section>
+        </div>
       </div>
     </div>
   );

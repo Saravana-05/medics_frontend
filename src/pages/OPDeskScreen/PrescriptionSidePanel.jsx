@@ -54,7 +54,7 @@ function PanelHeader({ icon: Icon, title, subtitle, accentColor, accentLight, ac
   const hLight = headerLight || accentLight;
   return (
     <>
-      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "48px", boxSizing: "border-box", backgroundColor: headerColor ? hColor : `color-mix(in srgb, ${hLight} 88%, ${hColor} 12%)`, backgroundImage: headerColor ? "none" : "linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045))", borderColor: "var(--color-border)" }}>
+      <div className="flex-shrink-0 px-3 py-1.5 border-b flex justify-between items-center" style={{ height: "40px", boxSizing: "border-box", backgroundColor: headerColor ? hColor : `color-mix(in srgb, ${hLight} 88%, ${hColor} 12%)`, backgroundImage: headerColor ? "none" : "linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045))", borderColor: "var(--color-border)" }}>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h3 className="font-bold leading-tight" style={{ color: titleColor || (headerColor ? "#000" : (textAccent || accentColor)), fontSize: "12.5px" }}>{title}</h3>

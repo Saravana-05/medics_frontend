@@ -18,7 +18,7 @@ export default function PrescriptionTabs({ activeTab, setActiveTab, tabCount, co
   const [hoveredKey, setHoveredKey] = useState(null);
 
   return (
-    <div className="flex-1 min-w-0 flex items-stretch" style={{ height: 48, marginLeft: -8 }}>
+    <div className="flex-1 min-w-0 flex items-stretch" style={{ height: 40, marginLeft: -8 }}>
       {PRESCRIPTION_TABS.map((tab, i) => {
         const isActive = activeTab === tab.key;
         const isHovered = hoveredKey === tab.key;

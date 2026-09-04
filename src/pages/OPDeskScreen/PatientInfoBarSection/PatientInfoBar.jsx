@@ -57,12 +57,12 @@ export default function PatientInfoBar({
 
   return (
     <>
-      <div className="select-none w-full h-full flex flex-col" style={{ background: "var(--color-surface)", fontFamily: "var(--font-body)" }}>
+      <div className={`select-none w-full h-full min-h-0 flex flex-col ${open ? "lg:overflow-visible" : "lg:overflow-hidden"}`} style={{ background: "var(--color-surface)", fontFamily: "var(--font-body)" }}>
 
         {/* ── Main Content Area ── */}
         {/* Stacks vertically on tablet/mobile, side-by-side from lg up.
             Height is driven by flex stretch (matches the sidebars) — no hardcoded height. */}
-        <div className="flex-1 flex flex-col lg:flex-row lg:relative lg:items-stretch lg:gap-[5px]">
+        <div className={`min-h-0 flex-1 flex flex-col lg:flex-row lg:relative lg:items-stretch lg:gap-[5px] ${open ? "lg:overflow-visible" : "lg:overflow-hidden"}`}>
 
           {/* Left accent bar — mirrors the right one; a segment shows only while
               its matching LeftSidebar tab is hovered. Desktop only.

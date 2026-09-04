@@ -383,7 +383,7 @@ export default function VitalSignsSection({ patient, activeTab }) {
           • IP Admission Info: 4 grouped boxed cards (IP Info / Attender /
             Room / Medic) — each card collapses its own extra rows
             internally (see IPInfoCard), row itself always shown            */}
-      <div className="hidden lg:block py-2">
+      <div className="hidden lg:block h-[99px] box-border overflow-hidden py-2">
         {!isIPTime && (
           <div className="flex items-center gap-1.5 mb-1.5">
             <HeaderIcon size={12} style={{ color: "var(--color-primary)" }} />

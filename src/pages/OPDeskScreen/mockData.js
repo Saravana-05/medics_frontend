@@ -88,7 +88,7 @@ export const CARE_PLAN_VIEW_DATA = CARE_PLAN_ROWS.map(([
 
 export const MOCK_PATIENTS = [
   {
-    id: "PID-1042", docNo: "OP: 3902",
+    id: "1042", docNo: "OP: 3902",
     name: "Smt. Vijayalakshmi", relation: "W/o. Sri.Krishnaswamy",
     age: 29, dob: "31/01/1995", gender: "Female", weight: "86KG",
     height: '168"', bpSystolic: 145, bpDiastolic: 90, pulse: 95, temp: "101.2",
@@ -154,7 +154,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-2187", docNo: "OP: 3903",
+    id: "2187", docNo: "OP: 3903",
     name: "Mr. Karthik Selvam", relation: "S/o. Sri.Selvam",
     age: 27, dob: "10/05/1997", gender: "Male", weight: "72KG",
     height: '167"', bpSystolic: 120, bpDiastolic: 80, pulse: 78, temp: "98.6",
@@ -203,7 +203,7 @@ export const MOCK_PATIENTS = [
     family: [],
   },
   {
-    id: "PID-3301", docNo: "OP: 3904",
+    id: "3301", docNo: "OP: 3904",
     name: "Smt. Lakshmi Devi", relation: "W/o. Sri.Mohan",
     age: 52, dob: "15/03/1972", gender: "Female", weight: "68KG",
     height: '162"', bpSystolic: 150, bpDiastolic: 95, pulse: 88, temp: "99.1",
@@ -266,7 +266,7 @@ export const MOCK_PATIENTS = [
     family: [],
   },
   {
-    id: "PID-4456", docNo: "OP: 3905",
+    id: "4456", docNo: "OP: 3905",
     name: "Mr. Rajesh Kumar", relation: "S/o. Sri.Ramesh",
     age: 45, dob: "12/08/1979", gender: "Male", weight: "65.5[144.4]",
     height: `181 [5'-11"]`, bpSystolic: 135, bpDiastolic: 85, pulse: 72, temp: "98°/37°  ",
@@ -329,7 +329,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-5567", docNo: "OP: 3906",
+    id: "5567", docNo: "OP: 3906",
     name: "Ms. Priya Sharma", relation: "D/o. Sri.Sharma",
     age: 24, dob: "22/03/2000", gender: "Female", weight: "55KG",
     height: '160"', bpSystolic: 110, bpDiastolic: 70, pulse: 82, temp: "98.8",
@@ -387,7 +387,7 @@ export const MOCK_PATIENTS = [
     family: [],
   },
   {
-    id: "PID-6678", docNo: "OP: 3907",
+    id: "6678", docNo: "OP: 3907",
     name: "Sri. Senthil Murugan", relation: "S/o. Sri.Murugan",
     age: 38, dob: "05/07/1986", gender: "Male", weight: "85KG",
     height: '175"', bpSystolic: 160, bpDiastolic: 100, pulse: 95, temp: "99.5",
@@ -440,7 +440,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-7789", docNo: "OP: 3908",
+    id: "7789", docNo: "OP: 3908",
     name: "Smt. Anitha Raman", relation: "W/o. Sri.Raman",
     age: 35, dob: "18/11/1989", gender: "Female", weight: "62KG",
     height: '164"', bpSystolic: 130, bpDiastolic: 82, pulse: 76, temp: "98.6",
@@ -498,7 +498,7 @@ export const MOCK_PATIENTS = [
     family: [],
   },
   {
-    id: "PID-8890", docNo: "OP: 3909",
+    id: "8890", docNo: "OP: 3909",
     name: "Mr. Arun Prakash", relation: "S/o. Sri.Prakash",
     age: 60, dob: "03/01/1964", gender: "Male", weight: "70KG",
     height: '168"', bpSystolic: 140, bpDiastolic: 88, pulse: 82, temp: "98.2",
@@ -550,7 +550,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-9901", docNo: "OP: 3910",
+    id: "9901", docNo: "OP: 3910",
     name: "Smt. Parvathy Devi", relation: "W/o. Sri.Devarajan",
     age: 68, dob: "12/09/1956", gender: "Female", weight: "58KG",
     height: '155"', bpSystolic: 155, bpDiastolic: 92, pulse: 90, temp: "98.8",
@@ -608,7 +608,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-1012", docNo: "OP: 3911",
+    id: "1012", docNo: "OP: 3911",
     name: "Mr. Dinesh Kumar", relation: "S/o. Sri.Kumar",
     age: 22, dob: "08/04/2002", gender: "Male", weight: "65KG",
     height: '170"', bpSystolic: 115, bpDiastolic: 75, pulse: 72, temp: "98.6",
@@ -657,7 +657,7 @@ export const MOCK_PATIENTS = [
     family: [],
   },
   {
-    id: "PID-1123", docNo: "OP: 3912",
+    id: "1123", docNo: "OP: 3912",
     name: "Smt. Vasanthi Ravi", relation: "W/o. Sri.Ravi",
     age: 42, dob: "19/06/1982", gender: "Female", weight: "75KG",
     height: '163"', bpSystolic: 145, bpDiastolic: 90, pulse: 88, temp: "99.2",
@@ -717,7 +717,7 @@ export const MOCK_PATIENTS = [
     ],
   },
   {
-    id: "PID-1234", docNo: "OP: 3913",
+    id: "1234", docNo: "OP: 3913",
     name: "Mr. Ganesh Babu", relation: "S/o. Sri.Babu",
     age: 55, dob: "25/12/1969", gender: "Male", weight: "82KG",
     height: '174"', bpSystolic: 130, bpDiastolic: 84, pulse: 76, temp: "98.4",
@@ -773,7 +773,7 @@ export const MOCK_PATIENTS = [
 
 export const PREVIOUS_VISITS = {
   ...expandedListPatientPreviousVisits,
-  "PID-1042": [
+  "1042": [
     { sl: 45, entryDt: "02/02/2024 16:02", docModule: "3902: OP-DP", reportDt: "", complaint: "Allergy, Anxiety", vitals: "86/25.7/140:90:96/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
     { sl: 44, entryDt: "02/02/2024 12:30", docModule: "3902: OP-LP-R", reportDt: "02/02/2024 16.00", complaint: "Allergy, Anxiety", vitals: "86/25.7/145:90:95/101.", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
     { sl: 43, entryDt: "21/01/2024 12:15", docModule: "2911: IP-F", reportDt: "", complaint: "Bowel Irritation", vitals: "85/25/120:80:96/98.6", by: "Dr.Sheela", nextVisit: "" },
@@ -783,13 +783,13 @@ export const PREVIOUS_VISITS = {
     { sl: 39, entryDt: "13/06/2023 10:30", docModule: "1211: OP-DP", reportDt: "", complaint: "Stomach Pain", vitals: "86/25.7/130:85:95/98.6", by: "Nr.Sridevi", nextVisit: "" },
     { sl: 38, entryDt: "12/06/2023 09:10", docModule: "1211: OP-SP-R", reportDt: "13/06/2023 10.30", complaint: "Stomach Pain", vitals: "86/25.7/130:85:95/98.6", by: "Dr.Arun", nextVisit: "13/06/2023" },
   ],
-  "PID-2187": [
+  "2187": [
     { sl: 12, entryDt: "28/01/2024 09:00", docModule: "3850: OP-DP", reportDt: "", complaint: "Fever, Headache", vitals: "72/--/120:80:78/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
   ],
-  "PID-3301": [
+  "3301": [
     { sl: 8, entryDt: "20/01/2024 11:00", docModule: "3810: OP-DP", reportDt: "", complaint: "Knee Pain", vitals: "68/--/150:95:88/99.1", by: "Dr.Arun", nextVisit: "03/02/2024" },
   ],
-  "PID-4456": [
+  "4456": [
     { sl: 23, entryDt: "26/06/2026 09:15", docModule: "3905: IP-DP", reportDt: "", complaint: "Post-op review, Multiple Fracture", vitals: "78/--/128:82:74/98.6", by: "Dr.Sudha", nextVisit: "27/06/2026" },
     // { sl: 22, entryDt: "25/06/2026 18:40", docModule: "3905: IP-SP-R", reportDt: "25/06/2026 19.10", complaint: "Post-surgery pain management", vitals: "78/--/132:84:76/99.0", by: "Dr.Srinivas", nextVisit: "" },
     { sl: 21, entryDt: "25/06/2026 08:05", docModule: "3905: IP-LP-R", reportDt: "25/06/2026 11.30", complaint: "Pre-op bloodwork review", vitals: "78/--/130:85:72/98.8", by: "Dr.Sudha", nextVisit: "" },
@@ -814,29 +814,29 @@ export const PREVIOUS_VISITS = {
     { sl: 2, entryDt: "28/07/2023 10:00", docModule: "3905: OP-SP-R", reportDt: "28/07/2023 14.00", complaint: "Shortness of breath", vitals: "78/--/140:88:76/98.6", by: "Dr.Priya", nextVisit: "02/08/2023" },
     { sl: 1, entryDt: "20/07/2023 09:15", docModule: "3905: OP-DP", reportDt: "", complaint: "First consultation, general checkup", vitals: "78/--/120:80:72/98.6", by: "Dr.Chandra Sekar", nextVisit: "28/07/2023" },
   ],
-  "PID-5567": [
+  "5567": [
     { sl: 1, entryDt: "03/02/2024 11:30", docModule: "3906: OP-DP", reportDt: "", complaint: "Abdominal Pain", vitals: "55/--/110:70:82/98.8", by: "Dr.Sharma", nextVisit: "05/02/2024" },
   ],
-  "PID-6678": [
+  "6678": [
     { sl: 2, entryDt: "02/02/2024 14:00", docModule: "3907: OP-DP", reportDt: "", complaint: "Dizziness", vitals: "85/--/160:100:95/99.5", by: "Dr.Karthik", nextVisit: "10/02/2024" },
   ],
-  "PID-7789": [
+  "7789": [
     { sl: 12, entryDt: "02/02/2024 09:00", docModule: "3908: OP-DP", reportDt: "", complaint: "Swelling, Headache", vitals: "62/--/130:82:76/98.6", by: "Dr.Meera", nextVisit: "15/02/2024" },
     { sl: 11, entryDt: "25/01/2024 10:00", docModule: "3908: OP-SP-R", reportDt: "25/01/2024 15.00", complaint: "Pregnancy Check", vitals: "60/--/125:80:72/98.4", by: "Dr.Meera", nextVisit: "03/02/2024" },
   ],
-  "PID-8890": [
+  "8890": [
     { sl: 6, entryDt: "01/02/2024 11:00", docModule: "3909: OP-DP", reportDt: "", complaint: "Frequent Urination", vitals: "70/--/140:88:82/98.2", by: "Dr.Raj", nextVisit: "17/02/2024" },
   ],
-  "PID-9901": [
+  "9901": [
     { sl: 9, entryDt: "02/02/2024 13:30", docModule: "3910: OP-DP", reportDt: "", complaint: "Joint Pain", vitals: "58/--/155:92:90/98.8", by: "Dr.Anjali", nextVisit: "20/02/2024" },
   ],
-  "PID-1012": [
+  "1012": [
     { sl: 1, entryDt: "03/02/2024 14:00", docModule: "3911: OP-DP", reportDt: "", complaint: "Sore Throat", vitals: "65/--/115:75:72/98.6", by: "Dr.Suresh", nextVisit: "10/02/2024" },
   ],
-  "PID-1123": [
+  "1123": [
     { sl: 5, entryDt: "02/02/2024 15:00", docModule: "3912: OP-DP", reportDt: "", complaint: "Palpitations", vitals: "75/--/145:90:88/99.2", by: "Dr.Geetha", nextVisit: "15/02/2024" },
   ],
-  "PID-1234": [
+  "1234": [
     { sl: 4, entryDt: "02/02/2024 15:30", docModule: "3913: OP-DP", reportDt: "", complaint: "Back Pain", vitals: "82/--/130:84:76/98.4", by: "Dr.Shankar", nextVisit: "18/02/2024" },
   ],
 };

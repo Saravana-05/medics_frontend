@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import {
   ChevronDown, ChevronUp, Eye, Pencil, X,
 } from "lucide-react";
@@ -7,6 +8,7 @@ import serviceFiles from "../data/serviceFiles.json";
 import { CARE_PLAN_VIEW_DATA } from "../pages/OPDeskScreen/mockData";
 import PrescriptionTabs from "../pages/OPDeskScreen/PrescriptionTabs";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
+import useWorkspaceModalLayout from "../hooks/useWorkspaceModalLayout";
 
 const dosageSchedule = (period, intake) => {
   const schedules = {
@@ -31,8 +33,8 @@ function InfoPair({ label, value }) {
 
 function Vital({ value, label, color }) {
   return (
-    <div className="flex min-h-[31px] items-center justify-center gap-2 rounded-full border px-3 py-1.5" style={{ color, borderColor: `${color}55`, background: `${color}12` }}>
-      <span className="text-[14px] font-normal">{value}</span><span className="text-[12px] font-normal">{label}</span>
+    <div className="flex h-[31px] w-[108px] shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5" style={{ color, borderColor: `${color}55`, background: `${color}12` }}>
+      <span className="truncate text-[14px] font-normal">{value}</span><span className="shrink-0 text-[12px] font-normal">{label}</span>
     </div>
   );
 }
@@ -74,7 +76,7 @@ function Drugs({ rows, onChange }) {
   return (
     <>
     <table className="w-full table-fixed border-collapse text-[12px]">
-      <thead><tr className="h-9 border-b border-slate-300 bg-[var(--color-services)] text-white">
+      <thead><tr className="h-9 border-b border-slate-300 bg-[var(--color-drugs)] text-white">
         <th className="w-[6%] px-2 py-2 text-center">No</th><th className="w-[44%] px-2 py-2 text-center">Drug</th>
         <th className="w-[8%] text-center">Buy</th><th className="w-[7%] text-center">M</th><th className="w-[7%] text-center">N</th>
         <th className="w-[7%] text-center">E</th><th className="w-[7%] text-center">N</th><th className="w-[14%] text-center">Actions</th>
@@ -126,7 +128,7 @@ function LabTestTabLayout({ rows }) {
   return (
     <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[#d67d7d] text-center text-[11px] font-bold text-slate-900">
+        <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[var(--color-lab)] text-center text-[11px] font-bold text-slate-900">
           <span>No.</span><span>Test Name</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -137,7 +139,7 @@ function LabTestTabLayout({ rows }) {
       </div>
 
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 grid-cols-[36px_80px_58px_minmax(120px,1fr)_82px] items-center border-b border-slate-300 bg-[#d67d7d] text-center text-[10px] font-bold leading-tight text-slate-900">
+        <div className="grid h-9 shrink-0 grid-cols-[36px_80px_58px_minmax(120px,1fr)_82px] items-center border-b border-slate-300 bg-[var(--color-lab)] text-center text-[10px] font-bold leading-tight text-slate-900">
           <span>No.</span><span>Observed Value</span><span>Unit</span><span>Biological Reference - Interval</span><span>Specimen</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -176,7 +178,7 @@ function ServiceTabLayout({ rows, files = serviceFiles, onFilesChange }) {
   return (
     <div className="grid h-full min-w-[850px] grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100 px-1 pb-1">
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[#a9cb77] text-center text-[11px] font-bold text-slate-900">
+        <div className="grid h-9 shrink-0 grid-cols-[52px_minmax(0,1fr)] items-center border-b border-slate-300 bg-[var(--color-services)] text-center text-[11px] font-bold text-slate-900">
           <span>No.</span><span>Service Name</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -187,7 +189,7 @@ function ServiceTabLayout({ rows, files = serviceFiles, onFilesChange }) {
       </div>
 
       <div className="flex min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 grid-cols-[32px_minmax(90px,1fr)_42px_48px_102px_70px] items-center border-b border-slate-300 bg-[#a9cb77] text-center text-[10px] font-bold text-slate-900">
+        <div className="grid h-9 shrink-0 grid-cols-[32px_minmax(90px,1fr)_42px_48px_102px_70px] items-center border-b border-slate-300 bg-[var(--color-services)] text-center text-[10px] font-bold text-slate-900">
           <span>No.</span><span>File Name</span><span>Type</span><span>Size</span><span>Dt-Time</span><span>Actions</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -207,7 +209,7 @@ function CarePlanTabLayout({ rows }) {
   return (
     <div className="h-full w-full bg-slate-100 px-1 pb-1">
       <div className="flex h-full min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[var(--color-primary)] text-center text-[10px] font-bold leading-tight text-white" style={{ gridTemplateColumns: carePlanColumns }}><span>No.</span><span>Medical Condition</span><span>Schedule Date</span><span>Milestone</span><span>Pathway Name</span><span>Activity Type</span><span>Activity Description</span><span>Schedule Status</span></div>
+        <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[var(--color-careplan)] text-center text-[10px] font-bold leading-tight text-slate-900" style={{ gridTemplateColumns: carePlanColumns }}><span>No.</span><span>Medical Condition</span><span>Schedule Date</span><span>Milestone</span><span>Pathway Name</span><span>Activity Type</span><span>Activity Description</span><span>Schedule Status</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           {activities.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: carePlanColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2" title={item.name}>{item.name || "—"}</span><span className="text-center">{item.schDate || "—"}</span><span className="text-center">{item.milestone || "—"}</span><span className="truncate px-2" title={item.pathwayName}>{item.pathwayName || "—"}</span><span className="truncate px-2 text-center" title={item.activityType}>{item.activityType || "—"}</span><span className="truncate px-2" title={item.activityDescription}>{item.activityDescription || "—"}</span><span className="truncate px-2 text-center" title={item.schStatus}>{item.schStatus || "—"}</span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`care-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
@@ -226,7 +228,7 @@ function IpTimelineTabLayout({ rows }) {
   return (
     <div className="h-full w-full bg-slate-100 px-1 pb-1">
       <div className="flex h-full min-w-0 flex-col border border-t-0 border-slate-300 bg-white">
-        <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[#f0a866] text-center text-[10px] font-bold text-slate-900" style={{ gridTemplateColumns: timelineColumns }}><span>No.</span><span>Medic</span><span>Time</span><span>Entry Type</span><span>Subject</span><span>Notes</span><span>Actions</span></div>
+        <div className="grid h-9 shrink-0 items-center border-b border-slate-300 bg-[var(--color-iptime)] text-center text-[10px] font-bold text-slate-900" style={{ gridTemplateColumns: timelineColumns }}><span>No.</span><span>Medic</span><span>Time</span><span>Entry Type</span><span>Subject</span><span>Notes</span><span>Actions</span></div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           {entries.map((item, index) => <div key={item.id || index} className="grid h-10 items-center border-b border-slate-200 text-[14px] odd:bg-white even:bg-slate-50" style={{ gridTemplateColumns: timelineColumns }}><span className="text-center">{index + 1}</span><span className="truncate px-2">{item.medic || "—"}</span><span className="text-center">{item.time || "—"}</span><span className="truncate px-2 text-center">{item.entryType || "—"}</span><span className="truncate px-2">{subjectFor(item)}</span><span className="truncate px-2">{item.notes || "—"}</span><span className="flex justify-center"><button type="button" className="p-1 text-[#9a4e16]" title={`View ${subjectFor(item)}`}><Eye size={13} /></button></span></div>)}
           {Array.from({ length: fillerCount }, (_, index) => <div key={`ip-empty-${index}`} className="h-10 border-b border-slate-200 bg-white" />)}
@@ -247,6 +249,7 @@ const tabForDocument = (documentName) => {
 };
 
 export default function PreviousInformationModal({ visit, patient = null, prescriptions = {}, onClose, onNavigate, onUpdatePrescription, currentIndex = 0, navigationVisits = [] }) {
+  const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout();
   const [activeTab, setActiveTab] = useState("drugs");
   const [navigationTab, setNavigationTab] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -314,10 +317,10 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
   const canNavigateUp = tabPosition < 0 ? tabVisits.length > 0 : tabPosition < tabVisits.length - 1;
   const canNavigateDown = tabPosition < 0 ? tabVisits.length > 0 : tabPosition > 0;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-8" onMouseDown={onClose}>
-      <div className="flex h-[90vh] w-[min(96vw,1051px)] flex-col overflow-hidden bg-white shadow-2xl" onMouseDown={event => event.stopPropagation()}>
-        <header className="grid h-[54px] shrink-0 grid-cols-[1fr_auto_1fr] items-center px-5 text-white" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, #063a59 100%)" }}>
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/50" style={{ paddingTop: verticalBounds.top, boxSizing: "border-box" }}>
+      <div ref={modalRef} className="list-modal-flat flex w-[min(96vw,1051px)] flex-col overflow-hidden bg-white shadow-2xl" style={{ height: verticalBounds.height, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }} onMouseDown={event => event.stopPropagation()}>
+        <header className="grid h-[54px] shrink-0 grid-cols-[1fr_auto_1fr] items-center px-5 text-white select-none" style={{ background: "linear-gradient(135deg, var(--color-primary-dark) 0%, #063a59 100%)", cursor: "grab", touchAction: "none" }} {...dragHandlers} title="Drag to move">
           <h2 className="whitespace-nowrap text-[16px] font-semibold">Previous Information</h2>
           <div className="flex items-center gap-3 whitespace-nowrap text-[12.5px]">
             <button
@@ -362,8 +365,8 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
             <b className="text-[15px]">{patientName}</b><div className="mt-1.5 text-[12px] text-slate-400">{patientDemographics}</div><div className="mt-5 text-[12.5px]">{visit.by || patient?.doctor || "—"}</div>
           </div>
           <div className="m-2 h-[104px] self-start overflow-hidden bg-white" aria-label="Patient photo">{patient?.photo && <img src={patient.photo} alt={patientName} className="h-full w-full object-cover" />}</div>
-          <div className="col-span-4 grid min-h-[76px] grid-cols-[1.5fr_2.2fr] border-t border-slate-300">
-            <div className="grid grid-cols-4 items-center gap-2 px-3 py-3">
+          <div className="col-span-4 grid min-h-[76px] grid-cols-[1.25fr_0.9fr_1fr_170px] border-t border-slate-300">
+            <div className="col-span-2 grid grid-cols-4 items-center gap-3 px-3 py-3">
               <Vital value={historicalVitals.bp} label="BP" color="#db6b75" />
               <Vital value={historicalVitals.temp} label="Temp" color="#e58b45" />
               <Vital value={historicalVitals.pulse} label="Pulse" color="#766ac8" />
@@ -373,16 +376,16 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
               <Vital value={historicalVitals.weight} label="Weight" color="#14b8a6" />
               <Vital value={historicalVitals.bmi} label="BMI" color="#22c55e" />
             </div>
-            <div className="grid grid-rows-2 gap-2 border-l border-slate-200 px-5 py-3 text-[14px]"><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">Chief Complaint:</span><span className="font-normal">{visit.complaint || patient?.chiefComplaint || "—"}</span></div><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">First Observation:</span><span className="font-normal">{visit.observation || patient?.firstObservation || "—"}</span></div></div>
+            <div className="col-span-2 grid grid-rows-2 gap-2 border-l border-slate-200 px-5 py-3 text-[14px]"><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">Chief Complaint:</span><span className="font-normal">{visit.complaint || patient?.chiefComplaint || "—"}</span></div><div className="flex min-h-[31px] items-center"><span className="mr-3 shrink-0 font-normal text-slate-500">First Observation:</span><span className="font-normal">{visit.observation || patient?.firstObservation || "—"}</span></div></div>
           </div>
         </section>
 
-        <nav className={`mt-[2px] grid h-[50px] shrink-0 ${hasRightPanel ? "grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100" : "grid-cols-1 bg-white"}`}>
-          <div className="flex h-[50px] min-w-0 overflow-hidden border border-slate-300 bg-white pl-2">
+        <nav className={`mt-[2px] grid h-[40px] shrink-0 ${hasRightPanel ? "grid-cols-[minmax(0,56fr)_minmax(0,44fr)] gap-[2px] bg-slate-100" : "grid-cols-1 bg-white"}`}>
+          <div className="flex h-[40px] min-w-0 overflow-hidden border border-slate-300 bg-white pl-2">
             <PrescriptionTabs activeTab={activeTab} setActiveTab={handleTabChange} compact fullBorder />
           </div>
-          {activeTab === "lab" && <div className="flex items-center justify-start border border-slate-300 bg-[var(--color-lab-light)] px-3 text-left text-[12.5px] font-bold text-[var(--color-lab)]">Test Report</div>}
-          {activeTab === "services" && <div className="flex items-center justify-start border border-slate-300 bg-[#eef5e3] px-3 text-left text-[12.5px] font-bold text-[#a9cb77]">Service Reports &amp; Findings</div>}
+          {activeTab === "lab" && <div className="flex items-center justify-start border border-slate-300 bg-[var(--color-lab-header)] px-3 text-left text-[12.5px] font-bold text-slate-900">Test Report</div>}
+          {activeTab === "services" && <div className="flex items-center justify-start border border-slate-300 bg-[var(--color-services-header)] px-3 text-left text-[12.5px] font-bold text-slate-900">Service Reports &amp; Findings</div>}
         </nav>
         <main className="min-h-0 flex-1 overflow-auto" style={{ backgroundImage: "repeating-linear-gradient(to bottom, transparent 0, transparent 44px, #d5dde2 44px, #d5dde2 45px)" }}>
           {activeTab === "drugs" && <DrugTabLayout rows={prescriptions.drugs} onChange={drugs => onUpdatePrescription?.({ drugs })} />}
@@ -392,6 +395,7 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
           {activeTab === "iptime" && <IpTimelineTabLayout rows={prescriptions.ipEntries || prescriptions.timeline} />}
         </main>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

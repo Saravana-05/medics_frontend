@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Search, Stethoscope, Users } from "lucide-react";
 import DataTable from "react-data-table-component";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
+import useWorkspaceModalLayout from "../hooks/useWorkspaceModalLayout";
 
 const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
 const DUTY_NURSES = ["Niveditha", "Soundarya", "Rajalakshmi"];
@@ -125,8 +126,8 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
   );
 }
 
-export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00" }) {
-  const modalRef = useRef(null);
+export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00", verticalAnchorRef }) {
+  const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout(verticalAnchorRef);
   const [filter, setFilter] = useState("");
   const [wardFilters, setWardFilters] = useState([]);
   const [complaintFilters, setComplaintFilters] = useState([]);
@@ -274,10 +275,10 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
     "Duty Doctor": { value: dutyDoctorFilters, options: FILTER_OPTIONS.dutyDoctor, onChange: setDutyDoctorFilters },
   };
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-8 animate-fade-in" style={{ background: "rgba(0,0,0,0.5)" }}>
-      <div ref={modalRef} role="dialog" aria-modal="true" aria-label="In Patient List" tabIndex={-1} className="list-modal-flat flex h-[90vh] w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up" style={{ background: "var(--color-surface)" }}>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center animate-fade-in" style={{ background: "rgba(0,0,0,0.5)", paddingTop: verticalBounds.top, boxSizing: "border-box" }}>
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-label="In Patient List" tabIndex={-1} className="list-modal-flat flex w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up" style={{ background: "var(--color-surface)", height: verticalBounds.height, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }}>
         <div className="flex-shrink-0 rounded-t-xl" style={{ background: IP_TOOLBAR_BACKGROUND }}>
-          <div className="flex items-center justify-between gap-4 px-5 py-3">
+          <div className="flex items-center justify-between gap-4 px-5 py-3 select-none" {...dragHandlers} style={{ cursor: "grab", touchAction: "none" }} title="Drag to move">
             <div className="flex items-center gap-4">
               <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold text-white"><Bed size={20} />In Patient List</h2>
               <div className="flex items-center whitespace-nowrap text-xs">
