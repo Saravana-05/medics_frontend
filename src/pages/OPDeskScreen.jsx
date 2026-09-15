@@ -24,7 +24,7 @@ import { savePatientRecord, getPatientRecord } from "./OPDeskScreen/patientRecor
 // whoever is actually logged in when that's someone other than the doctor (e.g. a
 // nurse entering notes on the doctor's behalf).
 const DEFAULT_DOCTOR_NAME = "Dr. Aravind Kumar";
-const VISIT_FINANCIAL_PERIODS = ["2020-21", "2021-22", "2022-23", "2023-24", "2024-25", "2025-26"];
+const VISIT_FINANCIAL_PERIODS = ["2020-21", "2021-22", "2022-23", "2023-24", "2024-25", "2025-26", "2026-27"];
 const DEFAULT_VISIT_PERIODS = VISIT_FINANCIAL_PERIODS.slice(-2);
 
 const CARE_PLAN_HIDDEN_COLUMN_DEFAULTS = {

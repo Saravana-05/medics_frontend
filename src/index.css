@@ -732,7 +732,8 @@ body {
   display: none !important;
 }
 
-.list-modal-flat svg.search-field-icon {
+.list-modal-flat svg.search-field-icon,
+.list-modal-flat svg.visit-navigation-icon {
   display: block !important;
 }
 

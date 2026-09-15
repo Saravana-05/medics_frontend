@@ -332,9 +332,9 @@ export default function PreviousInformationModal({ visit, patient = null, prescr
               All
             </button>
             {navigationTab && <span className="rounded bg-white/25 px-2 py-1 font-semibold">{activeDocumentLabel}</span>}
-            <div className="flex flex-col">
-              <button onClick={() => navigateWithinTab("up")} disabled={!canNavigateUp}><ChevronUp size={13} /></button>
-              <button onClick={() => navigateWithinTab("down")} disabled={!canNavigateDown}><ChevronDown size={13} /></button>
+            <div className="flex flex-col" role="group" aria-label="Visit navigation">
+              <button type="button" aria-label="Navigate up through visits" title="Navigate up through visits" className="flex h-5 w-7 items-center justify-center text-white hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30" onClick={() => navigateWithinTab("up")} disabled={!canNavigateUp}><ChevronUp className="visit-navigation-icon" size={18} aria-hidden="true" /></button>
+              <button type="button" aria-label="Navigate down through visits" title="Navigate down through visits" className="flex h-5 w-7 items-center justify-center text-white hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30" onClick={() => navigateWithinTab("down")} disabled={!canNavigateDown}><ChevronDown className="visit-navigation-icon" size={18} aria-hidden="true" /></button>
             </div>
             <span className="opacity-80">{shownPosition} / {tabVisits.length}</span>
           </div>

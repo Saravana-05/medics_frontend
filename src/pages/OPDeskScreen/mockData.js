@@ -1,3 +1,4 @@
+import deskPatientPreviousVisits from "../../data/deskPatientPreviousVisits.json";
 import listPatients from "../../data/listPatients.json";
 import listPatientPreviousVisits from "../../data/listPatientPreviousVisits.json";
 import listPatientClinicalProfiles from "../../data/listPatientClinicalProfiles.json";
@@ -773,6 +774,7 @@ export const MOCK_PATIENTS = [
 
 export const PREVIOUS_VISITS = {
   ...expandedListPatientPreviousVisits,
+  ...deskPatientPreviousVisits,
   "1042": [
     { sl: 45, entryDt: "02/02/2024 16:02", docModule: "3902: OP-DP", reportDt: "", complaint: "Allergy, Anxiety", vitals: "86/25.7/140:90:96/98.6", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
     { sl: 44, entryDt: "02/02/2024 12:30", docModule: "3902: OP-LP-R", reportDt: "02/02/2024 16.00", complaint: "Allergy, Anxiety", vitals: "86/25.7/145:90:95/101.", by: "Dr.Chandra Sekar", nextVisit: "03/02/2024" },
