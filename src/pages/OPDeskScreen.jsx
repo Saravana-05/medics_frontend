@@ -11,6 +11,8 @@ import { TAB_CONFIGS } from "../config/tabConfig";
 import PreviousVisitsTable from "./OPDeskScreen/PreviousVisitsTable";
 import { CARE_PLAN_VIEW_DATA, MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScreen/mockData";
 import Divider from "@mui/material/Divider";
+import { transitionPatient } from "./OPDeskScreen/patientWorkflow";
+import deskData from "../data/deskPatients.json";
 import medicineList from "../data/medicines.json";
 import labTestList from "../data/labTest.json";
 import serviceList from "../data/services.json";
@@ -69,7 +71,7 @@ function ColumnFilterButton({ columns, visible, onToggle, color }) {
 }
 
 export default function OPDeskScreen({ user, onLogout }) {
-  const [patients, setPatients] = useState(MOCK_PATIENTS);
+  const [patients, setPatients] = useState(() => deskData.patients.map(patient => ({ ...MOCK_PATIENTS.find(p => p.id === patient.id), ...patient })));
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [activeTab, setActiveTab] = useState("drugs");
   const [leftPanel, setLeftPanel] = useState(null);
@@ -145,7 +147,7 @@ export default function OPDeskScreen({ user, onLogout }) {
 
   const selectPatient = (p) => {
     const resolvedPatient = p
-      ? patients.find(patient => patient.name === p.name)
+      ? patients.find(patient => patient.id === (p.id || p.patientId))
         || (p.patientId ? patients.find(patient => patient.id === p.patientId) : null)
         || p
       : null;
@@ -163,8 +165,19 @@ export default function OPDeskScreen({ user, onLogout }) {
   // Adds a freshly-registered patient to the in-session patient list and
   // selects them immediately, same as picking an existing one from the dropdown.
   const addPatient = (newPatient) => {
-    setPatients(prev => [newPatient, ...prev]);
-    selectPatient(newPatient);
+    const registeredPatient = { ...newPatient, patientId: newPatient.id, listType: "registered", listSection: "registered", status: "Registered", appointmentStatus: "registered", complaint: newPatient.chiefComplaint || "", token: "—" };
+    setPatients(prev => [registeredPatient, ...prev]);
+    selectPatient(registeredPatient);
+  };
+
+  const updatePatientStatus = action => {
+    const result = transitionPatient(selectedPatient, action);
+    if (result.error) { setSaveMessage({ text: result.error, key: Date.now() }); return; }
+    savePatientRecord(selectedPatient.id, { drugs, labs, services, ipEntries, carePlanItems });
+    const next = result.patient;
+    setPatients(previous => previous.map(p => p.id === next.id ? next : p));
+    setSelectedPatient(next);
+    setSaveMessage({ text: action === "park" ? next.name + " parked. Work saved." : next.name + " finalised. Work saved.", key: Date.now() });
   };
 
   const handleSave = (text = "Prescription saved successfully!") => {
@@ -308,8 +321,8 @@ export default function OPDeskScreen({ user, onLogout }) {
             onAddPatient={addPatient}
             onOPList={() => {}}
             onIPList={() => {}}
-            onPark={() => {}}
-            onFinalize={() => handleSave()}
+            onPark={() => updatePatientStatus("park")}
+            onFinalize={() => updatePatientStatus("finalise")}
             highlightedTab={highlightedTab}
             leftHighlightedTab={leftHighlightedTab}
             tabsRowRef={prescriptionTabsRowRef}
@@ -319,7 +332,7 @@ export default function OPDeskScreen({ user, onLogout }) {
         </div>
 
         <div className="flex-shrink-0 flex mb-[8px]">
-          <RightSidebar activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
+          <RightSidebar patients={patients} onSelectPatient={selectPatient} activePanel={rightPanel} onPanelChange={setRightPanel} onHoverChange={setHighlightedTab}/>
         </div>
       </div>
       <Divider sx={{ backgroundColor: "#0a4a6e", height: 2 }} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import OPListModal from "../../../modal/Oplistmodal";
+import AllPatientsModal from "../../../modal/AllPatientsModal";
 import IPListModal from "../../../modal/IPListModal";
 
 const ShortcutLetter = ({ children }) => (
@@ -8,7 +9,7 @@ const ShortcutLetter = ({ children }) => (
   </span>
 );
 
-export default function TopBarSection({ patient, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
+export default function TopBarSection({ patient, patients, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
   const p = patient;
   const [followUpDate, setFollowUpDate] = useState(() => {
     const today = new Date();
@@ -18,6 +19,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
     return `${year}-${month}-${day}`;
   });
   const [showOPList, setShowOPList] = useState(false);
+  const [showAllPatients, setShowAllPatients] = useState(false);
   const [showIPList, setShowIPList] = useState(false);
   const [, setActiveTab] = useState(null);
   const [hoveredTab, setHoveredTab] = useState(null);
@@ -85,7 +87,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
                 aria-label="All Patients (Alt+L)"
                 onClick={() => {
                   setActiveTab("all-patients");
-                  onPark?.();
+                  setShowAllPatients(true);
                 }}
                 className="flex-1 min-w-0 flex items-center justify-center text-center leading-tight gap-1.5 px-3 py-2 text-[0.7rem] font-bold transition-all shadow-sm hover:shadow-md"
                 style={tabStyle("all-patients", "#656D78")}
@@ -181,9 +183,11 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
           </div>
         </div>
 
+      {showAllPatients && <AllPatientsModal patients={patients} verticalAnchorRef={tabsRowRef} onClose={() => setShowAllPatients(false)} onSelectPatient={onSelectPatient} />}
       {/* ── OP List Modal ── */}
       {showOPList && (
         <OPListModal
+          patients={patients}
           verticalAnchorRef={tabsRowRef}
           onClose={() => setShowOPList(false)}
           onSelectPatient={(row) => {
@@ -197,6 +201,7 @@ export default function TopBarSection({ patient, onPark, onFinalize, onIPList, o
       )}
       {showIPList && (
         <IPListModal
+          patients={patients}
           verticalAnchorRef={tabsRowRef}
           onClose={() => setShowIPList(false)}
           onSelectPatient={onSelectPatient}

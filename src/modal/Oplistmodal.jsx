@@ -4,44 +4,12 @@ import {
   ParkingCircle, CheckCircle, Filter, ChevronDown, Star,
   Activity, Stethoscope, ClipboardList, Tag, Eye, Search
 } from "lucide-react";
+import deskData from "../data/deskPatients.json";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
 
 /* ══════════════════════════════════════════════════════════
    MOCK DATA (replace with real API / props)
 ══════════════════════════════════════════════════════════ */
-const MOCK_OP_LIST = {
-  appointment: [
-    { patientId: "1042", token: "B1-9*",  sched: "10:05", status: "OP-Waiting",     docNo: "",     name: "Raveendran. K",      complaint: "Fever, Headache",     priority: "Normal",      need: "New Need", age: 45, gender: "M" },
-    { patientId: "2187", token: "B1-10",  sched: "10:10", status: "OP-Waiting",     docNo: "",     name: "Nandhini. A",        complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 32, gender: "F" },
-    { patientId: "3301", token: "B2-12",  sched: "10:35", status: "OP-Waiting",     docNo: "",     name: "Anjali (Baby). L",   complaint: "Fever, Cold, Cry",    priority: "Normal",      need: "New Need", age: 2, gender: "F" },
-    { patientId: "4456", token: "B2-13",  sched: "10:40", status: "OP-Appointment", docNo: "",     name: "Vignesh (Infant). R",complaint: "Injury Arm, Leg",     priority: "Urgent (OS)", need: "New Patient", age: 1, gender: "M" },
-    { patientId: "5567", token: "B2-14#", sched: "10:45", status: "OP-Appointment", docNo: "",     name: "Ramakrishnan. K.R",  complaint: "Allergy, Rashes",     priority: "Normal",      need: "New Need", age: 58, gender: "M" },
-    { patientId: "6678", token: "B2-15",  sched: "10:50", status: "OP-Appointment", docNo: "",     name: "Shankar. S",         complaint: "Severe Headache",     priority: "Normal",      need: "New Need", age: 42, gender: "M" },
-    { patientId: "7789", token: "B2-16",  sched: "10:55", status: "OP-Appointment", docNo: "",     name: "Sivakumar. T",       complaint: "Bruise Leg, Arm",     priority: "Normal",      need: "Follow-up", age: 39, gender: "M" },
-    { patientId: "8890", token: "B2-17*", sched: "11:00", status: "OP-Waiting",     docNo: "",     name: "Radhika. P",         complaint: "High Fever, Cold",    priority: "Normal (OS)", need: "New Need", age: 28, gender: "F" },
-  ],
-  parked: [
-    { token: "B1-2",    sched: "9:35", status: "OP-Parked",          docNo: "3898", name: "Vidhya Vimal",      complaint: "High Fever",          priority: "Normal",      need: "New Need", age: 35, gender: "F" },
-    { token: "B1-4",    sched: "9:45", status: "OP-Parked",          docNo: "3898", name: "Christopher. A",    complaint: "Allergy, Wheasing",   priority: "Normal",      need: "New Need", age: 47, gender: "M" },
-    { token: "@B1-6#",  sched: "9:55", status: "OP-Parked (Report)", docNo: "3899", name: "Pramila. L",        complaint: "Wheasing, Cough",     priority: "Important",   need: "Follow-up", age: 52, gender: "F" },
-    { token: "@B2-11",  sched: "10:30",status: "OP-Parked",          docNo: "3900", name: "Kalaiyarasi. S",    complaint: "Allergy, Asthma",     priority: "Urgent (OS)", need: "Referral", age: 41, gender: "F" },
-    { token: "B1-8",    sched: "10:02",status: "OP-Parked",          docNo: "3901", name: "Vinayagam. B",      complaint: "Breathing Trouble",   priority: "Emergency",   need: "Follow-up", age: 63, gender: "M" },
-  ],
-  treated: [
-    { token: "B1-1", sched: "9:30", status: "OP-Treated", docNo: "3894", name: "Ramchandar. A",   complaint: "Fever, Cold",       priority: "Normal", need: "New Need", age: 44, gender: "M" },
-    { token: "B1-3", sched: "9:40", status: "OP-Treated", docNo: "3895", name: "Tamilarasi. V",   complaint: "Fever, Cough, Cold",priority: "Normal", need: "Referral", age: 38, gender: "F" },
-    { token: "B1-5", sched: "9:50", status: "OP-Treated", docNo: "3896", name: "Mohamed Azar. M", complaint: "Fever, Cold",       priority: "Normal", need: "New Need", age: 31, gender: "M" },
-    { token: "B1-7", sched: "10:00",status: "OP-Treated", docNo: "3897", name: "Amarnath. N",     complaint: "Fever, Cold",       priority: "Normal", need: "New Need", age: 56, gender: "M" },
-  ],
-};
-
-const ALL_OP_ROWS = Object.values(MOCK_OP_LIST).flat();
-const OP_FILTER_OPTIONS = {
-  status: [...new Set(ALL_OP_ROWS.map(row => row.status))],
-  complaint: [...new Set(ALL_OP_ROWS.map(row => row.complaint))],
-  priority: [...new Set(ALL_OP_ROWS.map(row => row.priority))],
-};
-
 function HighlightedToken({ token }) {
   const markerStyles = {
     "*": { background: "#dbeafe", color: "#1d4ed8" },
@@ -182,7 +150,7 @@ function ColHeader({ filters }) {
   );
 }
 
-export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00", verticalAnchorRef }) {
+export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "03/02/2024", time = "10:00", verticalAnchorRef, patients = deskData.patients }) {
   const modalRef = useRef(null);
   const [filter, setFilter] = useState("");
   const [statusFilters, setStatusFilters] = useState([]);
@@ -192,6 +160,9 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   const [hoveredSection, setHoveredSection] = useState(null);
   const [focusedToken, setFocusedToken] = useState(null);
   const gridRef = useRef(null);
+  const opPatients = patients.filter(p => p.listType === "op");
+  const MOCK_OP_LIST = Object.fromEntries(["appointment", "parked", "treated"].map(key => [key, opPatients.filter(p => p.listSection === key)]));
+  const OP_FILTER_OPTIONS = Object.fromEntries(["status", "complaint", "priority"].map(key => [key, [...new Set(opPatients.map(p => p[key]))]]));
   const [verticalBounds, setVerticalBounds] = useState({ top: 32, height: Math.max(320, window.innerHeight - 40) });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragStateRef = useRef(null);
@@ -374,13 +345,13 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         }}
       >
         {/* Header */}
-        <div className="flex-shrink-0 rounded-t-xl" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary-dark) 50%, white) 0%, color-mix(in srgb, var(--color-primary) 50%, white) 100%)" }}>
+        <div className="op-list-toolbar flex-shrink-0 rounded-t-xl">
           <div className="px-5 py-3 flex items-center justify-between select-none"
             onPointerDown={handleDragStart}
             onPointerMove={handleDragMove}
             onPointerUp={handleDragEnd}
             onPointerCancel={handleDragEnd}
-            style={{ cursor: dragStateRef.current ? "grabbing" : "grab", touchAction: "none" }}
+            style={{ cursor: "grab", touchAction: "none" }}
             title="Drag to move">
             <div className="flex items-center gap-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2 whitespace-nowrap">
@@ -445,7 +416,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
         <ColHeader filters={headerFilters} />
 
         {/* Scrollable Content */}
-        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="flex-1 overflow-y-auto outline-none">
+        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="patient-list-scrollbar min-h-0 flex-1 overflow-y-auto outline-none">
           {/* Appointments Section */}
           {(activeSection === "all" || activeSection === "appointment") && apt.length > 0 && (
             <>

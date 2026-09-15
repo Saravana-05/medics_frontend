@@ -2,68 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bed, Calendar, CheckCircle, ChevronDown, Clock, Eye, Funnel, LogOut, ParkingCircle, Search, Stethoscope, Users } from "lucide-react";
 import DataTable from "react-data-table-component";
 import { formatTimeWithPeriod } from "../utils/formatTimeWithPeriod";
+import deskData from "../data/deskPatients.json";
 import useWorkspaceModalLayout from "../hooks/useWorkspaceModalLayout";
 
 const COLUMNS = ["Ward", "Room#", "Patient's Doctor", "Queue Status", "Patient Name", "Chief Complaint", "Priority", "Duty Doctor", "Duty Nurse"];
-const DUTY_NURSES = ["Niveditha", "Soundarya", "Rajalakshmi"];
-const IP_TOOLBAR_BACKGROUND = "color-mix(in srgb, var(--color-danger) 50%, white)";
-const IP_TABLE_HEADER_BACKGROUND = "color-mix(in srgb, var(--color-danger) 90%, white)";
-
-const IP_SECTIONS = [
-  {
-    key: "in-bed",
-    label: "IP-In Bed",
-    color: "#b8d7ef",
-    rows: [
-      ["Gynacology", "104", "Dr.Sheela", "IP-In Bed", "Shyamala Aravind", "Surgery: Uterus", "Normal", "Dr.Vimala"],
-      ["Gynacology", "202*", "Dr.Sheela", "IP-In Bed", "Kalaivani. R", "Delivery", "Normal", "Dr.Vimala"],
-      ["Surgery-1", "201", "Dr.Thomas", "IP-In Bed", "Vishnuram. K", "Surgery: Right Arm", "Normal", "Dr.Krishna"],
-      ["Ward-B1", "103*", "Dr.Chandra Sekar", "IP-In Bed", "Senthilkumar. D", "Lung Infection", "Important", "Dr.Krishna"],
-      ["Ward-B1", "203#", "Dr.Thomas", "IP-In Bed", "Surendran. KH", "High BP / Sugar", "Normal", "Dr.Krishna"],
-      ["Ward-B1", "ICU-1", "Dr.Thomas", "IP-In Bed", "Rajendran. K", "Infection-B", "Normal", "Dr.Krishna"],
-    ],
-  },
-  {
-    key: "parked",
-    label: "IP-Parked List",
-    color: "#c8dfa5",
-    rows: [
-      ["Dialysis", "102", "Dr.Chandra Sekar", "IP-Parked", "Vinodh Kumar. T", "Dialysis", "Urgent", "Dr.Krishna"],
-      ["Gynacology", "@101", "Dr.Sheela", "IP-Parked", "Masha Arun", "Delivery", "Emergency", "Dr.Vimala"],
-      ["Surgery-1", "ICU-2*", "Dr.Chandra Sekar", "IP-Parked (Report)", "Balaji. SR", "Surgery: Intestinal", "Urgent", "Dr.Krishna"],
-      ["Ward-B1", "204*", "Dr.Chandra Sekar", "IP-Parked", "Vishnuvardhan. K", "Tuberculosis", "Important", "Dr.Krishna"],
-      ["Ward-B1", "205*", "Dr.Sheela", "IP-Parked (Report)", "Kaveri. R", "Arthritis", "Normal", "Dr.Vimala"],
-    ],
-  },
-  {
-    key: "ready",
-    label: "IP-Ready to Discharge List",
-    color: "#e5a0a0",
-    rows: [
-      ["Surgery-1", "105", "Dr.Chandra Sekar", "IP-To Discharge", "Rajanathan. T", "Surgery: Bypass", "Normal", "Dr.Krishna"],
-      ["Surgery-1", "106", "Dr.Chandra Sekar", "IP-To Discharge", "Thirumurugan.K", "Surgery: Liver", "Normal", "Dr.Krishna"],
-    ],
-  },
-  {
-    key: "discharged",
-    label: "IP-Discharged List",
-    color: "#ffc48f",
-    rows: [
-      ["Gynacology", "206", "Dr.Sheela", "IP-Discharged", "Leela. K", "Delivery", "Normal", "Dr.Vimala"],
-      ["Gynacology", "207", "Dr.Sheela", "IP-Discharged", "Visalakshi. B", "Delivery", "Normal", "Dr.Vimala"],
-    ],
-  },
-];
-
 const GRID_COLUMNS = "92px 74px 115px 125px 153px 150px 90px 126px 126px";
-
-const FILTER_OPTIONS = {
-  ward: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[0])))],
-  complaint: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[5])))],
-  priority: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[6])))],
-  dutyDoctor: [...new Set(IP_SECTIONS.flatMap(section => section.rows.map(row => row[7])))],
-};
-
 function HighlightedRoom({ room }) {
   const markerStyles = {
     "*": { background: "#dbeafe", color: "#1d4ed8" },
@@ -126,7 +69,9 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
   );
 }
 
-export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00", verticalAnchorRef }) {
+export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00", verticalAnchorRef, patients = deskData.patients }) {
+  const ipPatients = patients.filter(p => p.listType === "ip");
+  const FILTER_OPTIONS = Object.fromEntries(["ward", "complaint", "priority", "dutyDoctor"].map(key => [key, [...new Set(ipPatients.map(p => p[key]))]]));
   const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout(verticalAnchorRef, 118);
   const [filter, setFilter] = useState("");
   const [wardFilters, setWardFilters] = useState([]);
@@ -173,24 +118,20 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
       document.body.style.overflow = previousOverflow;
       previouslyFocused?.focus?.();
     };
-  }, []);
+  }, [modalRef]);
 
-  const sections = useMemo(() => IP_SECTIONS.map((section, sectionIndex) => ({
-    ...section,
-    rows: section.rows
-      .map((row, rowIndex) => [...row, DUTY_NURSES[(sectionIndex + rowIndex) % DUTY_NURSES.length]])
-      .filter(row =>
-        (!wardFilters.length || wardFilters.includes(row[0])) &&
-        (!complaintFilters.length || complaintFilters.includes(row[5])) &&
-        (!priorityFilters.length || priorityFilters.includes(row[6])) &&
-        (!dutyDoctorFilters.length || dutyDoctorFilters.includes(row[7])) &&
-        (!normalizedFilter || row.some(value => value.toLowerCase().includes(normalizedFilter)))
-      ),
-  })), [complaintFilters, dutyDoctorFilters, normalizedFilter, priorityFilters, wardFilters]);
+  const sections = useMemo(() => [
+    ["in-bed", "IP-In Bed", "#b8d7ef"], ["parked", "IP-Parked List", "#c8dfa5"],
+    ["ready", "IP-Ready to Discharge List", "#e5a0a0"], ["discharged", "IP-Discharged List", "#ffc48f"],
+  ].map(([key, label, color]) => ({ key, label, color,
+    rows: patients.filter(p => p.listType === "ip" && p.listSection === key)
+      .map(p => [p.ward, p.room, p.doctor, p.status, p.name, p.complaint, p.priority, p.dutyDoctor, p.dutyNurse, p.id])
+      .filter(row => (!wardFilters.length || wardFilters.includes(row[0])) && (!complaintFilters.length || complaintFilters.includes(row[5])) && (!priorityFilters.length || priorityFilters.includes(row[6])) && (!dutyDoctorFilters.length || dutyDoctorFilters.includes(row[7])) && (!normalizedFilter || row.some(value => String(value).toLowerCase().includes(normalizedFilter))))
+  })), [patients, complaintFilters, dutyDoctorFilters, normalizedFilter, priorityFilters, wardFilters]);
 
   const handleSelect = (row, sectionKey) => {
     const listSection = sectionKey || visibleSections.find(section => section.rows.includes(row))?.key || "ip";
-    onSelectPatient?.({ name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8], listType: "ip", listSection });
+    onSelectPatient?.({ ...patients.find(p => p.id === row[9]), name: row[4], ward: row[0], room: row[1], doctor: row[2], complaint: row[5], priority: row[6], dutyNurse: row[8], listType: "ip", listSection });
     onClose?.();
   };
 
@@ -277,7 +218,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center animate-fade-in" style={{ background: "rgba(0,0,0,0.5)", paddingTop: verticalBounds.top, boxSizing: "border-box" }}>
       <div ref={modalRef} role="dialog" aria-modal="true" aria-label="In Patient List" tabIndex={-1} className="list-modal-flat flex w-[min(96vw,1051px)] flex-col overflow-hidden shadow-2xl outline-none animate-slide-up" style={{ background: "var(--color-surface)", height: verticalBounds.height, transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }}>
-        <div className="flex-shrink-0 rounded-t-xl" style={{ background: IP_TOOLBAR_BACKGROUND }}>
+        <div className="ip-list-toolbar flex-shrink-0 rounded-t-xl">
           <div className="flex items-center justify-between gap-4 px-5 py-3 select-none" {...dragHandlers} style={{ cursor: "grab", touchAction: "none" }} title="Drag to move">
             <div className="flex items-center gap-4">
               <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold text-white"><Bed size={20} />In Patient List</h2>
@@ -325,7 +266,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           </div>
         </div>
 
-        <div className="relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, background: IP_TABLE_HEADER_BACKGROUND, borderColor: "var(--color-border)" }}>
+        <div className="ip-list-table-header relative z-30 grid flex-shrink-0 border-b text-xs font-bold text-white" style={{ gridTemplateColumns: GRID_COLUMNS, borderColor: "var(--color-border)" }}>
           {COLUMNS.map(column => {
             const filterConfig = headerFilters[column];
             return (
@@ -336,7 +277,7 @@ export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
           })}
         </div>
 
-        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="min-h-0 flex-1 overflow-auto outline-none">
+        <div ref={gridRef} tabIndex={0} onKeyDown={handleGridKeyDown} className="patient-list-scrollbar min-h-0 flex-1 overflow-auto outline-none">
           {visibleSections.map(section => (
             <div key={section.key}>
               <div className="sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2" style={{ background: section.color, borderColor: "var(--color-border)" }}>

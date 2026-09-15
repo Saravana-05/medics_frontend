@@ -46,7 +46,7 @@ const BOTTOM_MARGIN = 16;
 // Translucent tint of a token color (works with CSS variables). pct like "14%".
 const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
 
-export default function RightSidebar({ activePanel, onPanelChange, onHoverChange }) {
+export default function RightSidebar({ activePanel, onPanelChange, onHoverChange, patients, onSelectPatient }) {
   const [hoveredKey,  setHoveredKey]  = useState(null);
   const [panelTop,    setPanelTop]    = useState(0);
   const [panelHeight, setPanelHeight] = useState(480);
@@ -126,7 +126,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
     let content = null;
     switch (visibleKey) {
       case "parked":
-        content = <ParkedPatientsPanel panelHeight={panelHeight} />;
+        content = <ParkedPatientsPanel panelHeight={panelHeight} patients={patients} onSelectPatient={patient => { onSelectPatient(patient); onPanelChange(null); }} />;
         break;
       case "emergency":
         content = <EmergencyPatientsPanel panelHeight={panelHeight} />;

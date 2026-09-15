@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function useWorkspaceModalLayout(verticalAnchorRef, anchorOffset = 58) {
+export default function useWorkspaceModalLayout(verticalAnchorRef, anchorOffset = 58, minimumViewportRatio = 0) {
   const modalRef = useRef(null);
   const [verticalBounds, setVerticalBounds] = useState({
     top: 32,
@@ -15,12 +15,17 @@ export default function useWorkspaceModalLayout(verticalAnchorRef, anchorOffset 
       const top = anchorTop == null ? 32 : Math.max(0, Math.round(anchorTop) - anchorOffset);
       const gridBottom = document.querySelector("[data-prescription-view-grid]")?.getBoundingClientRect().bottom;
       const workspaceBottom = gridBottom ?? window.innerHeight - 8;
-      setVerticalBounds({ top, height: Math.max(200, Math.round(workspaceBottom) - top) });
+      const workspaceHeight = Math.max(200, Math.round(workspaceBottom) - top);
+      const height = minimumViewportRatio
+        ? Math.min(window.innerHeight - 16, Math.max(workspaceHeight, window.innerHeight * minimumViewportRatio))
+        : workspaceHeight;
+      const boundedTop = minimumViewportRatio ? Math.max(8, Math.min(top, window.innerHeight - height - 8)) : top;
+      setVerticalBounds({ top: boundedTop, height });
     };
     syncVerticalBounds();
     window.addEventListener("resize", syncVerticalBounds);
     return () => window.removeEventListener("resize", syncVerticalBounds);
-  }, [verticalAnchorRef, anchorOffset]);
+  }, [verticalAnchorRef, anchorOffset, minimumViewportRatio]);
 
   const handleDragStart = event => {
     if (event.button !== undefined && event.button !== 0) return;

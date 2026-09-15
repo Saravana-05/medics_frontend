@@ -215,6 +215,48 @@ body {
   font-family: inherit;
 }
 
+/* Use alpha overlays instead of color-mix so the light OP/IP headers also
+   render in older Chrome on Windows 7. Solid colors remain as fallbacks. */
+.op-list-toolbar {
+  background: #87b6de;
+  background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+    linear-gradient(135deg, var(--color-primary-dark, #094d8f), var(--color-primary, #0f6cbd));
+}
+
+.ip-list-toolbar {
+  background: #ee9393;
+  background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+    var(--color-danger, #dc2626);
+}
+
+.ip-list-table-header {
+  background: #e03c3c;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+    var(--color-danger, #dc2626);
+}
+
+/* Keep exact pixel sizing through WebKit scrollbar rules in old/new Chrome. */
+.patient-list-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+.patient-list-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+  border-radius: 0;
+}
+
+.patient-list-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border: 0;
+  border-radius: 0;
+}
+
+.patient-list-scrollbar::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 3px;

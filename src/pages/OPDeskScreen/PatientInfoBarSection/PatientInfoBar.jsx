@@ -46,7 +46,7 @@ export default function PatientInfoBar({
   };
 
   const selectFromList = row => {
-    const title = row?.listType === "op"
+    const title = row?.listSource === "all" ? "By All Patients" : row?.listType === "op"
       ? "By OP List"
       : row?.listType === "ip"
         ? "By IP List"
@@ -112,6 +112,7 @@ export default function PatientInfoBar({
               style={{ borderColor: "var(--color-border)", boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)" }}
             >
               <TopBarSection
+                patients={patients}
                 patient={p}
                 tabsRowRef={tabsRowRef}
                 onPark={onPark}
@@ -145,6 +146,7 @@ export default function PatientInfoBar({
       {/* OP List Modal */}
       {opList && (
         <OPListModal
+          patients={patients}
           verticalAnchorRef={tabsRowRef}
           onClose={() => setOpList(false)}
           onSelectPatient={(row) => {
