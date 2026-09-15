@@ -127,7 +127,7 @@ function HeaderFilter({ label, value, options, onChange, textColor }) {
 }
 
 export default function IPListModal({ onClose, onSelectPatient, doctor = "Dr. Chandra Sekar", date = "24/02/2024", time = "10:00", verticalAnchorRef }) {
-  const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout(verticalAnchorRef);
+  const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout(verticalAnchorRef, 118);
   const [filter, setFilter] = useState("");
   const [wardFilters, setWardFilters] = useState([]);
   const [complaintFilters, setComplaintFilters] = useState([]);

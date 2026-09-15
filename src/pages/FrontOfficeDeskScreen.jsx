@@ -60,7 +60,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
     type: "IP"
   },
   { 
-    id: "PID-4456", 
+    id: "4456", 
     name: "Mr. Suresh Kumar", 
     age: 38, 
     gender: "Male", 
@@ -69,7 +69,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
     type: "OP"
   },
   { 
-    id: "PID-5567", 
+    id: "5567", 
     name: "Mrs. Priya Anand", 
     age: 31, 
     gender: "Female", 
@@ -78,7 +78,7 @@ const FrontOfficeDeskScreen = ({ user, onLogout }) => {
     type: "IP"
   },
   { 
-    id: "PID-6678", 
+    id: "6678", 
     name: "Mr. Ramkumar", 
     age: 45, 
     gender: "Male", 

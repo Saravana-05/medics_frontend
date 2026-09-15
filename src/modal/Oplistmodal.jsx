@@ -233,7 +233,7 @@ export default function OPListModal({ onClose, onSelectPatient, doctor = "Dr. Ch
   useEffect(() => {
     const syncVerticalBounds = () => {
       const anchorTop = verticalAnchorRef?.current?.getBoundingClientRect().top ?? 32;
-      const top = Math.max(0, Math.round(anchorTop) - 58);
+      const top = Math.max(0, Math.round(anchorTop) - 118);
       const viewGridBottom = document.querySelector("[data-prescription-view-grid]")?.getBoundingClientRect().bottom;
       const workspaceBottom = viewGridBottom ?? window.innerHeight - 8;
       setVerticalBounds({ top, height: Math.max(200, Math.round(workspaceBottom) - top) });
