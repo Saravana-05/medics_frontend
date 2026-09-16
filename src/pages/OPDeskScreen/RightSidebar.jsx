@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import ParkedPatientsPanel from "./ParkedPatientsPanel";
 import EmergencyPatientsPanel from "./EmergencyPatientsPanel";
@@ -38,16 +39,15 @@ function ShortcutLabel({ label, shortcut }) {
 }
 
 // ── Shared dimensions ───────────────────────────────────────────────
-const PANEL_WIDTH   = 360;
+const PANEL_WIDTH   = 900;
 const SIDEBAR_WIDTH = 78;
 const GAP           = 8;
 const BOTTOM_MARGIN = 16;
 
-// Translucent tint of a token color (works with CSS variables). pct like "14%".
-const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}, transparent)`;
 
 export default function RightSidebar({ activePanel, onPanelChange, onHoverChange, patients, onSelectPatient }) {
   const [hoveredKey,  setHoveredKey]  = useState(null);
+  const [sidebarLeft, setSidebarLeft] = useState(null);
   const [panelTop,    setPanelTop]    = useState(0);
   const [panelHeight, setPanelHeight] = useState(480);
   const [viewportWidth, setViewportWidth] = useState(
@@ -57,16 +57,52 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
   const sidebarRef = useRef(null);
   const popupRef   = useRef(null);
 
-  const isTabletView = viewportWidth < 1024;
-  const effectivePanelWidth = Math.min(PANEL_WIDTH, viewportWidth - SIDEBAR_WIDTH - GAP * 2);
+  const [removedEmergencyIds, setRemovedEmergencyIds] = useState([]);
+  const [lastRemovedEmergency, setLastRemovedEmergency] = useState(null);
+  const effectivePanelWidth = Math.min(activePanel === "schedule" ? 360 : PANEL_WIDTH, viewportWidth - SIDEBAR_WIDTH - GAP * 2);
 
   useEffect(() => {
-    const handleResize = () => setViewportWidth(window.innerWidth);
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+      const rect = sidebarRef.current?.getBoundingClientRect();
+      if (rect) {
+        const top = Math.max(GAP, Math.min(rect.top, window.innerHeight - 200 - BOTTOM_MARGIN));
+        setSidebarLeft(rect.left);
+        setPanelTop(top);
+        setPanelHeight(Math.max(120, window.innerHeight - top - BOTTOM_MARGIN));
+      }
+    };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const visibleKey = activePanel;
+  const isQueueModal = Boolean(activePanel && activePanel !== "schedule");
+
+  useEffect(() => {
+    if (!isQueueModal) return;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    popupRef.current?.focus();
+    const handleKey = event => {
+      if (event.key === "Escape") { event.preventDefault(); onPanelChange(null); }
+      if (event.key !== "Tab") return;
+      const controls = [...(popupRef.current?.querySelectorAll('button, input, select, summary, [tabindex="0"]') || [])];
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) return;
+      if (!controls.includes(document.activeElement)) { event.preventDefault(); (event.shiftKey ? last : first).focus(); }
+      else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKey);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [isQueueModal, onPanelChange]);
 
   // Notify parent of the HOVERED tab only, so TopBarSection's accent bar
   // shows solely on hover (panels themselves still open on click).
@@ -98,19 +134,20 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
     const sidebarRect = sidebarRef.current?.getBoundingClientRect();
     const anchorTop   = sidebarRect ? sidebarRect.top : e.currentTarget.getBoundingClientRect().top;
     const viewportH   = window.innerHeight || 800;
-    const available   = viewportH - anchorTop - BOTTOM_MARGIN;
+    const top = Math.max(GAP, Math.min(anchorTop, viewportH - 200 - BOTTOM_MARGIN));
+    const available = viewportH - top - BOTTOM_MARGIN;
 
-    setPanelTop(anchorTop);
-    setPanelHeight(Math.max(200, available));
+    setSidebarLeft(sidebarRect?.left ?? null);
+    setPanelTop(top);
+    setPanelHeight(Math.max(120, available));
     onPanelChange(tab.key === activePanel ? null : tab.key);
   };
 
   const renderPopup = () => {
     if (!visibleKey) return null;
 
-    const sidebarRect = sidebarRef.current?.getBoundingClientRect();
-    const rawLeft = sidebarRect
-      ? sidebarRect.left - effectivePanelWidth - GAP
+    const rawLeft = sidebarLeft !== null
+      ? sidebarLeft - effectivePanelWidth - GAP
       : viewportWidth - SIDEBAR_WIDTH - effectivePanelWidth - GAP;
     const panelLeft = Math.max(GAP, rawLeft);
 
@@ -123,23 +160,37 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
       height:   panelHeight,
     };
 
-    let content = null;
+    const contentHeight = isQueueModal ? Math.min(620, window.innerHeight - 32) : panelHeight;
+    let content;
     switch (visibleKey) {
       case "parked":
-        content = <ParkedPatientsPanel panelHeight={panelHeight} patients={patients} onSelectPatient={patient => { onSelectPatient(patient); onPanelChange(null); }} />;
+        content = <ParkedPatientsPanel panelHeight={contentHeight} patients={patients} onSelectPatient={patient => { onSelectPatient?.(patient); onPanelChange(null); }} />;
         break;
       case "emergency":
-        content = <EmergencyPatientsPanel panelHeight={panelHeight} />;
+        content = <EmergencyPatientsPanel panelHeight={contentHeight} patients={patients}
+          removedIds={removedEmergencyIds} removedEntry={lastRemovedEmergency}
+          onRemove={patient => { setRemovedEmergencyIds(ids => [...ids, patient.id]); setLastRemovedEmergency(patient); }}
+          onUndo={() => { setRemovedEmergencyIds(ids => ids.filter(id => id !== lastRemovedEmergency.id)); setLastRemovedEmergency(null); }}
+          onSelectPatient={patient => { onSelectPatient?.(patient); onPanelChange(null); }} />;
         break;
       case "reports":
-        content = <ReportsPanel panelHeight={panelHeight} />;
+        content = <ReportsPanel panelHeight={contentHeight} patients={patients} onSelectPatient={patient => { onSelectPatient?.(patient); onPanelChange(null); }} />;
         break;
       case "schedule":
-        content = <SchedulePanel panelHeight={panelHeight} />;
+        content = <SchedulePanel panelHeight={contentHeight} />;
         break;
       default:
         return null;
     }
+
+    if (isQueueModal) return createPortal(
+      <div className="patient-queue-modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onPanelChange(null); }}>
+        <div ref={popupRef} role="dialog" aria-modal="true" aria-label={`${RIGHT_TABS.find(tab => tab.key === visibleKey)?.label} patients`} tabIndex={-1} className="patient-queue-modal" style={{ width: Math.min(PANEL_WIDTH, viewportWidth - 24), height: contentHeight }}>
+          {content}
+          <button type="button" onClick={() => onPanelChange(null)} aria-label="Close panel" className="patient-queue-modal__close">Close</button>
+        </div>
+      </div>, document.body
+    );
 
     return (
       <div ref={popupRef} className="opdesk-drawer-shell" style={wrapperStyle}>
