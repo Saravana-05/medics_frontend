@@ -276,6 +276,16 @@ body {
   background: #6b7280;
 }
 
+.patient-card-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+.patient-card-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
 /* Hides the scrollbar visually while keeping the element scrollable
    (used on the grid-row containers so no slider/thumb shows). */
 .no-scrollbar {
