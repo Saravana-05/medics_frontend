@@ -22,6 +22,9 @@ const RIGHT_ACCENT_SEGMENTS = [
 ];
 
 export default function PatientInfoBar({
+  services,
+  onPatientDetailsChange,
+  drugs,
   patients,
   selectedPatient,
   onSelectPatient,
@@ -112,6 +115,9 @@ export default function PatientInfoBar({
               style={{ borderColor: "var(--color-border)", boxShadow: "0 5px 4px -2px rgba(0,0,0,0.35)" }}
             >
               <TopBarSection
+                services={services}
+                onPatientDetailsChange={onPatientDetailsChange}
+                drugs={drugs}
                 patients={patients}
                 patient={p}
                 tabsRowRef={tabsRowRef}

@@ -315,6 +315,13 @@ export default function OPDeskScreen({ user, onLogout }) {
 
         <div className="flex-1 flex">
           <PatientInfoBar
+            services={services}
+            onPatientDetailsChange={changes => {
+              if (!selectedPatient) return;
+              setSelectedPatient(previous => ({ ...previous, ...changes }));
+              setPatients(previous => previous.map(patient => patient.id === selectedPatient.id ? { ...patient, ...changes } : patient));
+            }}
+            drugs={drugs}
             patients={patients}
             selectedPatient={selectedPatient}
             onSelectPatient={selectPatient}

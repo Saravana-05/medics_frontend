@@ -2,6 +2,8 @@ import { useState } from "react";
 import OPListModal from "../../../modal/Oplistmodal";
 import AllPatientsModal from "../../../modal/AllPatientsModal";
 import IPListModal from "../../../modal/IPListModal";
+import FollowUpField from "./FollowUpField";
+import ServiceFeeField from "./ServiceFeeField";
 
 const ShortcutLetter = ({ children }) => (
   <span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>
@@ -9,26 +11,18 @@ const ShortcutLetter = ({ children }) => (
   </span>
 );
 
-export default function TopBarSection({ patient, patients, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
+export default function TopBarSection({ patient, patients, drugs, services, onPatientDetailsChange, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
   const p = patient;
   const [feesByVisit, setFeesByVisit] = useState({});
   const visitKey = JSON.stringify([p?.id ?? p?.patientId, p?.docNo, p?.docDate]);
-  const priority = p?.priority || p?.appointment?.priority || "";
-  const billing = p?.billing || (p?.todaysVisit?.fee === "Cash" ? "Self" : p?.todaysVisit?.fee) || "";
-  const service = "1200/-";
+  const priority = (p?.priority || p?.appointment?.priority || "Normal").toLowerCase();
+  const billing = (p?.billing || (p?.todaysVisit?.fee === "Cash" ? "Self" : p?.todaysVisit?.fee) || "Self").toLowerCase();
   const fieldStyle = {
     borderRadius: 0,
     background: "var(--color-surface)",
     borderColor: "var(--color-border)",
     color: "var(--color-text-base)",
   };
-  const [followUpDate, setFollowUpDate] = useState(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  });
   const [showOPList, setShowOPList] = useState(false);
   const [showAllPatients, setShowAllPatients] = useState(false);
   const [showIPList, setShowIPList] = useState(false);
@@ -141,55 +135,44 @@ export default function TopBarSection({ patient, patients, onPark, onFinalize, o
             <hr className="mt-0 mb-1.5" style={{ borderColor: "var(--color-border)", borderTopWidth: "1px", borderStyle: "solid" }} />
 
             {/* Each row pairs visit information with its document field. */}
-            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center gap-x-2 gap-y-1.5" style={{ color: "var(--color-text-base)" }}>
-              <span aria-hidden="true" />
-              <label htmlFor="top-bar-follow-up-date" className="text-[0.7rem] leading-none font-semibold" style={{ color: "var(--color-text-muted)" }}>Follow-up Date</label>
-              <div className="grid grid-cols-[44px_minmax(0,1fr)] items-center gap-x-[20px] min-h-10 text-xs font-semibold">
-                <span style={{ color: "var(--color-text-muted)", fontWeight: 600 }}>Priority</span>
-                <span className="break-words">{priority}</span>
+            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center gap-x-3 gap-y-2" style={{ color: "var(--color-text-base)" }}>
+              <FollowUpField key={visitKey} drugs={drugs} fieldStyle={fieldStyle} />
+              <div className="flex flex-col gap-0 min-w-0">
+                <label className="grid grid-cols-[44px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
+                  <span style={{ color: "var(--color-text-muted)" }}>Priority</span>
+                  <select aria-label="Priority" value={priority === "urgent" ? "emergency" : priority}
+                    onChange={event => onPatientDetailsChange?.({ priority: event.target.value })}
+                    className="h-7 w-full min-w-0 border-0 px-1 text-xs shadow-none" style={{ ...fieldStyle, background: "transparent" }}>
+                    <option value="important">Important</option><option value="normal">Normal</option><option value="emergency">Emergency</option>
+                  </select>
+                </label>
+                <label className="grid grid-cols-[44px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
+                  <span style={{ color: "var(--color-text-muted)" }}>Billing</span>
+                  <select aria-label="Billing" value={["self", "insurance", "corporate"].includes(billing) ? billing : "self"}
+                    onChange={event => onPatientDetailsChange?.({ billing: event.target.value })}
+                    className="h-7 w-full min-w-0 border-0 px-1 text-xs shadow-none" style={{ ...fieldStyle, background: "transparent" }}>
+                    <option value="self">Self</option><option value="insurance">Insurance</option><option value="corporate">Corporate</option>
+                  </select>
+                </label>
+                <ServiceFeeField key={visitKey} services={services} fieldStyle={fieldStyle} />
+                <label className="grid grid-cols-[44px_minmax(0,1fr)] mt-1 min-h-9 min-w-0 items-center text-xs font-semibold">
+                  <span style={{ color: "var(--color-text-muted)" }}>Fee</span>
+                  <input type="number" min="0" step="0.01" aria-label="Fee"
+                    value={feesByVisit[visitKey] ?? p?.feeAmount ?? ""}
+                    onChange={event => setFeesByVisit(previous => ({ ...previous, [visitKey]: event.target.value }))}
+                    className="h-9 w-full min-w-0 border px-2 text-left text-xs tabular-nums focus:outline-2 focus:outline-offset-1"
+                    style={{ ...fieldStyle, background: "var(--color-surface-alt)" }} />
+                </label>
               </div>
-              <div className="min-w-0">
-                <input
-                  id="top-bar-follow-up-date"
-                  type="date"
-                  value={followUpDate}
-                  onChange={(e) => setFollowUpDate(e.target.value)}
-                  className="w-full min-w-0 h-10 px-2 text-xs tabular-nums border shadow-sm focus:outline-2 focus:outline-offset-1"
-                  style={fieldStyle}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 items-start gap-2 min-h-10 text-xs font-semibold">
-                <div className="min-w-0">
-                  <span className="block mb-1 font-semibold" style={{ color: "var(--color-text-muted)" }}>Billing</span>
-                  <span className="block break-words">{billing}</span>
+              <div className="flex min-w-0 flex-col gap-2 self-start">
+                <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-9 items-center gap-1 px-2 py-1 border shadow-sm" style={fieldStyle}>
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.No</span>
+                  <span className="text-right text-xs font-semibold tabular-nums break-words">{p?.docNo?.replace(/\s*:\s*/g, " ") || ""}</span>
                 </div>
-                <div className="min-w-0">
-                  <span className="block mb-1 font-semibold" style={{ color: "var(--color-text-muted)" }}>Service</span>
-                  <span className="block tabular-nums break-words">{service}</span>
+                <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-9 items-center gap-1 px-2 py-1 border shadow-sm" style={fieldStyle}>
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.Date</span>
+                  <span className="text-right text-xs font-semibold tabular-nums">{p?.docDate || ""}</span>
                 </div>
-              </div>
-              <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-10 items-center gap-1 px-2 py-2 border shadow-sm" style={fieldStyle}>
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.No</span>
-                <span className="text-right text-xs font-semibold tabular-nums break-words">{p?.docNo?.replace(/\s*:\s*/g, " ") || ""}</span>
-              </div>
-
-              <label className="grid grid-cols-[44px_minmax(0,1fr)] min-h-10 min-w-0 items-center gap-x-1 text-xs font-semibold">
-                <span style={{ color: "var(--color-text-muted)", fontWeight: 600 }}>Fee</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  aria-label="Fee"
-                  value={feesByVisit[visitKey] ?? p?.feeAmount ?? ""}
-                  onChange={(event) => setFeesByVisit(previous => ({ ...previous, [visitKey]: event.target.value }))}
-                  className="h-10 w-full min-w-0 border px-1 text-right text-xs tabular-nums focus:outline-2 focus:outline-offset-1"
-                  style={{ ...fieldStyle, background: "var(--color-surface-alt)" }}
-                />
-              </label>
-              <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-10 items-center gap-1 px-2 py-2 border shadow-sm" style={fieldStyle}>
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.Date</span>
-                <span className="text-right text-xs font-semibold tabular-nums">{p?.docDate || ""}</span>
               </div>
             </div>
 
