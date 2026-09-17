@@ -13,6 +13,7 @@ import { CARE_PLAN_VIEW_DATA, MOCK_PATIENTS, PREVIOUS_VISITS } from "./OPDeskScr
 import Divider from "@mui/material/Divider";
 import { transitionPatient } from "./OPDeskScreen/patientWorkflow";
 import deskData from "../data/deskPatients.json";
+import { demoAttendant } from "./OPDeskScreen/demoAttendants";
 import medicineList from "../data/medicines.json";
 import labTestList from "../data/labTest.json";
 import serviceList from "../data/services.json";
@@ -71,7 +72,10 @@ function ColumnFilterButton({ columns, visible, onToggle, color }) {
 }
 
 export default function OPDeskScreen({ user, onLogout }) {
-  const [patients, setPatients] = useState(() => deskData.patients.map(patient => ({ ...MOCK_PATIENTS.find(p => p.id === patient.id), ...patient })));
+  const [patients, setPatients] = useState(() => deskData.patients.map((patient, index) => {
+    const record = { ...MOCK_PATIENTS.find(p => p.id === patient.id), ...patient };
+    return { ...record, attendant: demoAttendant(record, index) };
+  }));
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [activeTab, setActiveTab] = useState("drugs");
   const [leftPanel, setLeftPanel] = useState(null);

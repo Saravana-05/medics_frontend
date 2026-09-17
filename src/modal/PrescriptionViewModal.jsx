@@ -3,6 +3,12 @@ import {
   Pill, FlaskConical, Settings, FileSearch,
   ChevronUp, ChevronDown, Copy, Check, Printer, Eye,
   ActivitySquare, Thermometer, Heart, Wind, ClipboardList
+} from "lucide-react";import {
+  Pill, FlaskConical, Settings, FileSearch,
+  ChevronUp, ChevronDown, Copy, Check, Printer, Eye,
+  ActivitySquare, Thermometer, Heart, Wind, ClipboardList,
+  ParkingCircle, BookOpen, Ban, Clipboard, Stethoscope,
+  ArrowRightLeft, Pencil, Baby
 } from "lucide-react";
 
 const PRESCRIPTION_TABS = [
@@ -316,7 +322,24 @@ export default function PrescriptionViewModal({
 }) {
   const [activeTab, setActiveTab] = useState("drugs");
   const [copied, setCopied] = useState(false);
+  const [clinicalOverrides, setClinicalOverrides] = useState({});
+const [editingField, setEditingField] = useState(null); // "chiefComplaint" | "firstObservation" | "pregnancy" | "referral" | null
+const [draftValue, setDraftValue] = useState("");
   
+  
+  const startEdit = (field, currentValue) => {
+  setEditingField(field);
+  setDraftValue(currentValue === "—" ? "" : currentValue);
+};
+const saveEdit = (field) => {
+  setClinicalOverrides(prev => ({ ...prev, [field]: draftValue.trim() || "—" }));
+  setEditingField(null);
+  setDraftValue("");
+};
+const cancelEdit = () => {
+  setEditingField(null);
+  setDraftValue("");
+};
   if (!visit) return null;
 
   const handleCopy = async () => {
@@ -377,11 +400,11 @@ export default function PrescriptionViewModal({
   };
 
   const clinicalData = {
-    chiefComplaint: visit.complaint || "—",
-    firstObservation: visit.observation || "—",
-    pregnancy: visit.pregnancy || "—",
-    referral: visit.referral || "—",
-  };
+  chiefComplaint: clinicalOverrides.chiefComplaint ?? (visit.complaint || "—"),
+  firstObservation: clinicalOverrides.firstObservation ?? (visit.observation || "—"),
+  pregnancy: clinicalOverrides.pregnancy ?? (visit.pregnancy || "—"),
+  referral: clinicalOverrides.referral ?? (visit.referral || "—"),
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }}>
@@ -512,31 +535,56 @@ export default function PrescriptionViewModal({
             
             {/* Right: Clinical Information */}
             <div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Clipboard size={12} style={{ color: "var(--color-primary)" }} />
-                <span className="text-[0.8rem] font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {clinicalData.chiefComplaint && clinicalData.chiefComplaint !== "—" && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "var(--color-danger)18", border: "1px solid var(--color-danger)35" }}>
-                    <Stethoscope size={10} style={{ color: "var(--color-danger)" }} />
-                    <span className="text-xs font-bold" style={{ color: "var(--color-danger)" }}>{clinicalData.chiefComplaint}</span>
-                  </div>
-                )}
-                {clinicalData.firstObservation && clinicalData.firstObservation !== "—" && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#0284c718", border: "1px solid #0284c735" }}>
-                    <Eye size={10} style={{ color: "#0284c7" }} />
-                    <span className="text-xs font-bold" style={{ color: "#0284c7" }}>{clinicalData.firstObservation}</span>
-                  </div>
-                )}
-                {clinicalData.referral && clinicalData.referral !== "—" && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "#d9770618", border: "1px solid #d9770635" }}>
-                    <ArrowRightLeft size={10} style={{ color: "#d97706" }} />
-                    <span className="text-xs font-bold" style={{ color: "#d97706" }}>{clinicalData.referral}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+  <div className="flex items-center gap-1.5 mb-1.5">
+    <Clipboard size={12} style={{ color: "var(--color-primary)" }} />
+    <span className="text-[0.8rem] font-bold tracking-wide" style={{ color: "var(--color-text-muted)" }}>Clinical Information</span>
+  </div>
+  <div className="flex flex-wrap gap-1.5">
+    {[
+      { key: "chiefComplaint", label: "Chief Complaint", icon: Stethoscope, color: "var(--color-danger)" },
+      { key: "firstObservation", label: "First Observation", icon: Eye, color: "#0284c7" },
+      { key: "pregnancy", label: "Pregnancy Status", icon: Baby, color: "#db2777" },
+      { key: "referral", label: "Referral From", icon: ArrowRightLeft, color: "#d97706" },
+    ].map(({ key, label, icon: Icon, color }) => (
+      <div
+        key={key}
+        className="flex items-center gap-1 px-2 py-0.5 rounded-full"
+        style={{ background: `${color}18`, border: `1px solid ${color}35` }}
+      >
+        <Icon size={10} style={{ color }} />
+        {editingField === key ? (
+          <>
+            <input
+              autoFocus
+              value={draftValue}
+              onChange={(e) => setDraftValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveEdit(key);
+                if (e.key === "Escape") cancelEdit();
+              }}
+              placeholder={label}
+              className="text-xs font-bold bg-transparent border-b outline-none w-28"
+              style={{ color, borderColor: color }}
+            />
+            <button onClick={() => saveEdit(key)} title="Save" className="ml-0.5">
+              <Check size={10} style={{ color }} />
+            </button>
+            <button onClick={cancelEdit} title="Cancel">
+              <Ban size={10} style={{ color }} />
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="text-xs font-bold" title={label} style={{ color }}>{clinicalData[key]}</span>
+            <button onClick={() => startEdit(key, clinicalData[key])} title={`Edit ${label}`} className="ml-0.5">
+              <Pencil size={10} style={{ color }} />
+            </button>
+          </>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
           </div>
         </div>
         

@@ -1,6 +1,6 @@
 // src/components/PlatformDesk/Patients.jsx
 import { useState, useEffect } from "react";
-import { Heart, Plus, Filter } from "lucide-react";
+import { Heart, Plus } from "lucide-react";
 import TableUI from "../Table/TableUI";
 import PatientFormModal from "../../modal/PatientFormModal";
 import ViewPatientModal from "../../modal/ViewPatientModal";

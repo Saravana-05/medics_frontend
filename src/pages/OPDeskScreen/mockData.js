@@ -2,8 +2,9 @@ import deskPatientPreviousVisits from "../../data/deskPatientPreviousVisits.json
 import listPatients from "../../data/listPatients.json";
 import listPatientPreviousVisits from "../../data/listPatientPreviousVisits.json";
 import listPatientClinicalProfiles from "../../data/listPatientClinicalProfiles.json";
+import { demoAttendant } from "./demoAttendants";
 
-const enrichedListPatients = listPatients.map(patient => ({
+const enrichedListPatients = listPatients.map((patient, index) => ({
   ...patient,
   ...listPatientClinicalProfiles[patient.id],
   appointment: {
@@ -22,9 +23,9 @@ const enrichedListPatients = listPatients.map(patient => ({
     { type: "Chronic", name: patient.chiefComplaint, since: "2023", severity: "Medium" },
   ],
   family: [
-    { relation: "Attendant", name: "Family Attendant", age: 42, condition: "Nil" },
+    { relation: demoAttendant(patient, index).relationship, name: demoAttendant(patient, index).name, age: 42, condition: "Nil" },
   ],
-  attendant: { name: "Family Attendant", relationship: "Relative", phone: "9000000000" },
+  attendant: demoAttendant(patient, index),
   address: { line1: "Madurai", line2: "Tamil Nadu", line3: "625001", line4: "India", phone: "9000000000" },
 }));
 

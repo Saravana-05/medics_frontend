@@ -27,6 +27,13 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
     { key: "abortions", label: "Abortions" },
     { key: "livingChildren", label: "Living Children" }
   ];
+  const toDateInputValue = (since) => {
+  if (!since) return new Date().toISOString().slice(0, 10);
+  // Legacy data stored as just a year (e.g. "2019") — hardcode Jan 1 for that year
+  if (/^\d{4}$/.test(String(since))) return `${since}-01-01`;
+  const parsed = new Date(since);
+  return !isNaN(parsed) ? parsed.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+};
   useEffect(() => {
     setGynacInfoState(patient?.gynacInfo || null);
   }, [patient?.gynacInfo]);
@@ -47,10 +54,10 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
   const allergyItems = items.filter(item => item.type === "Allergy");
 
   const openAddForm = (type) => {
-    setEditingIndex(null);
-    setNewItem({ type, name: "", since: "", severity: "Medium", reaction: "" });
-    setShowAddForm(true);
-  };
+  setEditingIndex(null);
+  setNewItem({ type, name: "", since: new Date().toISOString().slice(0, 10), severity: "Medium", reaction: "" });
+  setShowAddForm(true);
+};
 
   const handleAdd = () => {
     if (newItem.name && newItem.since) {
@@ -63,10 +70,10 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
   };
 
   const handleEdit = (index) => {
-    setEditingIndex(index);
-    setNewItem(items[index]);
-    setShowAddForm(true);
-  };
+  setEditingIndex(index);
+  setNewItem({ ...items[index], since: toDateInputValue(items[index].since) });
+  setShowAddForm(true);
+};
 
   const handleUpdate = () => {
     if (newItem.name && newItem.since && editingIndex !== null) {
@@ -81,10 +88,10 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
   };
 
   const handleCancel = () => {
-    setShowAddForm(false);
-    setEditingIndex(null);
-    setNewItem({ type: "Allergy", name: "", since: "", severity: "Medium", reaction: "" });
-  };
+  setShowAddForm(false);
+  setEditingIndex(null);
+  setNewItem({ type: "Allergy", name: "", since: new Date().toISOString().slice(0, 10), severity: "Medium", reaction: "" });
+};
 
   const handleDelete = (index) => {
     const updatedItems = items.filter((_, i) => i !== index);
@@ -124,7 +131,7 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
               {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3" style={{ background: newItem.type === "Allergy" ? "#dc2626" : "#3f8f87" }}>
                 <span className="text-base font-bold text-white">
-                  {editingIndex !== null ? "Edit" : "Add"} {newItem.type}
+                  {editingIndex !== null ? "Edit" : "Add"} Caution
                 </span>
                 <button onClick={handleCancel} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
                   <X size={20} className="text-white" />
@@ -133,71 +140,70 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
 
               {/* Modal body */}
               <div className="p-4 space-y-3">
-                <div className="flex gap-3">
-                  <select
-                    value={newItem.type}
-                    onChange={(e) => setNewItem({ ...newItem, type: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                  >
-                    <option value="Allergy">Allergy</option>
-                    <option value="Chronic">Chronic</option>
-                  </select>
-                  <select
-                    value={newItem.severity}
-                    onChange={(e) => setNewItem({ ...newItem, severity: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                  >
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </select>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Condition/Allergy name"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
-                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                />
-                <div className="flex gap-3">
-                  <input
-                    type="year"
-                    value={newItem.since}
-                    onChange={(e) => setNewItem({ ...newItem, since: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                  />
-                  {/* <input
-                    type="text"
-                    placeholder="Reaction (optional)"
-                    value={newItem.reaction || ""}
-                    onChange={(e) => setNewItem({ ...newItem, reaction: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
-                    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                  /> */}
-                </div>
+                
+                  <div className="p-4 grid grid-cols-2 gap-3">
+  {/* Row 1, Col 1 — Read-only type, populated from which "+" icon was clicked */}
+  <div
+    className="w-full px-3 py-2 text-base border font-semibold"
+    style={{
+      borderColor: "var(--color-border)",
+      background: "var(--color-surface-alt)",
+      color: newItem.type === "Allergy" ? "#dc2626" : "#3f8f87"
+    }}
+  >
+    {newItem.type}
+  </div>
+
+  {/* Row 1, Col 2 — Severity */}
+  <select
+    value={newItem.severity}
+    onChange={(e) => setNewItem({ ...newItem, severity: e.target.value })}
+    className="w-full px-3 py-2 text-base border outline-none"
+    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+  >
+    <option value="High">High</option>
+    <option value="Medium">Medium</option>
+    <option value="Low">Low</option>
+  </select>
+
+  {/* Row 2, Col 1 — Name, placeholder changes based on type */}
+  <input
+    type="text"
+    placeholder={newItem.type === "Allergy" ? "Allergy name" : "Condition/Chronic name"}
+    value={newItem.name}
+    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+    className="w-full px-3 py-2 text-base border outline-none"
+    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+  />
+
+  {/* Row 2, Col 2 — Date */}
+  <input
+    type="date"
+    value={newItem.since}
+    onChange={(e) => setNewItem({ ...newItem, since: e.target.value })}
+    className="w-full px-3 py-2 text-base border outline-none"
+    style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+  />
+</div>
               </div>
 
               {/* Modal footer */}
               <div className="flex gap-3 px-4 pb-4">
-                <button
-                  onClick={editingIndex !== null ? handleUpdate : handleAdd}
-                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
-                  style={{ background: "var(--color-success)", color: "white" }}
-                >
-                  <Check size={16} /> {editingIndex !== null ? "Update" : "Add"}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
-                  style={{ background: "var(--color-danger)", color: "white" }}
-                >
-                  <X size={16} /> Cancel
-                </button>
-              </div>
+  <button
+    onClick={editingIndex !== null ? handleUpdate : handleAdd}
+    className="flex-1 px-3 py-2 text-base font-semibold flex items-center justify-center gap-1.5"
+    style={{ background: "var(--color-success)", color: "white" }}
+  >
+    <Check size={16} /> {editingIndex !== null ? "Update" : "Add"}
+  </button>
+  <button
+    onClick={handleCancel}
+    className="flex-1 px-3 py-2 text-base font-semibold flex items-center justify-center gap-1.5"
+    style={{ background: "var(--color-danger)", color: "white" }}
+  >
+    <X size={16} /> Cancel
+  </button>
+</div>
             </div>
           </div>
         )}

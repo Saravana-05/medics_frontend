@@ -2,17 +2,23 @@ import { useRef } from "react";
 import { Info, X } from "lucide-react";
 import { serviceFeeBreakdown } from "../serviceFees";
 
+const DEMO_SERVICES = [
+  { name: "Nebulization" },
+  { name: "Wound Dressing" },
+  { name: "Physiotherapy Session" },
+];
+
 export default function ServiceFeeField({ services = [], fieldStyle }) {
   const dialogRef = useRef(null);
-  const { rows, total } = serviceFeeBreakdown(services);
+  const { rows, total } = serviceFeeBreakdown(services.length ? services : DEMO_SERVICES);
   const hasSample = rows.some(row => row.sample);
-  const money = amount => amount.toLocaleString("en-IN", { style: "currency", currency: "INR" });
+  const money = amount => amount.toLocaleString("en-IN", { style: "currency", currency: "INR", useGrouping: false, minimumFractionDigits: 0, maximumFractionDigits: 2 });
   return <>
-    <div className="grid grid-cols-[44px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
+    <div className="grid grid-cols-[48px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
       <span style={{ color: "var(--color-text-muted)" }}>Service</span>
       <div className="flex min-w-0 items-center justify-between px-1 h-7">
-        <span className="truncate tabular-nums" title={`${money(total)}${hasSample ? " (includes sample prices)" : ""}`}>{money(total)}{hasSample && <span className="ml-1 text-[9px]">Demo</span>}</span>
-        <button type="button" aria-label="View service fee breakdown" onClick={() => dialogRef.current?.showModal()} className="shrink-0 p-1"><Info size={15} /></button>
+        <span className="truncate tabular-nums" title={`${money(total)}${hasSample ? " (includes sample prices)" : ""}`}>{money(total)}</span>
+        <button type="button" aria-label="View service fee breakdown" onClick={() => dialogRef.current?.showModal()} className="shrink-0 p-1 text-green-600"><Info size={15} /></button>
       </div>
     </div>
     <dialog ref={dialogRef} aria-labelledby="service-fee-title" className="m-auto w-[420px] max-w-[calc(100vw-32px)] border p-4 shadow-xl backdrop:bg-black/40"

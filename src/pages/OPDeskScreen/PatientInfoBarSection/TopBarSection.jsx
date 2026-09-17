@@ -4,12 +4,21 @@ import AllPatientsModal from "../../../modal/AllPatientsModal";
 import IPListModal from "../../../modal/IPListModal";
 import FollowUpField from "./FollowUpField";
 import ServiceFeeField from "./ServiceFeeField";
+import OPTimeField from "./OPTimeField";
 
 const ShortcutLetter = ({ children }) => (
   <span style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "2px" }}>
     {children}
   </span>
 );
+
+const REFERRAL_DOCTORS = [
+  "Dr. Anil Sharma",
+  "Dr. Priya Nair",
+  "Dr. Ravi Menon",
+  "Dr. Sneha Iyer",
+  "Dr. Kiran Rao",
+];
 
 export default function TopBarSection({ patient, patients, drugs, services, onPatientDetailsChange, onPark, onFinalize, onIPList, onSelectPatient, tabsRowRef }) {
   const p = patient;
@@ -134,45 +143,53 @@ export default function TopBarSection({ patient, patients, drugs, services, onPa
             {/* Separate the actions from the visit details. */}
             <hr className="mt-0 mb-1.5" style={{ borderColor: "var(--color-border)", borderTopWidth: "1px", borderStyle: "solid" }} />
 
-            {/* Each row pairs visit information with its document field. */}
-            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center gap-x-3 gap-y-2" style={{ color: "var(--color-text-base)" }}>
-              <FollowUpField key={visitKey} drugs={drugs} fieldStyle={fieldStyle} />
-              <div className="flex flex-col gap-0 min-w-0">
-                <label className="grid grid-cols-[44px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
+            <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-2" style={{ color: "var(--color-text-base)" }}>
+              <div className="flex min-w-0 flex-col justify-between gap-1">
+                <label className="grid grid-cols-[48px_minmax(0,1fr)] h-7 items-center text-xs">
                   <span style={{ color: "var(--color-text-muted)" }}>Priority</span>
                   <select aria-label="Priority" value={priority === "urgent" ? "emergency" : priority}
                     onChange={event => onPatientDetailsChange?.({ priority: event.target.value })}
-                    className="h-7 w-full min-w-0 border-0 px-1 text-xs shadow-none" style={{ ...fieldStyle, background: "transparent" }}>
+                    className="h-7 w-full min-w-0 border-0 px-1 text-xs" style={{ ...fieldStyle, background: "transparent" }}>
                     <option value="important">Important</option><option value="normal">Normal</option><option value="emergency">Emergency</option>
                   </select>
                 </label>
-                <label className="grid grid-cols-[44px_minmax(0,1fr)] min-h-7 items-center text-xs font-semibold">
+                <label className="grid grid-cols-[48px_minmax(0,1fr)] h-7 items-center text-xs">
                   <span style={{ color: "var(--color-text-muted)" }}>Billing</span>
                   <select aria-label="Billing" value={["self", "insurance", "corporate"].includes(billing) ? billing : "self"}
                     onChange={event => onPatientDetailsChange?.({ billing: event.target.value })}
-                    className="h-7 w-full min-w-0 border-0 px-1 text-xs shadow-none" style={{ ...fieldStyle, background: "transparent" }}>
+                    className="h-7 w-full min-w-0 border-0 px-1 text-xs" style={{ ...fieldStyle, background: "transparent" }}>
                     <option value="self">Self</option><option value="insurance">Insurance</option><option value="corporate">Corporate</option>
                   </select>
                 </label>
+                <OPTimeField patient={p} fieldStyle={fieldStyle} />
                 <ServiceFeeField key={visitKey} services={services} fieldStyle={fieldStyle} />
-                <label className="grid grid-cols-[44px_minmax(0,1fr)] mt-1 min-h-9 min-w-0 items-center text-xs font-semibold">
+                <label className="grid grid-cols-[48px_minmax(0,1fr)] min-w-0 items-center text-xs">
                   <span style={{ color: "var(--color-text-muted)" }}>Fee</span>
                   <input type="number" min="0" step="0.01" aria-label="Fee"
                     value={feesByVisit[visitKey] ?? p?.feeAmount ?? ""}
                     onChange={event => setFeesByVisit(previous => ({ ...previous, [visitKey]: event.target.value }))}
-                    className="h-9 w-full min-w-0 border px-2 text-left text-xs tabular-nums focus:outline-2 focus:outline-offset-1"
-                    style={{ ...fieldStyle, background: "var(--color-surface-alt)" }} />
+                    className="h-[34px] w-full min-w-0 border px-2 text-xs tabular-nums focus:outline-2 focus:outline-offset-1" style={fieldStyle} />
                 </label>
               </div>
-              <div className="flex min-w-0 flex-col gap-2 self-start">
-                <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-9 items-center gap-1 px-2 py-1 border shadow-sm" style={fieldStyle}>
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.No</span>
-                  <span className="text-right text-xs font-semibold tabular-nums break-words">{p?.docNo?.replace(/\s*:\s*/g, " ") || ""}</span>
+              <div className="flex min-w-0 flex-col justify-between gap-1.5">
+                <div className="flex min-h-[34px] min-w-0 items-center justify-between gap-1 border px-2 py-1 text-xs shadow-sm" style={fieldStyle}>
+                  <span className="shrink-0" style={{ color: "var(--color-text-muted)" }}>Doc.No</span>
+                  <span className="break-words text-right font-semibold tabular-nums">{p?.docNo?.replace(/\s*:\s*/g, " ") || ""}</span>
                 </div>
-                <div className="grid grid-cols-[52px_minmax(0,1fr)] min-w-0 min-h-9 items-center gap-1 px-2 py-1 border shadow-sm" style={fieldStyle}>
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Doc.Date</span>
-                  <span className="text-right text-xs font-semibold tabular-nums">{p?.docDate || ""}</span>
+                <div className="flex min-h-[34px] min-w-0 items-center justify-between gap-1 border px-2 py-1 text-xs shadow-sm" style={fieldStyle}>
+                  <span className="shrink-0" style={{ color: "var(--color-text-muted)" }}>Doc.Date</span>
+                  <span className="text-right font-semibold tabular-nums">{p?.docDate || ""}</span>
                 </div>
+                <label className="flex h-[34px] min-w-0 items-center border px-2 text-xs shadow-sm" style={fieldStyle}>
+                  <span className="shrink-0 text-[10px]" style={{ color: "var(--color-text-muted)" }}>Referral To</span>
+                  <select aria-label="Refer To" value={p?.referTo || ""}
+                    onChange={event => onPatientDetailsChange?.({ referTo: event.target.value })}
+                    className="h-full min-w-0 flex-1 border-0 pl-1 text-xs font-semibold" style={fieldStyle}>
+                    <option value="">Select doctor</option>
+                    {[...new Set(["Dr. Lalitha", ...REFERRAL_DOCTORS, p?.referTo].filter(Boolean))].map(doc => <option key={doc} value={doc}>{doc}</option>)}
+                  </select>
+                </label>
+                <FollowUpField key={visitKey} drugs={drugs} fieldStyle={fieldStyle} />
               </div>
             </div>
 
