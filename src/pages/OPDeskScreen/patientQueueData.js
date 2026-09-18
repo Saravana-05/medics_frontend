@@ -7,6 +7,10 @@ export const REPORTS = [
   { patientId: "OPL-003", report: "Liver Function Test", type: "Lab", status: "Ready", date: "2024-03-02" },
   { patientId: "OPL-004", report: "X-Ray Chest", type: "Service", status: "Ready", date: "2024-03-02" },
   { patientId: "OPL-005", report: "ECG", type: "Service", status: "Ready", date: "2024-03-01" },
+  // Parked demo patients — gives ParkedPatientsPanel a couple of live
+  // Lab/Service badges to show instead of every parked card falling back to "****".
+  { patientId: "OPL-009", report: "Complete Blood Count", type: "Lab", status: "Pending", date: "2024-03-03" },
+  { patientId: "OPL-010", report: "Allergy Panel", type: "Service", status: "Pending", date: "2024-03-03" },
 ];
 
 // Preserve the existing emergency demo cases without inventing clinical values.

@@ -5,21 +5,15 @@ import { REPORTS } from "./patientQueueData";
 import PatientCardFilter from "./PatientCardFilter";
 import { matchesPatientFilter } from "./patientFilterUtils";
 
-const MOCK_REPORTS = [
-  { patientName: "Raveendran. K", report: "Complete Blood Count", type: "Lab", status: "Pending", date: "03/03/2024" },
-  { patientName: "Nandhini. A", report: "Lipid Profile", type: "Lab", status: "Pending", date: "03/03/2024" },
-  { patientName: "Anjali (Baby). L", report: "Liver Function Test", type: "Lab", status: "Ready", date: "02/03/2024" },
-  { patientName: "Vignesh (Infant). R", report: "X-Ray Chest", type: "Service", status: "Ready", date: "02/03/2024" },
-  { patientName: "Ramakrishnan. K.R", report: "ECG", type: "Service", status: "Ready", date: "01/03/2024" },
-];
-
 function ReportsPanel({ panelHeight, patients = [] }) {
   const headerH = 50;
   const [selectedDate, setSelectedDate] = useState("");
   const [query, setQuery] = useState("");
-  const reports = REPORTS.map((report, index) => ({ ...report, patientName: MOCK_REPORTS[index].patientName }));
-  const filteredReports = reports.filter(report => (!selectedDate || report.date === selectedDate)
-    && matchesPatientFilter(patients.find(patient => patient.id === report.patientId) || { id: report.patientId, name: report.patientName }, query, [report.report, report.type, report.status]));
+  // Patient name comes from the real patients list (by patientId), not a
+  // positional match against a separate array — REPORTS can grow independently.
+  const patientFor = (patientId) => patients.find(patient => patient.id === patientId) || { id: patientId, name: patientId };
+  const filteredReports = REPORTS.filter(report => (!selectedDate || report.date === selectedDate)
+    && matchesPatientFilter(patientFor(report.patientId), query, [report.report, report.type, report.status]));
 
   const handleDateFilter = (date) => {
     setSelectedDate(date);
@@ -27,9 +21,9 @@ function ReportsPanel({ panelHeight, patients = [] }) {
 
   const getTypeBadgeStyle = (type) => {
     if (type === "Lab") {
-      return { bg: "var(--color-lab-light)", color: "var(--color-lab)" };
+      return { bg: "#93c5fd", color: "#1e3a8a" };
     }
-    return { bg: "var(--color-services-light)", color: "var(--color-services)" };
+    return { bg: "#d8b4fe", color: "#581c87" };
   };
 
   return (
@@ -63,26 +57,15 @@ function ReportsPanel({ panelHeight, patients = [] }) {
         ) : (
           filteredReports.map((item, i) => {
             const badgeStyle = getTypeBadgeStyle(item.type);
-            const patient = patients.find(patient => patient.id === item.patientId)
-              || { id: item.patientId, name: item.patientName };
+            const patient = patientFor(item.patientId);
+            const statusBadge = item.status === "Pending"
+              ? { label: item.status, background: "#fcd34d", color: "#78350f", position: "right" }
+              : { label: item.status, background: "#86efac", color: "#14532d", position: "right" };
+            const typeBadge = { label: item.type, background: badgeStyle.bg, color: badgeStyle.color, position: "left" };
             return (
-              <div key={i} className="flex justify-between items-center p-2 rounded-lg border"
-                style={{ borderColor: "var(--color-border)" }}>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium">{patient.name}</span>
-                    <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded"
-                      style={{ background: badgeStyle.bg, color: badgeStyle.color }}>
-                      {item.type}
-                    </span>
-                  </div>
-                  <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>{item.report}</div>
-                  <PatientCardDetails patient={patient} types={[item.type]} />
-                </div>
-                <span className="shrink-0 text-xs px-2 py-0.5 rounded-full"
-                  style={{ background: item.status === "Pending" ? "var(--color-lab-light)" : "var(--color-drugs-light)", color: item.status === "Pending" ? "var(--color-lab)" : "var(--color-drugs)" }}>
-                  {item.status}
-                </span>
+              <div key={i} className="p-2 border" style={{ borderColor: "var(--color-border)" }}>
+                <PatientCardDetails patient={patient} status={[typeBadge, statusBadge]} />
+                <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>{item.report}</div>
               </div>
             );
           })
