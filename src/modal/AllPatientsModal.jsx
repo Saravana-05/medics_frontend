@@ -1,27 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { Users, Search, X, UserRound } from "lucide-react";
-import CloseIcon from "@mui/icons-material/Close";
+import { useEffect, useMemo, useRef, useState } from "react";
+import DataTable from "react-data-table-component";
+import { Users, UserRound, Search } from "lucide-react";
 import useWorkspaceModalLayout from "../hooks/useWorkspaceModalLayout";
 
-const columns = ["Patient ID", "Patient Name", "Initial", "City", "Phone", "Care-of Phone", "Age", "Age Group"];
-const ageGroup = patient => {
-  if (patient.ageGroup) return patient.ageGroup;
-  if (patient.age === null || patient.age === undefined || patient.age === "") return "";
-  const age = Number(patient.age);
-  if (!Number.isFinite(age) || age < 0) return "";
-  return age < 18 ? "Child" : age < 60 ? "Adult" : "Senior";
-};
-
-const patientValues = p => [
-  p.patientId || p.id,
-  p.name,
-  p.initial || p.name?.match(/\.\s*([A-Za-z]{1,3})\.?$/)?.[1],
-  p.city || p.address?.city,
-  p.phone || p.address?.phone,
-  p.careOfPhone || p.attendant?.phone,
-  p.age,
-  ageGroup(p),
-];
+const rowValues = p => ({
+  patientId: p.patientId || p.id,
+  name: p.name,
+  city: p.city || p.address?.city,
+  phone: p.phone || p.address?.phone,
+  careOfPhone: p.careOfPhone || p.attendant?.phone,
+  careOfName: p.careOfName || p.attendant?.name,
+});
 
 const sidebarFields = p => [
   ["Patient ID", p.patientId || p.id],
@@ -33,10 +22,28 @@ const sidebarFields = p => [
 ];
 const displayValue = value => value === undefined || value === null || value === "" ? "—" : value;
 
+const COLUMN_DEFS = [
+  { key: "patientId", label: "Patient ID", width: "90px" },
+  { key: "name", label: "Patient Name", width: "150px" },
+  { key: "city", label: "City", width: "90px" },
+  { key: "phone", label: "Phone", width: "100px" },
+  { key: "careOfPhone", label: "Care-of Phone", width: "110px" },
+  { key: "careOfName", label: "Care-of Name", width: "120px" },
+];
+
+const customStyles = {
+  headRow: { style: { background: "var(--color-primary-dark)", minHeight: "32px", borderBottom: "none" } },
+  headCells: { style: { paddingLeft: "6px", paddingRight: "6px", paddingTop: "4px", paddingBottom: "4px", background: "var(--color-primary-dark)", color: "#ffffff", fontSize: "11px", fontWeight: 700, letterSpacing: "0.02em" } },
+  rows: {
+    style: { minHeight: "28px", fontSize: "11.5px", cursor: "pointer", borderBottom: "1px solid var(--color-border)" },
+    stripedStyle: { background: "var(--color-surface-alt)" },
+  },
+  cells: { style: { paddingLeft: "6px", paddingRight: "6px", paddingTop: "2px", paddingBottom: "2px" } },
+};
+
 export default function AllPatientsModal({ patients = [], verticalAnchorRef, onClose, onSelectPatient }) {
   const { modalRef, verticalBounds, dragOffset, dragHandlers } = useWorkspaceModalLayout(verticalAnchorRef, 118);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [viewedPatient, setViewedPatient] = useState(null);
   const profileRef = useRef(null);
@@ -48,16 +55,37 @@ export default function AllPatientsModal({ patients = [], verticalAnchorRef, onC
     if (viewedPatient) profileCloseRef.current?.focus();
   }, [viewedPatient]);
   const searchRef = useRef(null);
+  const footerViewRef = useRef(null);
   const closeRef = useRef(onClose);
   useEffect(() => { closeRef.current = onClose; }, [onClose]);
-  const filtered = patients.filter(p => (!status || p.status === status) &&
+
+  const filtered = useMemo(() => patients.filter(p =>
     [p.name, p.attendant?.name, p.attender?.name, p.careOfName,
       p.doctor, p.ipInfo?.consultant, p.phone, p.address?.phone,
       p.attendant?.phone, p.attender?.phone, p.careOfPhone,
       p.id, p.patientId, p.city, p.address?.city,
       p.address?.line1, p.address?.line2, p.address?.line3, p.address?.line4,
-    ].some(value => String(value ?? "").toLowerCase().includes(query.trim().toLowerCase())));
+    ].some(value => String(value ?? "").toLowerCase().includes(query.trim().toLowerCase()))
+  ), [patients, query]);
+
   const select = patient => { onSelectPatient({ ...patient, listSource: "all" }); onClose(); };
+  const openView = event => {
+    const patient = filtered.find(p => p.id === selectedId);
+    if (!patient) return;
+    footerViewRef.current = event.currentTarget;
+    setViewedPatient(patient);
+  };
+
+  const columns = useMemo(() => COLUMN_DEFS.map(col => ({
+    name: col.label,
+    selector: row => displayValue(rowValues(row)[col.key]),
+    sortable: false,
+    wrap: false,
+    grow: col.key === "name" || col.key === "careOfName" ? 2 : 1,
+    minWidth: col.width,
+    style: { color: "var(--color-text-base)" },
+  })), []);
+
   useEffect(() => {
     const previous = document.activeElement;
     const overflow = document.body.style.overflow;
@@ -66,7 +94,7 @@ export default function AllPatientsModal({ patients = [], verticalAnchorRef, onC
     const onKey = event => {
       if (event.key === "Escape") {
         event.preventDefault();
-        if (profileRef.current) { setViewedPatient(null); viewButtonRef.current?.focus(); }
+        if (profileRef.current) { setViewedPatient(null); (footerViewRef.current || viewButtonRef.current)?.focus(); }
         else closeRef.current();
       }
       if (event.key !== "Tab") return;
@@ -78,49 +106,59 @@ export default function AllPatientsModal({ patients = [], verticalAnchorRef, onC
     document.addEventListener("keydown", onKey);
     return () => { document.body.style.overflow = overflow; document.removeEventListener("keydown", onKey); previous?.focus?.(); };
   }, [modalRef]);
+
   return <div className="fixed inset-0 z-[100] flex items-start justify-center animate-fade-in" style={{ background: "rgba(0,0,0,0.5)", paddingTop: verticalBounds.top }}>
-    <div ref={modalRef} role="dialog" aria-modal="true" aria-label="All Patients" className={`flex max-w-[96vw] gap-3 ${viewedPatient ? "w-[1403px]" : "w-[1051px]"}`} style={{ height: verticalBounds.height, color: "var(--color-text-base)", transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, "--all-patients-accent": "#656D78" }}>
+    <div ref={modalRef} role="dialog" aria-modal="true" aria-label="All Patients" className={`flex max-w-[96vw] gap-3 ${viewedPatient ? "w-[1080px]" : "w-[720px]"}`} style={{ height: verticalBounds.height, color: "var(--color-text-base)", transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }}>
     <div className="list-modal-flat flex min-w-0 flex-1 flex-col overflow-hidden shadow-2xl" style={{ background: "var(--color-surface)" }}>
-      <div className="flex items-center justify-between px-5 py-3 text-white" style={{ background: "var(--all-patients-accent)", cursor: "grab", touchAction: "none" }} {...dragHandlers}>
-        <h2 className="flex items-center gap-2 text-lg font-bold"><Users size={20} />All Patients</h2>
-        <button onClick={onClose} className="bg-black/40 px-3 py-1.5 text-xs font-semibold">Close</button>
+      <div className="flex items-center justify-between gap-3 px-5 py-3" style={{ background: "#E5E7EB", color: "#1f2937", cursor: "grab", touchAction: "none" }} {...dragHandlers}>
+        <div className="flex items-center gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-bold"><Users size={20} />All Patients</h2>
+          <span className="text-xs font-bold" style={{ color: "#4b5563" }}>({patients.length})</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="relative max-w-full" onPointerDown={event => event.stopPropagation()}>
+            <Search className="absolute left-2 top-2.5" size={14} />
+            <input ref={searchRef} aria-label="Search by name, attender, doctor, phone, ID, or city" value={query}
+              onChange={e => { setQuery(e.target.value); setSelectedId(null); }}
+              placeholder="Name, attender, doctor, phone, ID, city…"
+              className="w-72 max-w-full border bg-white py-2 pl-7 pr-2 text-xs text-slate-800" />
+          </label>
+          <button onClick={onClose} className="bg-black/10 px-3 py-1.5 text-xs font-semibold hover:bg-black/20">Close</button>
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2 border-b p-3" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
-        <span className="px-3 py-2 text-xs font-bold">All ({patients.length})</span>
-        <label className="relative ml-auto max-w-full"><Search className="absolute left-2 top-2.5" size={14}/><input ref={searchRef} aria-label="Search by name, attender, doctor, phone, ID, or city" value={query} onChange={e => { setQuery(e.target.value); setSelectedId(null); }} placeholder="Name, attender, doctor, phone, ID, city…" className="w-80 max-w-full border bg-white py-2 pl-7 pr-2 text-xs text-slate-800" /></label>
-        <select aria-label="Filter patient status" value={status} onChange={e => { setStatus(e.target.value); setSelectedId(null); }} className="border bg-white p-2 text-xs text-slate-800"><option value="">All statuses</option>{[...new Set(patients.map(p => p.status).filter(Boolean))].map(value => <option key={value}>{value}</option>)}</select>
+      <div className="min-h-0 min-w-0 flex-1 overflow-auto patient-list-scrollbar">
+        <DataTable
+          columns={columns}
+          data={filtered}
+          keyField="id"
+          customStyles={customStyles}
+          striped
+          highlightOnHover
+          pointerOnHover
+          fixedHeader
+          fixedHeaderScrollHeight="100%"
+          noDataComponent={<p className="p-8 text-center text-sm">No matching patients</p>}
+          onRowClicked={row => setSelectedId(row.id)}
+          onRowDoubleClicked={row => select(row)}
+          conditionalRowStyles={[{
+            when: row => row.id === selectedId,
+            style: { background: "#dbeafe", outline: "2px solid #2563eb", outlineOffset: "-2px" },
+          }]}
+        />
       </div>
-      <div className="relative flex min-h-0 flex-1 overflow-hidden">
-      <div className="min-h-0 min-w-0 flex-1 overflow-auto patient-list-scrollbar" tabIndex={0} aria-label="Patient register" onKeyDown={event => {
-        if (event.target !== event.currentTarget) return;
-        if (!["ArrowDown", "ArrowUp", "Enter"].includes(event.key) || !filtered.length) return;
-        event.preventDefault();
-        const index = filtered.findIndex(p => p.id === selectedId);
-        if (event.key === "Enter") { if (index >= 0) select(filtered[index]); return; }
-        const next = index < 0 ? 0 : Math.max(0, Math.min(filtered.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)));
-        setSelectedId(filtered[next].id);
-        [...modalRef.current.querySelectorAll("[data-patient-id]")].find(row => row.dataset.patientId === String(filtered[next].id))?.scrollIntoView({ block: "nearest" });
-      }}>
-        <table className="w-full min-w-[1000px] table-fixed border-collapse text-left text-xs">
-          <colgroup>{[10, 20, 6, 10, 12, 12, 8, 10, 12].map((width, index) => <col key={index} style={{ width: `${width}%` }} />)}</colgroup>
-          <thead className="sticky top-0 z-10 text-white" style={{ background: "var(--all-patients-accent)" }}><tr>{columns.map(column => <th key={column} scope="col" className="px-2 py-3">{column}</th>)}<th scope="col" className="sticky right-0 px-2 py-3" style={{ background: "var(--all-patients-accent)" }}>Actions</th></tr></thead>
-          <tbody>{filtered.map((p,index) => <tr key={p.id} data-patient-id={p.id} aria-selected={selectedId === p.id} onClick={() => setSelectedId(p.id)} onDoubleClick={() => select(p)} className="cursor-pointer" style={{ background: selectedId === p.id ? "#e5e7eb" : index % 2 ? "var(--color-surface-alt)" : "var(--color-surface)" }}>
-            {patientValues(p).map((value,i) => <td key={i} className="break-words border-b px-2 py-2.5" style={{ borderColor: "var(--color-border)" }}>{displayValue(value)}</td>)}
-            <td className="sticky right-0 border-b px-2 py-2.5" style={{ borderColor: "var(--color-border)", background: "inherit" }} onDoubleClick={event => event.stopPropagation()}>
-              <div className="flex gap-1">
-                <button type="button" aria-label={`View ${p.name}`} className="border px-2 py-1.5 font-semibold" style={{ borderColor: "var(--all-patients-accent)", color: "var(--all-patients-accent)", background: "var(--color-surface)" }} onClick={event => { viewButtonRef.current = event.currentTarget; setViewedPatient(p); }}>View</button>
-                <button type="button" aria-label={`Load ${p.name}`} className="px-2 py-1.5 font-semibold text-white" style={{ background: "var(--all-patients-accent)" }} onClick={() => select(p)}>Load</button>
-              </div>
-            </td>
-          </tr>)}</tbody>
-        </table>
-        {!filtered.length && <p className="p-8 text-center text-sm">No matching patients</p>}
+      <div className="flex items-center justify-between border-t px-5 py-3 text-xs" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}>
+        <span>{filtered.length} of {patients.length} patients · Click a row, then View or Load · Double-click to load</span>
+        <div className="flex gap-2">
+          <button type="button" disabled={!filtered.some(p => p.id === selectedId)} onClick={openView}
+            className="border px-4 py-2 font-semibold disabled:opacity-40"
+            style={{ borderColor: "var(--color-primary-dark)", color: "var(--color-primary-dark)", background: "var(--color-surface)" }}>View</button>
+          <button type="button" disabled={!filtered.some(p => p.id === selectedId)} onClick={() => select(filtered.find(p => p.id === selectedId))}
+            className="px-4 py-2 font-semibold text-white disabled:opacity-40" style={{ background: "var(--color-primary-dark)" }}>Load Patient</button>
+        </div>
       </div>
-      </div>
-      <div className="flex items-center justify-between border-t px-5 py-3 text-xs" style={{ borderColor: "var(--color-border)", background: "var(--color-surface-alt)" }}><span>{filtered.length} of {patients.length} patients · Double-click a row or press Enter to load</span><button disabled={!filtered.some(p => p.id === selectedId)} onClick={() => select(filtered.find(p => p.id === selectedId))} className="px-4 py-2 font-semibold text-white disabled:opacity-40" style={{ background: "var(--all-patients-accent)" }}>Load Patient</button></div>
     </div>
       {viewedPatient && <aside aria-label="Patient profile" className="list-modal-flat flex w-[340px] max-w-[45vw] shrink-0 flex-col overflow-hidden border shadow-xl" style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}>
-  <div className="flex items-center justify-between px-4 py-3 text-white" style={{ background: "var(--all-patients-accent)" }}>
+  <div className="flex items-center justify-between px-4 py-3 text-white" style={{ background: "var(--color-primary-dark)" }}>
     <h3 className="flex items-center gap-2 font-bold"><UserRound size={18} />Patient Information</h3>
     <button ref={profileCloseRef} type="button" onClick={closeProfile} className="bg-black/40 px-3 py-1.5 text-xs font-semibold">Close</button>
   </div>
@@ -144,7 +182,7 @@ export default function AllPatientsModal({ patients = [], verticalAnchorRef, onC
       <dd className="break-words font-medium">{displayValue(value)}</dd>
     </div>)}</dl>
   </div>
-  <div className="border-t p-3" style={{ borderColor: "var(--color-border)" }}><button type="button" onClick={() => select(viewedPatient)} className="w-full px-4 py-2 text-sm font-semibold text-white" style={{ background: "var(--all-patients-accent)" }}>Load Patient</button></div>
+  <div className="border-t p-3" style={{ borderColor: "var(--color-border)" }}><button type="button" onClick={() => select(viewedPatient)} className="w-full px-4 py-2 text-sm font-semibold text-white" style={{ background: "var(--color-primary-dark)" }}>Load Patient</button></div>
 </aside>}
     </div>
   </div>;

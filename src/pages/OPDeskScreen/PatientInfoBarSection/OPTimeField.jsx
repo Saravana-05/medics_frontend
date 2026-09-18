@@ -27,7 +27,7 @@ export default function OPTimeField({ patient, fieldStyle }) {
     <div className="grid h-7 grid-cols-[48px_minmax(0,1fr)] items-center text-xs">
       <span style={{ color: "var(--color-text-muted)" }}>OP Time</span>
       <div className="flex min-w-0 items-center justify-between px-1">
-        <span className="font-semibold tabular-nums">{timing.duration || "—"}</span>
+        <span className="flex-1 font-semibold tabular-nums text-center pr-1">{timing.duration || "—"}</span>
         <button type="button" aria-label="View OP time breakdown" onClick={() => dialogRef.current?.showModal()} className="shrink-0 p-1 text-green-600"><Info size={15} /></button>
       </div>
     </div>

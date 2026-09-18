@@ -4,6 +4,7 @@ import { localDateValue, prescriptionDuration, dateAfterDays, daysUntilDate } fr
 export default function FollowUpField({ drugs, fieldStyle }) {
   const [editable, setEditable] = useState(false);
   const [manualDays, setManualDays] = useState(0);
+  const [patientMessage, setPatientMessage] = useState(false);
   const today = localDateValue();
   const defaultDays = prescriptionDuration(drugs);
   const days = editable ? manualDays : defaultDays;
@@ -13,9 +14,14 @@ export default function FollowUpField({ drugs, fieldStyle }) {
   return <div className="grid grid-cols-[50px_38px_minmax(0,1fr)] items-center gap-1 min-w-0">
     <label className="flex min-w-0 flex-col items-start gap-0.5">
     <span className="whitespace-nowrap text-[10px]" style={{ color: "var(--color-text-muted)" }}>Follow Up</span>
-    <input type="checkbox" aria-label="Edit follow up" checked={editable}
-      onChange={event => { setManualDays(defaultDays); setEditable(event.target.checked); }}
-      className="shrink-0" />
+    <span className="flex items-center" style={{ gap: "15px" }}>
+      <input type="checkbox" aria-label="Edit follow up" title="Prescription printing" checked={editable}
+        onChange={event => { setManualDays(defaultDays); setEditable(event.target.checked); }}
+        className="shrink-0" />
+      <input type="checkbox" aria-label="Patient message" title="Hospital to patient message" checked={patientMessage}
+        onChange={event => setPatientMessage(event.target.checked)}
+        className="shrink-0" />
+    </span>
     </label>
     <input type="number" min="0" max="36500" step="1" aria-label="Follow up days" title="Follow up days"
       value={days} readOnly={!editable}

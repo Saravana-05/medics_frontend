@@ -16,6 +16,7 @@ export const EMERGENCY_CASES = [
 ];
 
 export function queueEntry(patient) {
+  if (!patient) return { patient, reports: [], types: [], posted: [] };
   const record = getPatientRecord(patient.id);
   const reports = REPORTS.filter(report => report.patientId === patient.id);
   const types = new Set(reports.map(report => report.type));

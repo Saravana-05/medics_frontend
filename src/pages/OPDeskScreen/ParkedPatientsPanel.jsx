@@ -6,7 +6,8 @@ import { queueEntry } from "./patientQueueData";
 
 export default function ParkedPatientsPanel({ panelHeight, patients = [], onSelectPatient }) {
   const [query, setQuery] = useState("");
-  const parked = patients.filter(patient => (patient.listSection === "parked" || patient.appointmentStatus === "parked")
+  const parked = patients.filter(patient => patient
+    && (patient.listSection === "parked" || patient.appointmentStatus === "parked")
     && matchesPatientFilter(patient, query, queueEntry(patient).types));
   return <div className="flex flex-col overflow-hidden rounded-lg shadow-xl" style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
     <div className="shrink-0 border-b px-3 py-3 text-md font-bold text-white" style={{ background: "#eb6367" }}>Parked Patients ({parked.length})</div>
