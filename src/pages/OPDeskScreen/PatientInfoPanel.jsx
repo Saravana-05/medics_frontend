@@ -143,7 +143,6 @@ const TABS = [
 ];
 
 const PROFILE_HEADER_H = 50;
-const HEADER_H = 190;
 const FOOTER_H = 40;
 
 export default function PatientInfoPanel({
@@ -199,6 +198,12 @@ export default function PatientInfoPanel({
     }
     return name.substring(0, 2).toUpperCase();
   };
+
+  // Header detail values — plain text, no icons/labels, shown in 2 rows separated by "|"
+  const headerRows = [
+    [`${p.age || "—"} yrs*`, p.gender || "—", p.bloodGroup || "—"],
+    ["18/06/1995*", "Adult", "Married"],
+  ];
 
   // Render content based on active tab
   const renderContent = () => {
@@ -298,61 +303,73 @@ export default function PatientInfoPanel({
         <span className="text-base font-bold text-white">Patient Information</span>
       </div>
 
-      {/* Compact patient identity header — Name left / Photo right on the
-          top row, everything else stacked full-width beneath both. */}
+      {/* Patient identity header: Name left / ID right, photo centered,
+          details in two columns (icon + value only, no labels). */}
       <div
-        className="flex-shrink-0 px-4 py-3 border-b flex flex-col gap-2"
+        className="flex-shrink-0 px-4 py-3 border-b flex flex-col gap-3"
         style={{
           background: "linear-gradient(135deg, #eef6fb 0%, #ffffff 100%)",
           borderColor: "var(--color-border)",
-          height: HEADER_H,
         }}
       >
+        {/* Row 1: name (left) + patient ID (right), no label */}
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-[1.125rem] font-bold truncate" style={{ color: "var(--color-text-base)" }}>{p.name || "—"}</h3>
+          <h3 className="text-[1.125rem] font-bold truncate" style={{ color: "var(--color-text-base)" }}>
+            {p.name || "—"}
+          </h3>
+          <span
+            className="flex-shrink-0 rounded-md px-2.5 py-1 text-[0.775rem] font-semibold"
+            style={{ background: "var(--color-primary-muted)", color: "var(--color-primary)" }}
+          >
+            {p.id || p.patientId || "—"}
+          </span>
+        </div>
 
-          <div className="relative flex-shrink-0 rounded-lg overflow-hidden group shadow-md"
+        {/* Row 2: photo, centered */}
+        <div className="flex justify-center">
+          <div
+            className="relative rounded-full overflow-hidden group shadow-md"
             style={{
-              width: 72,
-              height: 82,
+              width: 96,
+              height: 96,
               background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%)",
-              border: "2px solid white",
-            }}>
+              border: "3px solid white",
+            }}
+          >
             {p.photo && !imageError ? (
-              <img src={p.photo} alt={p.name} className="w-full h-full object-cover" onError={() => setImageError(true)} />
+              <img
+                src={p.photo}
+                alt={p.name}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: "center 20%" }}
+                onError={() => setImageError(true)}
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-white font-bold text-2xl">{getInitials()}</span>
+                <span className="text-white font-bold text-3xl">{getInitials()}</span>
               </div>
             )}
-            <button className="absolute bottom-1 right-1 p-1 rounded-full bg-white shadow-md transition-all opacity-0 group-hover:opacity-100" title="Change photo">
+            <button
+              className="absolute bottom-1 right-1 p-1 rounded-full bg-white shadow-md transition-all opacity-0 group-hover:opacity-100"
+              title="Change photo"
+            >
               <Camera size={10} style={{ color: "var(--color-primary)" }} />
             </button>
           </div>
         </div>
 
-        <div className="min-w-0">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[0.68rem] font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>Patient ID:</span>
-            <span className="text-[0.775rem] font-semibold" style={{ color: "var(--color-primary)" }}>{p.id || p.patientId || "—"}</span>
-          </div>
-          <div className="mt-1.5 space-y-1 text-sm" style={{ color: "var(--color-text-base)" }}>
-            <div className="flex items-center gap-2 whitespace-nowrap">
-              <span><span style={{ color: "var(--color-text-muted)" }}>Age:</span> <span className="font-bold">{p.age || "—"} yrs*</span></span>
-              <span style={{ color: "var(--color-border-strong)" }}>|</span>
-              <span><span style={{ color: "var(--color-text-muted)" }}>Gender:</span> <span className="font-bold">{p.gender || "—"}</span></span>
-              <span style={{ color: "var(--color-border-strong)" }}>|</span>
-              <span><span style={{ color: "var(--color-text-muted)" }}>Blood:</span> <span className="font-bold">{p.bloodGroup || "—"}</span></span>
+        {/* Row 3: details in 2 rows, values only, separated by pipes */}
+        <div className="flex flex-col items-center gap-1 text-sm" style={{ color: "var(--color-text-base)" }}>
+          {headerRows.map((row, i) => (
+            <div key={i} className="flex items-center gap-2 whitespace-nowrap">
+              {row.map((value, j) => (
+                <span key={j} className="flex items-center gap-2">
+                  {j > 0 && <span style={{ color: "var(--color-border-strong)" }}>|</span>}
+                  <span>{value}</span>
+                </span>
+              ))}
             </div>
-            <div className="flex items-center gap-2 whitespace-nowrap">
-              <span><span style={{ color: "var(--color-text-muted)" }}>DOB:</span> <span className="font-bold">18/06/1995<sup className="text-[0.95em]">*</sup></span></span>
-              <span style={{ color: "var(--color-border-strong)" }}>|</span>
-              <span><span style={{ color: "var(--color-text-muted)" }}>Age Group:</span> <span className="font-bold">Adult</span></span>
-            </div>
-            <div className="whitespace-nowrap">
-              <span><span style={{ color: "var(--color-text-muted)" }}>Marital Status:</span> <span className="font-bold">Married</span></span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
