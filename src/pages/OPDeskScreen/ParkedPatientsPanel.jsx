@@ -6,9 +6,12 @@ import { queueEntry } from "./patientQueueData";
 
 export default function ParkedPatientsPanel({ panelHeight, patients = [], onSelectPatient }) {
   const [query, setQuery] = useState("");
-  const parked = patients.filter(patient => patient
-    && (patient.listSection === "parked" || patient.appointmentStatus === "parked")
-    && matchesPatientFilter(patient, query, queueEntry(patient).types));
+  const parked = patients.filter(patient => {
+    if (!patient || (patient.listSection !== "parked" && patient.appointmentStatus !== "parked")) return false;
+    const entry = queueEntry(patient);
+    const parkReason = entry.types.length ? entry.types : ["****"];
+    return matchesPatientFilter(patient, query, [...entry.types, ...parkReason, patient.status, patient.appointmentStatus, patient.listSection]);
+  });
   return <div className="flex flex-col overflow-hidden shadow-xl" style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
     <div className="shrink-0 border-b px-3 py-3 text-md font-bold text-white" style={{ background: "#eb6367" }}>Parked Patients ({parked.length})</div>
     <PatientCardFilter query={query} onChange={setQuery} />

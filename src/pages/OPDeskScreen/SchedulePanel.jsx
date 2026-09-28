@@ -1,126 +1,189 @@
-import { useState } from "react";
-import { 
-  CalendarClock, Plus, X, Calendar, Clock, Check, 
-  Briefcase, Coffee, Video, Users as UsersIcon, MapPin 
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Archive, Calendar, ListFilter, Plus, RotateCcw, Trash2, X } from "lucide-react";
+
+const SCHEDULE_TYPES = ["Visits", "Rounds", "Break", "Meeting", "Virtual", "Training"];
+const SCHEDULE_STATUSES = ["Important", "Planned", "Completed"];
+
+const STATUS_STYLES = {
+  Important: { background: "#fcd34d", color: "#78350f" },
+  Planned: { background: "#bfdbfe", color: "#1e3a8a" },
+  Completed: { background: "#86efac", color: "#14532d" },
+};
+
+const TYPE_STYLES = {
+  Visits: { background: "#dcfce7", color: "#166534" },
+  Rounds: { background: "#dbeafe", color: "#1e3a8a" },
+  Break: { background: "#fef3c7", color: "#92400e" },
+  Meeting: { background: "#e0e7ff", color: "#3730a3" },
+  Virtual: { background: "#cffafe", color: "#155e75" },
+  Training: { background: "#ede9fe", color: "#5b21b6" },
+};
 
 const MOCK_SCHEDULES = [
-  { id: 1, time: "09:00 AM - 10:00 AM", title: "Morning Rounds", type: "Rounds", location: "Ward A" },
-  { id: 2, time: "10:00 AM - 11:00 AM", title: "Department Meeting", type: "Meeting", location: "Conference Room" },
-  { id: 3, time: "11:00 AM - 12:00 PM", title: "Coffee Break", type: "Break", location: "Doctors Lounge" },
-  { id: 4, time: "12:00 PM - 01:00 PM", title: "Lunch Break", type: "Break", location: "Cafeteria" },
-  { id: 5, time: "01:00 PM - 02:00 PM", title: "Research Discussion", type: "Meeting", location: "Library" },
-  { id: 6, time: "02:00 PM - 03:00 PM", title: "Telemedicine Session", type: "Virtual", location: "Online" },
-  { id: 7, time: "03:00 PM - 04:00 PM", title: "Patient Review", type: "Work", location: "Office" },
-  { id: 8, time: "04:00 PM - 05:00 PM", title: "Training Session", type: "Training", location: "Seminar Hall" },
+  { id: 1, date: "2024-03-03", timeFrom: "08:30", timeTo: "09:00", title: "OP Review Visits", type: "Visits", status: "Important", location: "OP Room 1" },
+  { id: 2, date: "2024-03-03", timeFrom: "09:00", timeTo: "09:45", title: "Morning Ward Rounds", type: "Rounds", status: "Important", location: "Ward A" },
+  { id: 3, date: "2024-03-03", timeFrom: "10:00", timeTo: "10:30", title: "Case Review Meeting", type: "Meeting", status: "Planned", location: "Conference Room" },
+  { id: 4, date: "2024-03-03", timeFrom: "10:45", timeTo: "11:00", title: "Tea Break", type: "Break", status: "Completed", location: "Doctors Lounge" },
+  { id: 5, date: "2024-03-03", timeFrom: "11:30", timeTo: "12:00", title: "Virtual Follow-up", type: "Virtual", status: "Planned", location: "Online" },
+  { id: 6, date: "2024-03-03", timeFrom: "12:15", timeTo: "13:00", title: "Nurse Training Review", type: "Training", status: "Planned", location: "Seminar Hall" },
+  { id: 7, date: "2024-03-03", timeFrom: "14:00", timeTo: "14:45", title: "Post-op Visits", type: "Visits", status: "Important", location: "Surgery Block" },
+  { id: 8, date: "2024-03-03", timeFrom: "16:00", timeTo: "16:30", title: "Evening Ward Rounds", type: "Rounds", status: "Planned", location: "Ward B" },
 ];
+
+const todayString = () => new Date().toISOString().split("T")[0];
+
+const formatDisplayTime = (time) => {
+  if (!time) return "";
+  const [hourText, minute] = time.split(":");
+  const hour = Number(hourText);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  return `${hour % 12 || 12}:${minute} ${suffix}`;
+};
+
+const scheduleTime = (item) => `${formatDisplayTime(item.timeFrom)} - ${formatDisplayTime(item.timeTo)}`;
 
 function SchedulePanel({ panelHeight }) {
   const headerH = 50;
+  const filterH = 51;
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
+  const [query, setQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState("2024-03-03");
   const [schedules, setSchedules] = useState(MOCK_SCHEDULES);
   const [newSchedule, setNewSchedule] = useState({
     title: "",
     timeFrom: "",
     timeTo: "",
-    type: "Meeting",
+    type: "Visits",
+    status: "Planned",
     location: "",
-    date: selectedDate
+    date: selectedDate,
   });
 
-  const filteredSchedules = schedules;
+  const filteredSchedules = useMemo(() => (
+    schedules
+      .filter(item => Boolean(item.archived) === showArchive)
+      .filter(item => !selectedDate || item.date === selectedDate)
+      .filter(item => {
+        const search = query.trim().toLowerCase();
+        if (!search) return true;
+        return [item.title, item.location, item.status, item.type, scheduleTime(item)]
+          .filter(Boolean)
+          .some(value => String(value).toLowerCase().includes(search));
+      })
+      .sort((a, b) => `${a.timeFrom}-${a.timeTo}`.localeCompare(`${b.timeFrom}-${b.timeTo}`))
+  ), [schedules, selectedDate, showArchive, query]);
 
   const handleAddSchedule = () => {
-    if (newSchedule.title && newSchedule.timeFrom && newSchedule.timeTo) {
-      setSchedules([
-        ...schedules,
-        { 
-          id: Date.now(), 
-          time: `${newSchedule.timeFrom} - ${newSchedule.timeTo}`,
-          title: newSchedule.title, 
-          type: newSchedule.type,
-          location: newSchedule.location || "—"
-        }
-      ]);
-      setNewSchedule({ title: "", timeFrom: "", timeTo: "", type: "Meeting", location: "", date: selectedDate });
-      setShowAddForm(false);
-    }
+    if (!newSchedule.title || !newSchedule.timeFrom || !newSchedule.timeTo) return;
+    setSchedules(prev => [
+      ...prev,
+      {
+        id: Date.now(),
+        date: selectedDate || todayString(),
+        timeFrom: newSchedule.timeFrom,
+        timeTo: newSchedule.timeTo,
+        title: newSchedule.title,
+        type: newSchedule.type,
+        status: newSchedule.status,
+        location: newSchedule.location || "-",
+      },
+    ]);
+    setNewSchedule({ title: "", timeFrom: "", timeTo: "", type: "Visits", status: "Planned", location: "", date: selectedDate });
+    setShowAddForm(false);
   };
 
-  const getTypeIcon = (type) => {
-    switch(type) {
-      case "Meeting": return <UsersIcon size={12} />;
-      case "Break": return <Coffee size={12} />;
-      case "Virtual": return <Video size={12} />;
-      default: return <Briefcase size={12} />;
-    }
+  const archiveSchedule = (id) => {
+    setSchedules(prev => prev.map(item => item.id === id ? { ...item, archived: true } : item));
   };
 
-  const getTypeColor = (type) => {
-    switch(type) {
-      case "Meeting": return "#1d4ed8";
-      case "Break": return "#d97706";
-      case "Virtual": return "#0891b2";
-      case "Training": return "#7c3aed";
-      default: return "var(--color-primary)";
-    }
+  const restoreSchedule = (id) => {
+    setSchedules(prev => prev.map(item => item.id === id ? { ...item, archived: false } : item));
   };
 
-  const getTypeBg = (type) => {
-    switch(type) {
-      case "Meeting": return "#dbeafe";
-      case "Break": return "#fef3c7";
-      case "Virtual": return "#cffafe";
-      case "Training": return "#ede9fe";
-      default: return "var(--color-primary-muted)";
-    }
+  const deleteSchedule = (id) => {
+    setSchedules(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearFilters = () => {
+    setQuery("");
   };
 
   return (
-    <div className="overflow-hidden rounded-lg shadow-xl"
+    <div className="flex flex-col overflow-hidden rounded-lg shadow-xl"
       style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
-      <div className="px-3 py-2 border-b"
-        style={{ background: "#0c324a", borderColor: "var(--color-border)" }}>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            {/* <CalendarClock size={16} style={{ color: "var(--color-drugs)" }} /> */}
-            <span className="text-md font-bold text-white" >
-              Doctor's Schedule
-            </span>
-          </div>
-
-        </div>
-
+      <div className="shrink-0 px-3 py-2 border-b flex items-center justify-between"
+        style={{ background: "#0c324a", borderColor: "var(--color-border)", height: headerH }}>
+        <span className="text-md font-bold text-white">Doctor's Schedule</span>
       </div>
 
-      {/* Date filter row — right-aligned with light-grey divider + drop shadow (matches ReportsPanel) */}
       <div
-        className="px-3 py-2 flex items-center justify-end gap-2"
-        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}
+        className="shrink-0 px-3 py-2"
+        style={{ borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 6px rgba(0,0,0,0.08)", minHeight: filterH }}
       >
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center justify-center rounded-lg transition-all hover:bg-black/5 flex-shrink-0"
-          style={{ width: 40, height: 40, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-          title="Add schedule"
-        >
-          <Plus size={24} style={{ color: "var(--color-drugs)", fontWeight: "bold" }} />
-        </button>
-        <div className="relative">
-          <Calendar size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="pl-9 pr-3 text-sm rounded-lg border"
-            style={{ height: 40, borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-          />
+        <div className="flex flex-nowrap items-center justify-end gap-1.5">
+          <button
+            type="button"
+            aria-label="Add schedule"
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="flex h-[34px] shrink-0 items-center justify-center rounded-none border"
+            style={{ width: 42, minWidth: 42, background: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-base)" }}
+            title="Add schedule"
+          >
+            <Plus size={16} />
+          </button>
+          <button
+            type="button"
+            aria-expanded={showFilters}
+            onClick={() => setShowFilters(value => !value)}
+            className="flex h-[34px] items-center gap-1 rounded-none border px-2 text-xs"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-text-base)" }}
+          >
+            <ListFilter size={14} /> Filter{query ? " •" : ""}
+          </button>
+          <button
+            type="button"
+            aria-pressed={showArchive}
+            onClick={() => setShowArchive(value => !value)}
+            className="flex h-[34px] items-center gap-1 rounded-none border px-2 text-xs"
+            style={{
+              background: showArchive ? "#e5e7eb" : "var(--color-surface)",
+              borderColor: "var(--color-border)",
+              color: "var(--color-text-base)",
+            }}
+            title="View archived schedules"
+          >
+            <Archive size={14} /> Archive
+          </button>
+          <div className="relative">
+            <Calendar size={15} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="h-[34px] w-[148px] rounded-none border pl-8 pr-1 text-xs"
+              style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            />
+          </div>
         </div>
+        {showFilters && (
+          <div className="mt-2 flex gap-2">
+            <input
+              type="search"
+              aria-label="Filter schedules"
+              placeholder="Title, location, status or time"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              className="min-w-0 flex-1 rounded-none border p-2 text-xs"
+              style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+            />
+            <button type="button" onClick={clearFilters} className="text-xs underline">Clear</button>
+          </div>
+        )}
       </div>
 
-      <div className="p-3 space-y-2 overflow-y-auto" style={{ height: panelHeight - headerH }}>
-        {/* Add Form — modal popup (schedule theme only), same pattern as ChronicAllergyPanel/PatientFamilyPanel */}
+      <div className="patient-card-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
         {showAddForm && (
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
@@ -128,125 +191,158 @@ function SchedulePanel({ panelHeight }) {
             onClick={() => setShowAddForm(false)}
           >
             <div
-              className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              className="w-full max-w-sm overflow-hidden rounded-lg shadow-2xl"
               style={{ background: "var(--color-surface)" }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3" style={{ background: "#0c324a" }}>
                 <span className="text-base font-bold text-white">Add Schedule</span>
-                <button onClick={() => setShowAddForm(false)} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
+                <button type="button" onClick={() => setShowAddForm(false)} className="p-1 transition-all hover:bg-white/20" title="Close">
                   <X size={20} className="text-white" />
                 </button>
               </div>
 
-              {/* Modal body */}
               <div className="p-4 space-y-3">
                 <input
                   type="text"
                   placeholder="Schedule Title"
                   value={newSchedule.title}
                   onChange={(e) => setNewSchedule({ ...newSchedule, title: e.target.value })}
-                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
                 <div className="flex gap-3">
                   <input
                     type="time"
-                    placeholder="From"
                     value={newSchedule.timeFrom}
                     onChange={(e) => setNewSchedule({ ...newSchedule, timeFrom: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
+                    className="min-w-0 flex-1 rounded-none border px-3 py-2 text-base outline-none"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                   />
                   <input
                     type="time"
-                    placeholder="To"
                     value={newSchedule.timeTo}
                     onChange={(e) => setNewSchedule({ ...newSchedule, timeTo: e.target.value })}
-                    className="flex-1 px-3 py-2 text-base rounded-lg border outline-none"
+                    className="min-w-0 flex-1 rounded-none border px-3 py-2 text-base outline-none"
                     style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                   />
                 </div>
                 <select
                   value={newSchedule.type}
                   onChange={(e) => setNewSchedule({ ...newSchedule, type: e.target.value })}
-                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 >
-                  <option value="Meeting">Meeting</option>
-                  <option value="Work">Work</option>
-                  <option value="Break">Break</option>
-                  <option value="Virtual">Virtual</option>
-                  <option value="Training">Training</option>
+                  {SCHEDULE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+                </select>
+                <select
+                  value={newSchedule.status}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, status: e.target.value })}
+                  className="w-full rounded-none border px-3 py-2 text-base outline-none"
+                  style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                >
+                  {SCHEDULE_STATUSES.map(status => <option key={status} value={status}>{status}</option>)}
                 </select>
                 <input
                   type="text"
                   placeholder="Location (optional)"
                   value={newSchedule.location}
                   onChange={(e) => setNewSchedule({ ...newSchedule, location: e.target.value })}
-                  className="w-full px-3 py-2 text-base rounded-lg border outline-none"
+                  className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 />
               </div>
 
-              {/* Modal footer */}
               <div className="flex gap-3 px-4 pb-4">
                 <button
+                  type="button"
                   onClick={handleAddSchedule}
-                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-none px-3 py-2 text-base font-semibold"
                   style={{ background: "var(--color-success)", color: "white" }}
                 >
-                  <Check size={16} /> Add
+                  Add
                 </button>
                 <button
+                  type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-none px-3 py-2 text-base font-semibold"
                   style={{ background: "var(--color-danger)", color: "white" }}
                 >
-                  <X size={16} /> Cancel
+                  Cancel
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Schedule List */}
         {filteredSchedules.length === 0 ? (
-          <div className="text-center py-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            No schedules for this date
+          <div className="py-4 text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
+            {showArchive ? "No archived schedules for this date" : "No schedules for this date"}
           </div>
         ) : (
           filteredSchedules.map((item) => {
-            const typeColor = getTypeColor(item.type);
-            const typeBg = getTypeBg(item.type);
-            const TypeIcon = getTypeIcon(item.type);
-            
+            const statusStyle = STATUS_STYLES[item.status] || STATUS_STYLES.Planned;
+            const typeStyle = TYPE_STYLES[item.type] || TYPE_STYLES.Visits;
+
             return (
-              <div key={item.id} className="p-2 rounded-lg border hover:shadow-sm transition-all"
+              <div key={item.id} className="border p-2 transition-all hover:shadow-sm"
                 style={{ borderColor: "var(--color-border)" }}>
                 <div className="flex items-start gap-2">
-                  <div className="p-1.5 rounded-lg flex-shrink-0" style={{ background: typeBg }}>
-                    {TypeIcon}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{item.title}</div>
-                      <span className="text-[0.6rem] font-bold px-1.5 py-0.5 rounded"
-                        style={{ background: typeBg, color: typeColor }}>
-                        {item.type}
-                      </span>
-                    </div>
-                    <div className="text-xs mt-1 flex items-center gap-2" style={{ color: "var(--color-text-muted)" }}>
-                      <Clock size={10} />
-                      <span className="font-mono">{item.time}</span>
-                    </div>
-                    {item.location && item.location !== "—" && (
-                      <div className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
-                        <MapPin size={10} />
-                        <span>{item.location}</span>
-                      </div>
+                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-bold"
+                    style={{ background: statusStyle.background, color: statusStyle.color }}>
+                    {item.status}
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{item.title}</div>
+                    {item.location && item.location !== "-" && (
+                      <div className="mt-1 truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{item.location}</div>
                     )}
+                  </div>
+
+                  <div className="shrink-0 text-right">
+                    <div className="flex items-start justify-end gap-1">
+                      <div className="inline-block px-1.5 py-0.5 text-[10px] font-bold"
+                        style={{ background: typeStyle.background, color: typeStyle.color }}>
+                        {item.type}
+                      </div>
+                      {showArchive ? (
+                        <button
+                          type="button"
+                          aria-label="Restore schedule"
+                          onClick={() => restoreSchedule(item.id)}
+                          className="flex h-6 w-6 items-center justify-center rounded-none border"
+                          style={{ borderColor: "var(--color-border)", color: "var(--color-success)" }}
+                          title="Restore schedule"
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          aria-label="Archive schedule"
+                          onClick={() => archiveSchedule(item.id)}
+                          className="flex h-6 w-6 items-center justify-center rounded-none border"
+                          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+                          title="Archive schedule"
+                        >
+                          <Archive size={13} />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        aria-label="Delete schedule"
+                        onClick={() => deleteSchedule(item.id)}
+                        className="flex h-6 w-6 items-center justify-center rounded-none border"
+                        style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }}
+                        title="Delete schedule"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                    <div className="mt-1 whitespace-nowrap text-[11px] font-bold tabular-nums" style={{ color: "var(--color-text-base)" }}>
+                      {scheduleTime(item)}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -6,7 +6,7 @@ export default function PatientCardFilter({ query, onChange, children }) {
   return <div className="shrink-0 border-b px-3 py-2" style={{ borderColor: "var(--color-border)" }}>
     <div className="flex flex-wrap items-center justify-end gap-2">
       <button type="button" aria-expanded={open} onClick={() => setOpen(value => !value)}
-        className="flex items-center gap-1 rounded-none border px-2 py-2 text-xs"
+        className="flex h-[34px] items-center gap-1 rounded-none border px-2 text-xs"
         style={{ borderColor: "var(--color-border)", color: "var(--color-text-base)" }}>
         <ListFilter size={14} /> Filter{query ? " •" : ""}
       </button>

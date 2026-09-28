@@ -27,6 +27,22 @@ function buildFinancialPeriods(currentPeriod) {
 const CURRENT_PERIOD = getCurrentPeriod();
 const FINANCIAL_PERIODS = buildFinancialPeriods(CURRENT_PERIOD);
 
+function parseVisitDateTime(value) {
+  const [dateText = "", timeText = "00:00"] = String(value || "").split(" ");
+  const [day, month, year] = dateText.split("/").map(Number);
+  if (!day || !month || !year) return null;
+  const [hour = 0, minute = 0] = timeText.split(":").map(Number);
+  return new Date(year, month - 1, day, hour || 0, minute || 0);
+}
+
+function latestVisit(previousVisits = []) {
+  return previousVisits
+    .filter(visit => visit?.entryDt)
+    .map(visit => ({ ...visit, visitDate: parseVisitDateTime(visit.entryDt) }))
+    .filter(visit => visit.visitDate && !Number.isNaN(visit.visitDate.getTime()))
+    .sort((left, right) => right.visitDate - left.visitDate)[0];
+}
+
 function withCurrentPeriod(periods) {
   const base = periods && periods.length ? periods : [];
   const next = base.includes(CURRENT_PERIOD) ? base : [...base, CURRENT_PERIOD];
@@ -35,11 +51,13 @@ function withCurrentPeriod(periods) {
     .sort((left, right) => FINANCIAL_PERIODS.indexOf(left) - FINANCIAL_PERIODS.indexOf(right));
 }
 
-function PeriodPanel({ patient, panelHeight, appliedPeriods = FINANCIAL_PERIODS.slice(-2), onRun }) {
+function PeriodPanel({ patient, panelHeight, appliedPeriods = FINANCIAL_PERIODS.slice(-2), previousVisits = [], onRun }) {
   // selectedStack keeps insertion order: last item = most recently added = the only one poppable next.
   const [selectedStack, setSelectedStack] = useState(() => withCurrentPeriod(appliedPeriods));
   const [isRunning, setIsRunning] = useState(false);
   const firstVisit = patient?.todaysVisit?.firstVisit || String(patient?.docDate || "").split(" ")[0] || "—";
+  const lastVisit = latestVisit(previousVisits);
+  const lastVisitDate = String(lastVisit?.entryDt || "").split(" ")[0] || "—";
 
   const firstVisitPeriodIndex = (() => {
     const [day, month, year] = firstVisit.split("/").map(Number);
@@ -109,6 +127,11 @@ function PeriodPanel({ patient, panelHeight, appliedPeriods = FINANCIAL_PERIODS.
         <section className="flex items-center justify-between gap-3 pb-3">
           <div className="text-xs font-bold" style={{ color: "#0c324a" }}>Current Patient&apos;s First Visit</div>
           <div className="text-right text-sm" style={{ color: "var(--color-text-base)" }}>{firstVisit}</div>
+        </section>
+
+        <section className="flex items-center justify-between gap-3 border-t py-3" style={{ borderColor: "var(--color-border)" }}>
+          <div className="text-xs font-bold" style={{ color: "#0c324a" }}>Current Patient&apos;s Last Visit</div>
+          <div className="text-right text-sm" style={{ color: "var(--color-text-base)" }}>{lastVisitDate}</div>
         </section>
 
         <section className="border-t pt-3" style={{ borderColor: "var(--color-border)" }}>

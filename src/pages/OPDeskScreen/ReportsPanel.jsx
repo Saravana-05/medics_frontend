@@ -45,8 +45,8 @@ function ReportsPanel({ panelHeight, patients = [] }) {
             aria-label="Filter by report date"
             value={selectedDate}
             onChange={(e) => handleDateFilter(e.target.value)}
-            className="pl-9 pr-3 text-sm rounded-none border"
-            style={{ height: 40, borderColor: "var(--color-border)", background: "var(--color-surface)" }}
+            className="h-[34px] pl-9 pr-3 text-sm rounded-none border"
+            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
             placeholder="Filter by date"
           />
         </div>
@@ -59,9 +59,9 @@ function ReportsPanel({ panelHeight, patients = [] }) {
             const badgeStyle = getTypeBadgeStyle(item.type);
             const patient = patientFor(item.patientId);
             const statusBadge = item.status === "Pending"
-              ? { label: item.status, background: "#fcd34d", color: "#78350f", position: "right" }
-              : { label: item.status, background: "#86efac", color: "#14532d", position: "right" };
-            const typeBadge = { label: item.type, background: badgeStyle.bg, color: badgeStyle.color, position: "left" };
+              ? { label: item.status, background: "#fcd34d", color: "#78350f", position: "left" }
+              : { label: item.status, background: "#86efac", color: "#14532d", position: "left" };
+            const typeBadge = { label: item.type, background: badgeStyle.bg, color: badgeStyle.color, position: "right" };
             return (
               <div key={i} className="p-2 border" style={{ borderColor: "var(--color-border)" }}>
                 <PatientCardDetails patient={patient} status={[typeBadge, statusBadge]} />

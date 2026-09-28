@@ -42,7 +42,7 @@ const SIDEBAR_WIDTH = 78;
 const GAP           = 8;
 const BOTTOM_MARGIN = 16;
 
-export default function LeftSidebar({ activePanel, onPanelChange, patient, onHoverChange, visitPeriods, onVisitPeriodsRun }) {
+export default function LeftSidebar({ activePanel, onPanelChange, patient, onHoverChange, visitPeriods, previousVisits, onVisitPeriodsRun }) {
   const [hoveredKey,  setHoveredKey]  = useState(null);
   const [panelTop,    setPanelTop]    = useState(0);
   const [panelHeight, setPanelHeight] = useState(480);
@@ -155,7 +155,7 @@ export default function LeftSidebar({ activePanel, onPanelChange, patient, onHov
         );
         break;
       case "period":
-        content = <PeriodPanel patient={patient} panelHeight={panelHeight} appliedPeriods={visitPeriods} onRun={onVisitPeriodsRun} />;
+        content = <PeriodPanel patient={patient} panelHeight={panelHeight} appliedPeriods={visitPeriods} previousVisits={previousVisits} onRun={onVisitPeriodsRun} />;
         break;
       default:
         return null;

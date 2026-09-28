@@ -314,7 +314,7 @@ export default function OPDeskScreen({ user, onLogout }) {
           internally, so the main workspace below always keeps usable space. */}
       <div className="flex-shrink-0 flex items-stretch gap-[5px] max-h-screen overflow-y-auto md:max-h-none lg:h-[240px] lg:min-h-[240px] lg:max-h-[240px] lg:overflow-visible">
         <div className="flex-shrink-0 flex mb-[8px]">
-          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} visitPeriods={visitPeriods} onVisitPeriodsRun={setVisitPeriods} />
+          <LeftSidebar activePanel={leftPanel} onPanelChange={setLeftPanel} patient={selectedPatient} onHoverChange={setLeftHighlightedTab} visitPeriods={visitPeriods} previousVisits={allVisits} onVisitPeriodsRun={setVisitPeriods} />
         </div>
 
         <div className="flex-1 flex">
