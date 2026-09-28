@@ -31,12 +31,12 @@ const EDITABLE_GROUPS = ["Grand Parents", "Parents", "Siblings", "Children"];
 // (Grand Parents is fixed at 4 slots — Paternal/Maternal x Grand Father/Grand Mother — so no add/remove there.)
 const ADD_REMOVE_GROUPS = ["Siblings", "Children"];
 
-// Header text color for each group section label.
+// Header text color for each group section label (dark blue).
 const GROUP_HEADER_COLORS = {
-  "Grand Parents": "#c0392b", // red
-  Parents: "#27ae60", // green
-  Siblings: "#2980b9", // blue
-  Children: "#8e44ad", // violet
+  "Grand Parents": "#1e3a8a",
+  Parents: "#1e3a8a",
+  Siblings: "#1e3a8a",
+  Children: "#1e3a8a",
 };
 
 function PatientFamilyPanel({ panelHeight, onUpdate }) {
@@ -307,11 +307,17 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
             const isEditable = EDITABLE_GROUPS.includes(group);
 
             if (group === "Grand Parents") {
-              const grandparentItems = items.filter((member) => member.relation === group);
+              // One row per person, in order: Paternal Grand Father, Paternal Grand Mother,
+              // Maternal Grand Father, Maternal Grand Mother.
+              const grandparentItems = items
+                .filter((member) => member.relation === group)
+                .sort((left, right) =>
+                  GRANDPARENT_SIDES.indexOf(left.side) - GRANDPARENT_SIDES.indexOf(right.side)
+                  || GROUP_ROLES[group].indexOf(left.role) - GROUP_ROLES[group].indexOf(right.role));
               return (
                 <section key={group} className={groupIndex > 0 ? "pt-1" : ""}>
                   <div className="mb-1 flex items-center justify-between">
-                    <h3 className="text-xs font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
+                    <h3 className="text-[14px] font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
                     {isEditable && (
                       <button
                         onClick={() => openGroupEdit(group)}
@@ -323,32 +329,28 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                       </button>
                     )}
                   </div>
-                  {GRANDPARENT_SIDES.map((side) => {
-                    const sideItems = grandparentItems
-                      .filter((member) => member.side === side)
-                      .sort((left, right) => GROUP_ROLES[group].indexOf(left.role) - GROUP_ROLES[group].indexOf(right.role));
-                    if (sideItems.length === 0) return null;
-                    return (
-                      <div key={side} className="mb-1">
-                        <div className="px-2 pt-1 text-[0.65rem] font-bold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
-                          {side}
+                  <div className="grid grid-cols-1 gap-0">
+                    {grandparentItems.map((member) => (
+                      <div
+                        key={`${group}-${member.side}-${member.role}`}
+                        className="flex items-center gap-2 border-b px-2 py-1"
+                        style={{ borderColor: "var(--color-border)" }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-xs font-bold" style={{ color: "var(--color-text-muted)" }}>
+                            {member.role}{" "}
+                            <span className="font-normal">({member.side})</span>
+                          </div>
+                          <div className="truncate text-[0.65rem]" title={`${member.name}, ${member.age} years`} style={{ color: "var(--color-text-muted)" }}>
+                            {member.name || "—"} · {member.age || "—"} yrs
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 px-2 pb-1">
-                          {sideItems.map((member) => (
-                            <div
-                              key={`${group}-${side}-${member.role}`}
-                              className="min-w-0 border-b pb-1"
-                              style={{ borderColor: "var(--color-border)" }}
-                            >
-                              <div className="truncate text-[0.65rem]" style={{ color: "var(--color-text-muted)" }}>{member.role}</div>
-                              <div className="truncate text-[0.65rem]" title={`${member.name}, ${member.age} years`} style={{ color: "var(--color-text-muted)" }}>{member.name || "—"} · {member.age || "—"} yrs</div>
-                              <div className="truncate text-[0.65rem]" title={member.condition} style={{ color: "var(--color-text-base)" }}>{member.condition || "—"}</div>
-                            </div>
-                          ))}
-                        </div>
+                        <span className="max-w-[42%] shrink-0 truncate text-right text-sm" title={member.condition} style={{ color: "var(--color-text-base)" }}>
+                          {member.condition || "—"}
+                        </span>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </section>
               );
             }
@@ -362,7 +364,7 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                 className={groupIndex > 0 ? "pt-1" : ""}
               >
                 <div className="mb-1 flex items-center justify-between">
-                  <h3 className="text-xs font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
+                  <h3 className="text-[14px] font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
                   {isEditable && (
                     <button
                       onClick={() => openGroupEdit(group)}

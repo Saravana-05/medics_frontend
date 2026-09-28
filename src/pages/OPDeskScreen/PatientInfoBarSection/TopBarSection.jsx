@@ -111,8 +111,8 @@ export default function TopBarSection({ patient, patients, drugs, services, onPa
                 <span>Al<ShortcutLetter>l</ShortcutLetter> Patients</span>
               </button>
               <button
-                data-page-shortcut="k"
-                aria-label="Park (Alt+K)"
+                data-page-shortcut="d"
+                aria-label="Hold (Alt+D)"
                 onClick={() => {
                   setActiveTab("park");
                   onPark?.();
@@ -122,7 +122,7 @@ export default function TopBarSection({ patient, patients, drugs, services, onPa
                 onMouseEnter={() => setHoveredTab("park")}
                 onMouseLeave={() => setHoveredTab(null)}
               >
-                <span>Par<ShortcutLetter>k</ShortcutLetter></span>
+                <span>Hol<ShortcutLetter>d</ShortcutLetter></span>
               </button>
               <button
                 data-page-shortcut="z"

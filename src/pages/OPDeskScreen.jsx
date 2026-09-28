@@ -115,13 +115,15 @@ export default function OPDeskScreen({ user, onLogout }) {
   // Never intercept shortcuts while the user is typing or choosing a value.
   useEffect(() => {
     const handlePageShortcut = event => {
-      if (!event.altKey || event.shiftKey || event.ctrlKey || event.metaKey || event.repeat) return;
+      if (event.shiftKey || event.ctrlKey || event.metaKey || event.repeat) return;
 
       const target = event.target;
       if (target instanceof Element && target.closest("input, textarea, select, [contenteditable='true']")) return;
 
       const shortcut = String(event.key || "").toLowerCase();
       if (!/^[a-z0-9]$/.test(shortcut)) return;
+      const directShortcuts = new Set(["d", "k"]);
+      if (!event.altKey && !directShortcuts.has(shortcut)) return;
 
       // A modal rendered via a portal is appended after the main app root, so
       // when both a background control and a modal's control share the same

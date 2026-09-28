@@ -9,7 +9,7 @@ const RIGHT_TABS = [
   {
     key: "parked",
     label: "Parked",
-    shortcut: "d",
+    shortcut: "k",
     color: "#eb6367",
   },
   {
@@ -131,10 +131,11 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
         break;
       case "emergency":
         content = <EmergencyPatientsPanel panelHeight={panelHeight} patients={patients} removedIds={removedEmergencyIds}
+          onSelectPatient={patient => { onSelectPatient(patient); onPanelChange(null); }}
           onRemove={id => setRemovedEmergencyIds(ids => [...new Set([...ids, id])])} />;
         break;
       case "reports":
-        content = <ReportsPanel panelHeight={panelHeight} patients={patients} />;
+        content = <ReportsPanel panelHeight={panelHeight} patients={patients} onSelectPatient={patient => { onSelectPatient(patient); onPanelChange(null); }} />;
         break;
       case "schedule":
         content = <SchedulePanel panelHeight={panelHeight} />;

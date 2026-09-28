@@ -3,6 +3,10 @@ import { queueEntry } from "./patientQueueData";
 const present = value => value !== undefined && value !== null && value !== "" && value !== "—";
 const unit = (value, suffix) => present(value)
   ? `${String(value).replace(new RegExp(`\\s*${suffix}$`, "i"), "")} ${suffix}` : null;
+const computeBmi = (height, weight) => {
+  const h = parseFloat(height), w = parseFloat(weight);
+  return h > 50 && w > 0 ? (w / ((h / 100) ** 2)).toFixed(1) : null; // h in cm
+};
 
 // Doc: a parked patient's reason is Lab, Service, or unspecified/temporary ("***" —
 // discussion with another doctor, rest for BP check, urgent drip, etc). Lab/Service
@@ -27,8 +31,27 @@ function resolveParkReason(patient, entryTypes = []) {
 }
 
 // A thin horizontal rule between sections of the card.
-function Divider() {
-  return <div style={{ borderTop: "1px solid var(--color-border)" }} className="my-1.5" />;
+function Divider({ compact = false }) {
+  return <div style={{ borderTop: "1px solid var(--color-border)" }} className={compact ? "my-1" : "my-1.5"} />;
+}
+
+function waitSince(value) {
+  if (!present(value)) return null;
+  const match = String(value).match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+  if (!match) return null;
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const meridiem = match[3]?.toLowerCase();
+  if (meridiem === "pm" && hour < 12) hour += 12;
+  if (meridiem === "am" && hour === 12) hour = 0;
+  const now = new Date();
+  const then = new Date(now);
+  then.setHours(hour, minute, 0, 0);
+  if (then > now) then.setDate(then.getDate() - 1);
+  const totalMinutes = Math.max(0, Math.floor((now - then) / 60000));
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
 // Additional reference fields stay inside the existing compact sidebar cards.
@@ -40,7 +63,9 @@ function Divider() {
 // badges (e.g. ReportsPanel) takes full control, so a patient who happens to
 // be both parked and have a report doesn't get the reason shown twice. Every
 // badge's label is excluded from the services row below so nothing repeats there.
-export default function PatientCardDetails({ patient, types = [], status }) {
+// `hideAppointment` hides the slot/sched time; `waitTime` (string or null) overrides
+// patient.waitTime when provided.
+export default function PatientCardDetails({ patient, types = [], status, hideAppointment = false, waitTime, compact = false, hideServices = false }) {
   const entry = queueEntry(patient);
   const parkBadge = status ? null : resolveParkReason(patient, entry.types);
   const badges = [parkBadge, ...(Array.isArray(status) ? status : status ? [status] : [])].filter(Boolean);
@@ -48,6 +73,7 @@ export default function PatientCardDetails({ patient, types = [], status }) {
   const rightBadges = badges.filter(badge => badge.position !== "left");
   const badgeLabels = new Set(badges.map(badge => badge.label));
   const services = [...new Set([...entry.types, ...types])].filter(type => !badgeLabels.has(type));
+  const bmi = present(patient.bmi) ? patient.bmi : computeBmi(patient.height, patient.weight);
   const vitals = [
     present(patient.bpSystolic) && present(patient.bpDiastolic) ? `BP ${patient.bpSystolic}/${patient.bpDiastolic}` : null,
     present(patient.temp) ? `${String(patient.temp).replace(/\s*°?F$/i, "")} °F` : null,
@@ -56,12 +82,20 @@ export default function PatientCardDetails({ patient, types = [], status }) {
     patient.bloodGroup,
     present(patient.height) && /^\d+(\.\d+)?$/.test(String(patient.height)) ? unit(patient.height, "cm") : patient.height,
     unit(patient.weight, "kg"),
-    present(patient.bmi) ? `BMI ${patient.bmi}` : null,
+    present(bmi) ? `BMI ${bmi}` : null,
   ].filter(present);
+
+  const resolvedWaitTime = waitTime !== undefined
+    ? waitTime
+    : patient.waitTime || waitSince(patient.reportedTime || patient.attendedTime || patient.slot || patient.sched);
   const identity = [
     patient.patientId || (!patient.id?.startsWith("emergency-") ? patient.id : null),
-    [patient.token || patient.appt, patient.slot || patient.sched].filter(present).join(" · "),
-    ...[patient.room || patient.ipInfo?.room, patient.attendedTime, patient.waitTime].filter(value => present(value) && value !== "-"),
+    [patient.token || patient.appt, hideAppointment ? null : (patient.slot || patient.sched)].filter(present).join(" · "),
+    ...[
+      patient.room || patient.ipInfo?.room,
+      patient.attendedTime,
+      resolvedWaitTime,
+    ].filter(value => present(value) && value !== "-"),
   ].filter(present);
   const observation = patient.firstObservation || patient.complaint || patient.chiefComplaint || "Observation: Not recorded";
 
@@ -83,22 +117,22 @@ export default function PatientCardDetails({ patient, types = [], status }) {
         </span>
       )}
     </div>
-    <Divider />
+    <Divider compact={compact} />
 
     {identity.length > 0 && <>
       <div>{identity.join(" | ")}</div>
-      <Divider />
+      <Divider compact={compact} />
     </>}
 
-    <div aria-label="Vitals" className="truncate text-[10px]">
+    <div aria-label="Vitals" className={`${compact ? "whitespace-nowrap text-[9px] leading-3" : "truncate text-[10px]"}`}>
       {vitals.length ? vitals.join(" | ") : "Vitals: Not recorded"}
     </div>
-    <Divider />
+    <Divider compact={compact} />
 
     <div style={{ color: "var(--color-text-base)" }}>{observation}</div>
 
-    {services.length > 0 && <>
-      <Divider />
+    {!hideServices && services.length > 0 && <>
+      <Divider compact={compact} />
       <div>{services.join(" / ")}</div>
     </>}
   </div>;

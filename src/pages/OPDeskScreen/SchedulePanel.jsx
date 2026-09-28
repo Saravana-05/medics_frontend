@@ -1,8 +1,29 @@
 import { useMemo, useState } from "react";
-import { Archive, Calendar, ListFilter, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { Archive, Calendar, ListFilter, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 
 const SCHEDULE_TYPES = ["Visits", "Rounds", "Break", "Meeting", "Virtual", "Training"];
 const SCHEDULE_STATUSES = ["Important", "Planned", "Completed"];
+const BASE_SCHEDULE_TITLES = [
+  "OP Review Visits",
+  "Morning Ward Rounds",
+  "Case Review Meetings",
+  "Tea Break",
+  "Virtual Follow-up",
+  "Nurse Training Review",
+  "Post-op Visits",
+  "Evening Ward Rounds",
+  "Other",
+];
+const blankSchedule = {
+  title: "",
+  otherTitle: "",
+  timeFrom: "",
+  timeTo: "",
+  type: "",
+  status: "",
+  location: "",
+};
 
 const STATUS_STYLES = {
   Important: { background: "#fcd34d", color: "#78350f" },
@@ -22,7 +43,7 @@ const TYPE_STYLES = {
 const MOCK_SCHEDULES = [
   { id: 1, date: "2024-03-03", timeFrom: "08:30", timeTo: "09:00", title: "OP Review Visits", type: "Visits", status: "Important", location: "OP Room 1" },
   { id: 2, date: "2024-03-03", timeFrom: "09:00", timeTo: "09:45", title: "Morning Ward Rounds", type: "Rounds", status: "Important", location: "Ward A" },
-  { id: 3, date: "2024-03-03", timeFrom: "10:00", timeTo: "10:30", title: "Case Review Meeting", type: "Meeting", status: "Planned", location: "Conference Room" },
+  { id: 3, date: "2024-03-03", timeFrom: "10:00", timeTo: "10:30", title: "Case Review Meetings", type: "Meeting", status: "Planned", location: "Conference Room" },
   { id: 4, date: "2024-03-03", timeFrom: "10:45", timeTo: "11:00", title: "Tea Break", type: "Break", status: "Completed", location: "Doctors Lounge" },
   { id: 5, date: "2024-03-03", timeFrom: "11:30", timeTo: "12:00", title: "Virtual Follow-up", type: "Virtual", status: "Planned", location: "Online" },
   { id: 6, date: "2024-03-03", timeFrom: "12:15", timeTo: "13:00", title: "Nurse Training Review", type: "Training", status: "Planned", location: "Seminar Hall" },
@@ -46,20 +67,15 @@ function SchedulePanel({ panelHeight }) {
   const headerH = 50;
   const filterH = 51;
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingScheduleId, setEditingScheduleId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("2024-03-03");
   const [schedules, setSchedules] = useState(MOCK_SCHEDULES);
-  const [newSchedule, setNewSchedule] = useState({
-    title: "",
-    timeFrom: "",
-    timeTo: "",
-    type: "Visits",
-    status: "Planned",
-    location: "",
-    date: selectedDate,
-  });
+  const [scheduleTitles, setScheduleTitles] = useState(BASE_SCHEDULE_TITLES);
+  const [newSchedule, setNewSchedule] = useState(blankSchedule);
+  const [deleteCandidate, setDeleteCandidate] = useState(null);
 
   const filteredSchedules = useMemo(() => (
     schedules
@@ -75,23 +91,51 @@ function SchedulePanel({ panelHeight }) {
       .sort((a, b) => `${a.timeFrom}-${a.timeTo}`.localeCompare(`${b.timeFrom}-${b.timeTo}`))
   ), [schedules, selectedDate, showArchive, query]);
 
-  const handleAddSchedule = () => {
-    if (!newSchedule.title || !newSchedule.timeFrom || !newSchedule.timeTo) return;
-    setSchedules(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        date: selectedDate || todayString(),
-        timeFrom: newSchedule.timeFrom,
-        timeTo: newSchedule.timeTo,
-        title: newSchedule.title,
-        type: newSchedule.type,
-        status: newSchedule.status,
-        location: newSchedule.location || "-",
-      },
-    ]);
-    setNewSchedule({ title: "", timeFrom: "", timeTo: "", type: "Visits", status: "Planned", location: "", date: selectedDate });
+  const scheduleTitle = () => newSchedule.title === "Other" ? newSchedule.otherTitle.trim() : newSchedule.title;
+
+  const resetScheduleForm = () => {
+    setNewSchedule(blankSchedule);
+    setEditingScheduleId(null);
     setShowAddForm(false);
+  };
+
+  const handleSaveSchedule = () => {
+    const title = scheduleTitle();
+    if (!title || !newSchedule.timeFrom || !newSchedule.timeTo || !newSchedule.type || !newSchedule.status) return;
+    const payload = {
+      date: selectedDate || todayString(),
+      timeFrom: newSchedule.timeFrom,
+      timeTo: newSchedule.timeTo,
+      title,
+      type: newSchedule.type,
+      status: newSchedule.status,
+      location: newSchedule.location || "-",
+    };
+    setSchedules(prev => editingScheduleId
+      ? prev.map(item => item.id === editingScheduleId ? { ...item, ...payload } : item)
+      : [...prev, { id: Date.now(), ...payload }]);
+    resetScheduleForm();
+  };
+
+  const openAddSchedule = () => {
+    setNewSchedule(blankSchedule);
+    setEditingScheduleId(null);
+    setShowAddForm(true);
+  };
+
+  const openEditSchedule = (item) => {
+    const title = scheduleTitles.includes(item.title) ? item.title : "Other";
+    setNewSchedule({
+      title,
+      otherTitle: title === "Other" ? item.title : "",
+      timeFrom: item.timeFrom || "",
+      timeTo: item.timeTo || "",
+      type: item.type || "",
+      status: item.status || "",
+      location: item.location === "-" ? "" : item.location || "",
+    });
+    setEditingScheduleId(item.id);
+    setShowAddForm(true);
   };
 
   const archiveSchedule = (id) => {
@@ -104,10 +148,18 @@ function SchedulePanel({ panelHeight }) {
 
   const deleteSchedule = (id) => {
     setSchedules(prev => prev.filter(item => item.id !== id));
+    setDeleteCandidate(null);
   };
 
   const clearFilters = () => {
     setQuery("");
+  };
+
+  const addOtherScheduleTitle = () => {
+    const title = newSchedule.otherTitle.trim();
+    if (!title) return;
+    setScheduleTitles(prev => prev.includes(title) ? prev : [...prev.filter(item => item !== "Other"), title, "Other"]);
+    setNewSchedule(current => ({ ...current, title, otherTitle: "" }));
   };
 
   return (
@@ -126,7 +178,7 @@ function SchedulePanel({ panelHeight }) {
           <button
             type="button"
             aria-label="Add schedule"
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={openAddSchedule}
             className="flex h-[34px] shrink-0 items-center justify-center rounded-none border"
             style={{ width: 42, minWidth: 42, background: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text-base)" }}
             title="Add schedule"
@@ -154,7 +206,7 @@ function SchedulePanel({ panelHeight }) {
             }}
             title="View archived schedules"
           >
-            <Archive size={14} /> Archive
+            <Archive size={14} /> {showArchive ? "Unarchive" : "Archive"}
           </button>
           <div className="relative">
             <Calendar size={15} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--color-text-muted)" }} />
@@ -172,7 +224,7 @@ function SchedulePanel({ panelHeight }) {
             <input
               type="search"
               aria-label="Filter schedules"
-              placeholder="Title, location, status or time"
+              placeholder="<Title, location, status or time>"
               value={query}
               onChange={event => setQuery(event.target.value)}
               className="min-w-0 flex-1 rounded-none border p-2 text-xs"
@@ -188,7 +240,7 @@ function SchedulePanel({ panelHeight }) {
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.45)" }}
-            onClick={() => setShowAddForm(false)}
+            onClick={resetScheduleForm}
           >
             <div
               className="w-full max-w-sm overflow-hidden rounded-lg shadow-2xl"
@@ -196,21 +248,42 @@ function SchedulePanel({ panelHeight }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3" style={{ background: "#0c324a" }}>
-                <span className="text-base font-bold text-white">Add Schedule</span>
-                <button type="button" onClick={() => setShowAddForm(false)} className="p-1 transition-all hover:bg-white/20" title="Close">
+                <span className="text-base font-bold text-white">{editingScheduleId ? "Edit Schedule" : "Add Schedule"}</span>
+                <button type="button" onClick={resetScheduleForm} className="p-1 transition-all hover:bg-white/20" title="Close">
                   <X size={20} className="text-white" />
                 </button>
               </div>
 
               <div className="p-4 space-y-3">
-                <input
-                  type="text"
-                  placeholder="Schedule Title"
+                <select
                   value={newSchedule.title}
                   onChange={(e) => setNewSchedule({ ...newSchedule, title: e.target.value })}
                   className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
-                />
+                >
+                  <option value="" disabled>Select Schedule Title</option>
+                  {scheduleTitles.map(title => <option key={title} value={title}>{title}</option>)}
+                </select>
+                {newSchedule.title === "Other" && (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="<Schedule Title>"
+                      value={newSchedule.otherTitle}
+                      onChange={(e) => setNewSchedule({ ...newSchedule, otherTitle: e.target.value })}
+                      className="min-w-0 flex-1 rounded-none border px-3 py-2 text-base outline-none"
+                      style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={addOtherScheduleTitle}
+                      className="rounded-none px-3 py-2 text-sm font-semibold"
+                      style={{ background: "#0c324a", color: "white" }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
                 <div className="flex gap-3">
                   <input
                     type="time"
@@ -233,6 +306,7 @@ function SchedulePanel({ panelHeight }) {
                   className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 >
+                  <option value="" disabled>Select Schedule Label</option>
                   {SCHEDULE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
                 </select>
                 <select
@@ -241,11 +315,12 @@ function SchedulePanel({ panelHeight }) {
                   className="w-full rounded-none border px-3 py-2 text-base outline-none"
                   style={{ borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-base)" }}
                 >
+                  <option value="" disabled>Select Schedule Status</option>
                   {SCHEDULE_STATUSES.map(status => <option key={status} value={status}>{status}</option>)}
                 </select>
                 <input
                   type="text"
-                  placeholder="Location (optional)"
+                  placeholder="<Location (optional)>"
                   value={newSchedule.location}
                   onChange={(e) => setNewSchedule({ ...newSchedule, location: e.target.value })}
                   className="w-full rounded-none border px-3 py-2 text-base outline-none"
@@ -256,15 +331,15 @@ function SchedulePanel({ panelHeight }) {
               <div className="flex gap-3 px-4 pb-4">
                 <button
                   type="button"
-                  onClick={handleAddSchedule}
+                  onClick={handleSaveSchedule}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-none px-3 py-2 text-base font-semibold"
                   style={{ background: "var(--color-success)", color: "white" }}
                 >
-                  Add
+                  {editingScheduleId ? "Update" : "Add"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={resetScheduleForm}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-none px-3 py-2 text-base font-semibold"
                   style={{ background: "var(--color-danger)", color: "white" }}
                 >
@@ -288,13 +363,13 @@ function SchedulePanel({ panelHeight }) {
               <div key={item.id} className="border p-2 transition-all hover:shadow-sm"
                 style={{ borderColor: "var(--color-border)" }}>
                 <div className="flex items-start gap-2">
-                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-bold"
+                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium"
                     style={{ background: statusStyle.background, color: statusStyle.color }}>
                     {item.status}
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{item.title}</div>
+                    <div className="truncate text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{item.title}</div>
                     {item.location && item.location !== "-" && (
                       <div className="mt-1 truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{item.location}</div>
                     )}
@@ -302,10 +377,22 @@ function SchedulePanel({ panelHeight }) {
 
                   <div className="shrink-0 text-right">
                     <div className="flex items-start justify-end gap-1">
-                      <div className="inline-block px-1.5 py-0.5 text-[10px] font-bold"
+                      <div className="inline-block px-1.5 py-0.5 text-[10px] font-medium"
                         style={{ background: typeStyle.background, color: typeStyle.color }}>
                         {item.type}
                       </div>
+                      {!showArchive && (
+                        <button
+                          type="button"
+                          aria-label="Edit schedule"
+                          onClick={() => openEditSchedule(item)}
+                          className="flex h-6 w-6 items-center justify-center rounded-none border"
+                          style={{ borderColor: "var(--color-border)", color: "#0c324a" }}
+                          title="Edit schedule"
+                        >
+                          <Pencil size={13} />
+                        </button>
+                      )}
                       {showArchive ? (
                         <button
                           type="button"
@@ -332,7 +419,7 @@ function SchedulePanel({ panelHeight }) {
                       <button
                         type="button"
                         aria-label="Delete schedule"
-                        onClick={() => deleteSchedule(item.id)}
+                        onClick={() => setDeleteCandidate(item)}
                         className="flex h-6 w-6 items-center justify-center rounded-none border"
                         style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }}
                         title="Delete schedule"
@@ -340,7 +427,7 @@ function SchedulePanel({ panelHeight }) {
                         <Trash2 size={13} />
                       </button>
                     </div>
-                    <div className="mt-1 whitespace-nowrap text-[11px] font-bold tabular-nums" style={{ color: "var(--color-text-base)" }}>
+                    <div className="mt-1 whitespace-nowrap text-[11px] font-medium tabular-nums" style={{ color: "var(--color-text-base)" }}>
                       {scheduleTime(item)}
                     </div>
                   </div>
@@ -350,6 +437,14 @@ function SchedulePanel({ panelHeight }) {
           })
         )}
       </div>
+      <DeleteConfirmationModal
+        open={Boolean(deleteCandidate)}
+        title="Delete Schedule"
+        message="Are you sure you want to delete this schedule?"
+        itemName={deleteCandidate?.title}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={() => deleteSchedule(deleteCandidate?.id)}
+      />
     </div>
   );
 }
