@@ -25,19 +25,20 @@ const blankSchedule = {
   location: "",
 };
 
+// Text color only, no backgrounds.
 const STATUS_STYLES = {
-  Important: { background: "#fcd34d", color: "#78350f" },
-  Planned: { background: "#bfdbfe", color: "#1e3a8a" },
-  Completed: { background: "#86efac", color: "#14532d" },
+  Important: { color: "#b45309" },
+  Planned: { color: "#1d4ed8" },
+  Completed: { color: "#15803d" },
 };
 
 const TYPE_STYLES = {
-  Visits: { background: "#dcfce7", color: "#166534" },
-  Rounds: { background: "#dbeafe", color: "#1e3a8a" },
-  Break: { background: "#fef3c7", color: "#92400e" },
-  Meeting: { background: "#e0e7ff", color: "#3730a3" },
-  Virtual: { background: "#cffafe", color: "#155e75" },
-  Training: { background: "#ede9fe", color: "#5b21b6" },
+  Visits: { color: "#166534" },
+  Rounds: { color: "#1e3a8a" },
+  Break: { color: "#92400e" },
+  Meeting: { color: "#3730a3" },
+  Virtual: { color: "#155e75" },
+  Training: { color: "#5b21b6" },
 };
 
 const MOCK_SCHEDULES = [
@@ -363,8 +364,9 @@ function SchedulePanel({ panelHeight }) {
               <div key={item.id} className="border p-2 transition-all hover:shadow-sm"
                 style={{ borderColor: "var(--color-border)" }}>
                 <div className="flex items-start gap-2">
-                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium"
-                    style={{ background: statusStyle.background, color: statusStyle.color }}>
+                  {/* Status: text color only */}
+                  <span className="shrink-0 text-[10px] font-bold"
+                    style={{ color: statusStyle.color }}>
                     {item.status}
                   </span>
 
@@ -377,8 +379,9 @@ function SchedulePanel({ panelHeight }) {
 
                   <div className="shrink-0 text-right">
                     <div className="flex items-start justify-end gap-1">
-                      <div className="inline-block px-1.5 py-0.5 text-[10px] font-medium"
-                        style={{ background: typeStyle.background, color: typeStyle.color }}>
+                      {/* Type: text color only */}
+                      <div className="inline-block text-[10px] font-bold leading-6"
+                        style={{ color: typeStyle.color }}>
                         {item.type}
                       </div>
                       {!showArchive && (

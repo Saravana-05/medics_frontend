@@ -94,11 +94,11 @@ function ReportsPanel({ panelHeight, patients = [], onSelectPatient }) {
   };
 
   const getTypeBadgeStyle = (type) => {
-    if (type === "Lab") {
-      return { bg: "#93c5fd", color: "#1e3a8a" };
-    }
-    return { bg: "#d8b4fe", color: "#581c87" };
-  };
+  if (type === "Lab") {
+    return { bg: "transparent", color: "#1e3a8a" };
+  }
+  return { bg: "transparent", color: "#581c87" };
+};
 
   return (
     <div className="flex flex-col overflow-hidden rounded-lg shadow-xl"
@@ -191,8 +191,8 @@ function ReportsPanel({ panelHeight, patients = [], onSelectPatient }) {
             const patient = patientFor(item.patientId);
             const waitTime = formatWait(parseReported(item), now);
             const statusBadge = item.status === "Pending"
-              ? { label: item.status, background: "#fcd34d", color: "#78350f", position: "left" }
-              : { label: item.status, background: "#86efac", color: "#14532d", position: "left" };
+  ? { label: item.status, background: "transparent", color: "#b45309", position: "left" }
+  : { label: item.status, background: "transparent", color: "#15803d", position: "left" };
             const typeBadge = { label: item.type, background: badgeStyle.bg, color: badgeStyle.color, position: "right" };
             return (
               <button key={i} type="button" onClick={() => onSelectPatient?.(patient)} className="w-full p-2 border text-left hover:bg-blue-50" style={{ borderColor: "var(--color-border)" }}>

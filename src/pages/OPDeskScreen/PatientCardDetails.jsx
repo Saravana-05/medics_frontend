@@ -125,7 +125,7 @@ export default function PatientCardDetails({ patient, types = [], status, hideAp
     </>}
 
     <div aria-label="Vitals" className={`${compact ? "whitespace-nowrap text-[9px] leading-3" : "truncate text-[10px]"}`}>
-      {vitals.length ? vitals.join(" | ") : "Vitals: Not recorded"}
+      {vitals.length ? vitals.join(" |") : "Vitals: Not recorded"}
     </div>
     <Divider compact={compact} />
 
