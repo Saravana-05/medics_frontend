@@ -121,12 +121,10 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.45)" }}
-            onClick={handleCancel}
           >
             <div
               className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
               style={{ background: "var(--color-surface)" }}
-              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3" style={{ background: newItem.type === "Allergy" ? "#dc2626" : "#3f8f87" }}>
@@ -213,12 +211,10 @@ function ChronicAllergyPanel({ patient, panelHeight, onUpdate }) {
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.45)" }}
-            onClick={cancelGynacEdit}
           >
             <div
               className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
               style={{ background: "var(--color-surface)" }}
-              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3" style={{ background: "#7c3aed" }}>

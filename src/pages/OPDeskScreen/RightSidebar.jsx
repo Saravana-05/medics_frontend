@@ -56,8 +56,6 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
   );
 
   const sidebarRef = useRef(null);
-  const popupRef   = useRef(null);
-
   const isTabletView = viewportWidth < 1024;
   const effectivePanelWidth = Math.min(PANEL_WIDTH, viewportWidth - SIDEBAR_WIDTH - GAP * 2);
 
@@ -74,25 +72,6 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
   useEffect(() => {
     onHoverChange && onHoverChange(hoveredKey);
   }, [hoveredKey, onHoverChange]);
-
-  // Click outside to close (panels are click-to-open now)
-  useEffect(() => {
-    if (!activePanel) return;
-    const handleOutside = (e) => {
-      if (
-        popupRef.current && !popupRef.current.contains(e.target) &&
-        sidebarRef.current && !sidebarRef.current.contains(e.target)
-      ) {
-        onPanelChange(null);
-      }
-    };
-    document.addEventListener("mousedown", handleOutside);
-    document.addEventListener("touchstart", handleOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      document.removeEventListener("touchstart", handleOutside);
-    };
-  }, [activePanel, onPanelChange]);
 
   // Click handler: computes panel geometry AND toggles activePanel
   const handleTabActivate = (e, tab) => {
@@ -145,7 +124,7 @@ export default function RightSidebar({ activePanel, onPanelChange, onHoverChange
     }
 
     return (
-      <div ref={popupRef} className="opdesk-drawer-shell" style={wrapperStyle}>
+      <div className="opdesk-drawer-shell" style={wrapperStyle}>
         {content}
         <button
           onClick={() => onPanelChange(null)}

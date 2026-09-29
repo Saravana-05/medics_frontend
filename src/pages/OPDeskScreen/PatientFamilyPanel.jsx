@@ -27,9 +27,9 @@ const GRANDPARENT_SIDES = ["Paternal", "Maternal"];
 
 // Groups that support the group-level modal edit.
 const EDITABLE_GROUPS = ["Grand Parents", "Parents", "Siblings", "Children"];
-// Groups whose modal allows adding/removing individual members.
+// Groups that can receive new members from the separate add modal.
 // (Grand Parents is fixed at 4 slots — Paternal/Maternal x Grand Father/Grand Mother — so no add/remove there.)
-const ADD_REMOVE_GROUPS = ["Siblings", "Children"];
+const ADD_MEMBER_GROUPS = ["Siblings", "Children"];
 
 // Header text color for each group section label (dark blue).
 const GROUP_HEADER_COLORS = {
@@ -46,6 +46,8 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
   const [editingGroup, setEditingGroup] = useState(null);
   // Draft copy of that group's members, pre-filled from the real data, edited inside the modal
   const [groupDraft, setGroupDraft] = useState([]);
+  const [addingGroup, setAddingGroup] = useState(null);
+  const [addDraft, setAddDraft] = useState({ role: "", name: "", age: "", condition: "" });
 
   const headerH = 50;
   const isGrandParents = editingGroup === "Grand Parents";
@@ -79,18 +81,10 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
     );
   };
 
-  const addGroupMember = (role) => {
-    setGroupDraft((current) => [...current, { relation: editingGroup, role, name: "", age: "", condition: "" }]);
-  };
-
-  const removeGroupDraft = (draftIndex) => {
-    setGroupDraft((current) => current.filter((_, index) => index !== draftIndex));
-  };
-
   const saveGroupEdit = () => {
     const updatedItems = [
       ...items.filter((member) => member.relation !== editingGroup),
-      ...groupDraft.filter((member) => member.name.trim()).map((member) => ({ ...member, relation: editingGroup })),
+      ...groupDraft.map((member) => ({ ...member, relation: editingGroup })),
     ];
     setItems(updatedItems);
     if (onUpdate) onUpdate(updatedItems);
@@ -103,7 +97,29 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
     setGroupDraft([]);
   };
 
-  const canAddOrRemove = editingGroup ? ADD_REMOVE_GROUPS.includes(editingGroup) : false;
+  const openAddMember = (group) => {
+    setAddingGroup(group);
+    setAddDraft({ role: GROUP_ROLES[group][0], name: "", age: "", condition: "" });
+  };
+
+  const updateAddDraft = (field, value) => {
+    setAddDraft((current) => ({ ...current, [field]: value }));
+  };
+
+  const saveAddMember = () => {
+    if (!addDraft.name.trim()) return;
+
+    const updatedItems = [...items, { ...addDraft, relation: addingGroup }];
+    setItems(updatedItems);
+    if (onUpdate) onUpdate(updatedItems);
+    setAddingGroup(null);
+    setAddDraft({ role: "", name: "", age: "", condition: "" });
+  };
+
+  const cancelAddMember = () => {
+    setAddingGroup(null);
+    setAddDraft({ role: "", name: "", age: "", condition: "" });
+  };
 
   return (
     <div
@@ -133,12 +149,10 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.45)" }}
-            onClick={cancelGroupEdit}
           >
             <div
               className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
               style={{ background: "var(--color-surface)" }}
-              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
               <div className="flex items-center justify-between px-4 py-3" style={{ background: "#679cbc" }}>
@@ -222,11 +236,6 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                             ))}
                           </select>
                         </label>
-                        {canAddOrRemove && (
-                          <button type="button" onClick={() => removeGroupDraft(draftIndex)} className="mb-1.5 p-1" title="Remove">
-                            <X size={15} style={{ color: "var(--color-danger)" }} />
-                          </button>
-                        )}
                       </div>
                       <div className="grid grid-cols-[1fr_76px] gap-2">
                         <label className="space-y-1">
@@ -269,16 +278,6 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                   <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>No members added</div>
                 )}
 
-                {canAddOrRemove && (
-                  <button
-                    type="button"
-                    onClick={() => addGroupMember(GROUP_ROLES[editingGroup][0])}
-                    className="flex h-8 w-full items-center justify-center gap-1 border text-xs font-semibold"
-                    style={{ borderColor: "#679cbc", color: "#3f6f8f" }}
-                  >
-                    <Plus size={13} /><span>Add {editingGroup === "Children" ? "child" : "member"}</span>
-                  </button>
-                )}
               </div>
 
               {/* Modal footer */}
@@ -292,6 +291,91 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                 </button>
                 <button
                   onClick={cancelGroupEdit}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-danger)", color: "white" }}
+                >
+                  <X size={16} /> Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {addingGroup && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.45)" }}
+          >
+            <div
+              className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              style={{ background: "var(--color-surface)" }}
+            >
+              <div className="flex items-center justify-between px-4 py-3" style={{ background: "#679cbc" }}>
+                <span className="text-base font-bold text-white">Add {addingGroup === "Children" ? "Child" : "Member"}</span>
+                <button onClick={cancelAddMember} className="p-1 rounded transition-all hover:bg-white/20" title="Close">
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-3">
+                <label className="block space-y-1">
+                  <span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Relation</span>
+                  <select
+                    value={addDraft.role}
+                    onChange={(e) => updateAddDraft("role", e.target.value)}
+                    className="h-8 w-full border px-2 text-sm outline-none"
+                    style={{ borderColor: "var(--color-border)" }}
+                  >
+                    {GROUP_ROLES[addingGroup].map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </label>
+                <div className="grid grid-cols-[1fr_76px] gap-2">
+                  <label className="space-y-1">
+                    <span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Name</span>
+                    <input
+                      type="text"
+                      value={addDraft.name}
+                      onChange={(e) => updateAddDraft("name", e.target.value)}
+                      className="h-8 w-full border px-2 text-sm outline-none"
+                      style={{ borderColor: "var(--color-border)" }}
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Age</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={addDraft.age}
+                      onChange={(e) => updateAddDraft("age", e.target.value)}
+                      className="h-8 w-full border px-2 text-sm outline-none"
+                      style={{ borderColor: "var(--color-border)" }}
+                    />
+                  </label>
+                </div>
+                <label className="block space-y-1">
+                  <span className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>Disease</span>
+                  <input
+                    type="text"
+                    value={addDraft.condition}
+                    onChange={(e) => updateAddDraft("condition", e.target.value)}
+                    className="h-8 w-full border px-2 text-sm outline-none"
+                    style={{ borderColor: "var(--color-border)" }}
+                  />
+                </label>
+              </div>
+
+              <div className="flex gap-3 px-4 pb-4">
+                <button
+                  onClick={saveAddMember}
+                  className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
+                  style={{ background: "var(--color-success)", color: "white" }}
+                >
+                  <Check size={16} /> Add
+                </button>
+                <button
+                  onClick={cancelAddMember}
                   className="flex-1 px-3 py-2 rounded-lg text-base font-semibold flex items-center justify-center gap-1.5"
                   style={{ background: "var(--color-danger)", color: "white" }}
                 >
@@ -319,14 +403,26 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                   <div className="mb-1 flex items-center justify-between">
                     <h3 className="text-[14px] font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
                     {isEditable && (
-                      <button
-                        onClick={() => openGroupEdit(group)}
-                        className="flex h-7 w-7 items-center justify-center rounded border"
-                        style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
-                        title={`Edit ${group}`}
-                      >
-                        <Pencil size={15} />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        {ADD_MEMBER_GROUPS.includes(group) && (
+                          <button
+                            onClick={() => openAddMember(group)}
+                            className="flex h-7 w-7 items-center justify-center rounded border"
+                            style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
+                            title={`Add ${group === "Children" ? "child" : "member"}`}
+                          >
+                            <Plus size={16} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => openGroupEdit(group)}
+                          className="flex h-7 w-7 items-center justify-center rounded border"
+                          style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
+                          title={`Edit ${group}`}
+                        >
+                          <Pencil size={15} />
+                        </button>
+                      </div>
                     )}
                   </div>
                   <div className="grid grid-cols-1 gap-0">
@@ -366,14 +462,26 @@ function PatientFamilyPanel({ panelHeight, onUpdate }) {
                 <div className="mb-1 flex items-center justify-between">
                   <h3 className="text-[14px] font-bold" style={{ color: GROUP_HEADER_COLORS[group] }}>{group}</h3>
                   {isEditable && (
-                    <button
-                      onClick={() => openGroupEdit(group)}
-                      className="flex h-7 w-7 items-center justify-center rounded border"
-                      style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
-                      title={`Edit ${group}`}
-                    >
-                      <Pencil size={15} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {ADD_MEMBER_GROUPS.includes(group) && (
+                        <button
+                          onClick={() => openAddMember(group)}
+                          className="flex h-7 w-7 items-center justify-center rounded border"
+                          style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
+                          title={`Add ${group === "Children" ? "child" : "member"}`}
+                        >
+                          <Plus size={16} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => openGroupEdit(group)}
+                        className="flex h-7 w-7 items-center justify-center rounded border"
+                        style={{ borderColor: "var(--color-border)", color: "#3f6f8f" }}
+                        title={`Edit ${group}`}
+                      >
+                        <Pencil size={15} />
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="grid grid-cols-1 gap-0">

@@ -88,34 +88,48 @@ export default function PatientCardDetails({ patient, types = [], status, hideAp
   const resolvedWaitTime = waitTime !== undefined
     ? waitTime
     : patient.waitTime || waitSince(patient.reportedTime || patient.attendedTime || patient.slot || patient.sched);
+  const showNameRowWaitTime = waitTime !== undefined && present(resolvedWaitTime);
   const identity = [
     patient.patientId || (!patient.id?.startsWith("emergency-") ? patient.id : null),
     [patient.token || patient.appt, hideAppointment ? null : (patient.slot || patient.sched)].filter(present).join(" · "),
     ...[
       patient.room || patient.ipInfo?.room,
       patient.attendedTime,
-      resolvedWaitTime,
+      showNameRowWaitTime ? null : resolvedWaitTime,
     ].filter(value => present(value) && value !== "-"),
   ].filter(present);
   const observation = patient.firstObservation || patient.complaint || patient.chiefComplaint || "Observation: Not recorded";
 
   return <div className="mt-1 text-xs break-words" style={{ color: "var(--color-text-muted)" }}>
-    <div className="flex items-center gap-2">
-      {leftBadges.map((badge, index) => (
-        <span key={index} className="shrink-0 inline-block px-1.5 py-0.5 text-[10px] font-bold" style={{ background: badge.background, color: badge.color }}>
-          {badge.label}
-        </span>
-      ))}
-      <span className="min-w-0 flex-1 truncate text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{patient.name}</span>
-      {rightBadges.length > 0 && (
-        <span className="shrink-0 flex items-center gap-1">
-          {rightBadges.map((badge, index) => (
-            <span key={index} className="inline-block px-1.5 py-0.5 text-[10px] font-bold" style={{ background: badge.background, color: badge.color }}>
-              {badge.label}
+    <div className="space-y-0.5">
+      {badges.length > 0 && (
+        <div className="flex items-start justify-between gap-2">
+          <span className="flex min-w-0 flex-wrap items-center gap-1">
+            {leftBadges.map((badge, index) => (
+              <span key={index} className="shrink-0 inline-block px-1.5 py-0.5 text-[10px] font-bold" style={{ background: badge.background, color: badge.color }}>
+                {badge.label}
+              </span>
+            ))}
+          </span>
+          {rightBadges.length > 0 && (
+            <span className="shrink-0 flex max-w-[62%] flex-wrap items-center justify-end gap-1">
+              {rightBadges.map((badge, index) => (
+                <span key={index} className="inline-block px-1.5 py-0.5 text-[10px] font-bold" style={{ background: badge.background, color: badge.color }}>
+                  {badge.label}
+                </span>
+              ))}
             </span>
-          ))}
-        </span>
+          )}
+        </div>
       )}
+      <div className="flex items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold" style={{ color: "var(--color-text-base)" }}>{patient.name}</span>
+        {showNameRowWaitTime && (
+          <span className="shrink-0 text-right text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-base)" }}>
+            {resolvedWaitTime}
+          </span>
+        )}
+      </div>
     </div>
     <Divider compact={compact} />
 

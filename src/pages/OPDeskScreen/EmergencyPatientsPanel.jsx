@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import PatientCardFilter from "./PatientCardFilter";
 import { matchesPatientFilter } from "./patientFilterUtils";
 import { EMERGENCY_CASES, queueEntry } from "./patientQueueData";
+import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 
 // Backgrounds are transparent in this panel; only the text color is kept.
 const STATUS_BADGES = {
@@ -30,9 +31,17 @@ function emergencyBadges(patient) {
 
 function EmergencyPatientsPanel({ panelHeight, patients = [], removedIds = [], onSelectPatient, onRemove }) {
   const [query, setQuery] = useState("");
+  const [deleteCandidate, setDeleteCandidate] = useState(null);
   const headerH = 50;
   const cases = [...patients.filter(patient => queueEntry(patient).posted.includes("Emergency")), ...EMERGENCY_CASES]
     .filter(patient => !removedIds.includes(patient.id) && matchesPatientFilter(patient, query, ["Pending", "Ready", "Urgent", ...queueEntry(patient).types]));
+
+  const confirmDelete = () => {
+    if (!deleteCandidate) return;
+    onRemove?.(deleteCandidate.id);
+    setDeleteCandidate(null);
+  };
+
   return (
     <div className="flex flex-col overflow-hidden rounded-lg shadow-xl"
       style={{ background: "var(--color-surface)", width: "100%", height: panelHeight }}>
@@ -49,7 +58,7 @@ function EmergencyPatientsPanel({ panelHeight, patients = [], removedIds = [], o
             </button>
             <button
   type="button"
-  onClick={(event) => { event.stopPropagation(); onRemove?.(c.id); }}
+  onClick={(event) => { event.stopPropagation(); setDeleteCandidate(c); }}
   aria-label={`Remove ${c.name} from Emergency`}
   title="Remove"
   className="absolute bottom-1 right-3 flex h-6 w-6 items-center justify-center bg-transparent border-0 p-0"
@@ -61,6 +70,14 @@ function EmergencyPatientsPanel({ panelHeight, patients = [], removedIds = [], o
         ))}
         {!cases.length && <p className="py-6 text-center text-sm">{query ? "No patients match this filter" : "No emergency patients"}</p>}
       </div>
+      <DeleteConfirmationModal
+        open={Boolean(deleteCandidate)}
+        title="Delete Emergency Case"
+        message="Are you sure you want to delete this emergency case?"
+        itemName={deleteCandidate?.name}
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

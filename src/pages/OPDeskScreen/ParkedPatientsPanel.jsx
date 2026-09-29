@@ -4,7 +4,7 @@ import PatientCardFilter from "./PatientCardFilter";
 import { matchesPatientFilter } from "./patientFilterUtils";
 import { queueEntry } from "./patientQueueData";
 
-const EMPTY_REASON_BADGE = { label: "***", background: "#9ca3af", color: "#111827", position: "right" };
+const EMPTY_REASON_BADGE = { label: "***", background: "transparent", color: "#111827", position: "right" };
 const explicitParkReason = patient => patient?.parkReason || patient?.parkedReason || patient?.parkingReason || patient?.reason || "";
 const parkedStatusFor = patient => {
   if (explicitParkReason(patient)) return [];

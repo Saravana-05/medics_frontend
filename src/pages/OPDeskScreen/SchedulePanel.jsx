@@ -241,12 +241,10 @@ function SchedulePanel({ panelHeight }) {
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.45)" }}
-            onClick={resetScheduleForm}
           >
             <div
               className="w-full max-w-sm overflow-hidden rounded-lg shadow-2xl"
               style={{ background: "var(--color-surface)" }}
-              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3" style={{ background: "#0c324a" }}>
                 <span className="text-base font-bold text-white">{editingScheduleId ? "Edit Schedule" : "Add Schedule"}</span>
@@ -363,76 +361,77 @@ function SchedulePanel({ panelHeight }) {
             return (
               <div key={item.id} className="border p-2 transition-all hover:shadow-sm"
                 style={{ borderColor: "var(--color-border)" }}>
-                <div className="flex items-start gap-2">
-                  {/* Status: text color only */}
-                  <span className="shrink-0 text-[10px] font-bold"
-                    style={{ color: statusStyle.color }}>
-                    {item.status}
-                  </span>
+                <div className="space-y-0.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="inline-block text-[10px] font-bold" style={{ color: statusStyle.color }}>
+                      {item.status}
+                    </span>
+                    <span className="inline-block max-w-[62%] truncate text-right text-[10px] font-bold" style={{ color: typeStyle.color }}>
+                      {item.type}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium" style={{ color: "var(--color-text-base)" }}>
+                      {item.title}
+                    </span>
+                    <span className="shrink-0 whitespace-nowrap text-right text-[11px] font-semibold tabular-nums" style={{ color: "var(--color-text-base)" }}>
+                      {scheduleTime(item)}
+                    </span>
+                  </div>
+                </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium" style={{ color: "var(--color-text-base)" }}>{item.title}</div>
+                <div className="mt-1 flex items-end justify-between gap-2">
+                  <div className="min-w-0">
                     {item.location && item.location !== "-" && (
-                      <div className="mt-1 truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{item.location}</div>
+                      <div className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{item.location}</div>
                     )}
                   </div>
-
-                  <div className="shrink-0 text-right">
-                    <div className="flex items-start justify-end gap-1">
-                      {/* Type: text color only */}
-                      <div className="inline-block text-[10px] font-bold leading-6"
-                        style={{ color: typeStyle.color }}>
-                        {item.type}
-                      </div>
-                      {!showArchive && (
-                        <button
-                          type="button"
-                          aria-label="Edit schedule"
-                          onClick={() => openEditSchedule(item)}
-                          className="flex h-6 w-6 items-center justify-center rounded-none border"
-                          style={{ borderColor: "var(--color-border)", color: "#0c324a" }}
-                          title="Edit schedule"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                      )}
-                      {showArchive ? (
-                        <button
-                          type="button"
-                          aria-label="Restore schedule"
-                          onClick={() => restoreSchedule(item.id)}
-                          className="flex h-6 w-6 items-center justify-center rounded-none border"
-                          style={{ borderColor: "var(--color-border)", color: "var(--color-success)" }}
-                          title="Restore schedule"
-                        >
-                          <RotateCcw size={13} />
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          aria-label="Archive schedule"
-                          onClick={() => archiveSchedule(item.id)}
-                          className="flex h-6 w-6 items-center justify-center rounded-none border"
-                          style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
-                          title="Archive schedule"
-                        >
-                          <Archive size={13} />
-                        </button>
-                      )}
+                  <div className="flex shrink-0 items-center justify-end gap-1">
+                    {!showArchive && (
                       <button
                         type="button"
-                        aria-label="Delete schedule"
-                        onClick={() => setDeleteCandidate(item)}
+                        aria-label="Edit schedule"
+                        onClick={() => openEditSchedule(item)}
                         className="flex h-6 w-6 items-center justify-center rounded-none border"
-                        style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }}
-                        title="Delete schedule"
+                        style={{ borderColor: "var(--color-border)", color: "#0c324a" }}
+                        title="Edit schedule"
                       >
-                        <Trash2 size={13} />
+                        <Pencil size={13} />
                       </button>
-                    </div>
-                    <div className="mt-1 whitespace-nowrap text-[11px] font-medium tabular-nums" style={{ color: "var(--color-text-base)" }}>
-                      {scheduleTime(item)}
-                    </div>
+                    )}
+                    {showArchive ? (
+                      <button
+                        type="button"
+                        aria-label="Restore schedule"
+                        onClick={() => restoreSchedule(item.id)}
+                        className="flex h-6 w-6 items-center justify-center rounded-none border"
+                        style={{ borderColor: "var(--color-border)", color: "var(--color-success)" }}
+                        title="Restore schedule"
+                      >
+                        <RotateCcw size={13} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        aria-label="Archive schedule"
+                        onClick={() => archiveSchedule(item.id)}
+                        className="flex h-6 w-6 items-center justify-center rounded-none border"
+                        style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+                        title="Archive schedule"
+                      >
+                        <Archive size={13} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      aria-label="Delete schedule"
+                      onClick={() => setDeleteCandidate(item)}
+                      className="flex h-6 w-6 items-center justify-center rounded-none border"
+                      style={{ borderColor: "var(--color-border)", color: "var(--color-danger)" }}
+                      title="Delete schedule"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
                 </div>
               </div>
