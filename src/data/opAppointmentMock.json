@@ -1,0 +1,73 @@
+{
+  "tabs": ["Appointment", "Preliminary Checkup", "Slot Structure", "Fix Date to Doctor"],
+  "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "doctors": ["Dr. Anand", "Dr. Chandrasekar", "Dr.Sharmila"],
+  "doctorTemplates": {
+    "Dr. Anand": { "start": "09:00", "end": "16:30", "duration": 15 },
+    "Dr. Chandrasekar": { "start": "10:00", "end": "18:00", "duration": 10 },
+    "Dr.Sharmila": { "start": "08:30", "end": "14:30", "duration": 12 }
+  },
+  "defaultBooking": {
+    "staff": "Mrs. Stella",
+    "requestedAt": "2026-09-30T12:19",
+    "requestType": "Phone",
+    "requestHow": "By Phone",
+    "messageVia": "Phone",
+    "doctor": "",
+    "date": "2026-09-30",
+    "reportingTime": "08:45",
+    "token": "",
+    "time": "",
+    "status": "draft",
+    "reminders": ["On confirmation", "Appointment date - 07:00 AM", "60 min before reporting", "30 min before reporting"]
+  },
+  "patientMasterRecords": [
+    { "patientId": "PM0001", "patient": "R. Madhumitha", "gender": "Female", "dob": "18/02/1997", "age": "29y 6m 23d", "lifeStage": "Adult-Married", "patientPhone": "9842317601", "patientMsgType": "WApp", "attendant": "K. Praveen Kumar", "relationship": "Husband", "attendantPhone": "9787421104", "attendantMsgType": "Phone", "address1": "24, Vaigai Nagar 2nd Street", "address2": "KK Nagar, Madurai", "address3": "Madurai - 625020", "blood": "B+" },
+    { "patientId": "PM0002", "patient": "S. Arunachalam", "gender": "Male", "dob": "06/11/1962", "age": "63y 10m 4d", "lifeStage": "Senior-Married", "patientPhone": "9443126805", "patientMsgType": "Phone", "attendant": "A. Vasanthi", "relationship": "Wife", "attendantPhone": "9361527702", "attendantMsgType": "WApp", "address1": "11, VOC Nagar", "address2": "Thillai Nagar, Tiruchirappalli", "address3": "Tiruchirappalli - 620018", "blood": "AB+" },
+    { "patientId": "PM0003", "patient": "Baby N. Yazhini", "gender": "Female", "dob": "04/09/2026", "age": "6d", "lifeStage": "New Born", "patientPhone": "9790564208", "patientMsgType": "WApp", "attendant": "N. Nivetha", "relationship": "Mother", "attendantPhone": "9790564208", "attendantMsgType": "WApp", "address1": "7/14, Marutham Street", "address2": "Saibaba Colony, Coimbatore", "address3": "Coimbatore - 641011", "blood": "O-" },
+    { "patientId": "PM0004", "patient": "Master P. Harish", "gender": "Male", "dob": "21/01/2025", "age": "1y 7m 20d", "lifeStage": "Infant", "patientPhone": "9894756110", "patientMsgType": "Phone", "attendant": "P. Senthil Kumar", "relationship": "Father", "attendantPhone": "9894756110", "attendantMsgType": "Phone", "address1": "33, Kamarajar Salai", "address2": "Hasthampatti, Salem", "address3": "Salem - 636007", "blood": "A-" },
+    { "patientId": "PM0005", "patient": "A. Dharshan", "gender": "Male", "dob": "16/05/2022", "age": "4y 3m 25d", "lifeStage": "Toddler", "patientPhone": "9626214835", "patientMsgType": "WApp", "attendant": "A. Revathi", "relationship": "Mother", "attendantPhone": "9626214835", "attendantMsgType": "WApp", "address1": "15, Anna Nagar", "address2": "Palani Road, Dindigul", "address3": "Dindigul - 624001", "blood": "B-" },
+    { "patientId": "PM0006", "patient": "K. Janani", "gender": "Female", "dob": "12/08/2018", "age": "8y 0m 29d", "lifeStage": "Child", "patientPhone": "9788635214", "patientMsgType": "Phone", "attendant": "K. Murugan", "relationship": "Father", "attendantPhone": "9788635214", "attendantMsgType": "Phone", "address1": "48, Periyar Street", "address2": "Surampatti, Erode", "address3": "Erode - 638009", "blood": "AB-" },
+    { "patientId": "PM0007", "patient": "V. Akash", "gender": "Male", "dob": "29/03/2012", "age": "14y 5m 12d", "lifeStage": "Adolescent", "patientPhone": "9487326159", "patientMsgType": "WApp", "attendant": "V. Kalaivani", "relationship": "Mother", "attendantPhone": "9487326159", "attendantMsgType": "WApp", "address1": "9, Bharathi Nagar", "address2": "Palayamkottai, Tirunelveli", "address3": "Tirunelveli - 627002", "blood": "O+" },
+    { "patientId": "PM0008", "patient": "M. Keerthana", "gender": "Female", "dob": "25/12/2003", "age": "22y 8m 16d", "lifeStage": "Adult-Single", "patientPhone": "9003652471", "patientMsgType": "WApp", "attendant": "M. Divya", "relationship": "Sister", "attendantPhone": "9087652413", "attendantMsgType": "Phone", "address1": "62, Arcot Road", "address2": "Sathuvachari, Vellore", "address3": "Vellore - 632009", "blood": "A+" },
+    { "patientId": "PM0009", "patient": "T. Rajendran", "gender": "Male", "dob": "14/07/1974", "age": "52y 1m 27d", "lifeStage": "Adult-Married", "patientPhone": "9840873612", "patientMsgType": "Phone", "attendant": "R. Malathi", "relationship": "Wife", "attendantPhone": "9940361728", "attendantMsgType": "WApp", "address1": "19, Lakshmi Nagar", "address2": "Tambaram East, Chennai", "address3": "Chennai - 600059", "blood": "B+" },
+    { "patientId": "PM0010", "patient": "P. Kokilavani", "gender": "Female", "dob": "30/01/1955", "age": "71y 7m 11d", "lifeStage": "Senior-Widowed", "patientPhone": "9442598136", "patientMsgType": "WApp", "attendant": "P. Saranya", "relationship": "Daughter", "attendantPhone": "9789012635", "attendantMsgType": "WApp", "address1": "5, Medical College Road", "address2": "Thanjavur", "address3": "Thanjavur - 613004", "blood": "AB+" }
+  ],
+  "appointmentSlots": [
+    { "token": 1, "time": "09:00 AM", "status": "treated", "statusLabel": "Treated", "patient": "Arjun Menon", "session": "Session 1" },
+    { "token": 2, "time": "09:15 AM", "status": "treated", "statusLabel": "Treated", "patient": "Priya Nair", "session": "Session 1" },
+    { "token": 3, "time": "09:30 AM", "status": "treated", "statusLabel": "Treated", "patient": "Karthik Raman", "session": "Session 1" },
+    { "token": 4, "time": "09:45 AM", "status": "parked", "statusLabel": "Parked", "patient": "Meera Iyer", "session": "Session 1" },
+    { "token": 5, "time": "10:00 AM", "status": "treated", "statusLabel": "Treated", "patient": "Rahul Shah", "session": "Session 1" },
+    { "token": 6, "time": "10:15 AM", "status": "parked", "statusLabel": "Parked", "patient": "Ananya Rao", "session": "Session 1" },
+    { "token": 7, "time": "10:30 AM", "status": "ready", "statusLabel": "Ready", "patient": "Vikram Kumar", "session": "Session 1" },
+    { "token": 8, "time": "10:45 AM", "status": "ready", "statusLabel": "Ready", "patient": "Lakshmi Menon", "session": "Session 1" },
+    { "token": 9, "time": "11:00 AM", "status": "ready", "statusLabel": "Ready", "patient": "Suresh Babu", "session": "Session 1" },
+    { "token": 10, "time": "11:15 AM", "status": "ready", "statusLabel": "Ready", "patient": "Divya Krishnan", "session": "Session 1" },
+    { "token": 11, "time": "11:30 AM", "status": "reported", "statusLabel": "Reported", "patient": "Aditya Verma", "session": "Session 1" },
+    { "token": 12, "time": "11:45 AM", "status": "buffer", "statusLabel": "Buffer", "patient": "", "session": "Session 1" },
+    { "token": 13, "time": "12:00 PM", "status": "reported", "statusLabel": "Reported", "patient": "Rohit Nair", "session": "Session 1" },
+    { "token": 14, "time": "12:15 PM", "status": "booked", "statusLabel": "Booked", "patient": "Kavya Reddy", "session": "Session 1" },
+    { "token": 15, "time": "12:30 PM", "status": "booked", "statusLabel": "Booked", "patient": "Manoj Kumar", "session": "Session 1" },
+    { "token": 16, "time": "12:45 PM", "status": "booked", "statusLabel": "Booked", "patient": "Sneha Iyer", "session": "Session 1" },
+    { "token": 17, "time": "01:00 PM", "status": "block", "statusLabel": "Block", "patient": "", "session": "" },
+    { "token": 18, "time": "01:15 PM", "status": "block", "statusLabel": "Block", "patient": "", "session": "" },
+    { "token": 19, "time": "01:30 PM", "status": "block", "statusLabel": "Block", "patient": "", "session": "" },
+    { "token": 20, "time": "01:45 PM", "status": "block", "statusLabel": "Block", "patient": "", "session": "" },
+    { "token": 21, "time": "02:00 PM", "status": "booked", "statusLabel": "Booked", "patient": "Rakesh Krishnan", "session": "Session 2" },
+    { "token": 22, "time": "02:15 PM", "status": "booked", "statusLabel": "Booked", "patient": "Neha Verma", "session": "Session 2" },
+    { "token": 23, "time": "02:30 PM", "status": "booked", "statusLabel": "Booked", "patient": "Sanjay Patel", "session": "Session 2" },
+    { "token": 24, "time": "02:45 PM", "status": "buffer", "statusLabel": "Buffer", "patient": "", "session": "Session 2" },
+    { "token": 25, "time": "03:00 PM", "status": "free", "statusLabel": "Free", "patient": "", "session": "Session 2" },
+    { "token": 26, "time": "03:15 PM", "status": "free", "statusLabel": "Free", "patient": "", "session": "Session 2" },
+    { "token": 27, "time": "03:30 PM", "status": "free", "statusLabel": "Free", "patient": "", "session": "Session 2" },
+    { "token": 28, "time": "03:45 PM", "status": "buffer", "statusLabel": "Buffer", "patient": "", "session": "Session 2" },
+    { "token": 29, "time": "04:00 PM", "status": "free", "statusLabel": "Free", "patient": "", "session": "Session 2" },
+    { "token": 30, "time": "04:15 PM", "status": "free", "statusLabel": "Free", "patient": "", "session": "Session 2" }
+  ],
+  "previousVisits": [
+    ["21-08-2026", "OP", "Dr. Anand", "Viral fever", "Paracetamol", "Review in 3 days", "Closed"],
+    ["14-07-2026", "OP", "Dr.Sharmila", "Throat infection", "Antibiotic", "Completed", "Closed"],
+    ["02-04-2026", "IP", "Dr. Chandrasekar", "Dehydration", "IV fluids", "Discharged", "Closed"]
+  ]
+}
