@@ -180,9 +180,9 @@ function PatientMasterInfo({ patient }) {
 function PatientConfirmationBlock({ patient, slotOptions, selectedToken, onPatientChange, onSlotChange, disabled }) {
   if (!patient) return (
     <>
-      <label>Patient</label>
+      <label>Patients name</label>
       <select className="opa-danger-select opa-patient-select" value="" onChange={onPatientChange} disabled={disabled}>
-        <option value="">Select Patient from Patient Master</option>
+        <option value="">Select Patient from Patient Masters</option>
         {PATIENTS.map(item => <option key={item.id} value={item.id}>{item.name} ({item.id})</option>)}
       </select>
       <div className="opa-patient-demo-inline"></div>
